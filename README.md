@@ -45,3 +45,7 @@ Login with
 
 **Note: Doing a mvn clean will delete the SQLite DB and wipe out all the data.
 
+Donate
+------
+
+[Donate](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=54K7AB3NRBM76)
