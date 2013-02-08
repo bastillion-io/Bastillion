@@ -28,7 +28,7 @@
         KeyBox - Login
     </h3>
 
-    <div class="content">
+    <div class="content" style="border-left:none;">
 
         <s:actionerror/>
         <s:form action="loginSubmit">

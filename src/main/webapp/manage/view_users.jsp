@@ -78,7 +78,7 @@
             </s:if>
 
 
-            $('.scrollableTable').tableScroll({height:600});
+            $('.scrollableTable').tableScroll({height:500});
             $(".scrollableTable tr:odd").css("background-color", "#e0e0e0");
         });
     </script>
@@ -126,7 +126,7 @@
         </s:else>
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
-            <s:form action="selectUsersForAuthKeys" id="gen_auth_keys">
+            <s:form action="selectUsersForAuthKeys" id="gen_auth_keys" theme="simple">
                 <table class="vborder scrollableTable">
                     <thead>
 
@@ -153,8 +153,6 @@
                     </tr>
                     </thead>
                     <tbody>
-
-
                     <s:iterator var="user" value="sortedSet.itemList" status="stat">
                     <tr>
                         <s:if test="#genAuthKeys=='true'">
@@ -173,20 +171,19 @@
                         <td><s:property value="email"/></td>
                         <s:if test="#genAuthKeys=='true'"></s:if>
                         <s:else>
-
-                            <td>
+                            <td width="150">
                                 <div id="edit_btn_<s:property value="id"/>" class="edit_btn" style="float:left">
                                     Edit
                                 </div>
                                 <div id="del_btn_<s:property value="id"/>" class="del_btn" style="float:left">
                                     Delete
                                 </div>
+                                <div style="clear:both"></div>
                             </td>
                         </s:else>
                     </tr>
-                    </tbody>
-
                     </s:iterator>
+                    </tbody>
                 </table>
             </s:form>
         </s:if>

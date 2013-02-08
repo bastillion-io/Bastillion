@@ -19,29 +19,24 @@ table {
 }
 
 table td, table th {
+    padding: 5px;
     vertical-align: middle;
     overflow: hidden;
 }
 
-table td {
-    padding: 5px 5px 5px 5px;
-}
-
-table th {
-    padding: 15px 20px 15px 20px;
-    background-color: #e0e0e0;
-    border: 1px solid #CCCCCC;
-    white-space:nowrap;
-}
 
 .vborder {
     border: 1px solid #CCCCCC;
 }
+ .tablescroll_head th {
 
-.vborder td, .vborder th {
-    padding: 5px 20px 5px 20px;
-    border-left: 1px solid #CCCCCC;
-    border-right: 1px solid #CCCCCC;
+     background-color: #e0e0e0;
+ }
+
+.vborder td, .vborder th, .tablescroll_head th {
+      padding: 10px 15px 10px 15px;
+     border: 1px solid #CCCCCC;
+    white-space:nowrap;
 }
 
 .errorMessage {
@@ -56,7 +51,6 @@ table th {
 .nav {
     float: left;
     width: 125px;
-    border-right: 10px solid #CCCCCC;
 
 }
 
@@ -74,6 +68,7 @@ table th {
     padding: 0px 15px 15px 15px;
     float: left;
     width: 70%;
+    border-left: 10px solid #CCCCCC;
 }
 
 .page {
@@ -111,7 +106,6 @@ div.block label, div.block .inner_block {
 }
 
 div.block .input {
-    margin-left: 4px;
     float: left;
     margin: 8px 8px 8px 8px;
 }

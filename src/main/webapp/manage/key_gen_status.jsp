@@ -105,7 +105,7 @@
                         <td><s:property value="hostSystem.user"/></td>
                         <td><s:property value="hostSystem.host"/>:<s:property value="hostSystem.port"/></td>
                         <td><s:property value="hostSystem.authorizedKeys"/></td>
-                        <td>
+                        <td width="150">
                             <s:if test="statusCd==\"I\"">
                                 <div class="warning"> Not Started</div>
                             </s:if>

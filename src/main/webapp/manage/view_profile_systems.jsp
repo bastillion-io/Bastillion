@@ -82,7 +82,7 @@
 
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
-            <s:form action="assignSystemsToProfile">
+            <s:form action="assignSystemsToProfile" theme="simple">
                 <s:hidden name="profile.id"/>
 
                 <table class="vborder scrollableTable">
@@ -91,7 +91,7 @@
 
                     <tr>
                         <th><s:checkbox name="systemSelectAll" cssClass="systemSelect" fieldValue="true" theme="simple"/></th>
-                       <th id="<s:property value="@com.keybox.manage.db.SystemDB@SORT_BY_NAME"/>" class="sort">Display Name</th>
+                        <th id="<s:property value="@com.keybox.manage.db.SystemDB@SORT_BY_NAME"/>" class="sort">Display Name</th>
                         <th id="<s:property value="@com.keybox.manage.db.SystemDB@SORT_BY_USER"/>" class="sort">User</th>
                         <th id="<s:property value="@com.keybox.manage.db.SystemDB@SORT_BY_HOST"/>" class="sort">Host</th>
                     </tr>

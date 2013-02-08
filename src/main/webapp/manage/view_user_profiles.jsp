@@ -84,7 +84,8 @@
                         </td>
 
                         <td>
-                            <div id="del_btn_<s:property value="id"/>" class="del_btn" style="float:left">Delete</div>
+                            <div id="del_btn_<s:property value="id"/>" class="del_btn">Delete</div>
+
                         </td>
 
 

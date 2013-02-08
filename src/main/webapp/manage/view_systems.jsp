@@ -75,11 +75,9 @@
             </s:if>
 
 
-            $('.scrollableTable').tableScroll({height:600});
-            $(".scrollableTable tr:odd").css("background-color", "#e0e0e0");
-
-
-        });
+                $('.scrollableTable').tableScroll({height:500});
+                $(".scrollableTable tr:odd").css("background-color", "#e0e0e0");
+    });
     </script>
     <s:if test="fieldErrors.size > 0">
         <script type="text/javascript">
@@ -121,12 +119,9 @@
         </s:else>
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
-            <s:form action="selectSystemsForAuthKeys" id="gen_auth_keys">
 
                 <table class="vborder scrollableTable">
                     <thead>
-
-
                     <tr>
                         <s:if test="#genAuthKeys=='true'">
                             <th><s:checkbox name="systemSelectAll" cssClass="systemSelect" fieldValue="true"
@@ -146,9 +141,7 @@
                         </s:else>
                     </tr>
                     </thead>
-                    <tbody style="height:500px;">
-
-
+                    <tbody>
                     <s:iterator var="system" value="sortedSet.itemList" status="stat">
                         <tr>
                             <s:if test="#genAuthKeys=='true'">
@@ -159,29 +152,22 @@
                             </s:if>
                             <td>
                                 <s:property value="displayNm"/>
-
                             </td>
                             <td><s:property value="user"/></td>
                             <td><s:property value="host"/>:<s:property value="port"/></td>
                             <s:if test="#genAuthKeys=='true'"></s:if>
                             <s:else>
-
-                                <td>
-
-                                    <div id="edit_btn_<s:property value="id"/>" class="edit_btn" style="float:left">Edit
-                                    </div>
-                                    <div id="del_btn_<s:property value="id"/>" class="del_btn" style="float:left">Delete
-                                    </div>
-
+                                <td width="150">
+                                    <div id="edit_btn_<s:property value="id"/>" class="edit_btn" style="float:left" >Edit </div>
+                                    <div id="del_btn_<s:property value="id"/>" class="del_btn" style="float:left">Delete</div>
+                                    <div style="clear:both"></div>
                                 </td>
                             </s:else>
                         </tr>
 
                     </s:iterator>
-
                     </tbody>
                 </table>
-            </s:form>
 
 
         </s:if>

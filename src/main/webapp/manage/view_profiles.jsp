@@ -33,7 +33,7 @@
             //call delete action
             $(".del_btn").button().click(function() {
                 var id = $(this).attr('id').replace("del_btn_", "");
-                window.location = 'deleteProfile.action?profile.id=' + id +'&sortedSet.orderByDirection=<s:property value="sortedSet.orderByDirection" />&sortedSet.orderByField=<s:property value="sortedSet.orderByField"/>';
+                window.location = 'deleteProfile.action?profile.id=' + id + '&sortedSet.orderByDirection=<s:property value="sortedSet.orderByDirection" />&sortedSet.orderByField=<s:property value="sortedSet.orderByField"/>';
             });
             //submit add or edit form
             $(".submit_btn").button().click(function() {
@@ -62,7 +62,7 @@
             $('#<s:property value="sortedSet.orderByField"/>').attr('class', '<s:property value="sortedSet.orderByDirection"/>');
             </s:if>
 
-            $('.scrollableTable').tableScroll({height:600});
+            $('.scrollableTable').tableScroll({height:500});
             $(".scrollableTable tr:odd").css("background-color", "#e0e0e0");
         });
     </script>
@@ -88,7 +88,7 @@
 
     <div class="content">
         <s:form action="viewProfiles">
-            <s:hidden name="sortedSet.orderByDirection" />
+            <s:hidden name="sortedSet.orderByDirection"/>
             <s:hidden name="sortedSet.orderByField"/>
         </s:form>
 
@@ -102,36 +102,39 @@
 
 
                 <tr>
-                    <th id="<s:property value="@com.keybox.manage.db.ProfileDB@SORT_BY_PROFILE_NM"/>" class="sort">Profile Name</th>
+                    <th id="<s:property value="@com.keybox.manage.db.ProfileDB@SORT_BY_PROFILE_NM"/>" class="sort">
+                        Profile Name
+                    </th>
                     <th>&nbsp;</th>
                 </tr>
                 </thead>
                 <tbody>
 
 
-
                 <s:iterator var="profile" value="sortedSet.itemList" status="stat">
-                    <tr>
+                <tr>
 
 
-                        <td>
-                            <a href="viewProfileSystems.action?profile.id=<s:property value="id"/>"
-                               title="Manage Systems in Profile">
-                                <s:property value="nm"/>
-                            </a>
-                        </td>
+                    <td>
+                        <a href="viewProfileSystems.action?profile.id=<s:property value="id"/>"
+                           title="Manage Systems in Profile">
+                            <s:property value="nm"/>
+                        </a>
+                    </td>
 
-                        <td>
+                    <td width="150">
+
                             <div id="edit_btn_<s:property value="id"/>" class="edit_btn" style="float:left">Edit
                             </div>
                             <div id="del_btn_<s:property value="id"/>" class="del_btn" style="float:left">Delete
                             </div>
-                        </td>
-                    </tr>
+                            <div style="clear:both"/>
+                    </td>
+                </tr>
 
-                </tbody>
 
                 </s:iterator>
+                </tbody>
             </table>
         </s:if>
 
@@ -141,7 +144,7 @@
             <s:form action="saveProfile" class="save_profile_form_add">
                 <s:textfield name="profile.nm" label="Profile Name" size="15"/>
                 <s:textarea name="profile.desc" label="Profile Description" rows="5" cols="25"/>
-                <s:hidden name="sortedSet.orderByDirection" />
+                <s:hidden name="sortedSet.orderByDirection"/>
                 <s:hidden name="sortedSet.orderByField"/>
             </s:form>
             <div class="submit_btn">Submit</div>
@@ -156,7 +159,7 @@
                     <s:textarea name="profile.desc" value="%{desc}" label="Profile Description" rows="5"
                                 cols="25"/>
                     <s:hidden name="profile.id" value="%{id}"/>
-                    <s:hidden name="sortedSet.orderByDirection" />
+                    <s:hidden name="sortedSet.orderByDirection"/>
                     <s:hidden name="sortedSet.orderByField"/>
                 </s:form>
                 <div class="submit_btn">Submit</div>
