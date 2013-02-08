@@ -31,6 +31,7 @@ table th {
     padding: 15px 20px 15px 20px;
     background-color: #e0e0e0;
     border: 1px solid #CCCCCC;
+    white-space:nowrap;
 }
 
 .vborder {
