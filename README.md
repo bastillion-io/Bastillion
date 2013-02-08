@@ -6,6 +6,7 @@ About
 KeyBox provides a way to manage OpenSSH v2 public keys and distribute the generated authorized_keys files to systems that have been defined.
 
 Steps:
+
 1. Create users with public key
 2. Create systems
 3. Create profiles
