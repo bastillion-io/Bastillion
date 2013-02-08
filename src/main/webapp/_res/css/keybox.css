@@ -1,0 +1,152 @@
+html, body {
+    height: 100%;
+}
+
+body {
+    border: none;
+    margin: 0;
+    padding: 0;
+    font-family: ArialMT, Arial, sans-serif;
+    font-size: small;
+    background-color: #CCCCCC;
+}
+
+table {
+    border-collapse: collapse;
+    font-family: ArialMT, Arial, sans-serif;
+    font-size: small;
+    color: #4d4d4d;
+}
+
+table td, table th {
+    vertical-align: middle;
+    overflow: hidden;
+}
+
+table td {
+    padding: 5px 5px 5px 5px;
+}
+
+table th {
+    padding: 15px 20px 15px 20px;
+    background-color: #e0e0e0;
+    border: 1px solid #CCCCCC;
+}
+
+.vborder {
+    border: 1px solid #CCCCCC;
+}
+
+.vborder td, .vborder th {
+    padding: 5px 20px 5px 20px;
+    border-left: 1px solid #CCCCCC;
+    border-right: 1px solid #CCCCCC;
+}
+
+.errorMessage {
+    font-size: smaller;
+    color: #cc0000;
+}
+
+.errorLabel {
+    color: #cc0000;
+}
+
+.nav {
+    float: left;
+    width: 125px;
+    border-right: 10px solid #CCCCCC;
+
+}
+
+.nav_item {
+    padding: 8px 5px 8px 0px;
+    font-size: 11px;
+}
+
+.nav a {
+    color: #4d4d4d;
+}
+
+.content {
+    margin: 0px 0px 0px 10px;
+    padding: 0px 15px 15px 15px;
+    float: left;
+    width: 70%;
+}
+
+.page {
+    float: left;
+    margin: 10px 10px 10px 10px;
+    padding: 15px 15px 15px 15px;
+    background-color: #ffffff;
+    color: #4d4d4d;
+    width: 100%;
+
+}
+
+.page a {
+    color: #4d4d4d;
+}
+
+label, .label {
+    font-size: small;
+    font-weight: bold;
+    color: #4d4d4d;
+    paddding: 2px 2px 2px 2px;
+}
+
+div.block {
+    overflow: hidden;
+    border: 1px solid #CCCCCC;
+}
+
+div.block label, div.block .inner_block {
+    width: 120px;
+    display: block;
+    float: left;
+    text-align: left;
+    margin: 8px 8px 8px 8px;
+}
+
+div.block .input {
+    margin-left: 4px;
+    float: left;
+    margin: 8px 8px 8px 8px;
+}
+
+.error {
+    font-weight: bold;
+    color: #cc0000;
+}
+
+.warning {
+    font-weight: bold;
+    color: #b8b60e;
+}
+
+.success {
+    font-weight: bold;
+    color: #008000;
+}
+
+.sort {
+    background-position: right center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    background-image: url("../../img/bg.gif")
+}
+
+.asc {
+    background-position: right center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    background-image: url("../../img/asc.gif")
+}
+
+.desc {
+    background-position: right center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    background-image: url("../../img/desc.gif")
+}

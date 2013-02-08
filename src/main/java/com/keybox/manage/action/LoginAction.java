@@ -1,0 +1,178 @@
+package com.keybox.manage.action;
+
+import com.keybox.manage.db.AdminDB;
+import com.keybox.manage.model.Login;
+import com.keybox.manage.util.CookieUtil;
+import com.keybox.manage.util.EncryptionUtil;
+import com.opensymphony.xwork2.ActionSupport;
+import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.Result;
+import org.apache.struts2.interceptor.ServletRequestAware;
+import org.apache.struts2.interceptor.ServletResponseAware;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+/**
+ * Action to login to keybox
+ */
+public class LoginAction extends ActionSupport implements ServletRequestAware, ServletResponseAware {
+
+    HttpServletResponse servletResponse;
+    HttpServletRequest servletRequest;
+    Login login;
+
+    @Action(value = "/login",
+            results = {
+                    @Result(name = "success", location = "/login.jsp")
+            }
+    )
+    public String login() {
+
+        return SUCCESS;
+    }
+
+
+    @Action(value = "/loginSubmit",
+            results = {
+                    @Result(name = "input", location = "/login.jsp"),
+                    @Result(name = "change_password", location = "/manage/setPassword.action", type = "redirect"),
+                    @Result(name = "success", location = "/manage/viewSystems.action", type = "redirect")
+            }
+    )
+    public String loginSubmit() {
+        String retVal = SUCCESS;
+
+        String authToken = AdminDB.loginAdmin(login);
+        if (authToken != null) {
+            CookieUtil.add(servletResponse, "authToken", EncryptionUtil.encrypt(authToken));
+
+            //set timeout cookie
+            SimpleDateFormat sdf = new SimpleDateFormat("MMddyyyyHHmmss");
+            Calendar timeout = Calendar.getInstance();
+            timeout.add(Calendar.MINUTE, 15);
+            CookieUtil.add(servletResponse, "timeout", sdf.format(timeout.getTime()));
+
+        } else {
+            addActionError("Invalid username and password combination");
+            retVal = INPUT;
+        }
+        if (retVal == SUCCESS && "changeme".equals(login.getPassword())) {
+            retVal = "change_password";
+        }
+
+        return retVal;
+    }
+
+    @Action(value = "/logout",
+            results = {
+                    @Result(name = "success", location = "/login.action", type = "redirect")
+            }
+    )
+    public String logout() {
+        CookieUtil.deleteAll(servletRequest, servletResponse);
+        return SUCCESS;
+    }
+
+    @Action(value = "/manage/setPassword",
+            results = {
+                    @Result(name = "success", location = "/manage/set_password.jsp")
+            }
+    )
+    public String setPassword() {
+
+        return SUCCESS;
+    }
+
+    @Action(value = "/passwordSubmit",
+            results = {
+                    @Result(name = "input", location = "/manage/set_password.jsp"),
+                    @Result(name = "success", location = "/manage/viewSystems.action", type = "redirect")
+            }
+    )
+    public String passwordSubmit() {
+        String retVal = SUCCESS;
+
+        if (login.getPassword().equals(login.getPasswordConfirm())) {
+            login.setAuthToken(EncryptionUtil.decrypt(CookieUtil.get(servletRequest, "authToken")));
+
+            if (!AdminDB.updatePassword(login)) {
+                addActionError("Current password is invalid");
+                retVal = INPUT;
+            }
+
+        } else {
+            addActionError("Passwords do not match");
+            retVal = INPUT;
+        }
+
+
+        return retVal;
+    }
+
+
+    /**
+     * Validates fields for login submit
+     */
+    public void validateLoginSubmit() {
+        if (login.getUsername() == null ||
+                login.getUsername().trim().equals("")) {
+            addFieldError("login.username", "Username is required");
+        }
+        if (login.getPassword() == null ||
+                login.getPassword().trim().equals("")) {
+            addFieldError("login.password", "Password is required");
+        }
+
+
+    }
+
+
+    /**
+     * Validates fields for password submit
+     */
+    public void validatePasswordSubmit() {
+        if (login.getPassword() == null ||
+                login.getPassword().trim().equals("")) {
+            addFieldError("login.password", "New password is required");
+        }
+        if (login.getPasswordConfirm() == null ||
+                login.getPasswordConfirm().trim().equals("")) {
+            addFieldError("login.passwordConfirm", "New password confirmation is required");
+        }
+        if (login.getPrevPassword() == null ||
+                login.getPrevPassword().trim().equals("")) {
+            addFieldError("login.prevPassword", "Current password is required");
+        }
+
+
+    }
+
+    public Login getLogin() {
+        return login;
+    }
+
+    public void setLogin(Login login) {
+        this.login = login;
+    }
+
+
+    public HttpServletResponse getServletResponse() {
+        return servletResponse;
+    }
+
+    public void setServletResponse(HttpServletResponse servletResponse) {
+        this.servletResponse = servletResponse;
+    }
+
+    public HttpServletRequest getServletRequest() {
+        return servletRequest;
+    }
+
+    public void setServletRequest(HttpServletRequest servletRequest) {
+        this.servletRequest = servletRequest;
+    }
+}
