@@ -119,7 +119,7 @@
         </s:else>
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
-
+  	<s:form action="selectSystemsForAuthKeys" id="gen_auth_keys">
                 <table class="vborder scrollableTable">
                     <thead>
                     <tr>
@@ -168,8 +168,7 @@
                     </s:iterator>
                     </tbody>
                 </table>
-
-
+	</s:form>
         </s:if>
 
         <s:if test="#genAuthKeys=='true'">
