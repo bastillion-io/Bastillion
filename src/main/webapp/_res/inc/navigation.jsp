@@ -1,3 +1,9 @@
+<%
+/**
+ * Copyright (c) 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
+ * Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
+ */
+%>
 <div class="nav">
 
     <div style="float: left;margin-top: 5px;margin-left: -10px"><img src="<%= request.getContextPath() %>/img/keybox_50x38.png"/></div>

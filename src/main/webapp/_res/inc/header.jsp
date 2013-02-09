@@ -1,3 +1,9 @@
+<%
+/**
+ * Copyright (c) 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
+ * Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
+ */
+%>
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <script src="<%= request.getContextPath() %>/_res/js/jquery-1.8.3.js"></script>
