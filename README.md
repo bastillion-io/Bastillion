@@ -47,4 +47,4 @@ Login with
 
 Donate
 ------
-If you find this tool helpful and want to donate you can do so through [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=54K7AB3NRBM76)
+If you find this tool useful and are feeling generous you can donate through my [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=54K7AB3NRBM76)
