@@ -51,6 +51,7 @@ table td, table th {
 .nav {
     float: left;
     width: 125px;
+    border-right: 2px solid #CCCCCC;
 
 }
 
@@ -68,7 +69,6 @@ table td, table th {
     padding: 0px 15px 15px 15px;
     float: left;
     width: 70%;
-    border-left: 10px solid #CCCCCC;
 }
 
 .page {
