@@ -145,3 +145,8 @@ div.block .input {
     cursor: pointer;
     background-image: url("../../img/desc.gif")
 }
+
+.ui-button {
+    height:22px;
+}
+
