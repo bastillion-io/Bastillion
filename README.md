@@ -17,6 +17,13 @@ Steps:
 
 Prerequisites
 -------------
+SQLite3
+http://www.sqlite.org/download.html
+
+    sudo apt-get install sqlite3 sqlite3-dev 
+
+**Should already be installed in Mac OS X v10.5 or greater
+
 Maven 2 or greater
 http://maven.apache.org
 
