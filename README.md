@@ -3,7 +3,7 @@ KeyBox
 
 About
 -----
-KeyBox provides a way to manage OpenSSH v2 public keys and distribute the generated authorized_keys file to assigned systems.
+KeyBox provides a way to manage OpenSSH v2 public keys and shell scripts to be distributed or executed on defined systems.
 
 Steps:
 
