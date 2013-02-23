@@ -12,7 +12,7 @@ Steps:
 3. Create profiles
 4. Assign systems to profile
 5. Assign profiles to users
-6. Generate and set authorized key file for systems or users
+6. Generate and distribute authorized key file for systems or users
 
 
 Prerequisites

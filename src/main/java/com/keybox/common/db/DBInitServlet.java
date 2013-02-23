@@ -10,19 +10,23 @@ import com.keybox.manage.util.SSHUtil;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
 /**
- * Initial startup servlet.  Creates an SQLite DB and generates
+ * Initial startup task.  Creates an SQLite DB and generates
  * the system public/private key pair if none exists
  */
+@WebServlet( name="DBInitServlet",
+        urlPatterns = {"/config"},
+        loadOnStartup = 1)
 public class DBInitServlet extends javax.servlet.http.HttpServlet {
 
     /**
-     * servlet init method that created DB and generated public/private keys
-     * @param config servlet config
+     * task init method that created DB and generated public/private keys
+     * @param config task config
      * @throws ServletException
      */
     public void init(ServletConfig config) throws ServletException {
@@ -46,7 +50,8 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
                 statement.executeUpdate("create table if not exists system_map (profile_id INTEGER, system_id INTEGER, foreign key (profile_id) references profiles(id) on delete cascade , foreign key (system_id) references system(id) on delete cascade, primary key (profile_id, system_id))");
                 statement.executeUpdate("create table if not exists user_map (user_id INTEGER, profile_id INTEGER, foreign key (user_id) references users(id) on delete cascade, foreign key (profile_id) references profiles(id) on delete cascade, primary key (user_id, profile_id))");
                 statement.executeUpdate("create table if not exists private_key (passphrase string unique not null)");
-                statement.executeUpdate("create table if not exists system_key_gen (id INTEGER, auth_keys_val not null,status_cd string not null default 'I', foreign key (id) references system(id) on delete cascade)");
+                statement.executeUpdate("create table if not exists status (id INTEGER, auth_keys_val not null,status_cd string not null default 'I', output string, foreign key (id) references system(id) on delete cascade)");
+                statement.executeUpdate("create table if not exists scripts (id INTEGER PRIMARY KEY AUTOINCREMENT, display_nm string not null, script string not null)");
 
                 //generate new key and insert passphrase
                 statement.executeUpdate("insert or ignore into private_key (passphrase) values('" + SSHUtil.keyGen() + "')");

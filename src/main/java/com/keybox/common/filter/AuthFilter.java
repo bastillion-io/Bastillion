@@ -9,6 +9,7 @@ import com.keybox.manage.util.CookieUtil;
 import com.keybox.manage.util.EncryptionUtil;
 
 import javax.servlet.*;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -20,6 +21,8 @@ import java.util.Date;
 /**
  * Filter determines if admin user is authenticated
  */
+@WebFilter(filterName = "AuthFilter", urlPatterns = {"/manage/*"},
+        dispatcherTypes = {DispatcherType.REQUEST, DispatcherType.FORWARD, DispatcherType.INCLUDE})
 public class AuthFilter implements Filter {
 
     public void init(FilterConfig config) throws ServletException {
@@ -32,8 +35,8 @@ public class AuthFilter implements Filter {
     /**
      * doFilter determines if user is an administrator or redirect to login page
      *
-     * @param req   servlet request
-     * @param resp  servlet response
+     * @param req   task request
+     * @param resp  task response
      * @param chain filter chain
      * @throws ServletException
      * @throws IOException
