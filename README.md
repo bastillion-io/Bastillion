@@ -13,6 +13,7 @@ Steps:
 4. Assign systems to profile
 5. Assign profiles to users
 6. Generate and distribute authorized key file for systems or users
+7. Create shell scripts and execute on systems or system profiles
 
 
 Prerequisites
@@ -24,7 +25,7 @@ http://www.sqlite.org/download.html
 
 **Should already be installed in Mac OS X v10.5 or greater
 
-Maven 2 or greater
+Maven 3 or greater
 http://maven.apache.org
 
 Java JDK 1.6 or greater
@@ -43,7 +44,7 @@ In the directory that contains the pom.xml run
 
 	mvn package jetty:run
 
-Open browser to http://localhost:8090/keybox
+Open browser to http://localhost:8090
 
 Login with 
 
