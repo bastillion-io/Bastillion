@@ -5,8 +5,10 @@
 package com.keybox.manage.action;
 
 
+import com.keybox.manage.db.ScriptDB;
 import com.keybox.manage.db.SystemDB;
 import com.keybox.manage.model.HostSystem;
+import com.keybox.manage.model.Script;
 import com.keybox.manage.model.SortedSet;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
@@ -19,6 +21,7 @@ public class SystemAction extends ActionSupport {
 
     SortedSet sortedSet = new SortedSet();
     HostSystem hostSystem = new HostSystem();
+    Script script=null;
 
     @Action(value = "/manage/viewSystems",
             results = {
@@ -27,6 +30,9 @@ public class SystemAction extends ActionSupport {
     )
     public String viewSystems() {
         sortedSet = SystemDB.getSystemSet(sortedSet);
+        if(script!=null && script.getId()!=null){
+            script= ScriptDB.getScript(script.getId());
+        }
         return SUCCESS;
     }
 
@@ -114,5 +120,13 @@ public class SystemAction extends ActionSupport {
 
     public void setSortedSet(SortedSet sortedSet) {
         this.sortedSet = sortedSet;
+    }
+
+    public Script getScript() {
+        return script;
+    }
+
+    public void setScript(Script script) {
+        this.script = script;
     }
 }

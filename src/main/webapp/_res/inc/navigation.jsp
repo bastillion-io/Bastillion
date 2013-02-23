@@ -6,7 +6,9 @@
 %>
 <div class="nav">
 
+<!--
     <div style="float: left;margin-top: 5px;margin-left: -10px"><img src="<%= request.getContextPath() %>/img/keybox_50x38.png"/></div>
+-->
 
         <h3>
 
@@ -23,16 +25,18 @@
             <a href="viewProfiles.action">System Profiles</a>
         </div>
     <div class="nav_item">
-            <a href="viewSystems.action?genAuthKeys=true">Generate Keys for Systems</a>
+            <a href="viewSystems.action?selectForm=true">Distribute SSH Keys</a>
         </div>
 
-    <div class="nav_item">
-            <a href="viewUsers.action?genAuthKeys=true">Generate Keys for Users</a>
-        </div>
 
      <div class="nav_item">
-            <a href="setPassword.action">Change Admin Password</a>
-        </div>
+            <a href="viewScripts.action">Shell Scripts</a>
+     </div>
+
+     <div class="nav_item">
+            <a href="setPassword.action">Change Password</a>
+     </div>
+
 
    <div class="nav_item">
             <a href="../logout.action">Logout</a>

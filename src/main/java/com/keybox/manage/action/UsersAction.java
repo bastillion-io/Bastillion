@@ -5,7 +5,9 @@
 package com.keybox.manage.action;
 
 
+import com.keybox.manage.db.ScriptDB;
 import com.keybox.manage.db.UserDB;
+import com.keybox.manage.model.Script;
 import com.keybox.manage.model.SortedSet;
 import com.keybox.manage.model.User;
 import com.opensymphony.xwork2.ActionSupport;
@@ -21,6 +23,7 @@ public class UsersAction extends ActionSupport {
 
     SortedSet sortedSet=new SortedSet();
     User user = new User();
+    Script script=null;
 
 
     @Action(value = "/manage/viewUsers",
@@ -28,9 +31,12 @@ public class UsersAction extends ActionSupport {
                     @Result(name = "success", location = "/manage/view_users.jsp")
             }
     )
-    public String viewSystems() {
+    public String viewUsers() {
 
         sortedSet = UserDB.getUserSet(sortedSet);
+        if(script!=null && script.getId()!=null){
+            script=ScriptDB.getScript(script.getId());
+        }
         return SUCCESS;
     }
 
@@ -107,5 +113,13 @@ public class UsersAction extends ActionSupport {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Script getScript() {
+        return script;
+    }
+
+    public void setScript(Script script) {
+        this.script = script;
     }
 }

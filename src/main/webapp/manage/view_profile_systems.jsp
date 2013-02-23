@@ -75,8 +75,8 @@
        <s:form action="viewProfileSystems">
             <s:hidden name="sortedSet.orderByDirection"/>
             <s:hidden name="sortedSet.orderByField"/>
-           <s:hidden name="profile.id"/>
-            <s:hidden name="genAuthKeys"/>
+            <s:hidden name="profile.id"/>
+            <s:hidden name="selectForm"/>
         </s:form>
 
         <h3>Assign Systems to Profile</h3>

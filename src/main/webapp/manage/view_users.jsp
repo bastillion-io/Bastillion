@@ -113,14 +113,15 @@
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
     <div class="content">
-        <s:set id="genAuthKeys"><s:property value="#parameters['genAuthKeys']"/></s:set>
+        <s:set id="selectForm"><s:property value="#parameters['selectForm']"/></s:set>
         <s:form action="viewUsers">
             <s:hidden name="sortedSet.orderByDirection" />
             <s:hidden name="sortedSet.orderByField"/>
-            <s:hidden name="genAuthKeys"/>
+            <s:hidden name="selectForm"/>
         </s:form>
-        <s:if test="#genAuthKeys=='true'">
-            <h3>Generate Authorized Keys for Users</h3>
+        <s:if test="#selectForm=='true'">
+            <h3>Distribute Authorized Keys for Users</h3>
+            <jsp:include page="../_res/inc/nav_sub.jsp"/>
 
             <p>Select the users below to generate and set the authorized key file</p>
 
@@ -138,8 +139,8 @@
 
                     <tr>
 
-                        <s:if test="#genAuthKeys=='true'">
-                            <th><s:checkbox name="userSelectAll" cssClass="systemSelect" fieldValue="true"
+                        <s:if test="#selectForm=='true'">
+                            <th><s:checkbox name="userSelectAll" cssClass="userSelect" fieldValue="true"
                                             theme="simple"
                                     /></th>
                         </s:if>
@@ -152,7 +153,7 @@
                         <th id="<s:property value="@com.keybox.manage.db.UserDB@SORT_BY_EMAIL"/>" class="sort">Email
                             Address
                         </th>
-                        <s:if test="#genAuthKeys=='true'"></s:if>
+                        <s:if test="#selectForm=='true'"></s:if>
                         <s:else>
                             <th>&nbsp;</th>
                         </s:else>
@@ -161,7 +162,7 @@
                     <tbody>
                     <s:iterator var="user" value="sortedSet.itemList" status="stat">
                     <tr>
-                        <s:if test="#genAuthKeys=='true'">
+                        <s:if test="#selectForm=='true'">
                             <td>
                                 <s:checkbox name="userSelectId" cssClass="userSelect" fieldValue="%{id}"
                                             value="checked" theme="simple"/>
@@ -175,9 +176,9 @@
                         </td>
                         <td><s:property value="firstNm"/></td>
                         <td><s:property value="email"/></td>
-                        <s:if test="#genAuthKeys=='true'"></s:if>
+                        <s:if test="#selectForm=='true'"></s:if>
                         <s:else>
-                            <td width="150">
+                            <td>
                                 <div id="edit_btn_<s:property value="id"/>" class="edit_btn" style="float:left">
                                     Edit
                                 </div>
@@ -194,9 +195,9 @@
             </s:form>
         </s:if>
 
-        <s:if test="#genAuthKeys=='true'">
+        <s:if test="#selectForm=='true'">
 
-            <div id="gen_auth_keys" class="gen_auth_keys_btn">Generate Authorized Keys</div>
+            <div id="gen_auth_keys" class="gen_auth_keys_btn">Distribute Authorized Keys</div>
         </s:if>
 
 
@@ -212,7 +213,7 @@
                     <s:hidden name="user.id" value=""/>
                     <s:hidden name="sortedSet.orderByDirection"/>
                     <s:hidden name="sortedSet.orderByField"/>
-                    <s:hidden name="genAuthKeys"/>
+                    <s:hidden name="selectForm"/>
                 </s:form>
                 <div class="submit_btn">Submit</div>
                 <div class="cancel_btn">Cancel</div>
@@ -229,7 +230,7 @@
                         <s:hidden name="user.id" value="%{id}"/>
                         <s:hidden name="sortedSet.orderByDirection"/>
                         <s:hidden name="sortedSet.orderByField"/>
-                        <s:hidden name="genAuthKeys"/>
+                        <s:hidden name="selectForm"/>
                     </s:form>
                     <div class="submit_btn">Submit</div>
                     <div class="cancel_btn">Cancel</div>

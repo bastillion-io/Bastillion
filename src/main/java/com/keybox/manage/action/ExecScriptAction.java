@@ -4,8 +4,9 @@
  */
 package com.keybox.manage.action;
 
+import com.keybox.manage.db.ScriptDB;
 import com.keybox.manage.db.SystemStatusDB;
-import com.keybox.manage.db.PrivateKeyDB;
+import com.keybox.manage.model.Script;
 import com.keybox.manage.model.SystemStatus;
 import com.keybox.manage.util.SSHUtil;
 import com.opensymphony.xwork2.ActionSupport;
@@ -14,49 +15,55 @@ import org.apache.struts2.convention.annotation.Result;
 
 import java.util.List;
 
-/**
- * Action to generate and distribute auth keys for systems or users
- */
-public class AuthKeysAction extends ActionSupport {
+public class ExecScriptAction extends ActionSupport {
 
 
     List<Long> systemSelectId;
-    List<Long> userSelectId;
     List<Long> profileSelectId;
     String password;
+
     SystemStatus pendingSystemStatus;
     SystemStatus currentSystemStatus;
     List<SystemStatus> systemStatusList;
 
+    Script script = new Script();
 
-    @Action(value = "/manage/genAuthKeyForSystem",
+    @Action(value = "/manage/genExecScriptForSystem",
             results = {
-                    @Result(name = "success", location = "/manage/key_gen_status.jsp")
+                    @Result(name = "success", location = "/manage/exec_script_status.jsp")
             }
+
     )
-    public String genAuthKeyForSystem() {
+    public String genExecScriptForSystem() {
+        script = ScriptDB.getScript(script.getId());
 
         if (pendingSystemStatus != null && pendingSystemStatus.getId() != null) {
 
-            //get key gen status and a
+            //get status
             currentSystemStatus = SystemStatusDB.getSystemStatus(pendingSystemStatus.getId());
+            //if initial status run script
+            if (SystemStatus.INITIAL_STATUS.equals(currentSystemStatus.getStatusCd())
+                    || SystemStatus.AUTH_FAIL_STATUS.equals(currentSystemStatus.getStatusCd())
+                    ) {
 
-
-            //try and sftp key to remote server
-            currentSystemStatus = SSHUtil.authAndAddPubKey(currentSystemStatus, password);
-
-
-            SystemStatusDB.updateSystemStatus(currentSystemStatus);
-
-
+                //try and run script
+                currentSystemStatus = SSHUtil.execScriptOnSystem(currentSystemStatus, password, script);
+            }
             if (SystemStatus.AUTH_FAIL_STATUS.equals(currentSystemStatus.getStatusCd())) {
                 pendingSystemStatus = currentSystemStatus;
 
             } else {
+
                 pendingSystemStatus = SystemStatusDB.getNextPendingSystem();
+                if(pendingSystemStatus==null  && !SystemStatusDB.isFinished()){
+                    pendingSystemStatus=currentSystemStatus;
+                }
+
             }
 
         } else {
+            //done
+            System.out.println("done");
             currentSystemStatus = null;
             pendingSystemStatus = null;
         }
@@ -66,12 +73,12 @@ public class AuthKeysAction extends ActionSupport {
     }
 
 
-    @Action(value = "/manage/getNextPendingSystem",
+    @Action(value = "/manage/getNextPendingSystemForExecScript",
             results = {
-                    @Result(name = "success", location = "/manage/key_gen_status.jsp")
+                    @Result(name = "success", location = "/manage/exec_script_status.jsp")
             }
     )
-    public String getNextPendingSystem() {
+    public String getNextPendingSystemForExecScript() {
         currentSystemStatus = SystemStatusDB.getSystemStatus(pendingSystemStatus.getId());
         currentSystemStatus.setErrorMsg("Auth fail");
         currentSystemStatus.setStatusCd(SystemStatus.GENERIC_FAIL_STATUS);
@@ -82,54 +89,35 @@ public class AuthKeysAction extends ActionSupport {
 
 
         systemStatusList = SystemStatusDB.getAllSystemStatus();
+        script = ScriptDB.getScript(script.getId());
         return SUCCESS;
     }
 
-    @Action(value = "/manage/selectSystemsForAuthKeys",
+    @Action(value = "/manage/selectSystemsForExecScript",
             results = {
-                    @Result(name = "success", location = "/manage/key_gen_status.jsp")
+                    @Result(name = "success", location = "/manage/exec_script_status.jsp")
             }
     )
-    public String selectSystemsForAuthKeys() {
+    public String selectSystemsForExecScript() {
 
         if (systemSelectId != null && !systemSelectId.isEmpty()) {
 
             systemStatusList = SystemStatusDB.setInitialSystemStatus(SystemStatusDB.findAuthKeysForSystems(systemSelectId));
             //set first system to set auth keys
             pendingSystemStatus = SystemStatusDB.getNextPendingSystem();
-
+            script = ScriptDB.getScript(script.getId());
 
         }
         return SUCCESS;
     }
 
-    @Action(value = "/manage/selectUsersForAuthKeys",
+
+    @Action(value = "/manage/selectProfilesForExecScript",
             results = {
-                    @Result(name = "success", location = "/manage/key_gen_status.jsp")
+                    @Result(name = "success", location = "/manage/exec_script_status.jsp")
             }
     )
-    public String selectUsersForAuthKeys() {
-
-
-        if (userSelectId != null && !userSelectId.isEmpty()) {
-
-            systemStatusList = SystemStatusDB.setInitialSystemStatus(SystemStatusDB.findAuthKeysForUsers(userSelectId));
-
-            //set first system to set auth keys
-            pendingSystemStatus = SystemStatusDB.getNextPendingSystem();
-
-        }
-
-
-        return SUCCESS;
-    }
-
-    @Action(value = "/manage/selectProfilesForAuthKeys",
-            results = {
-                    @Result(name = "success", location = "/manage/key_gen_status.jsp")
-            }
-    )
-    public String selectProfilesForAuthKeys() {
+    public String selectProfilesForExecScript() {
 
 
         if (profileSelectId != null && !profileSelectId.isEmpty()) {
@@ -138,6 +126,7 @@ public class AuthKeysAction extends ActionSupport {
 
             //set first system to set auth keys
             pendingSystemStatus = SystemStatusDB.getNextPendingSystem();
+            script = ScriptDB.getScript(script.getId());
 
         }
 
@@ -154,14 +143,13 @@ public class AuthKeysAction extends ActionSupport {
         this.systemSelectId = systemSelectId;
     }
 
-    public List<Long> getUserSelectId() {
-        return userSelectId;
+    public List<Long> getProfileSelectId() {
+        return profileSelectId;
     }
 
-    public void setUserSelectId(List<Long> userSelectId) {
-        this.userSelectId = userSelectId;
+    public void setProfileSelectId(List<Long> profileSelectId) {
+        this.profileSelectId = profileSelectId;
     }
-
 
     public String getPassword() {
         return password;
@@ -169,14 +157,6 @@ public class AuthKeysAction extends ActionSupport {
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public List<SystemStatus> getSystemStatusList() {
-        return systemStatusList;
-    }
-
-    public void setSystemStatusList(List<SystemStatus> systemStatusList) {
-        this.systemStatusList = systemStatusList;
     }
 
     public SystemStatus getPendingSystemStatus() {
@@ -195,11 +175,19 @@ public class AuthKeysAction extends ActionSupport {
         this.currentSystemStatus = currentSystemStatus;
     }
 
-    public List<Long> getProfileSelectId() {
-        return profileSelectId;
+    public List<SystemStatus> getSystemStatusList() {
+        return systemStatusList;
     }
 
-    public void setProfileSelectId(List<Long> profileSelectId) {
-        this.profileSelectId = profileSelectId;
+    public void setSystemStatusList(List<SystemStatus> systemStatusList) {
+        this.systemStatusList = systemStatusList;
+    }
+
+    public Script getScript() {
+        return script;
+    }
+
+    public void setScript(Script script) {
+        this.script = script;
     }
 }

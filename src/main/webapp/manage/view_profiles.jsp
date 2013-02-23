@@ -24,6 +24,12 @@
                 width: 375,
                 modal: true
             });
+            $("#script_dia").dialog({
+                autoOpen: false,
+                height: 350,
+                width: 350,
+                modal: true
+             });
             //open add dialog
             $("#add_btn").button().click(function() {
                 $("#add_dialog").dialog("open");
@@ -35,7 +41,9 @@
                 $("#edit_dialog_" + id).dialog("open");
 
             });
-
+            $("#script_btn").click(function() {
+                $("#script_dia").dialog("open");
+            });
             //call delete action
             $(".del_btn").button().click(function() {
                 var id = $(this).attr('id').replace("del_btn_", "");
@@ -49,6 +57,21 @@
             $(".cancel_btn").button().click(function() {
                 $("#add_dialog").dialog("close");
                 $(".edit_dialog").dialog("close");
+            });
+             $(".select_frm_btn").button().click(function() {
+                //change form action if executing script
+                <s:if test="script!=null">
+                    $("#select_frm").attr("action","selectProfilesForExecScript.action");
+                 </s:if>
+                $("#select_frm").submit();
+             });
+             //select all check boxs
+             $("#select_frm_profileSelectAll").click(function() {
+                if ($(this).is(':checked')) {
+                        $(".profileSelect").attr('checked', true);
+                    } else {
+                        $(".profileSelect").attr('checked', false);
+                    }
             });
             $(".sort,.sortAsc,.sortDesc").click(function() {
                 var id = $(this).attr('id')
@@ -93,25 +116,63 @@
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
     <div class="content">
+            <s:set id="selectForm"><s:property value="#parameters['selectForm']"/></s:set>
         <s:form action="viewProfiles">
             <s:hidden name="sortedSet.orderByDirection"/>
             <s:hidden name="sortedSet.orderByField"/>
+            <s:hidden name="selectForm"/>
+             <s:if test="script!=null">
+                <s:hidden name="script.id"/>
+             </s:if>
         </s:form>
 
-        <h3>Manage System Profiles</h3>
 
-        <p>Add / Delete profiles or select a profile below to assign systems to that profile.</p>
+        <s:if test="#selectForm=='true'">
+            <s:if test="script!=null">
+                <h3>Execute Script on System Profiles</h3>
+                <jsp:include page="../_res/inc/nav_sub.jsp"/>
+                <p>Run <b><a id="script_btn" href="#"><s:property value="script.displayNm"/></a></b> on the selected system profiles below
+                </p>
+                <div id="script_dia" title="View Script">
+                    <pre><s:property value="script.script"/></pre>
+                </div>
+            </s:if>
+            <s:else>
+                <h3>Distribute Authorized Key for System Profiles</h3>
+                <jsp:include page="../_res/inc/nav_sub.jsp"/>
+                <p>Select the system profiles below to generate and set the authorized key file</p>
+            </s:else>
+
+        </s:if>
+        <s:else>
+             <h3>Manage System Profiles</h3>
+              <p>Add / Delete profiles or select a profile below to assign systems to that profile.</p>
+        </s:else>
+
+
+
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
+          <s:form action="selectProfilesForAuthKeys" id="select_frm" theme="simple">
+          <s:if test="script!=null">
+            <s:hidden name="script.id"/>
+          </s:if>
             <table class="vborder scrollableTable">
                 <thead>
 
 
                 <tr>
+                   <s:if test="#selectForm=='true'">
+                     <th><s:checkbox name="profileSelectAll" cssClass="profileSelect" fieldValue="true"
+                         theme="simple"/></th>
+                    </s:if>
                     <th id="<s:property value="@com.keybox.manage.db.ProfileDB@SORT_BY_PROFILE_NM"/>" class="sort">
                         Profile Name
                     </th>
-                    <th>&nbsp;</th>
+                     <s:if test="#selectForm=='true'"></s:if>
+                     <s:else>
+                        <th>&nbsp;</th>
+                     </s:else>
                 </tr>
                 </thead>
                 <tbody>
@@ -119,8 +180,12 @@
 
                 <s:iterator var="profile" value="sortedSet.itemList" status="stat">
                 <tr>
-
-
+                    <s:if test="#selectForm=='true'">
+                    <td>
+                                <s:checkbox name="profileSelectId" cssClass="profileSelect" fieldValue="%{id}"
+                                            value="checked" theme="simple"/>
+                    </td>
+                    </s:if>
                     <td>
                         <a href="viewProfileSystems.action?profile.id=<s:property value="id"/>"
                            title="Manage Systems in Profile">
@@ -128,22 +193,33 @@
                         </a>
                     </td>
 
-                    <td width="150">
-
+                    <s:if test="#selectForm=='true'"></s:if>
+                    <s:else>
+                    <td>
                             <div id="edit_btn_<s:property value="id"/>" class="edit_btn" style="float:left">Edit
                             </div>
                             <div id="del_btn_<s:property value="id"/>" class="del_btn" style="float:left">Delete
                             </div>
                             <div style="clear:both"/>
                     </td>
+                    </s:else>
                 </tr>
 
 
                 </s:iterator>
                 </tbody>
             </table>
+            </s:form>
         </s:if>
-
+       <s:if test="#selectForm=='true'">
+              <s:if test="script!=null">
+               <div class="select_frm_btn">Execute Script</div>
+              </s:if>
+              <s:else>
+                 <div class="select_frm_btn">Distribute Authorized Keys</div>
+           </s:else>
+       </s:if>
+       <s:else>
 
         <div id="add_btn">Add Profile</div>
         <div id="add_dialog" title="Add Profile">
@@ -152,6 +228,7 @@
                 <s:textarea name="profile.desc" label="Profile Description" rows="5" cols="25"/>
                 <s:hidden name="sortedSet.orderByDirection"/>
                 <s:hidden name="sortedSet.orderByField"/>
+                <s:hidden name="selectForm"/>
             </s:form>
             <div class="submit_btn">Submit</div>
             <div class="cancel_btn">Cancel</div>
@@ -167,12 +244,13 @@
                     <s:hidden name="profile.id" value="%{id}"/>
                     <s:hidden name="sortedSet.orderByDirection"/>
                     <s:hidden name="sortedSet.orderByField"/>
+                    <s:hidden name="selectForm"/>
                 </s:form>
                 <div class="submit_btn">Submit</div>
                 <div class="cancel_btn">Cancel</div>
             </div>
         </s:iterator>
-
+        </s:else>
     </div>
 
 

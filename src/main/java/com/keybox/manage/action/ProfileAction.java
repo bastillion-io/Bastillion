@@ -5,7 +5,9 @@
 package com.keybox.manage.action;
 
 import com.keybox.manage.db.ProfileDB;
+import com.keybox.manage.db.ScriptDB;
 import com.keybox.manage.model.Profile;
+import com.keybox.manage.model.Script;
 import com.keybox.manage.model.SortedSet;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
@@ -19,6 +21,7 @@ public class ProfileAction extends ActionSupport {
 
     SortedSet sortedSet = new SortedSet();
     Profile profile = new Profile();
+    Script script=null;
 
 
     @Action(value = "/manage/viewProfiles",
@@ -29,6 +32,10 @@ public class ProfileAction extends ActionSupport {
     public String viewSystems() {
 
         sortedSet = ProfileDB.getProfileSet(sortedSet);
+
+        if(script!=null && script.getId()!=null){
+            script= ScriptDB.getScript(script.getId());
+        }
         return SUCCESS;
     }
 
@@ -93,5 +100,13 @@ public class ProfileAction extends ActionSupport {
 
     public void setSortedSet(SortedSet sortedSet) {
         this.sortedSet = sortedSet;
+    }
+
+    public Script getScript() {
+        return script;
+    }
+
+    public void setScript(Script script) {
+        this.script = script;
     }
 }

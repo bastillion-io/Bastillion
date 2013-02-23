@@ -8,7 +8,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-
     <jsp:include page="../_res/inc/header.jsp"/>
     <script type="text/javascript">
         $(document).ready(function() {
@@ -19,6 +18,12 @@
                 modal: true
             });
             $(".edit_dialog").dialog({
+                autoOpen: false,
+                height: 350,
+                width: 350,
+                modal: true
+            });
+             $("#script_dia").dialog({
                 autoOpen: false,
                 height: 350,
                 width: 350,
@@ -35,6 +40,9 @@
                 $("#edit_dialog_" + id).dialog("open");
 
             });
+            $("#script_btn").click(function() {
+                $("#script_dia").dialog("open");
+             });
             //call delete action
             $(".del_btn").button().click(function() {
                 var id = $(this).attr('id').replace("del_btn_", "");
@@ -50,11 +58,15 @@
                 $(".edit_dialog").dialog("close");
             });
             //regenerate auth keys btn
-            $(".gen_auth_keys_btn").button().click(function() {
-                $("#gen_auth_keys").submit();
+            $(".select_frm_btn").button().click(function() {
+                //change form action if executing script
+                <s:if test="script!=null">
+                    $("#select_frm").attr("action","selectSystemsForExecScript.action");
+                </s:if>
+                $("#select_frm").submit();
             });
             //select all check boxs
-            $("#gen_auth_keys_systemSelectAll").click(function() {
+            $("#select_frm_systemSelectAll").click(function() {
 
                 if ($(this).is(':checked')) {
                     $(".systemSelect").attr('checked', true);
@@ -106,17 +118,35 @@
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
     <div class="content">
-        <s:set id="genAuthKeys"><s:property value="#parameters['genAuthKeys']"/></s:set>
+        <s:set id="selectForm"><s:property value="#parameters['selectForm']"/></s:set>
         <s:form action="viewSystems">
             <s:hidden name="sortedSet.orderByDirection"/>
             <s:hidden name="sortedSet.orderByField"/>
-            <s:hidden name="genAuthKeys"/>
+            <s:hidden name="selectForm"/>
+            <s:if test="script!=null">
+              <s:hidden name="script.id"/>
+            </s:if>
         </s:form>
 
-        <s:if test="#genAuthKeys=='true'">
-            <h3>Generate Authorized Key for Systems</h3>
+        <s:if test="#selectForm=='true'">
+            <s:if test="script!=null">
+                <h3>Execute Script on Systems</h3>
+                <jsp:include page="../_res/inc/nav_sub.jsp"/>
+                <p>Run <b>
+                <a id="script_btn" href="#"><s:property value="script.displayNm"/></a></b> on the selected systems below
+                </p>
+                <div id="script_dia" title="View Script">
+                    <pre><s:property value="script.script"/></pre>
+                </div>
+            </s:if>
+            <s:else>
+                <h3>Distribute Authorized Key for Systems</h3>
+                <jsp:include page="../_res/inc/nav_sub.jsp"/>
+                <p>Select the systems below to generate and set the authorized key file</p>
+            </s:else>
 
-            <p>Select the systems below to generate and set the authorized key file</p>
+
+
         </s:if>
         <s:else>
             <h3>Manage Systems</h3>
@@ -125,11 +155,15 @@
         </s:else>
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
-  	<s:form action="selectSystemsForAuthKeys" id="gen_auth_keys">
+
+  	        <s:form action="selectSystemsForAuthKeys" id="select_frm" theme="simple">
+  	             <s:if test="script!=null">
+                        <s:hidden name="script.id"/>
+                 </s:if>
                 <table class="vborder scrollableTable">
                     <thead>
                     <tr>
-                        <s:if test="#genAuthKeys=='true'">
+                        <s:if test="#selectForm=='true'">
                             <th><s:checkbox name="systemSelectAll" cssClass="systemSelect" fieldValue="true"
                                             theme="simple"/></th>
                         </s:if>
@@ -141,7 +175,7 @@
                         </th>
                         <th id="<s:property value="@com.keybox.manage.db.SystemDB@SORT_BY_HOST"/>" class="sort">Host
                         </th>
-                        <s:if test="#genAuthKeys=='true'"></s:if>
+                        <s:if test="#selectForm=='true'"></s:if>
                         <s:else>
                             <th>&nbsp;</th>
                         </s:else>
@@ -150,7 +184,7 @@
                     <tbody>
                     <s:iterator var="system" value="sortedSet.itemList" status="stat">
                         <tr>
-                            <s:if test="#genAuthKeys=='true'">
+                            <s:if test="#selectForm=='true'">
                                 <td>
                                     <s:checkbox name="systemSelectId" cssClass="systemSelect" fieldValue="%{id}"
                                                 value="checked" theme="simple"/>
@@ -161,9 +195,9 @@
                             </td>
                             <td><s:property value="user"/></td>
                             <td><s:property value="host"/>:<s:property value="port"/></td>
-                            <s:if test="#genAuthKeys=='true'"></s:if>
+                            <s:if test="#selectForm=='true'"></s:if>
                             <s:else>
-                                <td width="150">
+                                <td>
                                     <div id="edit_btn_<s:property value="id"/>" class="edit_btn" style="float:left" >Edit </div>
                                     <div id="del_btn_<s:property value="id"/>" class="del_btn" style="float:left">Delete</div>
                                     <div style="clear:both"></div>
@@ -174,15 +208,17 @@
                     </s:iterator>
                     </tbody>
                 </table>
-	</s:form>
+	    </s:form>
         </s:if>
 
-        <s:if test="#genAuthKeys=='true'">
-
-            <div id="gen_auth_keys" class="gen_auth_keys_btn">Generate Authorized Keys</div>
+        <s:if test="#selectForm=='true'">
+            <s:if test="script!=null">
+                <div class="select_frm_btn">Execute Script</div>
+            </s:if>
+            <s:else>
+                <div class="select_frm_btn">Distribute Authorized Keys</div>
+            </s:else>
         </s:if>
-
-
         <s:else>
             <div id="add_btn">Add System</div>
             <div id="add_dialog" title="Add System">
@@ -196,7 +232,7 @@
                     <s:hidden name="hostSystem.id" value=""/>
                     <s:hidden name="sortedSet.orderByDirection"/>
                     <s:hidden name="sortedSet.orderByField"/>
-                    <s:hidden name="genAuthKeys"/>
+                    <s:hidden name="selectForm"/>
                 </s:form>
                 <div class="submit_btn">Submit</div>
                 <div class="cancel_btn">Cancel</div>
@@ -215,7 +251,7 @@
                         <s:hidden name="hostSystem.id" value="%{id}"/>
                         <s:hidden name="sortedSet.orderByDirection"/>
                         <s:hidden name="sortedSet.orderByField"/>
-                        <s:hidden name="genAuthKeys"/>
+                        <s:hidden name="selectForm"/>
                     </s:form>
                     <div class="submit_btn">Submit</div>
                     <div class="cancel_btn">Cancel</div>

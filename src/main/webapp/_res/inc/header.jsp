@@ -14,3 +14,11 @@
 <link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/_res/css/keybox.css"/>
 <link rel="icon" href="<%= request.getContextPath() %>/img/keybox.ico" type="image/x-icon"/>
 
+<script type="text/javascript">
+$(function() {
+    $("a").tooltip();
+});
+</script>
+
+
+
