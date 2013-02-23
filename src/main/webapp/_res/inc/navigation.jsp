@@ -6,9 +6,7 @@
 %>
 <div class="nav">
 
-<!--
     <div style="float: left;margin-top: 5px;margin-left: -10px"><img src="<%= request.getContextPath() %>/img/keybox_50x38.png"/></div>
--->
 
         <h3>
 
