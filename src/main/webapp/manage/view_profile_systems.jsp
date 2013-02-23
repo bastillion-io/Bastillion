@@ -96,7 +96,7 @@
 
 
                     <tr>
-                        <th><s:checkbox name="systemSelectAll" cssClass="systemSelect" fieldValue="true" theme="simple"/></th>
+                        <th><s:checkbox name="systemSelectAll" cssClass="systemSelect" theme="simple"/></th>
                         <th id="<s:property value="@com.keybox.manage.db.SystemDB@SORT_BY_NAME"/>" class="sort">Display Name</th>
                         <th id="<s:property value="@com.keybox.manage.db.SystemDB@SORT_BY_USER"/>" class="sort">User</th>
                         <th id="<s:property value="@com.keybox.manage.db.SystemDB@SORT_BY_HOST"/>" class="sort">Host</th>
@@ -109,9 +109,8 @@
                     <s:iterator var="system" value="sortedSet.itemList" status="stat">
                         <tr>
                             <td>
-                                <s:checkbox id="systemSelectId_%{id}" name="systemSelectId" cssClass="systemSelect"
-                                            fieldValue="%{id}"
-                                            value="checked" theme="simple"/>
+                                <s:checkboxlist id="systemSelectId_%{id}" list="#{id:''}" name="systemSelectId" cssClass="systemSelect"
+                                            theme="simple"/>
                             </td>
                             <td>
                                 <s:property value="displayNm"/>

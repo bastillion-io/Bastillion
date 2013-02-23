@@ -164,7 +164,7 @@
                     <thead>
                     <tr>
                         <s:if test="#selectForm=='true'">
-                            <th><s:checkbox name="systemSelectAll" cssClass="systemSelect" fieldValue="true"
+                            <th><s:checkbox name="systemSelectAll" cssClass="systemSelect"
                                             theme="simple"/></th>
                         </s:if>
 
@@ -186,8 +186,8 @@
                         <tr>
                             <s:if test="#selectForm=='true'">
                                 <td>
-                                    <s:checkbox name="systemSelectId" cssClass="systemSelect" fieldValue="%{id}"
-                                                value="checked" theme="simple"/>
+                                    <s:checkboxlist name="systemSelectId" list="#{id:''}" cssClass="systemSelect"
+                                                theme="simple"/>
                                 </td>
                             </s:if>
                             <td>

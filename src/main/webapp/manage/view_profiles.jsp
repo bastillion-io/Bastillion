@@ -163,7 +163,7 @@
 
                 <tr>
                    <s:if test="#selectForm=='true'">
-                     <th><s:checkbox name="profileSelectAll" cssClass="profileSelect" fieldValue="true"
+                     <th><s:checkbox name="profileSelectAll" cssClass="profileSelect"
                          theme="simple"/></th>
                     </s:if>
                     <th id="<s:property value="@com.keybox.manage.db.ProfileDB@SORT_BY_PROFILE_NM"/>" class="sort">
@@ -182,8 +182,8 @@
                 <tr>
                     <s:if test="#selectForm=='true'">
                     <td>
-                                <s:checkbox name="profileSelectId" cssClass="profileSelect" fieldValue="%{id}"
-                                            value="checked" theme="simple"/>
+                                <s:checkboxlist name="profileSelectId" list="#{id:''}" cssClass="profileSelect"
+                                            theme="simple"/>
                     </td>
                     </s:if>
                     <td>

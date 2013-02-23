@@ -12,6 +12,7 @@ import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -144,7 +145,6 @@ public class AuthKeysAction extends ActionSupport {
 
         return SUCCESS;
     }
-
 
     public List<Long> getSystemSelectId() {
         return systemSelectId;

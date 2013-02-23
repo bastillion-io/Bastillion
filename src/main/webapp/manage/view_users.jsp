@@ -140,7 +140,7 @@
                     <tr>
 
                         <s:if test="#selectForm=='true'">
-                            <th><s:checkbox name="userSelectAll" cssClass="userSelect" fieldValue="true"
+                            <th><s:checkbox name="userSelectAll" cssClass="userSelect"
                                             theme="simple"
                                     /></th>
                         </s:if>
@@ -164,8 +164,8 @@
                     <tr>
                         <s:if test="#selectForm=='true'">
                             <td>
-                                <s:checkbox name="userSelectId" cssClass="userSelect" fieldValue="%{id}"
-                                            value="checked" theme="simple"/>
+                                <s:checkboxlist name="userSelectId" list="#{id:''}" cssClass="userSelect"
+                                            theme="simple"/>
                             </td>
                         </s:if>
                         <td>

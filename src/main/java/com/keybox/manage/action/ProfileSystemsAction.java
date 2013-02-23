@@ -16,6 +16,7 @@ import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Action to assign systems to profiles
@@ -49,11 +50,11 @@ public class ProfileSystemsAction extends ActionSupport {
     public String assignSystemsToProfile() {
 
         ProfileSystemsDB.deleteAllSystemsFromProfile(profile.getId());
-        for (Long hostSystemId : systemSelectId) {
-
-            ProfileSystemsDB.addSystemToProfile(profile.getId(), hostSystemId);
+        if(systemSelectId!=null){
+            for (Long hostSystemId : systemSelectId) {
+                ProfileSystemsDB.addSystemToProfile(profile.getId(), hostSystemId);
+            }
         }
-
         return SUCCESS;
     }
 
