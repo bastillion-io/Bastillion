@@ -211,14 +211,17 @@
             </table>
             </s:form>
         </s:if>
-       <s:if test="#selectForm=='true'">
-              <s:if test="script!=null">
-               <div class="select_frm_btn">Execute Script</div>
-              </s:if>
-              <s:else>
-                 <div class="select_frm_btn">Distribute Authorized Keys</div>
-           </s:else>
-       </s:if>
+        <s:if test="#selectForm=='true'">
+            <s:if test="script!=null && sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
+                <div class="select_frm_btn">Execute Script</div>
+            </s:if>
+            <s:elseif test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
+                <div class="select_frm_btn">Distribute Authorized Keys</div>
+            </s:elseif>
+            <s:else>
+                <div class="error">There are no profiles defined.  New profiles may be defined <a href="viewProfiles.action">here</a>.</div>
+            </s:else>
+        </s:if>
        <s:else>
 
         <div id="add_btn">Add Profile</div>

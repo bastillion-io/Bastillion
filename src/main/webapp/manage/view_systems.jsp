@@ -210,26 +210,27 @@
                 </table>
 	    </s:form>
         </s:if>
-
         <s:if test="#selectForm=='true'">
-            <s:if test="script!=null">
+            <s:if test="script!=null && sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
                 <div class="select_frm_btn">Execute Script</div>
             </s:if>
-            <s:else>
+            <s:elseif test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
                 <div class="select_frm_btn">Distribute Authorized Keys</div>
+            </s:elseif>
+            <s:else>
+              <div class="error">There are no systems defined.  New systems may be defined <a href="viewSystems.action">here</a>.</div>
             </s:else>
         </s:if>
         <s:else>
             <div id="add_btn">Add System</div>
             <div id="add_dialog" title="Add System">
                 <s:form action="saveSystem" class="save_sys_form_add">
-                    <s:textfield name="hostSystem.displayNm" value="" label="Display Name" size="10"/>
-                    <s:textfield name="hostSystem.user" value="root" label="System User" size="10"/>
-                    <s:textfield name="hostSystem.host" value="" label="Host" size="18"/>
-                    <s:textfield name="hostSystem.port" value="22" label="Port" size="2"/>
-                    <s:textfield name="hostSystem.authorizedKeys" value="~/.ssh/authorized_keys" label="Authorized Keys"
+                    <s:textfield name="hostSystem.displayNm" label="Display Name" size="10"/>
+                    <s:textfield name="hostSystem.user" label="System User" size="10"/>
+                    <s:textfield name="hostSystem.host" label="Host" size="18"/>
+                    <s:textfield name="hostSystem.port" label="Port" size="2"/>
+                    <s:textfield name="hostSystem.authorizedKeys" label="Authorized Keys"
                                  size="18"/>
-                    <s:hidden name="hostSystem.id" value=""/>
                     <s:hidden name="sortedSet.orderByDirection"/>
                     <s:hidden name="sortedSet.orderByField"/>
                     <s:hidden name="selectForm"/>

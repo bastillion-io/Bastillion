@@ -110,7 +110,7 @@ div.block .input {
     margin: 8px 8px 8px 8px;
 }
 
-.error {
+.error, .error a {
     font-weight: bold;
     color: #cc0000;
 }

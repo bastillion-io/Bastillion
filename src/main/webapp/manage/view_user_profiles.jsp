@@ -68,13 +68,13 @@
         <s:if test="user.profileList!= null && !user.profileList.isEmpty()">
 
             <table class="vborder scrollableTable">
-    <thead>
+            <thead>
 
                 <tr>
                     <th>Profile Name</th>
                     <th>&nbsp;</th>
                 </tr>
-    </thead>
+                </thead>
                 <tbody>
 
 
@@ -103,19 +103,27 @@
             </table>
         </s:if>
 
-        <div id="add_btn">Add Profile</div>
-
-        <div id="add_dialog" title="Add Profile">
+        <s:if test="profileList!= null && !profileList.isEmpty()">
+            <div id="add_btn">Add Profile</div>
+            <div id="add_dialog" title="Add Profile">
             <s:form action="addProfileToUser">
                 <s:select name="profileId" list="profileList" headerKey="" headerValue="- Select One -"
                           listKey="id" listValue="%{nm}"/>
                 <s:hidden name="user.id"/>
             </s:form>
+             <div class="submit_btn">Submit</div>
+                <div class="cancel_btn">Cancel</div>
+             </div>
+        </s:if>
+        <s:else>
+            <div class="error">There are no profiles defined.  New profiles may be defined <a href="viewProfiles.action">here</a>.</div>
+        </s:else>
 
 
-            <div class="submit_btn">Submit</div>
-            <div class="cancel_btn">Cancel</div>
-        </div>
+
+
+
+
     </div>
 </div>
 </body>

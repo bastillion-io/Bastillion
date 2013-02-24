@@ -63,7 +63,8 @@
             </s:if>
             <s:else>
                 <s:if test="currentSystemStatus==null||currentSystemStatus.statusCd==\"P\" ||currentSystemStatus.statusCd!=\"F\"">
-                    $("#exec_script_frm").submit();
+                setInterval(function(){$("#exec_script_frm").submit();},2000);
+
                 </s:if>
             </s:else>
             </s:if>
@@ -132,14 +133,19 @@
                                  <s:elseif test="statusCd==\"F\"">
                                     <div class="error">Failed</div>
                                 </s:elseif>
+                                <s:elseif test="statusCd==\"T\"">
+                                    <div class="error">Timeout</div>
+                                </s:elseif>
                                 <s:elseif test="statusCd==\"S\"">
                                     <div class="success">Success</div>
                                </s:elseif>
                         </td>
                         <td>
+                            <s:if test="statusCd==\"S\"||statusCd==\"T\"">
                             <div id="output_btn_<s:property value="id"/>" class="output_btn" style="float:left">
                             View Output
                             </div></td>
+                            </s:if>
 
                     </tr>
 

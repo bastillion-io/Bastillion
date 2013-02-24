@@ -119,6 +119,9 @@
                             <s:elseif test="statusCd==\"F\"">
                                 <div class="error">Failed</div>
                             </s:elseif>
+                            <s:elseif test="statusCd==\"T\"">
+                                <div class="error">Timeout</div>
+                            </s:elseif>
                             <s:elseif test="statusCd==\"S\"">
                                 <div class="success">Success</div>
                             </s:elseif>

@@ -54,7 +54,7 @@
 
             <s:if test="profile.hostSystemList!= null && !profile.hostSystemList.isEmpty()">
             <s:iterator var="system" value="profile.hostSystemList" status="stat">
-            $('#systemSelectId_<s:property value="id"/>').attr('checked', true);
+            $(':checkbox[value=<s:property value="id"/>]').attr('checked', true);
             </s:iterator>
             </s:if>
 
@@ -124,10 +124,13 @@
                     </tbody>
                 </table>
             </s:form>
+            <div id="assign_sys" class="assign_sys_btn">Assign</div>
         </s:if>
+        <s:else>
+            <div class="error">There are no systems defined.  New systems may be defined <a href="viewSystems.action">here</a>.</div>
+        </s:else>
 
 
-        <div id="assign_sys" class="assign_sys_btn">Assign</div>
 
 
     </div>

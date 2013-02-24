@@ -196,8 +196,12 @@
         </s:if>
 
         <s:if test="#selectForm=='true'">
-
-            <div id="gen_auth_keys" class="gen_auth_keys_btn">Distribute Authorized Keys</div>
+             <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
+                <div id="gen_auth_keys" class="gen_auth_keys_btn">Distribute Authorized Keys</div>
+              </s:if>
+             <s:else>
+                <div class="error">There are no users defined.  New users may be defined <a href="viewUsers.action">here</a>.</div>
+             </s:else>
         </s:if>
 
 
@@ -206,11 +210,10 @@
             <div id="add_btn">Add User</div>
             <div id="add_dialog" title="Add User">
                 <s:form action="saveUser" class="save_user_form_add">
-                    <s:textfield name="user.firstNm" value="" label="First Name" size="15"/>
-                    <s:textfield name="user.lastNm" value="" label="Last Name" size="15"/>
-                    <s:textfield name="user.email" value="" label="Email Address" size="25"/>
-                    <s:textarea name="user.publicKey" value="" label="Public Key" rows="10" cols="75"/>
-                    <s:hidden name="user.id" value=""/>
+                    <s:textfield name="user.firstNm" label="First Name" size="15"/>
+                    <s:textfield name="user.lastNm" label="Last Name" size="15"/>
+                    <s:textfield name="user.email" label="Email Address" size="25"/>
+                    <s:textarea name="user.publicKey" label="Public Key" rows="10" cols="75"/>
                     <s:hidden name="sortedSet.orderByDirection"/>
                     <s:hidden name="sortedSet.orderByField"/>
                     <s:hidden name="selectForm"/>

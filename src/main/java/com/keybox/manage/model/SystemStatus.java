@@ -4,6 +4,9 @@
  */
 package com.keybox.manage.model;
 
+/**
+ * System status value object
+ */
 public class SystemStatus {
 
 
@@ -11,6 +14,7 @@ public class SystemStatus {
     public static final String AUTH_FAIL_STATUS="A";
     public static final String IN_PROGRESS_STATUS="P";
     public static final String GENERIC_FAIL_STATUS="F";
+    public static final String TIMEOUT_STATUS="T";
     public static final String SUCCESS_STATUS="S";
 
 

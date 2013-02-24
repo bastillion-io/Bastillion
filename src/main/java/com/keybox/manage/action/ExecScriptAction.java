@@ -63,7 +63,6 @@ public class ExecScriptAction extends ActionSupport {
 
         } else {
             //done
-            System.out.println("done");
             currentSystemStatus = null;
             pendingSystemStatus = null;
         }

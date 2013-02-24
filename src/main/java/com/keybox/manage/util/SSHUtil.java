@@ -16,18 +16,12 @@ import com.keybox.manage.model.SystemStatus;
 import com.keybox.manage.task.ScriptTask;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
-
-import javax.servlet.AsyncContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * SSH utility class used to create public/private key for system and distribute authorized key files
@@ -40,6 +34,9 @@ public class SSHUtil {
     public static final String PUB_KEY_NAME = KEY_NAME + ".pub";
     //system path to public/private key
     public static String KEY_PATH = DBUtils.class.getClassLoader().getResource("com/keybox/common/db").getPath();
+
+    public static final int SESSION_TIMEOUT = 60000;
+    public static final int CHANNEL_TIMEOUT = 60000;
 
     /**
      * returns the system's public key
@@ -148,7 +145,7 @@ public class SSHUtil {
             java.util.Properties config = new java.util.Properties();
             config.put("StrictHostKeyChecking", "no");
             session.setConfig(config);
-            session.connect();
+            session.connect(SESSION_TIMEOUT);
             authAndAddPubKey(hostSystemStatus, session);
 
         } catch (Exception e) {
@@ -189,7 +186,7 @@ public class SSHUtil {
             channel = session.openChannel("sftp");
             channel.setInputStream(System.in);
             channel.setOutputStream(System.out);
-            channel.connect();
+            channel.connect(CHANNEL_TIMEOUT);
 
             c = (ChannelSftp) channel;
             String authorizedKeys = hostSystemStatus.getHostSystem().getAuthorizedKeys().replaceAll("~\\/", "");
@@ -230,7 +227,8 @@ public class SSHUtil {
 
 
         //set status to in progress
-        ThreadPoolExecutor executor = new ThreadPoolExecutor(5, 5, 30, TimeUnit.MINUTES, new LinkedBlockingQueue<Runnable>());
+        ExecutorService executor = Executors.newCachedThreadPool();
+
         JSch jsch = new JSch();
         try {
             //add private key
@@ -242,15 +240,16 @@ public class SSHUtil {
                 session.setPassword(password);
             }
             session.setConfig("StrictHostKeyChecking", "no");
-            session.connect();
+            session.connect(SESSION_TIMEOUT);
 
             //set status to in progress
             hostSystemStatus.setStatusCd(SystemStatus.IN_PROGRESS_STATUS);
             SystemStatusDB.updateSystemStatus(hostSystemStatus);
+            /* not sure if i should do this
             //set auth keys if password exists
             if (password != null && !password.trim().equals("")) {
                 hostSystemStatus = SSHUtil.authAndAddPubKey(hostSystemStatus, session);
-            }
+            }*/
             //make sure no errors have occurred
             if (SystemStatus.IN_PROGRESS_STATUS.equals(hostSystemStatus.getStatusCd())) {
                 executor.execute(new ScriptTask(session, hostSystemStatus, script));

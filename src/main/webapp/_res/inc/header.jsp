@@ -15,8 +15,27 @@
 <link rel="icon" href="<%= request.getContextPath() %>/img/keybox.ico" type="image/x-icon"/>
 
 <script type="text/javascript">
-$(function() {
-    $("a").tooltip();
+  $(document).ready(function() {
+    $(function() {
+        $("a").tooltip();
+    });
+   $(function() {
+     var tabindex = 1;
+     $('input,textarea,select,.ui-button').each(function() {
+        if (this.type != "hidden") {
+          var $input = $(this);
+          $input.attr("tabindex", tabindex);
+          tabindex++;
+        }
+     });
+
+     $(".ui-button").keyup(function(event){
+         if(event.keyCode == 13){
+             $(this).click();
+         }
+     });
+   });
+
 });
 </script>
 
