@@ -56,3 +56,5 @@ Login with
 Donate
 ------
 If you find this tool useful and are feeling generous you can donate through my [PayPal](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=54K7AB3NRBM76)
+
+[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/1d63734e95044db2bb95500235c0df9e "githalytics.com")](http://githalytics.com/skavanagh/KeyBox)
