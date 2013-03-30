@@ -42,7 +42,7 @@ In the directory that contains the pom.xml run
 
 To Run Jetty Build
 ------
-Export Environment Variables
+Export environment variables
 
      export JAVA_HOME=/path/to/jdk
      export PATH=$JAVA_HOME/bin:$PATH
@@ -70,6 +70,11 @@ Steps:
 5. Assign profiles to users
 6. Generate and distribute authorized key file for systems or users
 7. Start composite-ssh sessions or create or execute a script across multiple sessions
+
+
+Author
+------
+Sean Kavanagh - sean.p.kavanagh6@gmail.com
 
 
 Donate
