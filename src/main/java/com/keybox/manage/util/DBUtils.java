@@ -1,6 +1,17 @@
 /**
- * Copyright (c) 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
- * Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
+ * Copyright 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.keybox.manage.util;
 
@@ -11,6 +22,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Enumeration;
 import java.util.Properties;
 
 
@@ -18,6 +30,14 @@ import java.util.Properties;
  * Class to create and close database resources
  */
 public class DBUtils {
+    public static enum JournalMode {
+            DELETE, TRUNCATE, PERSIST, MEMORY, OFF, WAL;
+
+            public String getValue() {
+                return name();
+            }
+        }
+
 
     //system path to the sqlite DB
     private static String DB_PATH = DBUtils.class.getClassLoader().getResource("com/keybox/common/db").getPath();
@@ -35,6 +55,9 @@ public class DBUtils {
             config.enforceForeignKeys(true);
             Class.forName("org.sqlite.JDBC");
             // create a database connection
+
+
+
 
             con = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH + "/keybox.db", config.toProperties());
         } catch (Exception ex) {

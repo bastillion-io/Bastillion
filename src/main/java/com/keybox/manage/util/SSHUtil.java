@@ -1,23 +1,33 @@
 /**
- * Copyright (c) 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
- * Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
+ * Copyright 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.keybox.manage.util;
 
-import com.jcraft.jsch.Channel;
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.Session;
+import com.jcraft.jsch.*;
 import com.keybox.common.util.AppConfigLkup;
 import com.keybox.manage.db.PrivateKeyDB;
+import com.keybox.manage.db.ScriptDB;
 import com.keybox.manage.db.SystemStatusDB;
+import com.keybox.manage.model.SchSession;
 import com.keybox.manage.model.Script;
 import com.keybox.manage.model.SystemStatus;
-import com.keybox.manage.task.ScriptTask;
+import com.keybox.manage.task.SessionOutputTask;
 import org.codehaus.plexus.util.cli.CommandLineUtils;
 import org.codehaus.plexus.util.cli.Commandline;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -215,21 +225,23 @@ public class SSHUtil {
     }
 
 
+
+
     /**
-     * execute script on host system
+     * open SSH session host system
      *
      * @param hostSystemStatus object contains host system information
      * @param password         password to host system if needed
-     * @param script script object
      * @return status of key distribution
      */
-    public static SystemStatus execScriptOnSystem(SystemStatus hostSystemStatus, String password, Script script) {
-
-
-        //set status to in progress
-        ExecutorService executor = Executors.newCachedThreadPool();
+    public static SystemStatus openSSHTermOnSystem(SystemStatus hostSystemStatus, String password, Map<Long, SchSession> schSessionMap, Long scriptId) {
 
         JSch jsch = new JSch();
+
+        hostSystemStatus.setStatusCd(SystemStatus.SUCCESS_STATUS);
+
+        SchSession schSession = null;
+
         try {
             //add private key
             jsch.addIdentity(KEY_PATH + "/" + KEY_NAME, PrivateKeyDB.getPassphrase());
@@ -241,19 +253,31 @@ public class SSHUtil {
             }
             session.setConfig("StrictHostKeyChecking", "no");
             session.connect(SESSION_TIMEOUT);
+            Channel channel = session.openChannel("shell");
+            ((ChannelShell) channel).setPtyType("vt102");
 
-            //set status to in progress
-            hostSystemStatus.setStatusCd(SystemStatus.IN_PROGRESS_STATUS);
-            SystemStatusDB.updateSystemStatus(hostSystemStatus);
-            /* not sure if i should do this
-            //set auth keys if password exists
-            if (password != null && !password.trim().equals("")) {
-                hostSystemStatus = SSHUtil.authAndAddPubKey(hostSystemStatus, session);
-            }*/
-            //make sure no errors have occurred
-            if (SystemStatus.IN_PROGRESS_STATUS.equals(hostSystemStatus.getStatusCd())) {
-                executor.execute(new ScriptTask(session, hostSystemStatus, script));
-            }
+            InputStream outFromChannel = channel.getInputStream();
+
+            ExecutorService executor = Executors.newCachedThreadPool();
+
+            executor.execute(new SessionOutputTask(hostSystemStatus.getHostSystem().getId(), outFromChannel));
+
+
+            OutputStream inputToChannel = channel.getOutputStream();
+            PrintStream commander = new PrintStream(inputToChannel, true);
+
+
+            channel.connect();
+
+            schSession = new SchSession();
+            schSession.setSession(session);
+            schSession.setChannel(channel);
+            schSession.setCommander(commander);
+            schSession.setInputToChannel(inputToChannel);
+            schSession.setOutFromChannel(outFromChannel);
+            schSession.setHostSystem(hostSystemStatus.getHostSystem());
+
+
         } catch (Exception e) {
             hostSystemStatus.setErrorMsg(e.getMessage());
             if (e.getMessage().contains("Auth fail") || e.getMessage().contains("Auth cancel")) {
@@ -262,6 +286,31 @@ public class SSHUtil {
                 hostSystemStatus.setStatusCd(SystemStatus.GENERIC_FAIL_STATUS);
             }
         }
+
+        //add session to map
+        if (hostSystemStatus.getStatusCd().equals(SystemStatus.SUCCESS_STATUS)) {
+            schSessionMap.put(hostSystemStatus.getHostSystem().getId(), schSession);
+
+
+            //run script if provided run it
+            if (scriptId != null && scriptId > 0) {
+                Script script = ScriptDB.getScript(scriptId);
+                BufferedReader reader = new BufferedReader(new StringReader(script.getScript()));
+                String line;
+                try {
+                    while ((line = reader.readLine()) != null) {
+                        schSession.getCommander().println(line);
+                    }
+                } catch (Exception e) {
+                    hostSystemStatus.setErrorMsg(e.getMessage());
+                    hostSystemStatus.setStatusCd(SystemStatus.GENERIC_FAIL_STATUS);
+                }
+
+            }
+        }
+
+        SystemStatusDB.updateSystemStatus(hostSystemStatus);
+
         return hostSystemStatus;
     }
 

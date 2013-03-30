@@ -1,10 +1,23 @@
 <%
 /**
- * Copyright (c) 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
- * Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
+ * Copyright 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 %>
 <%@ taglib prefix="s" uri="/struts-tags" %>
+<s:set id="selectForm"><s:property value="#parameters['selectForm']"/></s:set>
+<s:set id="terms"><s:property value="#parameters['terms']"/></s:set>
 <!DOCTYPE html>
 <html>
 <head>
@@ -60,8 +73,8 @@
             //regenerate auth keys btn
             $(".select_frm_btn").button().click(function() {
                 //change form action if executing script
-                <s:if test="script!=null">
-                    $("#select_frm").attr("action","selectSystemsForExecScript.action");
+                <s:if test="script!=null||#terms=='true'">
+                    $("#select_frm").attr("action","selectSystemsForCompositeTerms.action");
                 </s:if>
                 $("#select_frm").submit();
             });
@@ -118,11 +131,11 @@
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
     <div class="content">
-        <s:set id="selectForm"><s:property value="#parameters['selectForm']"/></s:set>
         <s:form action="viewSystems">
             <s:hidden name="sortedSet.orderByDirection"/>
             <s:hidden name="sortedSet.orderByField"/>
             <s:hidden name="selectForm"/>
+            <s:hidden name="terms"/>
             <s:if test="script!=null">
               <s:hidden name="script.id"/>
             </s:if>
@@ -131,7 +144,7 @@
         <s:if test="#selectForm=='true'">
             <s:if test="script!=null">
                 <h3>Execute Script on Systems</h3>
-                <jsp:include page="../_res/inc/nav_sub.jsp"/>
+                <jsp:include page="../_res/inc/scripts_nav.jsp"/>
                 <p>Run <b>
                 <a id="script_btn" href="#"><s:property value="script.displayNm"/></a></b> on the selected systems below
                 </p>
@@ -139,9 +152,14 @@
                     <pre><s:property value="script.script"/></pre>
                 </div>
             </s:if>
+            <s:elseif test="#terms=='true'">
+                <h3>Composite SSH Terminals</h3>
+                <jsp:include page="../_res/inc/terms_nav.jsp"/>
+                <p>Select the systems below to generate composite SSH sessions in multiple terminals</p>
+            </s:elseif>
             <s:else>
                 <h3>Distribute Authorized Key for Systems</h3>
-                <jsp:include page="../_res/inc/nav_sub.jsp"/>
+                <jsp:include page="../_res/inc/key_nav.jsp"/>
                 <p>Select the systems below to generate and set the authorized key file</p>
             </s:else>
 
@@ -214,6 +232,9 @@
             <s:if test="script!=null && sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
                 <div class="select_frm_btn">Execute Script</div>
             </s:if>
+            <s:elseif test="#terms=='true' && sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
+                    <div class="select_frm_btn">Create SSH Terminals</div>
+            </s:elseif>
             <s:elseif test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
                 <div class="select_frm_btn">Distribute Authorized Keys</div>
             </s:elseif>

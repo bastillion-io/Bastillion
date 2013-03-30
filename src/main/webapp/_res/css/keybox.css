@@ -24,19 +24,19 @@ table td, table th {
     overflow: hidden;
 }
 
-
 .vborder {
     border: 1px solid #CCCCCC;
 }
- .tablescroll_head th {
 
-     background-color: #e0e0e0;
- }
+.tablescroll_head th {
+
+    background-color: #e0e0e0;
+}
 
 .vborder td, .vborder th, .tablescroll_head th {
-      padding: 10px 15px 10px 15px;
-     border: 1px solid #CCCCCC;
-    white-space:nowrap;
+    padding: 10px 15px 10px 15px;
+    border: 1px solid #CCCCCC;
+    white-space: nowrap;
 }
 
 .errorMessage {
@@ -147,6 +147,45 @@ div.block .input {
 }
 
 .ui-button {
-    height:22px;
+    height: 22px;
 }
 
+div.scroll {
+    width: 570px;
+    height: 200px;
+    overflow: scroll;
+    margin: 10px;
+    border: 1px solid #CCCCCC;
+}
+
+div.scroll pre {
+    padding: 2px 5px 2px 5px;
+}
+
+div.scrollwrapper {
+    width: 1200px;
+    height: 500px;
+    overflow-x: auto;
+     border: 1px solid #CCCCCC;
+    overflow-y: scroll;
+}
+
+div.scrollwrapper div {
+    margin: 15px 5px  0px 5px;
+    float: left;
+}
+
+div.scrollwrapper div h4 {
+    margin: 0 0 0 15px;
+}
+.top_nav {
+   padding:0;
+   list-style: none;
+}
+.top_nav_item {
+    float:left;
+    padding:0 15px 0px 0;
+}
+.clear {
+    clear:both;
+}

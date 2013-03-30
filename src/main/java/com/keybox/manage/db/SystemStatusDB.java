@@ -1,6 +1,17 @@
 /**
- * Copyright (c) 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
- * Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
+ * Copyright 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package com.keybox.manage.db;
 
@@ -330,11 +341,10 @@ public class SystemStatusDB {
 
         try {
 
-            PreparedStatement stmt = con.prepareStatement("insert into status (id, auth_keys_val, status_cd, output) values (?,?,?,?)");
+            PreparedStatement stmt = con.prepareStatement("insert into status (id, auth_keys_val, status_cd) values (?,?,?)");
             stmt.setLong(1, systemStatus.getId());
             stmt.setString(2, systemStatus.getAuthKeyVal());
             stmt.setString(3, systemStatus.getStatusCd());
-            stmt.setString(4, systemStatus.getOutput());
             stmt.execute();
             DBUtils.closeStmt(stmt);
 
@@ -376,11 +386,10 @@ public class SystemStatusDB {
 
         try {
 
-            PreparedStatement stmt = con.prepareStatement("update status set auth_keys_val=?, status_cd=?, output=? where id=?");
+            PreparedStatement stmt = con.prepareStatement("update status set auth_keys_val=?, status_cd=? where id=?");
             stmt.setString(1, systemStatus.getAuthKeyVal());
             stmt.setString(2, systemStatus.getStatusCd());
-            stmt.setString(3, systemStatus.getOutput());
-            stmt.setLong(4, systemStatus.getId());
+            stmt.setLong(3, systemStatus.getId());
             stmt.execute();
             DBUtils.closeStmt(stmt);
 
@@ -428,7 +437,6 @@ public class SystemStatusDB {
                 systemStatus.setId(rs.getLong("id"));
                 systemStatus.setAuthKeyVal(rs.getString("auth_keys_val"));
                 systemStatus.setStatusCd(rs.getString("status_cd"));
-                systemStatus.setOutput(rs.getString("output"));
                 systemStatus.setHostSystem(SystemDB.getSystem(con, systemStatus.getId()));
                 systemStatusList.add(systemStatus);
             }
@@ -464,7 +472,6 @@ public class SystemStatusDB {
                 systemStatus.setId(rs.getLong("id"));
                 systemStatus.setAuthKeyVal(rs.getString("auth_keys_val"));
                 systemStatus.setStatusCd(rs.getString("status_cd"));
-                systemStatus.setOutput(rs.getString("output"));
                 systemStatus.setHostSystem(SystemDB.getSystem(con, systemStatus.getId()));
             }
             DBUtils.closeRs(rs);
@@ -499,7 +506,6 @@ public class SystemStatusDB {
                 systemStatus.setId(rs.getLong("id"));
                 systemStatus.setAuthKeyVal(rs.getString("auth_keys_val"));
                 systemStatus.setStatusCd(rs.getString("status_cd"));
-                systemStatus.setOutput(rs.getString("output"));
                 systemStatus.setHostSystem(SystemDB.getSystem(con, systemStatus.getId()));
 
             }
