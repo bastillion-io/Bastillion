@@ -19,7 +19,7 @@ http://www.sqlite.org/download.html
 Java JDK 1.6 or greater
 http://www.oracle.com/technetwork/java/javase/overview/index.html
 
-Maven 3 or greater (Only needed if building from source0
+Maven 3 or greater ( Only needed if building from source )
 http://maven.apache.org
 
 Must run on *nix with OpenSSH version 2
@@ -27,7 +27,7 @@ Must run on *nix with OpenSSH version 2
 
 To Build from Source and Run with Maven
 ------
-Export Environment Variables
+Export environment variables
 
     export JAVA_HOME=/path/to/jdk
     export M2_HOME=/path/to/maven
@@ -48,7 +48,8 @@ Export Environment Variables
      export PATH=$JAVA_HOME/bin:$PATH
 
 Start KeyBox
-    ./startKeyBox.sh
+	
+	./startKeyBox.sh
 
 
 Using KeyBox
