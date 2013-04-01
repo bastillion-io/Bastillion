@@ -69,7 +69,7 @@ Steps:
 4. Assign systems to profile
 5. Assign profiles to users
 6. Generate and distribute authorized key file for systems or users
-7. Start composite-ssh sessions or create or execute a script across multiple sessions
+7. Start composite-ssh sessions or create and execute a script across multiple sessions
 
 
 Author
