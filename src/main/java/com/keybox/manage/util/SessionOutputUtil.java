@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.keybox.manage.db;
+package com.keybox.manage.util;
 
 import com.keybox.manage.model.SessionOutput;
 
 import java.util.*;
 
 
-public class SessionOutputMem {
+public class SessionOutputUtil {
 
     private static Map<Long, SessionOutput> sessionOutputMap = new LinkedHashMap<Long, SessionOutput>();
 
