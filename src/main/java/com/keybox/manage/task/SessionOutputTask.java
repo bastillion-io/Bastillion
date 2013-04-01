@@ -15,7 +15,7 @@
  */
 package com.keybox.manage.task;
 
-import com.keybox.manage.db.SessionOutputMem;
+import com.keybox.manage.util.SessionOutputUtil;
 import com.keybox.manage.model.SessionOutput;
 
 import java.io.BufferedReader;
@@ -45,17 +45,17 @@ public class SessionOutputTask implements Runnable {
 
             SessionOutput sessionOutput = new SessionOutput();
             sessionOutput.setSessionId(sessionId);
-            SessionOutputMem.addOutput(sessionOutput);
+            SessionOutputUtil.addOutput(sessionOutput);
 
             while ((value = br.read()) != -1) {
                 // converts int to character
                 char c = (char) value;
-                SessionOutputMem.addCharToOutput(sessionOutput, c);
+                SessionOutputUtil.addCharToOutput(sessionOutput, c);
 
             }
             //sleep for 5 sec before removing output object so that leftover output is displayed
             Thread.sleep(5000);
-            SessionOutputMem.removeOutput(sessionOutput);
+            SessionOutputUtil.removeOutput(sessionOutput);
 
         } catch (Exception ex) {
 

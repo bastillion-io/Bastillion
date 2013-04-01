@@ -142,7 +142,7 @@ public class SSHUtil {
         try {
 
             //add private key
-            jsch.addIdentity(KEY_PATH + "/" + KEY_NAME, PrivateKeyDB.getPassphrase());
+            jsch.addIdentity(KEY_PATH + "/" + KEY_NAME, EncryptionUtil.decrypt(PrivateKeyDB.getPassphrase()));
 
 
             //create session
@@ -244,7 +244,7 @@ public class SSHUtil {
 
         try {
             //add private key
-            jsch.addIdentity(KEY_PATH + "/" + KEY_NAME, PrivateKeyDB.getPassphrase());
+            jsch.addIdentity(KEY_PATH + "/" + KEY_NAME, EncryptionUtil.decrypt(PrivateKeyDB.getPassphrase()));
             Session session = jsch.getSession(hostSystemStatus.getHostSystem().getUser(), hostSystemStatus.getHostSystem().getHost(), hostSystemStatus.getHostSystem().getPort());
 
             //set password if it exists

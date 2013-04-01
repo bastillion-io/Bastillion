@@ -15,7 +15,7 @@
  */
 package com.keybox.manage.action;
 
-import com.keybox.manage.db.SessionOutputMem;
+import com.keybox.manage.util.SessionOutputUtil;
 import com.keybox.manage.db.SystemStatusDB;
 import com.keybox.manage.model.*;
 import com.keybox.manage.util.SSHUtil;
@@ -167,7 +167,7 @@ public class SecureShellAction extends ActionSupport implements ServletResponseA
     @Action(value = "/manage/getOutputJSON"
     )
     public synchronized String getOutputJSON() {
-        outputList = SessionOutputMem.getOutput();
+        outputList = SessionOutputUtil.getOutput();
         JSONArray json = (JSONArray) JSONSerializer.toJSON(outputList);
         try {
             servletResponse.getOutputStream().write(json.toString().getBytes());

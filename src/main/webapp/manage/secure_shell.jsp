@@ -145,8 +145,8 @@
 
 <div class="page">
 
+  <s:if test="schSessionMap!= null && !schSessionMap.isEmpty()">
     <div class="content">
-
         <ul class="top_nav">
             <li class="top_nav_item">
                 <s:form id="runCmd_all" action="runCmd" cssClass="runCmd" theme="simple">
@@ -226,8 +226,16 @@
             </s:if>
         </s:form>
 
-
     </div>
+     </s:if>
+        <s:else>
+         <jsp:include page="../_res/inc/navigation.jsp"/>
+
+            <div class="content">
+            <p class="error">No systems have been selected.</p>
+            </div>
+        </s:else>
+
 </div>
 </body>
 </html>
