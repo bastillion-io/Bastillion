@@ -27,6 +27,7 @@ import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletResponseAware;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,7 @@ public class SecureShellAction extends ActionSupport implements ServletResponseA
     String command;
     HttpServletResponse servletResponse;
     Integer keyCode = null;
-    Long id;
+    List<Long> idList = new ArrayList<Long>();
     List<Long> systemSelectId;
     List<Long> profileSelectId;
     SystemStatus currentSystemStatus;
@@ -49,7 +50,9 @@ public class SecureShellAction extends ActionSupport implements ServletResponseA
     String password;
     Script script = new Script();
 
-    /** Maps key press events to the ascii values */
+    /**
+     * Maps key press events to the ascii values
+     */
     static Map<Integer, byte[]> keyMap = new HashMap<Integer, byte[]>();
 
     static {
@@ -134,18 +137,9 @@ public class SecureShellAction extends ActionSupport implements ServletResponseA
     public String runCmd() {
         try {
             //if id then write to single system output buffer
-            if (id != null && id > 0) {
-                SchSession schSession = schSessionMap.get(id);
-                if (keyCode != null) {
-                    if (keyMap.containsKey(keyCode)) {
-                        schSession.getCommander().write(keyMap.get(keyCode));
-                    }
-                } else {
-                    schSession.getCommander().println(command);
-                }
-            } else {
-                //if none write to all output buffers
-                for (SchSession schSession : schSessionMap.values()) {
+            if (idList != null && idList.size() > 0) {
+                for (Long id : idList) {
+                    SchSession schSession = schSessionMap.get(id);
                     if (keyCode != null) {
                         if (keyMap.containsKey(keyCode)) {
                             schSession.getCommander().write(keyMap.get(keyCode));
@@ -166,13 +160,15 @@ public class SecureShellAction extends ActionSupport implements ServletResponseA
      */
     @Action(value = "/manage/getOutputJSON"
     )
-    public synchronized String getOutputJSON() {
+    public String getOutputJSON() {
         outputList = SessionOutputUtil.getOutput();
-        JSONArray json = (JSONArray) JSONSerializer.toJSON(outputList);
-        try {
-            servletResponse.getOutputStream().write(json.toString().getBytes());
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        synchronized (outputList) {
+            JSONArray json = (JSONArray) JSONSerializer.toJSON(outputList);
+            try {
+                servletResponse.getOutputStream().write(json.toString().getBytes());
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         }
         return null;
     }
@@ -216,7 +212,6 @@ public class SecureShellAction extends ActionSupport implements ServletResponseA
             }
 
         } else {
-            System.out.println("done");
             //done
             currentSystemStatus = null;
             pendingSystemStatus = null;
@@ -361,12 +356,12 @@ public class SecureShellAction extends ActionSupport implements ServletResponseA
         SecureShellAction.schSessionMap = schSessionMap;
     }
 
-    public Long getId() {
-        return id;
+    public List<Long> getIdList() {
+        return idList;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setIdList(List<Long> idList) {
+        this.idList = idList;
     }
 
     public List<Long> getSystemSelectId() {

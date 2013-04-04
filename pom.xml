@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.keybox</groupId>
     <artifactId>keybox</artifactId>
-    <version>1.05.000</version>
+    <version>1.06.000</version>
     <packaging>war</packaging>
     <name>KeyBox</name>
 
@@ -64,12 +64,6 @@
                 <groupId>org.mortbay.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
                 <configuration>
-                    <systemProperties>
-                        <systemProperty>
-                            <name>ServerEnv</name>
-                            <value>LCL</value>
-                        </systemProperty>
-                    </systemProperties>
                     <scanIntervalSeconds>-1</scanIntervalSeconds>
                     <connectors>
                         <connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">

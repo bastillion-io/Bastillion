@@ -30,13 +30,14 @@ import java.sql.Statement;
  * Initial startup task.  Creates an SQLite DB and generates
  * the system public/private key pair if none exists
  */
-@WebServlet( name="DBInitServlet",
+@WebServlet(name = "DBInitServlet",
         urlPatterns = {"/config"},
         loadOnStartup = 1)
 public class DBInitServlet extends javax.servlet.http.HttpServlet {
 
     /**
      * task init method that created DB and generated public/private keys
+     *
      * @param config task config
      * @throws ServletException
      */
@@ -63,12 +64,23 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
                 statement.executeUpdate("create table if not exists private_key (passphrase string unique not null)");
                 statement.executeUpdate("create table if not exists status (id INTEGER, auth_keys_val not null,status_cd string not null default 'I', foreign key (id) references system(id) on delete cascade)");
                 statement.executeUpdate("create table if not exists scripts (id INTEGER PRIMARY KEY AUTOINCREMENT, display_nm string not null, script string not null)");
-
-                System.out.println("Generating KeyBox SSH public/private key pair");
+      		System.out.println("Generating KeyBox SSH public/private key pair");
                 //generate new key and insert passphrase
                 statement.executeUpdate("insert or ignore into private_key (passphrase) values('" + EncryptionUtil.encrypt(SSHUtil.keyGen()) + "')");
                 System.out.println("KeyBox Public Key:");
                 System.out.println(SSHUtil.getPublicKey());
+
+		
+            }
+            //check to see if public key exists, if not create a new one
+            String publicKey = SSHUtil.getPublicKey();
+            if (publicKey == null || publicKey.trim().equals("")) {
+                System.out.println("Generating KeyBox SSH public/private key pair");
+                //generate new key and update passphrase
+                statement.executeUpdate("update private_key set passphrase='" + EncryptionUtil.encrypt(SSHUtil.keyGen()) + "'");
+                System.out.println("KeyBox Public Key:");
+                System.out.println(SSHUtil.getPublicKey());
+
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(statement);
