@@ -15,6 +15,7 @@
  */
 package com.keybox.manage.action;
 
+import com.keybox.manage.db.ScriptDB;
 import com.keybox.manage.util.SessionOutputUtil;
 import com.keybox.manage.db.SystemStatusDB;
 import com.keybox.manage.model.*;
@@ -27,6 +28,8 @@ import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletResponseAware;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +40,7 @@ import java.util.Map;
  */
 public class SecureShellAction extends ActionSupport implements ServletResponseAware {
 
-    private static Map<Long, SchSession> schSessionMap = new HashMap<Long, SchSession>();
+    static Map<Long, SchSession> schSessionMap = new HashMap<Long, SchSession>();
     List<SessionOutput> outputList;
     String command;
     HttpServletResponse servletResponse;
@@ -161,8 +164,8 @@ public class SecureShellAction extends ActionSupport implements ServletResponseA
     @Action(value = "/manage/getOutputJSON"
     )
     public String getOutputJSON() {
+        synchronized (SessionOutputUtil.class){
         outputList = SessionOutputUtil.getOutput();
-        synchronized (outputList) {
             JSONArray json = (JSONArray) JSONSerializer.toJSON(outputList);
             try {
                 servletResponse.getOutputStream().write(json.toString().getBytes());
@@ -190,31 +193,59 @@ public class SecureShellAction extends ActionSupport implements ServletResponseA
             //get status
             currentSystemStatus = SystemStatusDB.getSystemStatus(pendingSystemStatus.getId());
             //if initial status run script
-            if (SystemStatus.INITIAL_STATUS.equals(currentSystemStatus.getStatusCd())
-                    || SystemStatus.AUTH_FAIL_STATUS.equals(currentSystemStatus.getStatusCd())
+            if (currentSystemStatus!=null && (SystemStatus.INITIAL_STATUS.equals(currentSystemStatus.getStatusCd())
+                    || SystemStatus.AUTH_FAIL_STATUS.equals(currentSystemStatus.getStatusCd()))
                     ) {
 
-                //try and run script
-                currentSystemStatus = SSHUtil.openSSHTermOnSystem(currentSystemStatus, password, schSessionMap, script.getId());
+                //set current session
+                currentSystemStatus = SSHUtil.openSSHTermOnSystem(currentSystemStatus, password, schSessionMap);
 
 
             }
-            if (SystemStatus.AUTH_FAIL_STATUS.equals(currentSystemStatus.getStatusCd())) {
+            if (currentSystemStatus!=null && SystemStatus.AUTH_FAIL_STATUS.equals(currentSystemStatus.getStatusCd())) {
                 pendingSystemStatus = currentSystemStatus;
 
             } else {
 
+
                 pendingSystemStatus = SystemStatusDB.getNextPendingSystem();
+                while (pendingSystemStatus != null && currentSystemStatus != null && SystemStatus.SUCCESS_STATUS.equals(currentSystemStatus.getStatusCd())) {
+                    password=null;
+                    currentSystemStatus = SSHUtil.openSSHTermOnSystem(pendingSystemStatus, password, schSessionMap);
+                    pendingSystemStatus = SystemStatusDB.getNextPendingSystem();
+                }
+
+                //no pending systems left but current system is not finished
                 if (pendingSystemStatus == null && !SystemStatusDB.isFinished()) {
                     pendingSystemStatus = currentSystemStatus;
                 }
 
             }
 
-        } else {
-            //done
-            currentSystemStatus = null;
-            pendingSystemStatus = null;
+        }
+        if (pendingSystemStatus == null) {
+
+            //run script it exists
+            if (script != null && script.getId() != null && script.getId() > 0) {
+
+
+                script = ScriptDB.getScript(script.getId());
+
+                for (SchSession schSession : schSessionMap.values()) {
+                    BufferedReader reader = new BufferedReader(new StringReader(script.getScript()));
+                    String line;
+                    try {
+
+                        while ((line = reader.readLine()) != null) {
+                            schSession.getCommander().println(line);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+
+                    }
+                }
+
+            }
         }
 
 
@@ -253,12 +284,8 @@ public class SecureShellAction extends ActionSupport implements ServletResponseA
 
 
             List<SystemStatus> systemStatusList = SystemStatusDB.setInitialSystemStatus(SystemStatusDB.findAuthKeysForSystems(systemSelectId));
-            for (SystemStatus systemStatus : systemStatusList) {
-                currentSystemStatus = SSHUtil.openSSHTermOnSystem(systemStatus, password, schSessionMap, script.getId());
-            }
-
-
             pendingSystemStatus = SystemStatusDB.getNextPendingSystem();
+
 
         }
         return SUCCESS;
@@ -279,11 +306,8 @@ public class SecureShellAction extends ActionSupport implements ServletResponseA
 
 
             List<SystemStatus> systemStatusList = SystemStatusDB.setInitialSystemStatus(SystemStatusDB.findAuthKeysForProfile(profileSelectId));
-            for (SystemStatus systemStatus : systemStatusList) {
-                currentSystemStatus = SSHUtil.openSSHTermOnSystem(systemStatus, password, schSessionMap, script.getId());
-            }
-
             pendingSystemStatus = SystemStatusDB.getNextPendingSystem();
+
         }
 
 
@@ -315,6 +339,7 @@ public class SecureShellAction extends ActionSupport implements ServletResponseA
 
         return SUCCESS;
     }
+
 
     public List<SessionOutput> getOutputList() {
         return outputList;

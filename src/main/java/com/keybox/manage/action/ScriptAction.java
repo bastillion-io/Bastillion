@@ -82,7 +82,7 @@ public class ScriptAction extends ActionSupport {
         if (script == null
                 || script.getDisplayNm() == null
                 || script.getDisplayNm().trim().equals("")) {
-            addFieldError("script.displayNm", "Script Name is required");
+            addFieldError("script.displayNm", "Required");
         }
 
         if (script == null
@@ -90,7 +90,7 @@ public class ScriptAction extends ActionSupport {
                 || script.getScript().trim().equals("")
                 || (new Script()).getScript().trim().equals(script.getScript().trim())
                 ) {
-            addFieldError("script.script", "Script is required");
+            addFieldError("script.script", "Required");
         }
 
         if (!this.getFieldErrors().isEmpty()) {

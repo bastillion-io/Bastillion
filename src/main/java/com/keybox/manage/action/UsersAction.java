@@ -87,18 +87,18 @@ public class UsersAction extends ActionSupport {
         if (user == null
                 || user.getLastNm() == null
                 || user.getLastNm().trim().equals("")) {
-            addFieldError("user.lastNm", "Last Name is required");
+            addFieldError("user.lastNm", "Required");
         }
 
         if (user == null
                 || user.getFirstNm() == null
                 || user.getFirstNm().trim().equals("")) {
-            addFieldError("user.firstNm", "First Name is required");
+            addFieldError("user.firstNm", "Required");
         }
         if (user == null
                 || user.getPublicKey() == null
                 || user.getPublicKey().trim().equals("")) {
-            addFieldError("user.publicKey", "Public Key is required");
+            addFieldError("user.publicKey", "Required");
 
         }
 

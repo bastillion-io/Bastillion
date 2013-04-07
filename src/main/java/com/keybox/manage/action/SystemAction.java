@@ -83,29 +83,29 @@ public class SystemAction extends ActionSupport {
         if (hostSystem == null
                 || hostSystem.getDisplayNm() == null
                 || hostSystem.getDisplayNm().trim().equals("")) {
-            addFieldError("hostSystem.displayNm", "Display Name is required");
+            addFieldError("hostSystem.displayNm", "Required");
         }
         if (hostSystem == null
                 || hostSystem.getUser() == null
                 || hostSystem.getUser().trim().equals("")) {
-            addFieldError("hostSystem.user", "User is required");
+            addFieldError("hostSystem.user", "Required");
         }
         if (hostSystem == null
                 || hostSystem.getHost() == null
                 || hostSystem.getHost().trim().equals("")) {
-            addFieldError("hostSystem.host", "Host is required");
+            addFieldError("hostSystem.host", "Required");
         }
         if (hostSystem == null
                 || hostSystem.getPort() == null) {
-            addFieldError("hostSystem.port", "Port is required");
+            addFieldError("hostSystem.port", "Required");
         } else if (!(hostSystem.getPort() > 0)) {
-            addFieldError("hostSystem.port", "Port is invalid");
+            addFieldError("hostSystem.port", "Invalid");
         }
 
         if (hostSystem == null
                 || hostSystem.getAuthorizedKeys() == null
-                || hostSystem.getAuthorizedKeys().trim().equals("")) {
-            addFieldError("hostSystem.authorizedKeys", "Authorized Keys is required");
+                || hostSystem.getAuthorizedKeys().trim().equals("")|| hostSystem.getAuthorizedKeys().trim().equals("~")) {
+            addFieldError("hostSystem.authorizedKeys", "Required");
         }
 
         if (!this.getFieldErrors().isEmpty()) {

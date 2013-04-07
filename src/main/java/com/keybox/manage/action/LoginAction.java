@@ -135,11 +135,11 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
     public void validateLoginSubmit() {
         if (login.getUsername() == null ||
                 login.getUsername().trim().equals("")) {
-            addFieldError("login.username", "Username is required");
+            addFieldError("login.username", "Required");
         }
         if (login.getPassword() == null ||
                 login.getPassword().trim().equals("")) {
-            addFieldError("login.password", "Password is required");
+            addFieldError("login.password", "Required");
         }
 
 
@@ -152,15 +152,15 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
     public void validatePasswordSubmit() {
         if (login.getPassword() == null ||
                 login.getPassword().trim().equals("")) {
-            addFieldError("login.password", "New password is required");
+            addFieldError("login.password", "Required");
         }
         if (login.getPasswordConfirm() == null ||
                 login.getPasswordConfirm().trim().equals("")) {
-            addFieldError("login.passwordConfirm", "New password confirmation is required");
+            addFieldError("login.passwordConfirm", "Required");
         }
         if (login.getPrevPassword() == null ||
                 login.getPrevPassword().trim().equals("")) {
-            addFieldError("login.prevPassword", "Current password is required");
+            addFieldError("login.prevPassword", "Required");
         }
 
 

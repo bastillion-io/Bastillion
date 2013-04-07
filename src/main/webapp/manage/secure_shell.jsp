@@ -25,18 +25,30 @@
     <script type="text/javascript">
         $(document).ready(function() {
 
+            $('#runCmd_command').focus();
 
             $("#set_password_dialog").dialog({
                 autoOpen: false,
                 height: 200,
-                minWidth: 400,
+                minWidth: 500,
                 modal: true
             });
             $("#error_dialog").dialog({
                 autoOpen: false,
                 height: 200,
-                width: 400,
+                width: 500,
                 modal: true
+            });
+            $("#upload_push_dialog").dialog({
+                autoOpen: false,
+                height: 350,
+                width: 530,
+                modal: true,
+                open: function(event, ui) { $(".ui-dialog-titlebar-close").show(); },
+                close: function() {
+                    $("#upload_push_frame").attr("src", "");
+                    $('#runCmd_command').focus();
+                }
             });
 
             $(".enter_btn").button().click(function() {
@@ -46,7 +58,10 @@
 
             //submit add or edit form
             $(".submit_btn").button().click(function() {
+                <s:if test="pendingSystemStatus!=null">
                 $(this).prev().submit();
+                </s:if>
+                 $("#error_dialog").dialog("close");
                 $('#runCmd_command').focus();
             });
             //close all forms
@@ -110,34 +125,44 @@
 
             //if terminal window toggle active for commands
             $(".run_cmd").click(function() {
-                //check if all terminals are selected
-                var allSelected = true;
-                $(".run_cmd").each(function(index) {
-                    if (!$(this).hasClass('run_cmd_active')) {
-                        allSelected = false;
-                    }
-                });
-
-                //if all terminals are selected make only the clicked one active
-                if (allSelected) {
-                    $(".run_cmd").removeClass('run_cmd_active');
-                    $(this).addClass('run_cmd_active');
-
+               //de-active or active clicked terminal
+               if ($(this).hasClass('run_cmd_active')) {
+                    $(this).removeClass('run_cmd_active')
                 } else {
-                    //de-active or active clicked terminal
-                    if ($(this).hasClass('run_cmd_active')) {
-                        $(this).removeClass('run_cmd_active')
-
-                    } else {
-                        $(this).addClass('run_cmd_active')
-                    }
+                    $(this).addClass('run_cmd_active')
                 }
+
                 $('#runCmd_command').focus();
             });
 
             $('#select_all').click(function() {
                 $(".run_cmd").addClass('run_cmd_active');
                 $('#runCmd_command').focus();
+            });
+
+            $('#unselect_all').click(function() {
+                $(".run_cmd").removeClass('run_cmd_active');
+                $('#runCmd_command').focus();
+            });
+
+            $('#upload_push').click(function() {
+
+
+                //get id list from selected terminals
+                var ids = [];
+                $(".run_cmd_active").each(function(index) {
+                    var id = $(this).attr("id").replace("run_cmd_", "");
+                    ids.push(id);
+                });
+                var idListStr = '?action=upload';
+                ids.forEach(function(entry) {
+                    idListStr = idListStr + '&idList=' + entry;
+                });
+
+                $("#upload_push_frame").attr("src", "/manage/setUpload.action" + idListStr);
+                $("#upload_push_dialog").dialog("open");
+
+
             });
 
 
@@ -161,7 +186,8 @@
             </s:if>
             </s:if>
 
-            <s:if test="pendingSystemStatus==null && (currentSystemStatus==null||currentSystemStatus.statusCd==\"S\")">
+            <s:if test="pendingSystemStatus==null">
+
             setInterval(function() {
                 $.getJSON('getOutputJSON.action', function(data) {
                     var append = false;
@@ -181,11 +207,11 @@
     </script>
     <style type="text/css">
         .content {
-            width: 95%;
+            width: 100%;
         }
     </style>
 
-    <title>KeyBox - Terms</title>
+    <title>KeyBox - Composite Terms</title>
 
 </head>
 <body>
@@ -194,6 +220,8 @@
 
     <s:if test="(schSessionMap!= null && !schSessionMap.isEmpty()) || pendingSystemStatus!=null">
         <div class="content">
+
+        <s:if test="pendingSystemStatus==null">
             <ul class="top_nav">
                 <li class="top_nav_item">
                     <s:form id="runCmd" action="runCmd" cssClass="runCmd" theme="simple">
@@ -209,6 +237,11 @@
             <br/>
 
             <div id="select_all">Select All</div>
+            <div id="unselect_all">Unselect All</div>
+            <div id="upload_push">Upload &amp; Push</div>
+            <div class="clear"></div>
+
+            </s:if>
             <div class="scrollwrapper">
                 <s:iterator value="schSessionMap">
                     <div id="run_cmd_<s:property value="key"/>" class="run_cmd_active run_cmd">
@@ -257,6 +290,14 @@
                 <div class="submit_btn">OK</div>
             </div>
 
+            <div id="upload_push_dialog" title="Upload &amp; Push">
+                <iframe id="upload_push_frame" width="500px" height="300px" style="border: none;">
+
+                </iframe>
+
+
+            </div>
+
 
             <s:form id="composite_terms_frm" action="createTerms">
                 <s:hidden name="pendingSystemStatus.id"/>
@@ -276,5 +317,6 @@
     </s:else>
 
 </div>
+
 </body>
 </html>

@@ -1,5 +1,4 @@
 html, body {
-    height: 100%;
 }
 
 body {
@@ -151,8 +150,8 @@ div.block .input {
 }
 
 div.scroll {
-    width: 570px;
-    height: 200px;
+    width: 550px;
+    height: 250px;
     overflow: scroll;
     margin: 10px;
     border: 1px solid #CCCCCC;
@@ -163,8 +162,8 @@ div.scroll pre {
 }
 
 div.scrollwrapper {
-    width: 100%;
-    height: 500px;
+    width: 95%;
+    height: 600px;
     overflow-x: auto;
     border: 1px solid #CCCCCC;
     overflow-y: scroll;
@@ -177,35 +176,71 @@ div.scrollwrapper div {
 div.scrollwrapper div h4 {
     margin: 8px 0 0 8px;
 }
+
 .top_nav {
-   padding:0;
-   list-style: none;
+    padding: 0;
+    list-style: none;
 }
+
 .top_nav_item {
-    float:left;
-    padding:0 15px 0px 0;
+    float: left;
+    padding: 0 15px 0px 0;
 }
+
 .run_cmd_active {
-    background: #6699CC;
+    background: #4d4d4d;
 }
+
 .run_cmd_active  h4 {
-    color:#FFFFFF;
+    color: #FFFFFF;
 }
 
 .run_cmd {
-   border: 1px solid #CCCCCC;
+    border: 1px solid #CCCCCC;
 }
 
-.scroll{
+.scroll {
     background-color: #ffffff;
 }
-#select_all{
+
+#select_all {
+    float: left;
     padding: 0 0 10px 10px;
     font-weight: bold;
     text-decoration: underline;
     cursor: pointer;
 
 }
+#unselect_all {
+    float: left;
+    padding: 0 0 10px 30px;
+    font-weight: bold;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+
+#upload_push {
+    float: left;
+    padding: 0 0 10px 30px;
+    font-weight: bold;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
 .clear {
-    clear:both;
+    clear: both;
+}
+
+.ui-dialog-titlebar-close  {
+    display:none;
+}
+.errorsBg{
+	background-color:#fdd;
+	color:red;
+	border: 1px solid;
+}
+
+.errorMessage{
+	padding:0px 8px;
 }

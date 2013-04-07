@@ -27,13 +27,13 @@
             $("#error_dialog").dialog({
                 autoOpen: false,
                 height: 200,
-                width: 400,
+                width: 500,
                 modal: true
             });
             $("#set_password_dialog").dialog({
                 autoOpen: false,
                 height: 200,
-                width: 400,
+                width: 500,
                 modal: true
             });
             //submit add or edit form

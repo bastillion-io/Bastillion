@@ -64,7 +64,7 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
                 statement.executeUpdate("create table if not exists private_key (passphrase string unique not null)");
                 statement.executeUpdate("create table if not exists status (id INTEGER, auth_keys_val not null,status_cd string not null default 'I', foreign key (id) references system(id) on delete cascade)");
                 statement.executeUpdate("create table if not exists scripts (id INTEGER PRIMARY KEY AUTOINCREMENT, display_nm string not null, script string not null)");
-      		System.out.println("Generating KeyBox SSH public/private key pair");
+      		    System.out.println("Generating KeyBox SSH public/private key pair");
                 //generate new key and insert passphrase
                 statement.executeUpdate("insert or ignore into private_key (passphrase) values('" + EncryptionUtil.encrypt(SSHUtil.keyGen()) + "')");
                 System.out.println("KeyBox Public Key:");

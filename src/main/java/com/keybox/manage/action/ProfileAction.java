@@ -87,7 +87,7 @@ public class ProfileAction extends ActionSupport {
         if (profile == null
                 || profile.getNm() == null
                 || profile.getNm().trim().equals("")) {
-            addFieldError("profile.nm", "Profile Name is required");
+            addFieldError("profile.nm", "Required");
         }
 
         if (!this.getFieldErrors().isEmpty()) {

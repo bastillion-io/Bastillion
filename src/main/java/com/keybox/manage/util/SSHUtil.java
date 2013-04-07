@@ -177,6 +177,62 @@ public class SSHUtil {
 
     }
 
+
+
+
+
+    /**
+     * distributes uploaded item to system defined
+     *
+     * @param hostSystemStatus object contains host system information
+     * @param session          an established SSH session
+     * @param source           source file
+     * @param destination      destination file
+     * @return status uploaded file
+     */
+    public static SystemStatus pushUpload(SystemStatus hostSystemStatus, Session session, String source, String destination) {
+
+
+        hostSystemStatus.setStatusCd(SystemStatus.SUCCESS_STATUS);
+        Channel channel = null;
+        ChannelSftp c = null;
+
+        try {
+
+
+            channel = session.openChannel("sftp");
+            channel.setInputStream(System.in);
+            channel.setOutputStream(System.out);
+            channel.connect(CHANNEL_TIMEOUT);
+
+            c = (ChannelSftp) channel;
+            destination = destination.replaceAll("~\\/|~", "");
+
+
+            //get file input stream
+            FileInputStream file = new FileInputStream(source);
+            c.put(file, destination);
+
+
+        } catch (Exception e) {
+            hostSystemStatus.setErrorMsg(e.getMessage());
+            hostSystemStatus.setStatusCd(SystemStatus.GENERIC_FAIL_STATUS);
+        }
+        //exit
+        if (c != null) {
+            c.exit();
+        }
+        //disconnect
+        if (channel != null) {
+            channel.disconnect();
+        }
+
+        return hostSystemStatus;
+
+
+    }
+
+
     /**
      * distributes authorized keys for host system
      *
@@ -199,7 +255,7 @@ public class SSHUtil {
             channel.connect(CHANNEL_TIMEOUT);
 
             c = (ChannelSftp) channel;
-            String authorizedKeys = hostSystemStatus.getHostSystem().getAuthorizedKeys().replaceAll("~\\/", "");
+            String authorizedKeys = hostSystemStatus.getHostSystem().getAuthorizedKeys().replaceAll("~\\/|~", "");
 
             //turn public key list into a input stream
             InputStream inputStreamAuthKeyVal = new ByteArrayInputStream(hostSystemStatus.getAuthKeyVal().getBytes());
@@ -225,8 +281,6 @@ public class SSHUtil {
     }
 
 
-
-
     /**
      * open SSH session host system
      *
@@ -234,7 +288,7 @@ public class SSHUtil {
      * @param password         password to host system if needed
      * @return status of key distribution
      */
-    public static SystemStatus openSSHTermOnSystem(SystemStatus hostSystemStatus, String password, Map<Long, SchSession> schSessionMap, Long scriptId) {
+    public static SystemStatus openSSHTermOnSystem(SystemStatus hostSystemStatus, String password, Map<Long, SchSession> schSessionMap) {
 
         JSch jsch = new JSch();
 
@@ -290,23 +344,6 @@ public class SSHUtil {
         //add session to map
         if (hostSystemStatus.getStatusCd().equals(SystemStatus.SUCCESS_STATUS)) {
             schSessionMap.put(hostSystemStatus.getHostSystem().getId(), schSession);
-
-
-            //run script if provided run it
-            if (scriptId != null && scriptId > 0) {
-                Script script = ScriptDB.getScript(scriptId);
-                BufferedReader reader = new BufferedReader(new StringReader(script.getScript()));
-                String line;
-                try {
-                    while ((line = reader.readLine()) != null) {
-                        schSession.getCommander().println(line);
-                    }
-                } catch (Exception e) {
-                    hostSystemStatus.setErrorMsg(e.getMessage());
-                    hostSystemStatus.setStatusCd(SystemStatus.GENERIC_FAIL_STATUS);
-                }
-
-            }
         }
 
         SystemStatusDB.updateSystemStatus(hostSystemStatus);
