@@ -28,15 +28,15 @@
 
             $("#add_dialog").dialog({
                 autoOpen: false,
-                height: 350,
-                width: 750,
+                height: 400,
+                width: 800,
                 modal: true
             });
 
             $(".edit_dialog").dialog({
                 autoOpen: false,
-                height: 350,
-                width: 750,
+                height: 400,
+                width: 800,
                 modal: true
             });
 

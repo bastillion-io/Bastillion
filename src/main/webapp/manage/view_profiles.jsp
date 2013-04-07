@@ -27,14 +27,14 @@
         $(document).ready(function() {
             $("#add_dialog").dialog({
                 autoOpen: false,
-                height: 225,
-                width: 375,
+                height: 255,
+                width: 400,
                 modal: true
             });
             $(".edit_dialog").dialog({
                 autoOpen: false,
-                height: 225,
-                width: 375,
+                height: 255,
+                width: 400,
                 modal: true
             });
             $("#script_dia").dialog({
