@@ -38,6 +38,10 @@ table td, table th {
     white-space: nowrap;
 }
 
+.vborder td a, .vborder th a, .tablescroll_head th a{
+    white-space: nowrap;
+}
+
 .errorMessage {
     font-size: smaller;
     color: #cc0000;
@@ -50,7 +54,6 @@ table td, table th {
 .nav {
     float: left;
     width: 125px;
-    border-right: 2px solid #CCCCCC;
 
 }
 
@@ -68,6 +71,7 @@ table td, table th {
     padding: 0px 15px 15px 15px;
     float: left;
     width: 70%;
+    border-left: 1px solid #CCCCCC;
 }
 
 .page {
@@ -76,7 +80,7 @@ table td, table th {
     padding: 15px 15px 15px 15px;
     background-color: #ffffff;
     color: #4d4d4d;
-    width: 100%;
+    width: 95%;
 
 }
 
@@ -149,31 +153,25 @@ div.block .input {
     height: 22px;
 }
 
-div.scroll {
-    width: 550px;
-    height: 250px;
-    overflow: scroll;
+div.term {
     margin: 10px;
     border: 1px solid #CCCCCC;
 }
 
-div.scroll pre {
-    padding: 2px 5px 2px 5px;
-}
 
-div.scrollwrapper {
-    width: 95%;
-    height: 600px;
+
+div.termwrapper {
+    width: 100%;
+    height: 620px;
     overflow-x: auto;
     border: 1px solid #CCCCCC;
     overflow-y: scroll;
 }
 
-div.scrollwrapper div {
-    float: left;
+div.termwrapper div {
 }
 
-div.scrollwrapper div h4 {
+div.termwrapper div h4 {
     margin: 8px 0 0 8px;
 }
 
@@ -197,36 +195,29 @@ div.scrollwrapper div h4 {
 
 .run_cmd {
     border: 1px solid #CCCCCC;
+    float: left;
+    min-width:580px;
 }
 
-.scroll {
-    background-color: #ffffff;
+.term {
+    background-color: #000000;
+}
+
+
+
+.top_link {
+    float: left;
+    padding: 0 0 10px 30px;
+    font-weight: bold;
+    text-decoration: underline;
+    cursor: pointer;
+
 }
 
 #select_all {
-    float: left;
-    padding: 0 0 10px 10px;
-    font-weight: bold;
-    text-decoration: underline;
-    cursor: pointer;
-
-}
-#unselect_all {
-    float: left;
-    padding: 0 0 10px 30px;
-    font-weight: bold;
-    text-decoration: underline;
-    cursor: pointer;
+ padding: 0 0 10px 0;
 }
 
-
-#upload_push {
-    float: left;
-    padding: 0 0 10px 30px;
-    font-weight: bold;
-    text-decoration: underline;
-    cursor: pointer;
-}
 
 .clear {
     clear: both;
@@ -244,3 +235,29 @@ div.scrollwrapper div h4 {
 .errorMessage{
 	padding:0px 8px;
 }
+
+.output {
+z-index:100;
+}
+
+
+
+
+.terminal {
+  border: #f0f0f0 solid 5px;
+  font-family: "DejaVu Sans Mono", "Liberation Mono", monospace;
+  font-size: 10px;
+  color: #000000;
+  background: #f0f0f0;
+}
+
+
+
+.reverse-video {
+  color: #f0f0f0;
+  background: #4d4d4d;
+}
+
+
+
+

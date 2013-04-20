@@ -15,7 +15,9 @@
  */
 package com.keybox.manage.action;
 
+import com.keybox.manage.db.PrivateKeyDB;
 import com.keybox.manage.db.ScriptDB;
+import com.keybox.manage.util.EncryptionUtil;
 import com.keybox.manage.util.SessionOutputUtil;
 import com.keybox.manage.db.SystemStatusDB;
 import com.keybox.manage.model.*;
@@ -51,6 +53,7 @@ public class SecureShellAction extends ActionSupport implements ServletResponseA
     SystemStatus currentSystemStatus;
     SystemStatus pendingSystemStatus;
     String password;
+    static String passphrase;
     Script script = new Script();
 
     /**
@@ -71,6 +74,10 @@ public class SecureShellAction extends ActionSupport implements ServletResponseA
         keyMap.put(39, new byte[]{(byte) 0x1b, (byte) 0x4f, (byte) 0x43});
         //DOWN
         keyMap.put(40, new byte[]{(byte) 0x1b, (byte) 0x4f, (byte) 0x42});
+        //BS
+        keyMap.put(8, new byte[]{(byte) 0x08});
+        //TAB
+        keyMap.put(9, new byte[]{(byte) 0x09});
         //CTR
         keyMap.put(17, new byte[]{});
         //CTR-A
@@ -148,7 +155,7 @@ public class SecureShellAction extends ActionSupport implements ServletResponseA
                             schSession.getCommander().write(keyMap.get(keyCode));
                         }
                     } else {
-                        schSession.getCommander().println(command);
+                        schSession.getCommander().print(command);
                     }
                 }
             }
@@ -164,8 +171,8 @@ public class SecureShellAction extends ActionSupport implements ServletResponseA
     @Action(value = "/manage/getOutputJSON"
     )
     public String getOutputJSON() {
-        synchronized (SessionOutputUtil.class){
-        outputList = SessionOutputUtil.getOutput();
+        synchronized (SessionOutputUtil.class) {
+            outputList = SessionOutputUtil.getOutput();
             JSONArray json = (JSONArray) JSONSerializer.toJSON(outputList);
             try {
                 servletResponse.getOutputStream().write(json.toString().getBytes());
@@ -190,44 +197,53 @@ public class SecureShellAction extends ActionSupport implements ServletResponseA
 
         if (pendingSystemStatus != null && pendingSystemStatus.getId() != null) {
 
+            //check to see if passphrase has been provided
+            String  passphrase = EncryptionUtil.decrypt(PrivateKeyDB.getPassphrase());
+            //set use provided passphrase
+            if (passphrase == null || passphrase.trim().equals("")) {
+                passphrase = this.getPassphrase();
+            }
+
             //get status
             currentSystemStatus = SystemStatusDB.getSystemStatus(pendingSystemStatus.getId());
             //if initial status run script
-            if (currentSystemStatus!=null && (SystemStatus.INITIAL_STATUS.equals(currentSystemStatus.getStatusCd())
-                    || SystemStatus.AUTH_FAIL_STATUS.equals(currentSystemStatus.getStatusCd()))
+            if (currentSystemStatus != null
+                    && (SystemStatus.INITIAL_STATUS.equals(currentSystemStatus.getStatusCd())
+                    || SystemStatus.AUTH_FAIL_STATUS.equals(currentSystemStatus.getStatusCd())
+                    || SystemStatus.PUBLIC_KEY_FAIL_STATUS.equals(currentSystemStatus.getStatusCd()))
                     ) {
 
                 //set current session
-                currentSystemStatus = SSHUtil.openSSHTermOnSystem(currentSystemStatus, password, schSessionMap);
-
+                currentSystemStatus = SSHUtil.openSSHTermOnSystem(currentSystemStatus, passphrase, password, schSessionMap);
 
             }
-            if (currentSystemStatus!=null && SystemStatus.AUTH_FAIL_STATUS.equals(currentSystemStatus.getStatusCd())) {
+            if (currentSystemStatus != null
+                    && (SystemStatus.AUTH_FAIL_STATUS.equals(currentSystemStatus.getStatusCd())
+                    || SystemStatus.PUBLIC_KEY_FAIL_STATUS.equals(currentSystemStatus.getStatusCd()))) {
+
                 pendingSystemStatus = currentSystemStatus;
 
             } else {
 
 
                 pendingSystemStatus = SystemStatusDB.getNextPendingSystem();
+                //if success loop through systems until finished or need password
                 while (pendingSystemStatus != null && currentSystemStatus != null && SystemStatus.SUCCESS_STATUS.equals(currentSystemStatus.getStatusCd())) {
-                    password=null;
-                    currentSystemStatus = SSHUtil.openSSHTermOnSystem(pendingSystemStatus, password, schSessionMap);
+                    currentSystemStatus = SSHUtil.openSSHTermOnSystem(pendingSystemStatus, passphrase, null, schSessionMap);
                     pendingSystemStatus = SystemStatusDB.getNextPendingSystem();
                 }
 
-                //no pending systems left but current system is not finished
-                if (pendingSystemStatus == null && !SystemStatusDB.isFinished()) {
-                    pendingSystemStatus = currentSystemStatus;
-                }
+
 
             }
+            passphrase=null;
 
         }
-        if (pendingSystemStatus == null) {
+        if (SystemStatusDB.getNextPendingSystem()== null) {
+            this.passphrase=null;
 
             //run script it exists
             if (script != null && script.getId() != null && script.getId() > 0) {
-
 
                 script = ScriptDB.getScript(script.getId());
 
@@ -267,7 +283,6 @@ public class SecureShellAction extends ActionSupport implements ServletResponseA
         SystemStatusDB.updateSystemStatus(currentSystemStatus);
         pendingSystemStatus = SystemStatusDB.getNextPendingSystem();
 
-
         return SUCCESS;
     }
 
@@ -285,7 +300,12 @@ public class SecureShellAction extends ActionSupport implements ServletResponseA
 
             List<SystemStatus> systemStatusList = SystemStatusDB.setInitialSystemStatus(SystemStatusDB.findAuthKeysForSystems(systemSelectId));
             pendingSystemStatus = SystemStatusDB.getNextPendingSystem();
-
+            //check to see if passphrase has been provided
+            String  passphrase = EncryptionUtil.decrypt(PrivateKeyDB.getPassphrase());
+            //set use provided passphrase
+            if (pendingSystemStatus!=null && (passphrase == null || passphrase.trim().equals(""))) {
+               pendingSystemStatus.setStatusCd(SystemStatus.PUBLIC_KEY_FAIL_STATUS);
+            }
 
         }
         return SUCCESS;
@@ -307,17 +327,21 @@ public class SecureShellAction extends ActionSupport implements ServletResponseA
 
             List<SystemStatus> systemStatusList = SystemStatusDB.setInitialSystemStatus(SystemStatusDB.findAuthKeysForProfile(profileSelectId));
             pendingSystemStatus = SystemStatusDB.getNextPendingSystem();
+            //check to see if passphrase has been provided
+            String  passphrase = EncryptionUtil.decrypt(PrivateKeyDB.getPassphrase());
+            //set use provided passphrase
+            if (pendingSystemStatus!=null && (passphrase == null || passphrase.trim().equals(""))) {
+                pendingSystemStatus.setStatusCd(SystemStatus.PUBLIC_KEY_FAIL_STATUS);
+            }
 
         }
-
-
         return SUCCESS;
     }
 
 
     @Action(value = "/manage/exitTerms",
             results = {
-                    @Result(name = "success", location = "viewSystems.action?selectForm=true&terms=true", type = "redirect")
+                    @Result(name = "success", location = "/manage/menu.jsp", type = "redirect")
 
             }
     )
@@ -436,6 +460,14 @@ public class SecureShellAction extends ActionSupport implements ServletResponseA
 
     public void setScript(Script script) {
         this.script = script;
+    }
+
+    public String getPassphrase() {
+        return passphrase;
+    }
+
+    public void setPassphrase(String passphrase) {
+        this.passphrase = passphrase;
     }
 }
 

@@ -55,7 +55,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
             results = {
                     @Result(name = "input", location = "/login.jsp"),
                     @Result(name = "change_password", location = "/manage/setPassword.action", type = "redirect"),
-                    @Result(name = "success", location = "/manage/viewSystems.action", type = "redirect")
+                    @Result(name = "success", location = "/manage/menu.jsp", type = "redirect")
             }
     )
     public String loginSubmit() {
@@ -105,7 +105,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
     @Action(value = "/passwordSubmit",
             results = {
                     @Result(name = "input", location = "/manage/set_password.jsp"),
-                    @Result(name = "success", location = "/manage/viewSystems.action", type = "redirect")
+                    @Result(name = "success", location = "/manage/menu.jsp", type = "redirect")
             }
     )
     public String passwordSubmit() {

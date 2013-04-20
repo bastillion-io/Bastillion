@@ -20,198 +20,215 @@
 <html>
 <head>
 
-    <jsp:include page="../_res/inc/header.jsp"/>
+<jsp:include page="../_res/inc/header.jsp"/>
 
-    <script type="text/javascript">
-        $(document).ready(function() {
+<script type="text/javascript">
+$(document).ready(function() {
 
-            $('#runCmd_command').focus();
+    $('#dummy').focus();
 
-            $("#set_password_dialog").dialog({
-                autoOpen: false,
-                height: 200,
-                minWidth: 500,
-                modal: true
-            });
-            $("#error_dialog").dialog({
-                autoOpen: false,
-                height: 200,
-                width: 500,
-                modal: true
-            });
-            $("#upload_push_dialog").dialog({
-                autoOpen: false,
-                height: 350,
-                width: 530,
-                modal: true,
-                open: function(event, ui) { $(".ui-dialog-titlebar-close").show(); },
-                close: function() {
-                    $("#upload_push_frame").attr("src", "");
-                    $('#runCmd_command').focus();
-                }
-            });
+    $("#set_password_dialog").dialog({
+        autoOpen: false,
+        height: 200,
+        minWidth: 500,
+        modal: true
+    });
+    $("#set_passphrase_dialog").dialog({
+        autoOpen: false,
+        height: 200,
+        minWidth: 500,
+        modal: true
+   });
+    $("#error_dialog").dialog({
+        autoOpen: false,
+        height: 200,
+        width: 500,
+        modal: true
+    });
+    $("#upload_push_dialog").dialog({
+        autoOpen: false,
+        height: 350,
+        width: 530,
+        modal: true,
+        open: function(event, ui) {
+            $(".ui-dialog-titlebar-close").show();
+        },
+        close: function() {
+            $("#upload_push_frame").attr("src", "");
+        }
+    });
 
-            $(".enter_btn").button().click(function() {
-                $(this).prev().submit();
-                $('#runCmd_command').focus();
-            });
+    $(".enter_btn").button().click(function() {
+        $(this).prev().submit();
+    });
 
-            //submit add or edit form
-            $(".submit_btn").button().click(function() {
-                <s:if test="pendingSystemStatus!=null">
-                $(this).prev().submit();
-                </s:if>
-                 $("#error_dialog").dialog("close");
-                $('#runCmd_command').focus();
-            });
-            //close all forms
-            $(".cancel_btn").button().click(function() {
-                $("#set_password_dialog").dialog("close");
-                window.location = 'getNextPendingSystemForTerms.action?pendingSystemStatus.id=<s:property value="pendingSystemStatus.id"/>&script.id=<s:if test="script!=null"><s:property value="script.id"/></s:if>';
-                $('#runCmd_command').focus();
+    //submit add or edit form
+    $(".submit_btn").button().click(function() {
+        <s:if test="pendingSystemStatus!=null">
+        $(this).prev().submit();
+        </s:if>
+        $("#error_dialog").dialog("close");
+    });
+    //close all forms
+    $(".cancel_btn").button().click(function() {
+        $("#set_password_dialog").dialog("close");
+        window.location = 'getNextPendingSystemForTerms.action?pendingSystemStatus.id=<s:property value="pendingSystemStatus.id"/>&script.id=<s:if test="script!=null"><s:property value="script.id"/></s:if>';
 
-            });
-
-            //function for command keys (ie ESC, CTRL, etc..)
-            var keys = {};
-            $("#runCmd_command").keydown(function(e) {
-                keys[e.which] = true;
-                var c = String.fromCharCode(e.which);
-                if (keys[27] || keys[37] || keys[38] || keys[39] || keys[40] || keys[17]) {
+    });
 
 
-                    var ids = [];
-                    $(".run_cmd_active").each(function(index) {
-                        var id = $(this).attr("id").replace("run_cmd_", "");
-                        ids.push(id);
-                    });
-                    var idListStr = '';
-                    ids.forEach(function(entry) {
-                        idListStr = idListStr + '&idList=' + entry;
-                    });
-                    $.ajax({ url: 'runCmd.action?keyCode=' + e.which + idListStr});
+    //if terminal window toggle active for commands
+    $(".run_cmd").click(function() {
+        //de-active or active clicked terminal
+        if ($(this).hasClass('run_cmd_active')) {
+            $(this).removeClass('run_cmd_active')
+        } else {
+            $(this).addClass('run_cmd_active')
+        }
+
+    });
+
+    $('#select_all').click(function() {
+        $(".run_cmd").addClass('run_cmd_active');
+    });
+
+    $('#unselect_all').click(function() {
+        $(".run_cmd").removeClass('run_cmd_active');
+    });
+
+    $('#upload_push').click(function() {
 
 
-                    $('#runCmd_command').val('');
-                    $('#runCmd_command').focus();
-                }
+        //get id list from selected terminals
+        var ids = [];
+        $(".run_cmd_active").each(function(index) {
+            var id = $(this).attr("id").replace("run_cmd_", "");
+            ids.push(id);
+        });
+        var idListStr = '?action=upload';
+        ids.forEach(function(entry) {
+            idListStr = idListStr + '&idList=' + entry;
+        });
 
-            });
-            $(document).keyup(function (e) {
-                delete keys[e.which];
-            });
-
-            //run command
-            $('#runCmd').submit(function() {
-
-
-                var ids = [];
-                $(".run_cmd_active").each(function(index) {
-                    var id = $(this).attr("id").replace("run_cmd_", "");
-                    ids.push(id);
-                });
-                var idListStr = '';
-                ids.forEach(function(entry) {
-                    idListStr = idListStr + '&idList=' + entry;
-                });
-                $.ajax({ url: 'runCmd.action?command=' + $('#runCmd_command').val() + idListStr});
+        $("#upload_push_frame").attr("src", "/manage/setUpload.action" + idListStr);
+        $("#upload_push_dialog").dialog("open");
 
 
-                $('#runCmd_command').val('');
-                $('#runCmd_command').focus();
-                return false;
+    });
 
-            });
-
-            //if terminal window toggle active for commands
-            $(".run_cmd").click(function() {
-               //de-active or active clicked terminal
-               if ($(this).hasClass('run_cmd_active')) {
-                    $(this).removeClass('run_cmd_active')
-                } else {
-                    $(this).addClass('run_cmd_active')
-                }
-
-                $('#runCmd_command').focus();
-            });
-
-            $('#select_all').click(function() {
-                $(".run_cmd").addClass('run_cmd_active');
-                $('#runCmd_command').focus();
-            });
-
-            $('#unselect_all').click(function() {
-                $(".run_cmd").removeClass('run_cmd_active');
-                $('#runCmd_command').focus();
-            });
-
-            $('#upload_push').click(function() {
+     var tabindex = 1;
+     $('.run_cmd').each(function() {
+          var $input = $(this);
+          $input.attr("tabindex", tabindex);
+          tabindex++;
+     });
 
 
-                //get id list from selected terminals
-                var ids = [];
-                $(".run_cmd_active").each(function(index) {
-                    var id = $(this).attr("id").replace("run_cmd_", "");
-                    ids.push(id);
-                });
-                var idListStr = '?action=upload';
-                ids.forEach(function(entry) {
-                    idListStr = idListStr + '&idList=' + entry;
-                });
 
-                $("#upload_push_frame").attr("src", "/manage/setUpload.action" + idListStr);
-                $("#upload_push_dialog").dialog("open");
-
-
-            });
-
-
-            <s:if test="pendingSystemStatus!=null">
-            <s:if test="pendingSystemStatus.statusCd==\"A\"">
+    <s:if test="currentSystemStatus!=null && currentSystemStatus.statusCd=='GENERICFAIL'">
+        $("#error_dialog").dialog("open");
+    </s:if>
+    <s:elseif test="pendingSystemStatus!=null">
+        <s:if test="pendingSystemStatus.statusCd=='AUTHFAIL'">
             $("#set_password_dialog").dialog("open");
+        </s:if>
+        <s:elseif test="pendingSystemStatus.statusCd=='KEYAUTHFAIL'">
+            $("#set_passphrase_dialog").dialog("open");
+        </s:elseif>
+        <s:else>
+            <s:if test="currentSystemStatus==null ||currentSystemStatus.statusCd!='GENERICFAIL'">
+                setInterval(function() {
+                    $("#composite_terms_frm").submit();
+                 }, 2000);
             </s:if>
-            <s:else>
-            <s:if test="currentSystemStatus==null||currentSystemStatus.statusCd==\"P\" ||currentSystemStatus.statusCd!=\"F\"">
-            setInterval(function() {
-                $("#composite_terms_frm").submit();
-            }, 2000);
-            </s:if>
-            </s:else>
-            </s:if>
+        </s:else>
+    </s:elseif>
 
 
-            <s:if test="currentSystemStatus!=null">
-            <s:if test="currentSystemStatus.statusCd==\"F\"">
-            $("#error_dialog").dialog("open");
-            </s:if>
-            </s:if>
 
-            <s:if test="pendingSystemStatus==null">
 
-            setInterval(function() {
-                $.getJSON('getOutputJSON.action', function(data) {
-                    var append = false;
-                    $.each(data, function(key, val) {
-                        if (val.output != '') {
-                            $('#output_' + val.sessionId).append(val.output);
-                            $('#scroll_' + val.sessionId).scrollTop($("#output_" + val.sessionId).height());
-                        }
-                    });
-                    //scroll to bottom
-                });
-            }, 750);
-            </s:if>
 
+
+    <s:if test="pendingSystemStatus==null">
+
+        var keys = {};
+        $(document).keypress(function(e) {
+            var keyCode= (e.keyCode)? e.keyCode: e.charCode;
+
+            var idListStr = '';
+            $(".run_cmd_active").each(function(index) {
+                var id = $(this).attr("id").replace("run_cmd_", "");
+                idListStr = idListStr + '&idList=' + id;
+            });
+
+            if(String.fromCharCode(keyCode) && String.fromCharCode(keyCode)!='' && !keys[17]){
+                $.ajax({ url: 'runCmd.action?command=' +String.fromCharCode(keyCode) + idListStr});
+            }
 
         });
-    </script>
-    <style type="text/css">
-        .content {
-            width: 100%;
-        }
-    </style>
+        //function for command keys (ie ESC, CTRL, etc..)
+        $(document).keydown(function (e) {
+            var keyCode= (e.keyCode)? e.keyCode: e.charCode;
+            keys[keyCode]=true;
+            if (keys[27] || keys[37] || keys[38] || keys[39] || keys[40] ||  keys[13] || keys[8] || keys[9] || keys[17]) {
+                    var idListStr = '';
+                    $(".run_cmd_active").each(function(index) {
+                        var id = $(this).attr("id").replace("run_cmd_", "");
+                        idListStr = idListStr + '&idList=' + id;
+                    });
+                    $.ajax({ url: 'runCmd.action?keyCode=' + keyCode + idListStr});
+                }
 
-    <title>KeyBox - Composite Terms</title>
+        });
+
+        $(document).keyup(function (e) {
+            var keyCode= (e.keyCode)? e.keyCode: e.charCode;
+            delete keys[keyCode];
+            $('#dummy').focus();
+        });
+
+        $(document).click(function (e) {
+            $('#dummy').focus();
+        });
+
+
+
+    var termMap = {};
+
+    $(".output").each(function(index) {
+        var id = $(this).attr("id").replace("output_", "");
+        termMap[id] =  new Terminal(80, 24);
+        termMap[id].open($(this));
+    });
+
+
+    setInterval(function() {
+        $.getJSON('getOutputJSON.action', function(data) {
+            var append = false;
+            $.each(data, function(key, val) {
+                if (val.output != '') {
+                   termMap[val.sessionId].write(val.output);
+                }
+            });
+        });
+    }, 500);
+    </s:if>
+
+});
+</script>
+<style type="text/css">
+    .content {
+        width: 99%;
+        padding:5px;
+        margin:0;
+        border:none;
+    }
+    .page {
+        padding:10px;
+    }
+</style>
+
+<title>KeyBox - Composite Terms</title>
 
 </head>
 <body>
@@ -221,50 +238,55 @@
     <s:if test="(schSessionMap!= null && !schSessionMap.isEmpty()) || pendingSystemStatus!=null">
         <div class="content">
 
-        <s:if test="pendingSystemStatus==null">
-            <ul class="top_nav">
-                <li class="top_nav_item">
-                    <s:form id="runCmd" action="runCmd" cssClass="runCmd" theme="simple">
-                        #&nbsp;<s:textfield id="runCmd_command" name="command" theme="simple"
-                                            cssClass="runCmd_command" size="35"/>
-                        <div id="enter_btn" class="enter_btn">Enter</div>
-                    </s:form>
-                </li>
+            <s:if test="pendingSystemStatus==null">
 
-                <li class="top_nav_item"><a href="/manage/exitTerms.action">Exit Terminals</a></li>
-            </ul>
-            <div class="clear"></div>
-            <br/>
 
-            <div id="select_all">Select All</div>
-            <div id="unselect_all">Unselect All</div>
-            <div id="upload_push">Upload &amp; Push</div>
-            <div class="clear"></div>
+                <div id="select_all" class="top_link">Select All</div>
+                <div id="unselect_all" class="top_link">Unselect All</div>
+                <div id="upload_push" class="top_link">Upload &amp; Push</div>
+                 <div class="top_link" ><a href="/manage/exitTerms.action">Exit Terminals</a></div>
+                 <div class="top_link" style="float:right;"><input type="text" name="dummy" id="dummy" size="1" style="border:none;color:#FFFFFF;width:1px;height:1px"/></div>
+                <div class="clear"></div>
 
             </s:if>
-            <div class="scrollwrapper">
+            <div class="termwrapper">
                 <s:iterator value="schSessionMap">
                     <div id="run_cmd_<s:property value="key"/>" class="run_cmd_active run_cmd">
 
                         <h4><s:property value="value.hostSystem.displayLabel"/></h4>
 
-                        <div id="scroll_<s:property value="key"/>" class="scroll">
-                            <pre id="output_<s:property value="key"/>" class="output"></pre>
+
+                        <div id="term" class="term">
+                            <div id="output_<s:property value="key"/>" class="output"></div>
                         </div>
+
                     </div>
                 </s:iterator>
             </div>
 
 
-            <div id="set_password_dialog" title="Set Password">
+            <div id="set_password_dialog" title="Enter Password">
                 <p class="error"><s:property value="pendingSystemStatus.errorMsg"/></p>
 
-                <p>Set password for <s:property value="pendingSystemStatus.hostSystem.displayLabel"/>
+                <p>Enter password for <s:property value="pendingSystemStatus.hostSystem.displayLabel"/>
 
                 </p>
                 <s:form id="password_frm" action="createTerms">
                     <s:hidden name="pendingSystemStatus.id"/>
                     <s:password name="password" label="Password" size="15" value="" autocomplete="off"/>
+                    <s:if test="script!=null">
+                        <s:hidden name="script.id"/>
+                    </s:if>
+                </s:form>
+                <div class="submit_btn">Submit</div>
+                <div class="cancel_btn">Cancel</div>
+            </div>
+
+            <div id="set_passphrase_dialog" title="Enter Passphrase">
+                <p class="error"><s:property value="pendingSystemStatus.errorMsg"/></p>
+                <s:form id="passphrase_frm" action="createTerms">
+                    <s:hidden name="pendingSystemStatus.id"/>
+                    <s:password name="passphrase" label="Passphrase" size="15" value="" autocomplete="off"/>
                     <s:if test="script!=null">
                         <s:hidden name="script.id"/>
                     </s:if>

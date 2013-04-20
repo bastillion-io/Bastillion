@@ -26,13 +26,13 @@
         $(document).ready(function() {
             $("#add_dialog").dialog({
                 autoOpen: false,
-                height: 275,
+                height: 300,
                 width: 400,
                 modal: true
             });
             $(".edit_dialog").dialog({
                 autoOpen: false,
-                height: 275,
+                height: 300,
                 width: 400,
                 modal: true
             });

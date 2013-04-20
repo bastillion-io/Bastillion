@@ -18,14 +18,14 @@ package com.keybox.manage.util;
 import com.jcraft.jsch.*;
 import com.keybox.common.util.AppConfigLkup;
 import com.keybox.manage.db.PrivateKeyDB;
-import com.keybox.manage.db.ScriptDB;
 import com.keybox.manage.db.SystemStatusDB;
 import com.keybox.manage.model.SchSession;
-import com.keybox.manage.model.Script;
 import com.keybox.manage.model.SystemStatus;
 import com.keybox.manage.task.SessionOutputTask;
-import org.codehaus.plexus.util.cli.CommandLineUtils;
-import org.codehaus.plexus.util.cli.Commandline;
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.ExecuteException;
+import org.apache.commons.exec.PumpStreamHandler;
 
 import java.io.*;
 import java.util.HashMap;
@@ -55,32 +55,32 @@ public class SSHUtil {
      */
     public static String getPublicKey() {
         String publicKey = null;
-        Commandline cmd = new Commandline();
 
 
         //get ssh-keygen cmd from properties file
         Map<String, String> replaceMap = new HashMap<String, String>();
         replaceMap.put("pubKeyPath", KEY_PATH);
         replaceMap.put("pubKeyName", PUB_KEY_NAME);
+        //cat public ssh key
         String cmdStr = AppConfigLkup.getProperty("catPublicKeyCmd", replaceMap);
 
-        cmd.createArg().setLine(cmdStr);
 
-        CommandLineUtils.StringStreamConsumer out = new CommandLineUtils.StringStreamConsumer();
-        CommandLineUtils.StringStreamConsumer err = new CommandLineUtils.StringStreamConsumer();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        CommandLine cmdLine = CommandLine.parse(cmdStr);
+        DefaultExecutor executor = new DefaultExecutor();
+        PumpStreamHandler streamHandler = new PumpStreamHandler(out);
+        executor.setStreamHandler(streamHandler);
         try {
-            int returnCode = CommandLineUtils.executeCommandLine(cmd, out, err);
-
-            if (returnCode != 0) {
-                System.out.println(err.getOutput());
-            } else {
-                publicKey = out.getOutput();
-            }
-        } catch (Exception ex) {
+            executor.execute(cmdLine);
+            publicKey = out.toString();
+        } catch (ExecuteException ex) {
+            System.out.println(out.toString());
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
         return publicKey;
     }
+
 
     /**
      * generates system's public/private key par and returns passphrase
@@ -88,41 +88,126 @@ public class SSHUtil {
      * @return passphrase for system generated key
      */
     public static String keyGen() {
+        return keyGen(null);
 
+    }
 
-        String passphrase = UUID.randomUUID().toString();
-
-        Commandline cmd = new Commandline();
+    /**
+     * generates system's public/private key par and returns passphrase
+     *
+     * @return passphrase for system generated key
+     */
+    public static String keyGen(String passphrase) {
 
 
         //get ssh-keygen cmd from properties file
         Map<String, String> replaceMap = new HashMap<String, String>();
         replaceMap.put("keyPath", KEY_PATH);
         replaceMap.put("keyName", KEY_NAME);
-        replaceMap.put("passphrase", passphrase);
-        String cmdStr = AppConfigLkup.getProperty("sshKeyGenCmd", replaceMap);
+        replaceMap.put("pubKeyPath", KEY_PATH);
+        replaceMap.put("pubKeyName", PUB_KEY_NAME);
+        //delete previous ssh keys
+        String cmdStr = AppConfigLkup.getProperty("deleteSshKeys", replaceMap);
 
-        //set command
-        cmd.createArg().setLine(cmdStr);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        CommandLine cmdLine = CommandLine.parse(cmdStr);
+        DefaultExecutor executor = new DefaultExecutor();
+        PumpStreamHandler streamHandler = new PumpStreamHandler(out);
+        executor.setStreamHandler(streamHandler);
 
-        CommandLineUtils.StringStreamConsumer out = new CommandLineUtils.StringStreamConsumer();
-        CommandLineUtils.StringStreamConsumer err = new CommandLineUtils.StringStreamConsumer();
         try {
-            int returnCode = CommandLineUtils.executeCommandLine(cmd, out, err);
-
-            if (returnCode != 0) {
-                System.out.println(err.getOutput());
-            } else {
-                System.out.println(out.getOutput());
-            }
-        } catch (Exception ex) {
+            executor.execute(cmdLine);
+        } catch (ExecuteException ex) {
+            System.out.println(out.toString());
+        } catch (IOException ex) {
             ex.printStackTrace();
         }
 
-        cmd.clear();
-        cmd.clearArgs();
+
+        //if no passphrase set to random GUID
+        if (passphrase == null || passphrase.trim().equals("")) {
+            passphrase = UUID.randomUUID().toString();
+        }
+
+        //get ssh-keygen cmd from properties file
+        replaceMap = new HashMap<String, String>();
+        replaceMap.put("keyPath", KEY_PATH);
+        replaceMap.put("keyName", KEY_NAME);
+        replaceMap.put("passphrase", passphrase);
+        //create new ssh keys
+        cmdStr = AppConfigLkup.getProperty("sshKeyGenCmd", replaceMap);
+
+        out = new ByteArrayOutputStream();
+        cmdLine = CommandLine.parse(cmdStr);
+        executor = new DefaultExecutor();
+        streamHandler = new PumpStreamHandler(out);
+        executor.setStreamHandler(streamHandler);
+
+        try {
+            executor.execute(cmdLine);
+        } catch (ExecuteException ex) {
+            System.out.println(out.toString());
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+
         return passphrase;
 
+
+    }
+
+    /**
+     * checks to see if passphrase is valid for ssh-key
+     *
+     * @param passphrase ssh key passphrase
+     * @return boolean validity indicator
+     */
+    public static boolean isPassphraseValid(String passphrase) {
+        boolean isValid = false;
+
+
+        String verifyPubKey = null;
+        //get ssh-keygen command from properties file to verify passphrase
+        Map<String, String> replaceMap = new HashMap<String, String>();
+        replaceMap.put("keyPath", KEY_PATH);
+        replaceMap.put("keyName", KEY_NAME);
+        replaceMap.put("passphrase", passphrase);
+        //verify ssh key passphrase
+        String cmdStr = AppConfigLkup.getProperty("verifyPassphrase", replaceMap);
+
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        CommandLine cmdLine = CommandLine.parse(cmdStr);
+        DefaultExecutor executor = new DefaultExecutor();
+        PumpStreamHandler streamHandler = new PumpStreamHandler(out);
+        executor.setStreamHandler(streamHandler);
+        try {
+            executor.execute(cmdLine);
+            verifyPubKey = out.toString();
+        } catch (ExecuteException ex) {
+            System.out.println(out.toString());
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+
+        String currentPubKey = getPublicKey();
+        if (currentPubKey != null && !currentPubKey.trim().equals("")
+                && verifyPubKey != null && !verifyPubKey.trim().equals("")) {
+
+            //replace everything but public key text
+            currentPubKey = currentPubKey.trim().replaceAll("^.*?\\ |\\ .*?$", "");
+            verifyPubKey = verifyPubKey.trim().replaceAll("^.*?\\ |\\ .*?$", "");
+            //compair to make sure it matches
+            if (currentPubKey.equals(verifyPubKey)) {
+                isValid = true;
+            }
+
+        }
+
+
+        return isValid;
 
     }
 
@@ -130,10 +215,11 @@ public class SSHUtil {
      * distributes authorized keys for host system
      *
      * @param hostSystemStatus object contains host system information
+     * @param passphrase       ssh key passphrase
      * @param password         password to host system if needed
      * @return status of key distribution
      */
-    public static SystemStatus authAndAddPubKey(SystemStatus hostSystemStatus, String password) {
+    public static SystemStatus authAndAddPubKey(SystemStatus hostSystemStatus, String passphrase, String password) {
 
 
         JSch jsch = new JSch();
@@ -142,8 +228,7 @@ public class SSHUtil {
         try {
 
             //add private key
-            jsch.addIdentity(KEY_PATH + "/" + KEY_NAME, EncryptionUtil.decrypt(PrivateKeyDB.getPassphrase()));
-
+            jsch.addIdentity(KEY_PATH + "/" + KEY_NAME, passphrase);
 
             //create session
             session = jsch.getSession(hostSystemStatus.getHostSystem().getUser(), hostSystemStatus.getHostSystem().getHost(), hostSystemStatus.getHostSystem().getPort());
@@ -159,8 +244,11 @@ public class SSHUtil {
             authAndAddPubKey(hostSystemStatus, session);
 
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             hostSystemStatus.setErrorMsg(e.getMessage());
-            if (e.getMessage().contains("Auth fail") || e.getMessage().contains("Auth cancel")) {
+            if (e.getMessage().toLowerCase().contains("userauth fail")) {
+                hostSystemStatus.setStatusCd(SystemStatus.PUBLIC_KEY_FAIL_STATUS);
+            } else if (e.getMessage().toLowerCase().contains("auth fail") || e.getMessage().toLowerCase().contains("auth cancel")) {
                 hostSystemStatus.setStatusCd(SystemStatus.AUTH_FAIL_STATUS);
             } else {
                 hostSystemStatus.setStatusCd(SystemStatus.GENERIC_FAIL_STATUS);
@@ -172,13 +260,11 @@ public class SSHUtil {
         if (session != null) {
             session.disconnect();
         }
+        SystemStatusDB.updateSystemStatus(hostSystemStatus);
         return hostSystemStatus;
 
 
     }
-
-
-
 
 
     /**
@@ -257,7 +343,7 @@ public class SSHUtil {
             c = (ChannelSftp) channel;
             String authorizedKeys = hostSystemStatus.getHostSystem().getAuthorizedKeys().replaceAll("~\\/|~", "");
 
-            //turn public key list into a input stream
+            //return public key list into a input stream
             InputStream inputStreamAuthKeyVal = new ByteArrayInputStream(hostSystemStatus.getAuthKeyVal().getBytes());
             c.put(inputStreamAuthKeyVal, authorizedKeys);
 
@@ -285,10 +371,11 @@ public class SSHUtil {
      * open SSH session host system
      *
      * @param hostSystemStatus object contains host system information
+     * @param passphrase       ssh key passphrase
      * @param password         password to host system if needed
      * @return status of key distribution
      */
-    public static SystemStatus openSSHTermOnSystem(SystemStatus hostSystemStatus, String password, Map<Long, SchSession> schSessionMap) {
+    public static SystemStatus openSSHTermOnSystem(SystemStatus hostSystemStatus, String passphrase, String password, Map<Long, SchSession> schSessionMap) {
 
         JSch jsch = new JSch();
 
@@ -298,7 +385,9 @@ public class SSHUtil {
 
         try {
             //add private key
-            jsch.addIdentity(KEY_PATH + "/" + KEY_NAME, EncryptionUtil.decrypt(PrivateKeyDB.getPassphrase()));
+            jsch.addIdentity(KEY_PATH + "/" + KEY_NAME, passphrase);
+
+            //create session
             Session session = jsch.getSession(hostSystemStatus.getHostSystem().getUser(), hostSystemStatus.getHostSystem().getHost(), hostSystemStatus.getHostSystem().getPort());
 
             //set password if it exists
@@ -333,8 +422,11 @@ public class SSHUtil {
 
 
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             hostSystemStatus.setErrorMsg(e.getMessage());
-            if (e.getMessage().contains("Auth fail") || e.getMessage().contains("Auth cancel")) {
+            if (e.getMessage().toLowerCase().contains("userauth fail")) {
+                hostSystemStatus.setStatusCd(SystemStatus.PUBLIC_KEY_FAIL_STATUS);
+            } else if (e.getMessage().toLowerCase().contains("auth fail") || e.getMessage().toLowerCase().contains("auth cancel")) {
                 hostSystemStatus.setStatusCd(SystemStatus.AUTH_FAIL_STATUS);
             } else {
                 hostSystemStatus.setStatusCd(SystemStatus.GENERIC_FAIL_STATUS);

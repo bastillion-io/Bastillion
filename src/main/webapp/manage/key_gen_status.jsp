@@ -36,6 +36,12 @@
                 width: 500,
                 modal: true
             });
+             $("#set_passphrase_dialog").dialog({
+                autoOpen: false,
+                height: 200,
+                width: 500,
+                modal: true
+            });
             //submit add or edit form
             $(".submit_btn").button().click(function() {
                 $(this).prev().submit();
@@ -50,26 +56,25 @@
             $(".scrollableTable tr:odd").css("background-color", "#e0e0e0");
 
 
-            <s:if test="pendingSystemStatus!=null">
-            //set scroll
-            var container = $('.tablescroll_wrapper'), scrollTo = $('#status_<s:property value="pendingSystemStatus.hostSystem.id"/>');
-            container.scrollTop(scrollTo.offset().top - container.offset().top + container.scrollTop()-225);
 
+             <s:if test="currentSystemStatus!=null && currentSystemStatus.statusCd=='GENERICFAIL'">
+                $("#error_dialog").dialog("open");
+            </s:if>
+            <s:elseif test="pendingSystemStatus!=null">
+                //set scroll
+                var container = $('.tablescroll_wrapper'), scrollTo = $('#status_<s:property value="pendingSystemStatus.hostSystem.id"/>');
+                container.scrollTop(scrollTo.offset().top - container.offset().top + container.scrollTop()-225);
+                <s:if test="pendingSystemStatus.statusCd=='AUTHFAIL'">
+                    $("#set_password_dialog").dialog("open");
+                </s:if>
+                <s:elseif test="pendingSystemStatus.statusCd=='KEYAUTHFAIL'">
+                    $("#set_passphrase_dialog").dialog("open");
+                </s:elseif>
+                <s:else>
+                    $("#gen_key_frm").submit();
+                </s:else>
+            </s:elseif>
 
-            <s:if test="pendingSystemStatus.statusCd==\"A\"">
-            $("#set_password_dialog").dialog("open");
-            </s:if>
-            <s:else>
-            <s:if test="currentSystemStatus==null ||currentSystemStatus.statusCd!=\"F\"">
-                $("#gen_key_frm").submit();
-            </s:if>
-            </s:else>
-            </s:if>
-            <s:if test="currentSystemStatus!=null">
-            <s:if test="currentSystemStatus.statusCd==\"F\"">
-            $("#error_dialog").dialog("open");
-            </s:if>
-            </s:if>
 
 
         });
@@ -118,22 +123,19 @@
                         <td><s:property value="hostSystem.host"/>:<s:property value="hostSystem.port"/></td>
                         <td><s:property value="hostSystem.authorizedKeys"/></td>
                         <td>
-                            <s:if test="statusCd==\"I\"">
-                                <div class="warning"> Not Started</div>
+                            <s:if test="statusCd=='INITIAL'">
+                                <div class="warning">Not Started</div>
                             </s:if>
-                            <s:elseif test="statusCd==\"P\"">
-                                <div class="warning">In Progress</div>
-                            </s:elseif>
-                            <s:elseif test="statusCd==\"A\"">
+                            <s:elseif test="statusCd=='AUTHFAIL'">
                                 <div class="warning">Authentication Failed</div>
                             </s:elseif>
-                            <s:elseif test="statusCd==\"F\"">
+                            <s:elseif test="statusCd=='KEYAUTHFAIL'">
+                                <div class="warning">Passphrase Authentication Failed</div>
+                            </s:elseif>
+                            <s:elseif test="statusCd=='GENERICFAIL'">
                                 <div class="error">Failed</div>
                             </s:elseif>
-                            <s:elseif test="statusCd==\"T\"">
-                                <div class="error">Timeout</div>
-                            </s:elseif>
-                            <s:elseif test="statusCd==\"S\"">
+                            <s:elseif test="statusCd=='SUCCESS'">
                                 <div class="success">Success</div>
                             </s:elseif>
                         </td>
@@ -149,10 +151,10 @@
         </s:else>
 
 
-        <div id="set_password_dialog" title="Set Password">
+        <div id="set_password_dialog" title="Enter Password">
             <p class="error"><s:property value="pendingSystemStatus.errorMsg"/></p>
 
-            <p>Set password for <s:property value="pendingSystemStatus.hostSystem.displayLabel"/>
+            <p>Enter password for <s:property value="pendingSystemStatus.hostSystem.displayLabel"/>
 
             </p>
             <s:form id="password_frm" action="genAuthKeyForSystem">
@@ -163,6 +165,15 @@
             <div class="cancel_btn">Cancel</div>
         </div>
 
+        <div id="set_passphrase_dialog" title="Enter Passphrase">
+            <p class="error"><s:property value="pendingSystemStatus.errorMsg"/></p>
+            <s:form id="passphrase_frm" action="genAuthKeyForSystem">
+                <s:hidden name="pendingSystemStatus.id"/>
+                <s:password name="passphrase" label="Passphrase" size="15" value="" autocomplete="off"/>
+            </s:form>
+            <div class="submit_btn">Submit</div>
+            <div class="cancel_btn">Cancel</div>
+        </div>
 
         <div id="error_dialog" title="Error">
             <p class="error">Error: <s:property value="currentSystemStatus.errorMsg"/></p>

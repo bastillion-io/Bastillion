@@ -294,7 +294,7 @@ public class SystemStatusDB {
                 SystemStatus systemStatus = new SystemStatus();
                 systemStatus.setId(hostSystem.getId());
                 systemStatus.setAuthKeyVal(authKeyVal);
-                systemStatus.setStatusCd("I");
+                systemStatus.setStatusCd(SystemStatus.INITIAL_STATUS);
 
                 //insert new status
                 insertSystemStatus(con, systemStatus);
@@ -498,7 +498,10 @@ public class SystemStatusDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("select * from status where status_cd like 'A' or status_cd like 'I'");
+            PreparedStatement stmt = con.prepareStatement("select * from status where status_cd like ? or status_cd like ? or status_cd like ?");
+            stmt.setString(1,SystemStatus.INITIAL_STATUS);
+            stmt.setString(2,SystemStatus.AUTH_FAIL_STATUS);
+            stmt.setString(3,SystemStatus.PUBLIC_KEY_FAIL_STATUS);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
@@ -507,7 +510,6 @@ public class SystemStatusDB {
                 systemStatus.setAuthKeyVal(rs.getString("auth_keys_val"));
                 systemStatus.setStatusCd(rs.getString("status_cd"));
                 systemStatus.setHostSystem(SystemDB.getSystem(con, systemStatus.getId()));
-
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
@@ -520,31 +522,4 @@ public class SystemStatusDB {
 
     }
 
-    /**
-     * check to see if system work is finished
-     *
-     * @return boolean returns true if system work is finished
-     */
-    public static boolean isFinished() {
-
-        boolean isFinished=true;
-        Connection con = null;
-        try {
-            con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("select * from status where status_cd like 'I' or status_cd like 'P' or status_cd like 'A'");
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                isFinished=false;
-            }
-            DBUtils.closeRs(rs);
-            DBUtils.closeStmt(stmt);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        DBUtils.closeConn(con);
-        return isFinished;
-
-    }
 }

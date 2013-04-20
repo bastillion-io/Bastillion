@@ -17,7 +17,7 @@ package com.keybox.manage.db;
 
 import com.keybox.manage.model.HostSystem;
 import com.keybox.manage.model.Profile;
-import com.keybox.manage.model.SystemKeyGenStatus;
+import com.keybox.manage.model.SystemStatus;
 import com.keybox.manage.model.User;
 import com.keybox.manage.util.DBUtils;
 import com.keybox.manage.util.SSHUtil;
@@ -249,9 +249,9 @@ public class GenerateAuthKeysDB {
      *
      * @param hostSystemList systems to set initial status
      */
-    public static List<SystemKeyGenStatus> setInitialSystemKeyGen(List<HostSystem> hostSystemList) {
+    public static List<SystemStatus> setInitialSystemKeyGen(List<HostSystem> hostSystemList) {
         Connection con = null;
-        List<SystemKeyGenStatus> systemKeyGenStatusList = new ArrayList<SystemKeyGenStatus>();
+        List<SystemStatus> SystemStatusList = new ArrayList<SystemStatus>();
         try {
             con = DBUtils.getConn();
 
@@ -264,16 +264,16 @@ public class GenerateAuthKeysDB {
                 for (String pubKey : hostSystem.getPublicKeyList()) {
                     authKeyVal = authKeyVal + pubKey + "\n";
                 }
-                SystemKeyGenStatus systemKeyGenStatus = new SystemKeyGenStatus();
-                systemKeyGenStatus.setId(hostSystem.getId());
-                systemKeyGenStatus.setAuthKeyVal(authKeyVal);
-                systemKeyGenStatus.setStatusCd("I");
+                SystemStatus SystemStatus = new SystemStatus();
+                SystemStatus.setId(hostSystem.getId());
+                SystemStatus.setAuthKeyVal(authKeyVal);
+                SystemStatus.setStatusCd(SystemStatus.INITIAL_STATUS);
 
                 //insert new status
-                insertSystemKeyGen(con, systemKeyGenStatus);
+                insertSystemKeyGen(con, SystemStatus);
 
                 //get update status list
-                systemKeyGenStatusList = getAllSystemKeyGen(con);
+                SystemStatusList = getAllSystemKeyGen(con);
 
             }
 
@@ -281,7 +281,7 @@ public class GenerateAuthKeysDB {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-        return systemKeyGenStatusList;
+        return SystemStatusList;
     }
 
     /**
@@ -308,16 +308,16 @@ public class GenerateAuthKeysDB {
      * inserts into the system_key_gen table to keep track of key placement status
      *
      * @param con                DB connection object
-     * @param systemKeyGenStatus systems for authorized_keys replacement
+     * @param SystemStatus systems for authorized_keys replacement
      */
-    private static void insertSystemKeyGen(Connection con, SystemKeyGenStatus systemKeyGenStatus) {
+    private static void insertSystemKeyGen(Connection con, SystemStatus SystemStatus) {
 
         try {
 
             PreparedStatement stmt = con.prepareStatement("insert into system_key_gen (id, auth_keys_val, status_cd) values (?,?,?)");
-            stmt.setLong(1, systemKeyGenStatus.getId());
-            stmt.setString(2, systemKeyGenStatus.getAuthKeyVal());
-            stmt.setString(3, systemKeyGenStatus.getStatusCd());
+            stmt.setLong(1, SystemStatus.getId());
+            stmt.setString(2, SystemStatus.getAuthKeyVal());
+            stmt.setString(3, SystemStatus.getStatusCd());
             stmt.execute();
             DBUtils.closeStmt(stmt);
 
@@ -331,15 +331,15 @@ public class GenerateAuthKeysDB {
     /**
      * updates the system_key_gen table to keep track of key placement status
      *
-     * @param systemKeyGenStatus systems for authorized_keys replacement
+     * @param SystemStatus systems for authorized_keys replacement
      */
-    public static void updateSystemKeyGen(SystemKeyGenStatus systemKeyGenStatus) {
+    public static void updateSystemKeyGen(SystemStatus SystemStatus) {
 
         Connection con = null;
         try {
             con = DBUtils.getConn();
 
-            updateSystemKeyGen(con, systemKeyGenStatus);
+            updateSystemKeyGen(con, SystemStatus);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -353,16 +353,16 @@ public class GenerateAuthKeysDB {
      * updates the system_key_gen table to keep track of key placement status
      *
      * @param con                DB connection
-     * @param systemKeyGenStatus systems for authorized_keys replacement
+     * @param SystemStatus systems for authorized_keys replacement
      */
-    public static void updateSystemKeyGen(Connection con, SystemKeyGenStatus systemKeyGenStatus) {
+    public static void updateSystemKeyGen(Connection con, SystemStatus SystemStatus) {
 
         try {
 
             PreparedStatement stmt = con.prepareStatement("update system_key_gen set auth_keys_val=?, status_cd=? where id=?");
-            stmt.setString(1, systemKeyGenStatus.getAuthKeyVal());
-            stmt.setString(2, systemKeyGenStatus.getStatusCd());
-            stmt.setLong(3, systemKeyGenStatus.getId());
+            stmt.setString(1, SystemStatus.getAuthKeyVal());
+            stmt.setString(2, SystemStatus.getStatusCd());
+            stmt.setLong(3, SystemStatus.getId());
             stmt.execute();
             DBUtils.closeStmt(stmt);
 
@@ -376,19 +376,19 @@ public class GenerateAuthKeysDB {
     /**
      * returns all key placement statuses
      */
-    public static List<SystemKeyGenStatus> getAllSystemKeyGen() {
+    public static List<SystemStatus> getAllSystemKeyGen() {
 
-        List<SystemKeyGenStatus> systemKeyGenStatusList = new ArrayList<SystemKeyGenStatus>();
+        List<SystemStatus> SystemStatusList = new ArrayList<SystemStatus>();
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            systemKeyGenStatusList = getAllSystemKeyGen(con);
+            SystemStatusList = getAllSystemKeyGen(con);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-        return systemKeyGenStatusList;
+        return SystemStatusList;
 
     }
 
@@ -397,21 +397,21 @@ public class GenerateAuthKeysDB {
      *
      * @param con DB connection object
      */
-    private static List<SystemKeyGenStatus> getAllSystemKeyGen(Connection con) {
+    private static List<SystemStatus> getAllSystemKeyGen(Connection con) {
 
-        List<SystemKeyGenStatus> systemKeyGenStatusList = new ArrayList<SystemKeyGenStatus>();
+        List<SystemStatus> SystemStatusList = new ArrayList<SystemStatus>();
         try {
 
             PreparedStatement stmt = con.prepareStatement("select * from system_key_gen");
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                SystemKeyGenStatus systemKeyGenStatus = new SystemKeyGenStatus();
-                systemKeyGenStatus.setId(rs.getLong("id"));
-                systemKeyGenStatus.setAuthKeyVal(rs.getString("auth_keys_val"));
-                systemKeyGenStatus.setStatusCd(rs.getString("status_cd"));
-                systemKeyGenStatus.setHostSystem(SystemDB.getSystem(con, systemKeyGenStatus.getId()));
-                systemKeyGenStatusList.add(systemKeyGenStatus);
+                SystemStatus SystemStatus = new SystemStatus();
+                SystemStatus.setId(rs.getLong("id"));
+                SystemStatus.setAuthKeyVal(rs.getString("auth_keys_val"));
+                SystemStatus.setStatusCd(rs.getString("status_cd"));
+                SystemStatus.setHostSystem(SystemDB.getSystem(con, SystemStatus.getId()));
+                SystemStatusList.add(SystemStatus);
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
@@ -419,7 +419,7 @@ public class GenerateAuthKeysDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return systemKeyGenStatusList;
+        return SystemStatusList;
 
     }
 
@@ -429,10 +429,10 @@ public class GenerateAuthKeysDB {
      *
      * @param systemId system id
      */
-    public static SystemKeyGenStatus getSystemKeyGen(Long systemId) {
+    public static SystemStatus getSystemKeyGen(Long systemId) {
 
         Connection con = null;
-        SystemKeyGenStatus systemKeyGenStatus = null;
+        SystemStatus SystemStatus = null;
         try {
             con = DBUtils.getConn();
 
@@ -441,11 +441,11 @@ public class GenerateAuthKeysDB {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                systemKeyGenStatus = new SystemKeyGenStatus();
-                systemKeyGenStatus.setId(rs.getLong("id"));
-                systemKeyGenStatus.setAuthKeyVal(rs.getString("auth_keys_val"));
-                systemKeyGenStatus.setStatusCd(rs.getString("status_cd"));
-                systemKeyGenStatus.setHostSystem(SystemDB.getSystem(con, systemKeyGenStatus.getId()));
+                SystemStatus = new SystemStatus();
+                SystemStatus.setId(rs.getLong("id"));
+                SystemStatus.setAuthKeyVal(rs.getString("auth_keys_val"));
+                SystemStatus.setStatusCd(rs.getString("status_cd"));
+                SystemStatus.setHostSystem(SystemDB.getSystem(con, SystemStatus.getId()));
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
@@ -454,7 +454,7 @@ public class GenerateAuthKeysDB {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-        return systemKeyGenStatus;
+        return SystemStatus;
 
 
     }
@@ -463,11 +463,11 @@ public class GenerateAuthKeysDB {
     /**
      * returns the first system that authorized keys has not been tried
      *
-     * @return systemKeyGenStatus systems for authorized_keys replacement
+     * @return SystemStatus systems for authorized_keys replacement
      */
-    public static SystemKeyGenStatus getNextPendingSystem() {
+    public static SystemStatus getNextPendingSystem() {
 
-        SystemKeyGenStatus systemKeyGenStatus = null;
+        SystemStatus SystemStatus = null;
         Connection con = null;
         try {
             con = DBUtils.getConn();
@@ -475,11 +475,11 @@ public class GenerateAuthKeysDB {
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                systemKeyGenStatus = new SystemKeyGenStatus();
-                systemKeyGenStatus.setId(rs.getLong("id"));
-                systemKeyGenStatus.setAuthKeyVal(rs.getString("auth_keys_val"));
-                systemKeyGenStatus.setStatusCd(rs.getString("status_cd"));
-                systemKeyGenStatus.setHostSystem(SystemDB.getSystem(con, systemKeyGenStatus.getId()));
+                SystemStatus = new SystemStatus();
+                SystemStatus.setId(rs.getLong("id"));
+                SystemStatus.setAuthKeyVal(rs.getString("auth_keys_val"));
+                SystemStatus.setStatusCd(rs.getString("status_cd"));
+                SystemStatus.setHostSystem(SystemDB.getSystem(con, SystemStatus.getId()));
 
             }
             DBUtils.closeRs(rs);
@@ -489,7 +489,7 @@ public class GenerateAuthKeysDB {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-        return systemKeyGenStatus;
+        return SystemStatus;
 
     }
 }

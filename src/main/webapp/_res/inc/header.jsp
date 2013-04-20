@@ -20,6 +20,8 @@
 <script src="<%= request.getContextPath() %>/_res/js/jquery-1.8.3.js"></script>
 <script src="<%= request.getContextPath() %>/_res/js/jquery-ui.js"></script>
 <script src="<%= request.getContextPath() %>/_res/js/jquery.tablescroll.js"></script>
+<script src="<%= request.getContextPath() %>/_res/js/tty/terms.js"></script>
+
 
 <link rel="stylesheet" href="<%= request.getContextPath() %>/_res/css/jquery-ui/base/jquery-ui.css"/>
 <link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/_res/css/keybox.css"/>

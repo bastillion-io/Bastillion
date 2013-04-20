@@ -87,7 +87,8 @@ public class SessionOutputUtil {
             for (Character ch : sessionOutput.getOutputChars()) {
                 output.append(ch);
             }
-            sessionOutput.setOutput(output.toString().replaceAll("\\[.*?m|\\[.*?m",""));
+            //sessionOutput.setOutput(output.toString().replaceAll("\\[.*?m|\\[.*?m",""));
+            sessionOutput.setOutput(output.toString());
             sessionOutput.setOutputChars(new ArrayList<Character>());
 
             outputList.add(sessionOutput);

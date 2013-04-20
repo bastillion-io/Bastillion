@@ -55,10 +55,6 @@ public class DBUtils {
             config.enforceForeignKeys(true);
             Class.forName("org.sqlite.JDBC");
             // create a database connection
-
-
-
-
             con = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH + "/keybox.db", config.toProperties());
         } catch (Exception ex) {
             ex.printStackTrace();

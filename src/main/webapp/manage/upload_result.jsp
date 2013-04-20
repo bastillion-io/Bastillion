@@ -46,11 +46,11 @@
             var container = $('.tablescroll_wrapper'), scrollTo = $('#status_<s:property value="pendingSystemStatus.hostSystem.id"/>');
             container.scrollTop(scrollTo.offset().top - container.offset().top + container.scrollTop() - 55);
             </s:if>
-            <s:if test="currentSystemStatus!=null && currentSystemStatus.statusCd==\"F\"">
+            <s:if test="currentSystemStatus!=null && currentSystemStatus.statusCd=='GENERICFAIL'">
             $("#error_dialog").dialog("open");
             </s:if>
             <s:elseif test="pendingSystemStatus!=null">
-                $('#push').submit();
+            $('#push').submit();
             </s:elseif>
 
 
@@ -94,24 +94,21 @@
                 <td><s:property value="hostSystem.host"/>:<s:property value="hostSystem.port"/></td>
 
                 <td>
-                    <s:if test="statusCd==\"I\"">
-                        <div class="warning"> Not Started</div>
-                    </s:if>
-                    <s:elseif test="statusCd==\"P\"">
-                        <div class="warning">In Progress</div>
-                    </s:elseif>
-                    <s:elseif test="statusCd==\"A\"">
-                        <div class="warning">Authentication Failed</div>
-                    </s:elseif>
-                    <s:elseif test="statusCd==\"F\"">
-                        <div class="error">Failed</div>
-                    </s:elseif>
-                    <s:elseif test="statusCd==\"T\"">
-                        <div class="error">Timeout</div>
-                    </s:elseif>
-                    <s:elseif test="statusCd==\"S\"">
-                        <div class="success">Success</div>
-                    </s:elseif>
+                   <s:if test="statusCd=='INITIAL'">
+                    <div class="warning">Not Started</div>
+                   </s:if>
+                   <s:elseif test="statusCd=='AUTHFAIL'">
+                    <div class="warning">Authentication Failed</div>
+                   </s:elseif>
+                   <s:elseif test="statusCd=='KEYAUTHFAIL'">
+                    <div class="warning">Passphrase Authentication Failed</div>
+                   </s:elseif>
+                   <s:elseif test="statusCd=='GENERICFAIL'">
+                    <div class="error">Failed</div>
+                   </s:elseif>
+                   <s:elseif test="statusCd=='SUCCESS'">
+                    <div class="success">Success</div>
+                   </s:elseif>
                 </td>
 
             </tr>

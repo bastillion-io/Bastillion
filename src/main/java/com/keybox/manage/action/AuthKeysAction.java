@@ -18,12 +18,12 @@ package com.keybox.manage.action;
 import com.keybox.manage.db.SystemStatusDB;
 import com.keybox.manage.db.PrivateKeyDB;
 import com.keybox.manage.model.SystemStatus;
+import com.keybox.manage.util.EncryptionUtil;
 import com.keybox.manage.util.SSHUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,6 +36,7 @@ public class AuthKeysAction extends ActionSupport {
     List<Long> userSelectId;
     List<Long> profileSelectId;
     String password;
+    static String passphrase;
     SystemStatus pendingSystemStatus;
     SystemStatus currentSystemStatus;
     List<SystemStatus> systemStatusList;
@@ -50,27 +51,39 @@ public class AuthKeysAction extends ActionSupport {
 
         if (pendingSystemStatus != null && pendingSystemStatus.getId() != null) {
 
-            //get key gen status and a
+            //get key gen status and set current system
             currentSystemStatus = SystemStatusDB.getSystemStatus(pendingSystemStatus.getId());
 
+            //check to see if passphrase has been provided
+            String  passphrase = EncryptionUtil.decrypt(PrivateKeyDB.getPassphrase());
+            //set use provided passphrase
+            if (passphrase == null || passphrase.trim().equals("")) {
+                passphrase = this.getPassphrase();
+            }
 
             //try and sftp key to remote server
-            currentSystemStatus = SSHUtil.authAndAddPubKey(currentSystemStatus, password);
+            currentSystemStatus = SSHUtil.authAndAddPubKey(currentSystemStatus, passphrase, password);
 
-
-            SystemStatusDB.updateSystemStatus(currentSystemStatus);
-
-
-            if (SystemStatus.AUTH_FAIL_STATUS.equals(currentSystemStatus.getStatusCd())) {
+            if (SystemStatus.AUTH_FAIL_STATUS.equals(currentSystemStatus.getStatusCd()) || SystemStatus.PUBLIC_KEY_FAIL_STATUS.equals(currentSystemStatus.getStatusCd())) {
                 pendingSystemStatus = currentSystemStatus;
 
             } else {
                 pendingSystemStatus = SystemStatusDB.getNextPendingSystem();
-            }
 
-        } else {
-            currentSystemStatus = null;
-            pendingSystemStatus = null;
+
+                //if success loop through systems until finished or need password
+                while (pendingSystemStatus != null && currentSystemStatus != null && SystemStatus.SUCCESS_STATUS.equals(currentSystemStatus.getStatusCd())) {
+                    currentSystemStatus = SSHUtil.authAndAddPubKey(pendingSystemStatus, passphrase, null);
+                    pendingSystemStatus = SystemStatusDB.getNextPendingSystem();
+                }
+
+            }
+            passphrase = null;
+
+        }
+        //if no pending systems null passphrase
+        if (SystemStatusDB.getNextPendingSystem() == null) {
+            this.passphrase = null;
         }
 
         systemStatusList = SystemStatusDB.getAllSystemStatus();
@@ -109,6 +122,12 @@ public class AuthKeysAction extends ActionSupport {
             systemStatusList = SystemStatusDB.setInitialSystemStatus(SystemStatusDB.findAuthKeysForSystems(systemSelectId));
             //set first system to set auth keys
             pendingSystemStatus = SystemStatusDB.getNextPendingSystem();
+            //check to see if passphrase has been provided
+            String  passphrase = EncryptionUtil.decrypt(PrivateKeyDB.getPassphrase());
+            //set use provided passphrase
+            if (pendingSystemStatus!=null && (passphrase == null || passphrase.trim().equals(""))) {
+                pendingSystemStatus.setStatusCd(SystemStatus.PUBLIC_KEY_FAIL_STATUS);
+            }
 
 
         }
@@ -129,6 +148,13 @@ public class AuthKeysAction extends ActionSupport {
 
             //set first system to set auth keys
             pendingSystemStatus = SystemStatusDB.getNextPendingSystem();
+            //check to see if passphrase has been provided
+            String  passphrase = EncryptionUtil.decrypt(PrivateKeyDB.getPassphrase());
+            //set use provided passphrase
+            if (pendingSystemStatus!=null && (passphrase == null || passphrase.trim().equals(""))) {
+                pendingSystemStatus.setStatusCd(SystemStatus.PUBLIC_KEY_FAIL_STATUS);
+            }
+
 
         }
 
@@ -150,12 +176,20 @@ public class AuthKeysAction extends ActionSupport {
 
             //set first system to set auth keys
             pendingSystemStatus = SystemStatusDB.getNextPendingSystem();
+            //check to see if passphrase has been provided
+            String  passphrase = EncryptionUtil.decrypt(PrivateKeyDB.getPassphrase());
+            //set use provided passphrase
+            if (pendingSystemStatus!=null && (passphrase == null || passphrase.trim().equals(""))) {
+                pendingSystemStatus.setStatusCd(SystemStatus.PUBLIC_KEY_FAIL_STATUS);
+            }
+
 
         }
 
 
         return SUCCESS;
     }
+
 
     public List<Long> getSystemSelectId() {
         return systemSelectId;
@@ -212,5 +246,13 @@ public class AuthKeysAction extends ActionSupport {
 
     public void setProfileSelectId(List<Long> profileSelectId) {
         this.profileSelectId = profileSelectId;
+    }
+
+    public String getPassphrase() {
+        return passphrase;
+    }
+
+    public void setPassphrase(String passphrase) {
+        this.passphrase = passphrase;
     }
 }

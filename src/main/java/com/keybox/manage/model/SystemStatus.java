@@ -21,12 +21,11 @@ package com.keybox.manage.model;
 public class SystemStatus {
 
 
-    public static final String INITIAL_STATUS="I";
-    public static final String AUTH_FAIL_STATUS="A";
-    public static final String IN_PROGRESS_STATUS="P";
-    public static final String GENERIC_FAIL_STATUS="F";
-    public static final String TIMEOUT_STATUS="T";
-    public static final String SUCCESS_STATUS="S";
+    public static final String INITIAL_STATUS="INITIAL";
+    public static final String AUTH_FAIL_STATUS="AUTHFAIL";
+    public static final String PUBLIC_KEY_FAIL_STATUS="KEYAUTHFAIL";
+    public static final String GENERIC_FAIL_STATUS="GENERICFAIL";
+    public static final String SUCCESS_STATUS="SUCCESS";
 
 
     Long id;

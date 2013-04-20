@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.keybox</groupId>
     <artifactId>keybox</artifactId>
-    <version>1.07.000</version>
+    <version>1.08.100</version>
     <packaging>war</packaging>
     <name>KeyBox</name>
 
@@ -25,9 +25,9 @@
             <version>3.7.2</version>
         </dependency>
         <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-utils</artifactId>
-            <version>3.0.4</version>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-exec</artifactId>
+            <version>1.1</version>
         </dependency>
         <dependency>
             <groupId>com.jcraft</groupId>

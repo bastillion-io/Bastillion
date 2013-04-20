@@ -16,6 +16,8 @@
 package com.keybox.manage.db;
 
 import com.keybox.manage.util.DBUtils;
+import com.keybox.manage.util.EncryptionUtil;
+import com.keybox.manage.util.SSHUtil;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -59,6 +61,32 @@ public class PrivateKeyDB {
 
         return passphrase;
     }
+
+    /**
+     * Updates system-gen passphrase in db
+     * @param passphrase passphrase string
+     */
+    public static void updatePassphrase(String passphrase){
+
+        Connection con = null;
+
+        try {
+            con = DBUtils.getConn();
+
+            PreparedStatement stmt = con.prepareStatement("update private_key set passphrase=?");
+            stmt.setString(1,passphrase);
+            stmt.execute();
+            DBUtils.closeStmt(stmt);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+
+
+
+    }
+
 
 
 }
