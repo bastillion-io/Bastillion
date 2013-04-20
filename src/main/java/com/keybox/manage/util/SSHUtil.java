@@ -244,7 +244,6 @@ public class SSHUtil {
             authAndAddPubKey(hostSystemStatus, session);
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             hostSystemStatus.setErrorMsg(e.getMessage());
             if (e.getMessage().toLowerCase().contains("userauth fail")) {
                 hostSystemStatus.setStatusCd(SystemStatus.PUBLIC_KEY_FAIL_STATUS);
@@ -422,7 +421,6 @@ public class SSHUtil {
 
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             hostSystemStatus.setErrorMsg(e.getMessage());
             if (e.getMessage().toLowerCase().contains("userauth fail")) {
                 hostSystemStatus.setStatusCd(SystemStatus.PUBLIC_KEY_FAIL_STATUS);
