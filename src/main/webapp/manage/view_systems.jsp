@@ -40,7 +40,10 @@
                 autoOpen: false,
                 height: 350,
                 width: 350,
-                modal: true
+                modal: true,
+                open: function(event, ui) {
+                    $(".ui-dialog-titlebar-close").show();
+                }
             });
             //open add dialog
             $("#add_btn").button().click(function() {
