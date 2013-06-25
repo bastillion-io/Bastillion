@@ -58,8 +58,8 @@ $(document).ready(function() {
         }
     });
 
-    $(".enter_btn").button().click(function() {
-        $(this).prev().submit();
+    $(".termwrapper").sortable({
+        helper : 'clone'
     });
 
     //submit add or edit form
@@ -129,13 +129,6 @@ $(document).ready(function() {
 
 
     });
-
-     var tabindex = 1;
-     $('.run_cmd').each(function() {
-          var $input = $(this);
-          $input.attr("tabindex", tabindex);
-          tabindex++;
-     });
 
 
 
