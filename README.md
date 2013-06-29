@@ -42,6 +42,9 @@ In the directory that contains the pom.xml run
 
 To Run Jetty Build
 ------
+Download KeyBox-jetty-vX.XX.tar.gz
+http://sourceforge.net/projects/skavanaghkeybox
+
 Export environment variables
 
      export JAVA_HOME=/path/to/jdk
