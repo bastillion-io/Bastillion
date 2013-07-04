@@ -25,6 +25,22 @@ http://maven.apache.org
 Must run on *nix with OpenSSH version 2
 
 
+To Run Jetty Build
+------
+Download keybox-jetty-vX.XX.tar.gz
+
+https://github.com/skavanagh/KeyBox/releases
+
+Export environment variables
+
+     export JAVA_HOME=/path/to/jdk
+     export PATH=$JAVA_HOME/bin:$PATH
+
+Start KeyBox
+
+        ./startKeyBox.sh
+
+
 To Build from Source and Run with Maven
 ------
 Export environment variables
@@ -38,22 +54,6 @@ In the directory that contains the pom.xml run
 	mvn package jetty:run
 
 **Note: Doing a mvn clean will delete the SQLite DB and wipe out all the data.
-
-
-To Run Jetty Build
-------
-Download KeyBox-jetty-vX.XX.tar.gz
-
-http://sourceforge.net/projects/skavanaghkeybox
-
-Export environment variables
-
-     export JAVA_HOME=/path/to/jdk
-     export PATH=$JAVA_HOME/bin:$PATH
-
-Start KeyBox
-	
-	./startKeyBox.sh
 
 
 Using KeyBox
