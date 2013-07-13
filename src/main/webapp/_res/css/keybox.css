@@ -257,7 +257,10 @@ z-index:100;
   color: #f0f0f0;
   background: #4d4d4d;
 }
-
+.note {
+   font-style:italic;
+   font-size:smaller;
+}
 
 
 

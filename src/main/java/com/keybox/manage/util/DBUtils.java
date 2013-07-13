@@ -30,13 +30,6 @@ import java.util.Properties;
  * Class to create and close database resources
  */
 public class DBUtils {
-    public static enum JournalMode {
-            DELETE, TRUNCATE, PERSIST, MEMORY, OFF, WAL;
-
-            public String getValue() {
-                return name();
-            }
-        }
 
 
     //system path to the sqlite DB
@@ -56,6 +49,7 @@ public class DBUtils {
             Class.forName("org.sqlite.JDBC");
             // create a database connection
             con = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH + "/keybox.db", config.toProperties());
+
         } catch (Exception ex) {
             ex.printStackTrace();
         }

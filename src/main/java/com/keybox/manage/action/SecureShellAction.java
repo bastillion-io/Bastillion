@@ -36,13 +36,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This action will create composite ssh terminals to be used
  */
 public class SecureShellAction extends ActionSupport implements ServletResponseAware {
 
-    static Map<Long, SchSession> schSessionMap = new HashMap<Long, SchSession>();
+    static Map<Long, SchSession> schSessionMap = new ConcurrentHashMap<Long, SchSession>();
     List<SessionOutput> outputList;
     String command;
     HttpServletResponse servletResponse;
@@ -171,14 +172,12 @@ public class SecureShellAction extends ActionSupport implements ServletResponseA
     @Action(value = "/manage/getOutputJSON"
     )
     public String getOutputJSON() {
-        synchronized (SessionOutputUtil.class) {
-            outputList = SessionOutputUtil.getOutput();
-            JSONArray json = (JSONArray) JSONSerializer.toJSON(outputList);
-            try {
-                servletResponse.getOutputStream().write(json.toString().getBytes());
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+        outputList = SessionOutputUtil.getOutput();
+        JSONArray json = (JSONArray) JSONSerializer.toJSON(outputList);
+        try {
+            servletResponse.getOutputStream().write(json.toString().getBytes());
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
         return null;
     }

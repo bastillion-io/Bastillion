@@ -23,6 +23,7 @@ import java.util.*;
 public class SessionOutputUtil {
 
     private static Map<Long, SessionOutput> sessionOutputMap = new LinkedHashMap<Long, SessionOutput>();
+    private static final Object lock = new Object();
 
 
     /**
@@ -30,10 +31,12 @@ public class SessionOutputUtil {
      *
      * @param sessionOutput session output object
      */
-    public synchronized static void addOutput(SessionOutput sessionOutput) {
+    public static void addOutput(SessionOutput sessionOutput) {
 
         if (sessionOutput != null) {
-            sessionOutputMap.put(sessionOutput.getSessionId(), sessionOutput);
+            synchronized (lock){
+                sessionOutputMap.put(sessionOutput.getSessionId(), sessionOutput);
+            }
         }
 
     }
@@ -43,11 +46,13 @@ public class SessionOutputUtil {
      *
      * @param sessionOutput session output object
      */
-    public synchronized static void removeOutput(SessionOutput sessionOutput) {
+    public static void removeOutput(SessionOutput sessionOutput) {
 
 
         if (sessionOutput != null) {
-            sessionOutputMap.remove(sessionOutput.getSessionId());
+            synchronized (lock){
+                sessionOutputMap.remove(sessionOutput.getSessionId());
+            }
         }
 
     }
@@ -57,14 +62,14 @@ public class SessionOutputUtil {
      *
      * @param sessionOutput session output object
      */
-    public synchronized static void addCharToOutput(SessionOutput sessionOutput, char c) {
+    public static void addCharToOutput(SessionOutput sessionOutput, char c) {
 
 
         if (sessionOutput != null) {
             sessionOutput.getOutputChars().add(c);
-            sessionOutputMap.put(sessionOutput.getSessionId(), sessionOutput);
-
-
+            synchronized (lock){
+                sessionOutputMap.put(sessionOutput.getSessionId(), sessionOutput);
+            }
         }
 
     }
@@ -75,28 +80,30 @@ public class SessionOutputUtil {
      *
      * @return sessionId session id object
      */
-    public synchronized static List<SessionOutput> getOutput() {
+    public static List<SessionOutput> getOutput() {
         List<SessionOutput> outputList = new ArrayList<SessionOutput>();
 
+        synchronized (lock){
+            for (Long outputId : sessionOutputMap.keySet()) {
+                SessionOutput sessionOutput = sessionOutputMap.get(outputId);
 
-        for (Long outputId : sessionOutputMap.keySet()) {
-            SessionOutput sessionOutput = sessionOutputMap.get(outputId);
+                //get output chars and set to output
+                StringBuilder output = new StringBuilder(sessionOutput.getOutputChars().size());
+                for (Character ch : sessionOutput.getOutputChars()) {
+                    output.append(ch);
+                }
+                //sessionOutput.setOutput(output.toString().replaceAll("\\[.*?m|\\[.*?m",""));
+                sessionOutput.setOutput(output.toString());
+                sessionOutput.setOutputChars(new ArrayList<Character>());
 
-            //get output chars and set to output
-            StringBuilder output = new StringBuilder(sessionOutput.getOutputChars().size());
-            for (Character ch : sessionOutput.getOutputChars()) {
-                output.append(ch);
+                outputList.add(sessionOutput);
+
+                //put back with new char array
+                sessionOutputMap.put(sessionOutput.getSessionId(), sessionOutput);
+
             }
-            //sessionOutput.setOutput(output.toString().replaceAll("\\[.*?m|\\[.*?m",""));
-            sessionOutput.setOutput(output.toString());
-            sessionOutput.setOutputChars(new ArrayList<Character>());
-
-            outputList.add(sessionOutput);
-
-            //put back with new char array
-            sessionOutputMap.put(sessionOutput.getSessionId(), sessionOutput);
-
         }
+
 
         return outputList;
     }

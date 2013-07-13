@@ -17,6 +17,8 @@
 %>
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="-1"/>
 <script src="<%= request.getContextPath() %>/_res/js/jquery-1.8.3.js"></script>
 <script src="<%= request.getContextPath() %>/_res/js/jquery-ui.js"></script>
 <script src="<%= request.getContextPath() %>/_res/js/jquery.tablescroll.js"></script>
