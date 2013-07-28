@@ -15,15 +15,10 @@
  */
 package com.keybox.manage.util;
 
-
-import org.sqlite.SQLiteConfig;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.Enumeration;
-import java.util.Properties;
 
 
 /**
@@ -44,11 +39,12 @@ public class DBUtils {
         Connection con = null;
         try {
 
-            SQLiteConfig config = new SQLiteConfig();
-            config.enforceForeignKeys(true);
-            Class.forName("org.sqlite.JDBC");
+            Class.forName("org.h2.Driver");
             // create a database connection
-            con = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH + "/keybox.db", config.toProperties());
+            String user="keybox";
+            String password="filepwd wHevzQ23uJst/Qg3V+4P+g1/L+rgwKQELW+QUne1";
+            con = DriverManager.getConnection("jdbc:h2:" + DB_PATH + "/keybox;CIPHER=AES", user, password);
+
 
         } catch (Exception ex) {
             ex.printStackTrace();

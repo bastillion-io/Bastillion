@@ -50,23 +50,23 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
             Connection connection = DBUtils.getConn();
             Statement statement = connection.createStatement();
 
-            ResultSet rs = statement.executeQuery("select * from sqlite_master where type='table' and name='admin'");
+            ResultSet rs = statement.executeQuery("select * from information_schema.tables where upper(table_name) = 'ADMIN' and table_schema='PUBLIC'");
             if (rs == null || !rs.next()) {
-                statement.executeUpdate("create table if not exists admin (id INTEGER PRIMARY KEY AUTOINCREMENT, username string unique not null, password string not null, auth_token string)");
+                statement.executeUpdate("create table if not exists admin (id INTEGER PRIMARY KEY AUTO_INCREMENT, username varchar unique not null, password varchar not null, auth_token varchar)");
                 //insert default admin user
-                statement.executeUpdate("insert or ignore into admin (username, password) values('admin', '" + EncryptionUtil.hash("changeme") + "')");
+                statement.executeUpdate("insert into admin (username, password) values('admin', '" + EncryptionUtil.hash("changeme") + "')");
 
-                statement.executeUpdate("create table if not exists system (id INTEGER PRIMARY KEY AUTOINCREMENT, display_nm string not null, user not null, host string not null, port INTEGER not null, authorized_keys string not null)");
-                statement.executeUpdate("create table if not exists users (id INTEGER PRIMARY KEY AUTOINCREMENT, first_nm string not null, last_nm string not null, email string, public_key string)");
-                statement.executeUpdate("create table if not exists profiles (id INTEGER PRIMARY KEY AUTOINCREMENT, nm string not null, desc string not null)");
+                statement.executeUpdate("create table if not exists system (id INTEGER PRIMARY KEY AUTO_INCREMENT, display_nm varchar not null, user varchar not null, host varchar not null, port INTEGER not null, authorized_keys varchar not null)");
+                statement.executeUpdate("create table if not exists users (id INTEGER PRIMARY KEY AUTO_INCREMENT, first_nm varchar not null, last_nm varchar not null, email varchar, public_key varchar)");
+                statement.executeUpdate("create table if not exists profiles (id INTEGER PRIMARY KEY AUTO_INCREMENT, nm varchar not null, desc varchar not null)");
                 statement.executeUpdate("create table if not exists system_map (profile_id INTEGER, system_id INTEGER, foreign key (profile_id) references profiles(id) on delete cascade , foreign key (system_id) references system(id) on delete cascade, primary key (profile_id, system_id))");
                 statement.executeUpdate("create table if not exists user_map (user_id INTEGER, profile_id INTEGER, foreign key (user_id) references users(id) on delete cascade, foreign key (profile_id) references profiles(id) on delete cascade, primary key (user_id, profile_id))");
-                statement.executeUpdate("create table if not exists private_key (passphrase string unique)");
-                statement.executeUpdate("create table if not exists status (id INTEGER, auth_keys_val not null,status_cd string not null default 'INITIAL', foreign key (id) references system(id) on delete cascade)");
-                statement.executeUpdate("create table if not exists scripts (id INTEGER PRIMARY KEY AUTOINCREMENT, display_nm string not null, script string not null)");
+                statement.executeUpdate("create table if not exists private_key (passphrase varchar unique)");
+                statement.executeUpdate("create table if not exists status (id INTEGER, auth_keys_val varchar not null, status_cd varchar not null default 'INITIAL', foreign key (id) references system(id) on delete cascade)");
+                statement.executeUpdate("create table if not exists scripts (id INTEGER PRIMARY KEY AUTO_INCREMENT, display_nm varchar not null, script varchar not null)");
       		    System.out.println("Generating KeyBox SSH public/private key pair");
                 //generate new key and insert passphrase
-                statement.executeUpdate("insert or ignore into private_key (passphrase) values('" + EncryptionUtil.encrypt(SSHUtil.keyGen()) + "')");
+                statement.executeUpdate("insert into private_key (passphrase) values('" + EncryptionUtil.encrypt(SSHUtil.keyGen()) + "')");
                 System.out.println("KeyBox Public Key:");
                 System.out.println(SSHUtil.getPublicKey());
 

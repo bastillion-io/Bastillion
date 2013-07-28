@@ -3,19 +3,11 @@ KeyBox
 
 About
 -----
-KeyBox provides a way to manage OpenSSH v2 public keys and can start a web-based ssh terminal to execute commands and
-scripts on multiple ssh sessions simultaneously.
+KeyBox provides a way to manage OpenSSH v2 public keys and can start a web-based ssh terminal to execute commands and scripts on multiple ssh sessions simultaneously.
 
 
 Prerequisites
 -------------
-SQLite3
-http://www.sqlite.org/download.html
-
-    sudo apt-get install sqlite3 sqlite3-dev 
-
-**Should already be installed in Mac OS X v10.5 or greater
-
 Java JDK 1.6 or greater
 http://www.oracle.com/technetwork/java/javase/overview/index.html
 
@@ -53,7 +45,7 @@ In the directory that contains the pom.xml run
 
 	mvn package jetty:run
 
-**Note: Doing a mvn clean will delete the SQLite DB and wipe out all the data.
+**Note: Doing a mvn clean will delete the H2 DB and wipe out all the data.
 
 
 Using KeyBox
@@ -82,7 +74,7 @@ KeyBox generates its own ssh-key with a unique passphrase upon initial startup. 
 KeyBox's public-key delete 'id_rsa' and 'id_rsa.pub' in the classes/com/keybox/common/db 
 directory and restart the application.
 
-The SQLite DB may be backed up by copying 'keybox.db' in the classes/com/keybox/common/db directory.
+The H2 DB may be backed up by copying 'keybox.h2.db' in the classes/com/keybox/common/db directory.
 
 
 

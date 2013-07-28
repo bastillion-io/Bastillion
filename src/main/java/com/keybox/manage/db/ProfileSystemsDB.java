@@ -42,7 +42,11 @@ public class ProfileSystemsDB {
 
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("insert or ignore into system_map (profile_id, system_id) values (?,?)");
+            PreparedStatement stmt = con.prepareStatement("delete from system_map where profile_id=? and system_id=?");
+            stmt.setLong(1, profileId);
+            stmt.setLong(2, systemId);
+
+            stmt = con.prepareStatement("insert into system_map (profile_id, system_id) values (?,?)");
             stmt.setLong(1, profileId);
             stmt.setLong(2, systemId);
 

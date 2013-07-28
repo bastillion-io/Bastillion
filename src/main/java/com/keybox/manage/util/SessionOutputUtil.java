@@ -23,7 +23,6 @@ import java.util.*;
 public class SessionOutputUtil {
 
     private static Map<Long, SessionOutput> sessionOutputMap = new LinkedHashMap<Long, SessionOutput>();
-    private static final Object lock = new Object();
 
 
     /**
@@ -34,7 +33,7 @@ public class SessionOutputUtil {
     public static void addOutput(SessionOutput sessionOutput) {
 
         if (sessionOutput != null) {
-            synchronized (lock){
+            synchronized (sessionOutputMap){
                 sessionOutputMap.put(sessionOutput.getSessionId(), sessionOutput);
             }
         }
@@ -50,7 +49,7 @@ public class SessionOutputUtil {
 
 
         if (sessionOutput != null) {
-            synchronized (lock){
+            synchronized (sessionOutputMap){
                 sessionOutputMap.remove(sessionOutput.getSessionId());
             }
         }
@@ -67,7 +66,7 @@ public class SessionOutputUtil {
 
         if (sessionOutput != null) {
             sessionOutput.getOutputChars().add(c);
-            synchronized (lock){
+            synchronized (sessionOutputMap){
                 sessionOutputMap.put(sessionOutput.getSessionId(), sessionOutput);
             }
         }
@@ -83,7 +82,7 @@ public class SessionOutputUtil {
     public static List<SessionOutput> getOutput() {
         List<SessionOutput> outputList = new ArrayList<SessionOutput>();
 
-        synchronized (lock){
+        synchronized (sessionOutputMap){
             for (Long outputId : sessionOutputMap.keySet()) {
                 SessionOutput sessionOutput = sessionOutputMap.get(outputId);
 
