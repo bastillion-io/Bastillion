@@ -45,12 +45,13 @@ public class UserProfileDB {
             PreparedStatement stmt = con.prepareStatement("delete from user_map where profile_id=? and user_id=?");
             stmt.setLong(1, profileId);
             stmt.setLong(2, userId);
+            stmt.execute();
 
             stmt = con.prepareStatement("insert into user_map (profile_id, user_id) values (?,?)");
             stmt.setLong(1, profileId);
             stmt.setLong(2, userId);
-
             stmt.execute();
+
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
