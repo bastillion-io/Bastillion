@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.keybox</groupId>
     <artifactId>keybox</artifactId>
-    <version>1.08.50</version>
+    <version>1.08.51</version>
     <packaging>war</packaging>
     <name>KeyBox</name>
     <properties>
@@ -80,7 +80,7 @@
             <plugin>
                 <groupId>org.mortbay.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-		<version>8.1.12.v20130726</version>
+		        <version>8.1.12.v20130726</version>
                 <configuration>
                     <scanIntervalSeconds>-1</scanIntervalSeconds>
                     <connectors>

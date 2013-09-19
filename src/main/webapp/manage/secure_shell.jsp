@@ -113,7 +113,7 @@ $(document).ready(function() {
             idListStr = idListStr + '&idList=' + entry;
         });
 
-        $("#upload_push_frame").attr("src", "/manage/setUpload.action" + idListStr);
+        $("#upload_push_frame").attr("src", "setUpload.action" + idListStr);
         $("#upload_push_dialog").dialog("open");
 
 
@@ -158,7 +158,8 @@ $(document).ready(function() {
             });
 
             if(String.fromCharCode(keyCode) && String.fromCharCode(keyCode)!='' && !keys[17]){
-                $.ajax({ url: 'runCmd.action?command=' +String.fromCharCode(keyCode) + idListStr});
+                var cmdStr=String.fromCharCode(keyCode).replace("+","%2b");
+                $.ajax({ url: 'runCmd.action?command=' +cmdStr + idListStr});
             }
 
         });
@@ -241,7 +242,7 @@ $(document).ready(function() {
 
                 <div id="select_all" class="top_link">Select All</div>
                 <div id="upload_push" class="top_link">Upload &amp; Push</div>
-                 <div class="top_link" ><a href="/manage/exitTerms.action">Exit Terminals</a></div>
+                 <div class="top_link" ><a href="exitTerms.action">Exit Terminals</a></div>
                  <div class="note" style="float:right;">(Use CMD-Click or CTRL-Click to select multiple individual terminals)</div>
                 <div class="clear"></div>
 

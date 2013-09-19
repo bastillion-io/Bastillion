@@ -429,7 +429,7 @@ public class SystemStatusDB {
         List<SystemStatus> systemStatusList = new ArrayList<SystemStatus>();
         try {
 
-            PreparedStatement stmt = con.prepareStatement("select * from status");
+            PreparedStatement stmt = con.prepareStatement("select * from status order by id asc");
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -498,7 +498,7 @@ public class SystemStatusDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("select * from status where status_cd like ? or status_cd like ? or status_cd like ?");
+            PreparedStatement stmt = con.prepareStatement("select * from status where status_cd like ? or status_cd like ? or status_cd like ? order by id asc");
             stmt.setString(1,SystemStatus.INITIAL_STATUS);
             stmt.setString(2,SystemStatus.AUTH_FAIL_STATUS);
             stmt.setString(3,SystemStatus.PUBLIC_KEY_FAIL_STATUS);
