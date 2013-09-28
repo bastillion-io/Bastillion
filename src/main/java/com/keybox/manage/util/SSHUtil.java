@@ -17,7 +17,6 @@ package com.keybox.manage.util;
 
 import com.jcraft.jsch.*;
 import com.keybox.common.util.AppConfigLkup;
-import com.keybox.manage.db.PrivateKeyDB;
 import com.keybox.manage.db.SystemStatusDB;
 import com.keybox.manage.model.SchSession;
 import com.keybox.manage.model.SystemStatus;
@@ -31,7 +30,6 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.*;
 
 /**
  * SSH utility class used to create public/private key for system and distribute authorized key files
@@ -400,9 +398,10 @@ public class SSHUtil {
 
             InputStream outFromChannel = channel.getInputStream();
 
-            ExecutorService executor = Executors.newCachedThreadPool();
 
-            executor.execute(new SessionOutputTask(hostSystemStatus.getHostSystem().getId(), outFromChannel));
+            Runnable run=new SessionOutputTask(hostSystemStatus.getHostSystem().getId(), outFromChannel);
+            Thread thread = new Thread(run);
+            thread.start();
 
 
             OutputStream inputToChannel = channel.getOutputStream();

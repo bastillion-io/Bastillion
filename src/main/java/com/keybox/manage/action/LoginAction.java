@@ -102,7 +102,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
         return SUCCESS;
     }
 
-    @Action(value = "/passwordSubmit",
+    @Action(value = "/manage/passwordSubmit",
             results = {
                     @Result(name = "input", location = "/manage/set_password.jsp"),
                     @Result(name = "success", location = "/manage/menu.jsp", type = "redirect")
