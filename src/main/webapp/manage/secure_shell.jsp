@@ -81,7 +81,7 @@ $(document).ready(function() {
       $(".run_cmd").click(function() {
 
         //check for cmd-click / ctr-click
-        if(!keys[17] && !keys[91]) {
+        if(!keys[17] && !keys[91] && !keys[93] && !keys[224]) {
             $(".run_cmd").removeClass('run_cmd_active');
         }
 
@@ -186,6 +186,20 @@ $(document).ready(function() {
 
         $(document).click(function (e) {
             $('#dummy').focus();
+        });
+
+  	//get cmd text from paste
+        $("#dummy").bind('paste', function(e) {
+            $('#dummy').val('');
+            setTimeout(function() {
+                    var idListStr = '';
+                    $(".run_cmd_active").each(function(index) {
+                            var id = $(this).attr("id").replace("run_cmd_", "");
+                            idListStr = idListStr + '&idList=' + id;
+                    });
+                    var cmdStr=escape($('#dummy').val()).replace("+","%2b");
+                    $.ajax({ url: 'runCmd.action?command=' +cmdStr + idListStr});
+            }, 100);
         });
 
 
@@ -338,7 +352,7 @@ $(document).ready(function() {
     </s:else>
 
 </div>
-<div style="float:right;"><input type="text" name="dummy" id="dummy" size="1" style="border:none;color:#FFFFFF;width:1px;height:1px"/></div>
+<div style="float:right;"><textarea name="dummy" id="dummy" size="1" style="border:none;color:#FFFFFF;width:1px;height:1px"/></div>
 <div style="float:right;"><input type="text" name="dummy2" id="dummy2" size="1" style="border:none;color:#FFFFFF;width:1px;height:1px"/></div>
 
 </body>
