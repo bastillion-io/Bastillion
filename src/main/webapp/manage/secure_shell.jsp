@@ -352,8 +352,9 @@ $(document).ready(function() {
     </s:else>
 
 </div>
-<div style="float:right;"><textarea name="dummy" id="dummy" size="1" style="border:none;color:#FFFFFF;width:1px;height:1px"/></div>
-<div style="float:right;"><input type="text" name="dummy2" id="dummy2" size="1" style="border:none;color:#FFFFFF;width:1px;height:1px"/></div>
+<div style="float:right;"><textarea name="dummy" id="dummy" size="1" style="border:none;color:#FFFFFF;width:1px;height:1px"></textarea></div>
+<div style="float:right;"><input type="text" name="dummy2" id="dummy2" size="1" style="border:none;color:#FFFFFF;width:1px;height:1px"/>
+</div>
 
 </body>
 </html>
