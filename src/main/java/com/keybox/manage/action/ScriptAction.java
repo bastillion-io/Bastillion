@@ -16,60 +16,65 @@
 package com.keybox.manage.action;
 
 
+import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.db.ScriptDB;
 import com.keybox.manage.model.Script;
 import com.keybox.manage.model.SortedSet;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
+import org.apache.struts2.interceptor.ServletRequestAware;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Action to manage scripts
  */
-public class ScriptAction extends ActionSupport {
+public class ScriptAction extends ActionSupport implements ServletRequestAware {
 
     SortedSet sortedSet = new SortedSet();
     Script script=new Script();
+    HttpServletRequest servletRequest;
 
-
-    @Action(value = "/manage/viewScripts",
+    @Action(value = "/admin/viewScripts",
             results = {
-                    @Result(name = "success", location = "/manage/view_scripts.jsp")
+                    @Result(name = "success", location = "/admin/view_scripts.jsp")
             }
     )
     public String viewScripts() {
-
-        sortedSet = ScriptDB.getScriptSet(sortedSet);
+        Long userId= AuthUtil.getUserId(servletRequest.getSession());
+        sortedSet = ScriptDB.getScriptSet(sortedSet, userId);
 
         return SUCCESS;
     }
 
 
-    @Action(value = "/manage/saveScript",
+    @Action(value = "/admin/saveScript",
             results = {
-                    @Result(name = "input", location = "/manage/view_scripts.jsp"),
-                    @Result(name = "success", location = "/manage/viewScripts.action?sortedSet.orderByDirection=${sortedSet.orderByDirection}&sortedSet.orderByField=${sortedSet.orderByField}", type="redirect")
+                    @Result(name = "input", location = "/admin/view_scripts.jsp"),
+                    @Result(name = "success", location = "/admin/viewScripts.action?sortedSet.orderByDirection=${sortedSet.orderByDirection}&sortedSet.orderByField=${sortedSet.orderByField}", type="redirect")
             }
     )
     public String saveScript() {
-
+        Long userId= AuthUtil.getUserId(servletRequest.getSession());
         if (script.getId() != null) {
-            ScriptDB.updateScript(script);
+            ScriptDB.updateScript(script, userId);
         } else {
-            ScriptDB.insertScript(script);
+            ScriptDB.insertScript(script, userId);
         }
         return SUCCESS;
     }
 
-    @Action(value = "/manage/deleteScript",
+    @Action(value = "/admin/deleteScript",
             results = {
-                    @Result(name = "success", location = "/manage/viewScripts.action?sortedSet.orderByDirection=${sortedSet.orderByDirection}&sortedSet.orderByField=${sortedSet.orderByField}", type="redirect")
+                    @Result(name = "success", location = "/admin/viewScripts.action?sortedSet.orderByDirection=${sortedSet.orderByDirection}&sortedSet.orderByField=${sortedSet.orderByField}", type="redirect")
             }
     )
     public String deleteScript() {
 
+        Long userId= AuthUtil.getUserId(servletRequest.getSession());
         if (script.getId() != null) {
-            ScriptDB.deleteScript(script.getId());
+            ScriptDB.deleteScript(script.getId(), userId);
         }
         return SUCCESS;
     }
@@ -94,7 +99,8 @@ public class ScriptAction extends ActionSupport {
         }
 
         if (!this.getFieldErrors().isEmpty()) {
-            sortedSet = ScriptDB.getScriptSet(sortedSet);
+            Long userId= AuthUtil.getUserId(servletRequest.getSession());
+            sortedSet = ScriptDB.getScriptSet(sortedSet, userId);
         }
 
     }
@@ -113,5 +119,13 @@ public class ScriptAction extends ActionSupport {
 
     public void setScript(Script script) {
         this.script = script;
+    }
+
+    public HttpServletRequest getServletRequest() {
+        return servletRequest;
+    }
+
+    public void setServletRequest(HttpServletRequest servletRequest) {
+        this.servletRequest = servletRequest;
     }
 }

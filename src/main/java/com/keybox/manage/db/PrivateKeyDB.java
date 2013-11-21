@@ -15,40 +15,45 @@
  */
 package com.keybox.manage.db;
 
+import com.keybox.manage.model.ApplicationKey;
 import com.keybox.manage.util.DBUtils;
 import com.keybox.manage.util.EncryptionUtil;
-import com.keybox.manage.util.SSHUtil;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 /**
- * DAO that returns passphrase for the system generated private key
+ * DAO that returns public / private key for the system generated private key
  */
 public class PrivateKeyDB {
 
 
     /**
-     * returns passphrase for the system generated private key
-     * @return passphrase
+     * returns public private key for applcation
+     * @return app key values
      */
-    public static String getPassphrase() {
+    public static ApplicationKey getApplicationKey() {
 
-        String passphrase = null;
+        ApplicationKey appKey = null;
 
         Connection con = null;
 
         try {
             con = DBUtils.getConn();
 
-            PreparedStatement stmt = con.prepareStatement("select * from  private_key");
+            PreparedStatement stmt = con.prepareStatement("select * from  application_key");
 
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
 
-                passphrase=rs.getString("passphrase");
+                appKey= new ApplicationKey();
+                appKey.setId(rs.getLong("id"));
+                appKey.setPassphrase(EncryptionUtil.decrypt(rs.getString("passphrase")));
+                appKey.setPrivateKey(EncryptionUtil.decrypt(rs.getString("private_key")));
+                appKey.setPublicKey(rs.getString("public_key"));
+
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
@@ -59,33 +64,10 @@ public class PrivateKeyDB {
         DBUtils.closeConn(con);
 
 
-        return passphrase;
+        return appKey;
     }
 
-    /**
-     * Updates system-gen passphrase in db
-     * @param passphrase passphrase string
-     */
-    public static void updatePassphrase(String passphrase){
 
-        Connection con = null;
-
-        try {
-            con = DBUtils.getConn();
-
-            PreparedStatement stmt = con.prepareStatement("update private_key set passphrase=?");
-            stmt.setString(1,passphrase);
-            stmt.execute();
-            DBUtils.closeStmt(stmt);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        DBUtils.closeConn(con);
-
-
-
-    }
 
 
 

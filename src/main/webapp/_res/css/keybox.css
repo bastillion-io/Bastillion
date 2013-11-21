@@ -42,7 +42,7 @@ table td, table th {
     white-space: nowrap;
 }
 
-.errorMessage {
+.errorMessage, .errorMessage a {
     font-size: smaller;
     color: #cc0000;
 }

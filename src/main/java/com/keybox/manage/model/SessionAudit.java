@@ -16,47 +16,48 @@
 package com.keybox.manage.model;
 
 
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
- * Output from ssh session
+ * value object for terminal logs and history
  */
-public class SessionOutput {
-    Long sessionId;
-    Long userId;
-    Long hostSystemId;
-    String output="";
+public class SessionAudit {
+    Long id;
+    List<HostSystem> hostSystemList;
+    User user;
+    Date sessionTm;
 
-    public String getOutput() {
-        return output;
+
+    public User getUser() {
+        return user;
     }
 
-    public void setOutput(String output) {
-        this.output = output;
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    public Long getUserId() {
-        return userId;
+    public Date getSessionTm() {
+        return sessionTm;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setSessionTm(Date sessionTm) {
+        this.sessionTm = sessionTm;
     }
 
-    public Long getHostSystemId() {
-        return hostSystemId;
+    public Long getId() {
+        return id;
     }
 
-    public void setHostSystemId(Long hostSystemId) {
-        this.hostSystemId = hostSystemId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public Long getSessionId() {
-        return sessionId;
+    public List<HostSystem> getHostSystemList() {
+        return hostSystemList;
     }
 
-    public void setSessionId(Long sessionId) {
-        this.sessionId = sessionId;
+    public void setHostSystemList(List<HostSystem> hostSystemList) {
+        this.hostSystemList = hostSystemList;
     }
 }

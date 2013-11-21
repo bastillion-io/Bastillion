@@ -15,21 +15,25 @@
  */
 package com.keybox.manage.action;
 
+import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.db.SystemStatusDB;
 import com.keybox.manage.model.SchSession;
-import com.keybox.manage.model.SystemStatus;
+import com.keybox.manage.model.HostSystem;
 import com.keybox.manage.util.DBUtils;
 import com.keybox.manage.util.SSHUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.AgeFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
+import org.apache.struts2.interceptor.ServletRequestAware;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-public class UploadAndPushAction extends ActionSupport {
+public class UploadAndPushAction extends ActionSupport implements ServletRequestAware {
 
 
     File upload;
@@ -37,42 +41,44 @@ public class UploadAndPushAction extends ActionSupport {
     String uploadFileName;
     List<Long> idList = new ArrayList<Long>();
     String pushDir = "~";
-    List<SystemStatus> systemStatusList;
-    SystemStatus pendingSystemStatus;
-    SystemStatus currentSystemStatus;
+    List<HostSystem> hostSystemList;
+    HostSystem pendingSystemStatus;
+    HostSystem currentSystemStatus;
+    HttpServletRequest servletRequest;
 
     public static String UPLOAD_PATH = DBUtils.class.getClassLoader().getResource(".").getPath() + "../upload";
 
 
-    @Action(value = "/manage/setUpload",
+    @Action(value = "/admin/setUpload",
             results = {
-                    @Result(name = "success", location = "/manage/upload.jsp")
+                    @Result(name = "success", location = "/admin/upload.jsp")
             }
     )
     public String setUpload() throws Exception {
-        SystemStatusDB.setInitialSystemStatus(SystemStatusDB.findAuthKeysForSystems(idList));
+        Long userId= AuthUtil.getUserId(servletRequest.getSession());
+        SystemStatusDB.setInitialSystemStatus(idList, userId);
         return SUCCESS;
 
     }
 
 
-    @Action(value = "/manage/upload",
+    @Action(value = "/admin/upload",
             results = {
-                    @Result(name = "input", location = "/manage/upload.jsp"),
-                    @Result(name = "success", location = "/manage/upload_result.jsp")
+                    @Result(name = "input", location = "/admin/upload.jsp"),
+                    @Result(name = "success", location = "/admin/upload_result.jsp")
             }
     )
     public String upload() {
 
-
+        Long userId= AuthUtil.getUserId(servletRequest.getSession());
         try {
             File destination = new File(UPLOAD_PATH, uploadFileName);
             FileUtils.copyFile(upload, destination);
 
+            pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
 
-            pendingSystemStatus = SystemStatusDB.getNextPendingSystem();
+            hostSystemList = SystemStatusDB.getAllSystemStatus(userId);
 
-            systemStatusList = SystemStatusDB.getAllSystemStatus();
 
 
         } catch (Exception e) {
@@ -83,28 +89,28 @@ public class UploadAndPushAction extends ActionSupport {
         return SUCCESS;
     }
 
-    @Action(value = "/manage/push",
+    @Action(value = "/admin/push",
             results = {
-                    @Result(name = "success", location = "/manage/upload_result.jsp")
+                    @Result(name = "success", location = "/admin/upload_result.jsp")
             }
     )
     public String push() {
 
-
+        Long userId=AuthUtil.getUserId(servletRequest.getSession());
         try {
 
             //get next pending system
-            pendingSystemStatus = SystemStatusDB.getNextPendingSystem();
+            pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
             if (pendingSystemStatus != null) {
                 //get session for system
-                SchSession session = SecureShellAction.getSchSessionMap().get(pendingSystemStatus.getId());
+                SchSession session = SecureShellAction.getUserSchSessionMap().get(userId).getSchSessionMap().get(pendingSystemStatus.getId());
                 //push upload to system
                 currentSystemStatus = SSHUtil.pushUpload(pendingSystemStatus, session.getSession(), UPLOAD_PATH + "/" + uploadFileName, pushDir + "/" + uploadFileName);
 
                 //update system status
-                SystemStatusDB.updateSystemStatus(currentSystemStatus);
+                SystemStatusDB.updateSystemStatus(currentSystemStatus, userId);
 
-                pendingSystemStatus = SystemStatusDB.getNextPendingSystem();
+                pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
 
             }
 
@@ -113,8 +119,25 @@ public class UploadAndPushAction extends ActionSupport {
                 File delFile = new File(UPLOAD_PATH, uploadFileName);
                 FileUtils.deleteQuietly(delFile);
 
+
+                //delete all expired files in upload path
+                File delDir = new File(UPLOAD_PATH);
+                if (delDir.isDirectory()) {
+
+                    //set expire time to delete all files older than 48 hrs
+                    Calendar expireTime = Calendar.getInstance();
+                    expireTime.add(Calendar.HOUR, - 48);
+
+                    Iterator<File> filesToDelete = FileUtils.iterateFiles(delDir, new AgeFileFilter(expireTime.getTime()), TrueFileFilter.TRUE);
+                    while(filesToDelete.hasNext()) {
+                        delFile=filesToDelete.next();
+                        delFile.delete();
+                    }
+
+                }
+
             }
-            systemStatusList = SystemStatusDB.getAllSystemStatus();
+            hostSystemList = SystemStatusDB.getAllSystemStatus(userId);
 
 
         } catch (Exception e) {
@@ -180,27 +203,37 @@ public class UploadAndPushAction extends ActionSupport {
         this.idList = idList;
     }
 
-    public List<SystemStatus> getSystemStatusList() {
-        return systemStatusList;
+    public List<HostSystem> getHostSystemList() {
+        return hostSystemList;
     }
 
-    public void setSystemStatusList(List<SystemStatus> systemStatusList) {
-        this.systemStatusList = systemStatusList;
+    public void setHostSystemList(List<HostSystem> hostSystemList) {
+        this.hostSystemList = hostSystemList;
     }
 
-    public SystemStatus getPendingSystemStatus() {
+
+
+    public HttpServletRequest getServletRequest() {
+        return servletRequest;
+    }
+
+    public void setServletRequest(HttpServletRequest servletRequest) {
+        this.servletRequest = servletRequest;
+    }
+
+    public HostSystem getPendingSystemStatus() {
         return pendingSystemStatus;
     }
 
-    public void setPendingSystemStatus(SystemStatus pendingSystemStatus) {
+    public void setPendingSystemStatus(HostSystem pendingSystemStatus) {
         this.pendingSystemStatus = pendingSystemStatus;
     }
 
-    public SystemStatus getCurrentSystemStatus() {
+    public HostSystem getCurrentSystemStatus() {
         return currentSystemStatus;
     }
 
-    public void setCurrentSystemStatus(SystemStatus currentSystemStatus) {
+    public void setCurrentSystemStatus(HostSystem currentSystemStatus) {
         this.currentSystemStatus = currentSystemStatus;
     }
 }

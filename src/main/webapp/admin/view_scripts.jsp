@@ -57,25 +57,13 @@
             });
             //submit add or edit form
             $(".submit_btn").button().click(function() {
-                $(this).prev().submit();
+               $(this).parents('form:first').submit();
             });
             //close all forms
             $(".cancel_btn").button().click(function() {
                 $("#add_dialog").dialog("close");
                 $(".edit_dialog").dialog("close");
             });  //regenerate auth keys btn
-            $(".gen_auth_keys_btn").button().click(function() {
-                $("#gen_auth_keys").submit();
-            });
-            //select all check boxs
-            $("#gen_auth_keys_scriptSelectAll").click(function() {
-
-                if ($(this).is(':checked')) {
-                    $(".scriptSelect").attr('checked', true);
-                } else {
-                    $(".scriptSelect").attr('checked', false);
-                }
-            });
             $(".sort,.sortAsc,.sortDesc").click(function() {
                 var id = $(this).attr('id')
 
@@ -124,7 +112,6 @@
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
     <div class="content">
-        <s:set id="selectForm"><s:property value="#parameters['selectForm']"/></s:set>
         <s:form action="viewScripts">
             <s:hidden name="sortedSet.orderByDirection" />
             <s:hidden name="sortedSet.orderByField"/>
@@ -146,7 +133,7 @@
                     <s:iterator var="script" value="sortedSet.itemList" status="stat">
                     <tr>
                         <td>
-                                <a title="Execute Script" href="viewSystems.action?selectForm=true&script.id=<s:property value="id"/>""><s:property value="displayNm"/></a>
+                                <a title="Execute Script" href="viewSystems.action?script.id=<s:property value="id"/>""><s:property value="displayNm"/></a>
                         </td>
                             <td>
                                 <div id="edit_btn_<s:property value="id"/>" class="edit_btn" style="float:left">
@@ -172,9 +159,12 @@
                     <s:textarea name="script.script" label="Script" rows="15" cols="35" wrap="off"/>
                     <s:hidden name="sortedSet.orderByDirection"/>
                     <s:hidden name="sortedSet.orderByField"/>
+                    <tr> <td>&nbsp;</td>
+                        <td align="left"><div class="submit_btn">Submit</div>
+                        <div class="cancel_btn">Cancel</div></td>
+                    </tr>
                 </s:form>
-                <div class="submit_btn">Submit</div>
-                <div class="cancel_btn">Cancel</div>
+
             </div>
 
 
@@ -186,9 +176,11 @@
                        <s:hidden name="script.id" value="%{id}"/>
                        <s:hidden name="sortedSet.orderByDirection"/>
                        <s:hidden name="sortedSet.orderByField"/>
+                       <tr> <td>&nbsp;</td>
+                        <td align="left"><div class="submit_btn">Submit</div>
+                        <div class="cancel_btn">Cancel</div></td>
+                        </tr>
                     </s:form>
-                    <div class="submit_btn">Submit</div>
-                    <div class="cancel_btn">Cancel</div>
                 </div>
             </s:iterator>
 

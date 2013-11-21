@@ -1,19 +1,19 @@
 <%
-    /**
-     * Copyright 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
-     *
-     * Licensed under the Apache License, Version 2.0 (the "License");
-     * you may not use this file except in compliance with the License.
-     * You may obtain a copy of the License at
-     *
-     * http://www.apache.org/licenses/LICENSE-2.0
-     *
-     * Unless required by applicable law or agreed to in writing, software
-     * distributed under the License is distributed on an "AS IS" BASIS,
-     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-     * See the License for the specific language governing permissions and
-     * limitations under the License.
-     */
+/**
+ * Copyright 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 %>
 <%@ taglib prefix="s" uri="/struts-tags" %>
 <!DOCTYPE html>
@@ -25,30 +25,32 @@
 <script type="text/javascript">
 $(document).ready(function() {
 
+    $.ajaxSetup({ cache: false });
+
     $('#dummy').focus();
 
     $("#set_password_dialog").dialog({
         autoOpen: false,
         height: 200,
-        minWidth: 500,
+        minWidth: 550,
         modal: true
     });
     $("#set_passphrase_dialog").dialog({
         autoOpen: false,
         height: 200,
-        minWidth: 500,
+        minWidth: 550,
         modal: true
    });
     $("#error_dialog").dialog({
         autoOpen: false,
         height: 200,
-        width: 500,
+        minWidth:550,
         modal: true
     });
     $("#upload_push_dialog").dialog({
         autoOpen: false,
-        height: 350,
-        width: 530,
+        height: 375,
+        minWidth: 725,
         modal: true,
         open: function(event, ui) {
             $(".ui-dialog-titlebar-close").show();
@@ -59,13 +61,13 @@ $(document).ready(function() {
     });
 
     $(".termwrapper").sortable({
-        helper : 'clone'
+            helper : 'clone'
     });
 
     //submit add or edit form
     $(".submit_btn").button().click(function() {
         <s:if test="pendingSystemStatus!=null">
-        $(this).prev().submit();
+        $(this).parents('form:first').submit();
         </s:if>
         $("#error_dialog").dialog("close");
     });
@@ -81,7 +83,7 @@ $(document).ready(function() {
       $(".run_cmd").click(function() {
 
         //check for cmd-click / ctr-click
-        if(!keys[17] && !keys[91] && !keys[93] && !keys[224]) {
+	if(!keys[17] && !keys[91] && !keys[93] && !keys[224]) {
             $(".run_cmd").removeClass('run_cmd_active');
         }
 
@@ -121,6 +123,7 @@ $(document).ready(function() {
 
 
 
+
     <s:if test="currentSystemStatus!=null && currentSystemStatus.statusCd=='GENERICFAIL'">
         $("#error_dialog").dialog("open");
     </s:if>
@@ -157,9 +160,9 @@ $(document).ready(function() {
                 idListStr = idListStr + '&idList=' + id;
             });
 
-	    if(String.fromCharCode(keyCode) && String.fromCharCode(keyCode)!='' && !keys[17]  && !keys[91] && !keys[93] && !keys[224]){
+            if(String.fromCharCode(keyCode) && String.fromCharCode(keyCode)!='' && !keys[17]  && !keys[91] && !keys[93] && !keys[224]){
                 var cmdStr=String.fromCharCode(keyCode).replace(/\+/g,"%2b");
-                $.ajax({ url: 'runCmd.action?command=' +cmdStr + idListStr});
+                $.ajax({ url: '../terms/runCmd.action?command=' +cmdStr+ idListStr, cache: false});
             }
 
         });
@@ -167,13 +170,22 @@ $(document).ready(function() {
         $(document).keydown(function (e) {
             var keyCode= (e.keyCode)? e.keyCode: e.charCode;
             keys[keyCode]=true;
+            //27 - ESC
+            //37 - LEFT
+            //38 - UP
+            //39 - RIGHT
+            //40 - DOWN
+            //13 - ENTER
+            //8 - BS
+            //9 - TAB
+            //17 - CTRL
             if (keys[27] || keys[37] || keys[38] || keys[39] || keys[40] ||  keys[13] || keys[8] || keys[9] || keys[17]) {
                     var idListStr = '';
                     $(".run_cmd_active").each(function(index) {
                         var id = $(this).attr("id").replace("run_cmd_", "");
                         idListStr = idListStr + '&idList=' + id;
                     });
-                    $.ajax({ url: 'runCmd.action?keyCode=' + keyCode + idListStr});
+                    $.ajax({ url: '../terms/runCmd.action?keyCode=' + keyCode + idListStr,cache: false});
                 }
 
         });
@@ -188,7 +200,7 @@ $(document).ready(function() {
             $('#dummy').focus();
         });
 
-  	//get cmd text from paste
+        //get cmd text from paste
         $("#dummy").bind('paste', function(e) {
             $('#dummy').val('');
             setTimeout(function() {
@@ -198,7 +210,7 @@ $(document).ready(function() {
                             idListStr = idListStr + '&idList=' + id;
                     });
                     var cmdStr=escape($('#dummy').val()).replace(/\+/g,"%2b");
-                    $.ajax({ url: 'runCmd.action?command=' +cmdStr + idListStr});
+                    $.ajax({ url: '../terms/runCmd.action?command=' +cmdStr + idListStr,cache: false});
             }, 100);
         });
 
@@ -212,19 +224,20 @@ $(document).ready(function() {
         termMap[id].open($(this));
     });
 
+
     var lock=false;
     setInterval(function() {
         if(!lock){
             lock=true;
-            $.getJSON('getOutputJSON.action?t='+new Date().getTime(), function(data) {
+            $.getJSON('../terms/getOutputJSON.action?t='+new Date().getTime(), function(data) {
                 $.each(data, function(key, val) {
                     if (val.output != '') {
-                        termMap[val.sessionId].write(val.output);
-                    }
-                });
-            }).always(function() { lock=false; });
-        }
-    }, 500);
+                            termMap[val.hostSystemId].write(val.output);
+                        }
+                    });
+                }).always(function() { lock=false; });
+            }
+        }, 500);
     </s:if>
 
 });
@@ -248,7 +261,7 @@ $(document).ready(function() {
 
 <div class="page">
 
-    <s:if test="(schSessionMap!= null && !schSessionMap.isEmpty()) || pendingSystemStatus!=null">
+    <s:if test="(systemList!= null && !systemList.isEmpty()) || pendingSystemStatus!=null">
         <div class="content">
 
             <s:if test="pendingSystemStatus==null">
@@ -260,17 +273,15 @@ $(document).ready(function() {
                  <div class="note" style="float:right;">(Use CMD-Click or CTRL-Click to select multiple individual terminals)</div>
                 <div class="clear"></div>
 
-
             </s:if>
             <div class="termwrapper">
-                <s:iterator value="schSessionMap">
-                    <div id="run_cmd_<s:property value="key"/>" class="run_cmd_active run_cmd">
+                <s:iterator value="systemList">
+                    <div id="run_cmd_<s:property value="id"/>" class="run_cmd_active run_cmd">
 
-                        <h4><s:property value="value.hostSystem.displayLabel"/></h4>
-
+                        <h4><s:property value="displayLabel"/></h4>
 
                         <div id="term" class="term">
-                            <div id="output_<s:property value="key"/>" class="output"></div>
+                            <div id="output_<s:property value="id"/>" class="output"></div>
                         </div>
 
                     </div>
@@ -281,7 +292,7 @@ $(document).ready(function() {
             <div id="set_password_dialog" title="Enter Password">
                 <p class="error"><s:property value="pendingSystemStatus.errorMsg"/></p>
 
-                <p>Enter password for <s:property value="pendingSystemStatus.hostSystem.displayLabel"/>
+                <p>Enter password for <s:property value="pendingSystemStatus.displayLabel"/>
 
                 </p>
                 <s:form id="password_frm" action="createTerms">
@@ -290,29 +301,38 @@ $(document).ready(function() {
                     <s:if test="script!=null">
                         <s:hidden name="script.id"/>
                     </s:if>
+                    <tr>
+                   <td colspan="2">
+                    <div class="submit_btn">Submit</div>
+                    <div class="cancel_btn">Cancel</div>
+                    </td>
+                  </tr>
                 </s:form>
-                <div class="submit_btn">Submit</div>
-                <div class="cancel_btn">Cancel</div>
             </div>
 
             <div id="set_passphrase_dialog" title="Enter Passphrase">
                 <p class="error"><s:property value="pendingSystemStatus.errorMsg"/></p>
+                 <p>Enter passphrase for <s:property value="pendingSystemStatus.displayLabel"/></p>
                 <s:form id="passphrase_frm" action="createTerms">
                     <s:hidden name="pendingSystemStatus.id"/>
                     <s:password name="passphrase" label="Passphrase" size="15" value="" autocomplete="off"/>
                     <s:if test="script!=null">
                         <s:hidden name="script.id"/>
                     </s:if>
+                    <tr>
+                    <td colspan="2">
+                     <div class="submit_btn">Submit</div>
+                     <div class="cancel_btn">Cancel</div>
+                     </td>
+                   </tr>
                 </s:form>
-                <div class="submit_btn">Submit</div>
-                <div class="cancel_btn">Cancel</div>
             </div>
 
 
             <div id="error_dialog" title="Error">
                 <p class="error">Error: <s:property value="currentSystemStatus.errorMsg"/></p>
 
-                <p>System: <s:property value="currentSystemStatus.hostSystem.displayLabel"/>
+                <p>System: <s:property value="currentSystemStatus.displayLabel"/>
 
                 </p>
 
@@ -321,12 +341,16 @@ $(document).ready(function() {
                     <s:if test="script!=null">
                         <s:hidden name="script.id"/>
                     </s:if>
+                    <tr>
+                    <td colspan="2">
+                    <div class="submit_btn">OK</div>
+                    </td>
+                    </tr>
                 </s:form>
-                <div class="submit_btn">OK</div>
             </div>
 
             <div id="upload_push_dialog" title="Upload &amp; Push">
-                <iframe id="upload_push_frame" width="500px" height="300px" style="border: none;">
+                <iframe id="upload_push_frame" width="700px" height="300px" style="border: none;">
 
                 </iframe>
 
@@ -355,6 +379,5 @@ $(document).ready(function() {
 <div style="float:right;"><textarea name="dummy" id="dummy" size="1" style="border:none;color:#FFFFFF;width:1px;height:1px"></textarea></div>
 <div style="float:right;"><input type="text" name="dummy2" id="dummy2" size="1" style="border:none;color:#FFFFFF;width:1px;height:1px"/>
 </div>
-
 </body>
 </html>

@@ -17,9 +17,14 @@ package com.keybox.manage.util;
 
 import com.jcraft.jsch.*;
 import com.keybox.common.util.AppConfigLkup;
+import com.keybox.manage.db.PrivateKeyDB;
+import com.keybox.manage.db.PublicKeyDB;
+import com.keybox.manage.db.SystemDB;
 import com.keybox.manage.db.SystemStatusDB;
+import com.keybox.manage.model.ApplicationKey;
+import com.keybox.manage.model.HostSystem;
 import com.keybox.manage.model.SchSession;
-import com.keybox.manage.model.SystemStatus;
+import com.keybox.manage.model.UserSchSessions;
 import com.keybox.manage.task.SessionOutputTask;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
@@ -30,6 +35,7 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.*;
 
 /**
  * SSH utility class used to create public/private key for system and distribute authorized key files
@@ -81,6 +87,39 @@ public class SSHUtil {
 
 
     /**
+     * returns the system's public key
+     *
+     * @return system's public key
+     */
+    public static String getPrivateKey() {
+        String privateKey = null;
+
+
+        //get ssh-keygen cmd from properties file
+        Map<String, String> replaceMap = new HashMap<String, String>();
+        replaceMap.put("keyPath", KEY_PATH);
+        replaceMap.put("keyName", KEY_NAME);
+        //cat public ssh key
+        String cmdStr = AppConfigLkup.getProperty("catPrivateKeyCmd", replaceMap);
+
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        CommandLine cmdLine = CommandLine.parse(cmdStr);
+        DefaultExecutor executor = new DefaultExecutor();
+        PumpStreamHandler streamHandler = new PumpStreamHandler(out);
+        executor.setStreamHandler(streamHandler);
+        try {
+            executor.execute(cmdLine);
+            privateKey = out.toString();
+        } catch (ExecuteException ex) {
+            System.out.println(out.toString());
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return privateKey;
+    }
+
+    /**
      * generates system's public/private key par and returns passphrase
      *
      * @return passphrase for system generated key
@@ -91,11 +130,10 @@ public class SSHUtil {
     }
 
     /**
-     * generates system's public/private key par and returns passphrase
+     * delete SSH keys
      *
-     * @return passphrase for system generated key
      */
-    public static String keyGen(String passphrase) {
+    public static void deleteSshKeys() {
 
 
         //get ssh-keygen cmd from properties file
@@ -121,6 +159,16 @@ public class SSHUtil {
             ex.printStackTrace();
         }
 
+    }
+    /**
+     * generates system's public/private key par and returns passphrase
+     *
+     * @return passphrase for system generated key
+     */
+    public static String keyGen(String passphrase) {
+
+
+        deleteSshKeys();
 
         //if no passphrase set to random GUID
         if (passphrase == null || passphrase.trim().equals("")) {
@@ -128,17 +176,17 @@ public class SSHUtil {
         }
 
         //get ssh-keygen cmd from properties file
-        replaceMap = new HashMap<String, String>();
+        Map<String, String> replaceMap = new HashMap<String, String>();
         replaceMap.put("keyPath", KEY_PATH);
         replaceMap.put("keyName", KEY_NAME);
         replaceMap.put("passphrase", passphrase);
         //create new ssh keys
-        cmdStr = AppConfigLkup.getProperty("sshKeyGenCmd", replaceMap);
+        String cmdStr = AppConfigLkup.getProperty("sshKeyGenCmd", replaceMap);
 
-        out = new ByteArrayOutputStream();
-        cmdLine = CommandLine.parse(cmdStr);
-        executor = new DefaultExecutor();
-        streamHandler = new PumpStreamHandler(out);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        CommandLine cmdLine = CommandLine.parse(cmdStr);
+        DefaultExecutor executor = new DefaultExecutor();
+        PumpStreamHandler streamHandler = new PumpStreamHandler(out);
         executor.setStreamHandler(streamHandler);
 
         try {
@@ -156,80 +204,30 @@ public class SSHUtil {
     }
 
     /**
-     * checks to see if passphrase is valid for ssh-key
-     *
-     * @param passphrase ssh key passphrase
-     * @return boolean validity indicator
-     */
-    public static boolean isPassphraseValid(String passphrase) {
-        boolean isValid = false;
-
-
-        String verifyPubKey = null;
-        //get ssh-keygen command from properties file to verify passphrase
-        Map<String, String> replaceMap = new HashMap<String, String>();
-        replaceMap.put("keyPath", KEY_PATH);
-        replaceMap.put("keyName", KEY_NAME);
-        replaceMap.put("passphrase", passphrase);
-        //verify ssh key passphrase
-        String cmdStr = AppConfigLkup.getProperty("verifyPassphrase", replaceMap);
-
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        CommandLine cmdLine = CommandLine.parse(cmdStr);
-        DefaultExecutor executor = new DefaultExecutor();
-        PumpStreamHandler streamHandler = new PumpStreamHandler(out);
-        executor.setStreamHandler(streamHandler);
-        try {
-            executor.execute(cmdLine);
-            verifyPubKey = out.toString();
-        } catch (ExecuteException ex) {
-            System.out.println(out.toString());
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-
-
-        String currentPubKey = getPublicKey();
-        if (currentPubKey != null && !currentPubKey.trim().equals("")
-                && verifyPubKey != null && !verifyPubKey.trim().equals("")) {
-
-            //replace everything but public key text
-            currentPubKey = currentPubKey.trim().replaceAll("^.*?\\ |\\ .*?$", "");
-            verifyPubKey = verifyPubKey.trim().replaceAll("^.*?\\ |\\ .*?$", "");
-            //compair to make sure it matches
-            if (currentPubKey.equals(verifyPubKey)) {
-                isValid = true;
-            }
-
-        }
-
-
-        return isValid;
-
-    }
-
-    /**
      * distributes authorized keys for host system
      *
-     * @param hostSystemStatus object contains host system information
-     * @param passphrase       ssh key passphrase
-     * @param password         password to host system if needed
+     * @param hostSystem object contains host system information
+     * @param passphrase ssh key passphrase
+     * @param password   password to host system if needed
      * @return status of key distribution
      */
-    public static SystemStatus authAndAddPubKey(SystemStatus hostSystemStatus, String passphrase, String password) {
+    public static HostSystem authAndAddPubKey(HostSystem hostSystem, String passphrase, String password) {
 
 
         JSch jsch = new JSch();
         Session session = null;
-        hostSystemStatus.setStatusCd(SystemStatus.SUCCESS_STATUS);
+        hostSystem.setStatusCd(HostSystem.SUCCESS_STATUS);
         try {
-
+            ApplicationKey appKey = PrivateKeyDB.getApplicationKey();
+            //check to see if passphrase has been provided
+            if (passphrase == null || passphrase.trim().equals("")) {
+                passphrase = appKey.getPassphrase();
+            }
             //add private key
-            jsch.addIdentity(KEY_PATH + "/" + KEY_NAME, passphrase);
+            jsch.addIdentity(appKey.getId().toString(), appKey.getPrivateKey().trim().getBytes(), appKey.getPublicKey().getBytes(), passphrase.getBytes());
 
             //create session
-            session = jsch.getSession(hostSystemStatus.getHostSystem().getUser(), hostSystemStatus.getHostSystem().getHost(), hostSystemStatus.getHostSystem().getPort());
+            session = jsch.getSession(hostSystem.getUser(), hostSystem.getHost(), hostSystem.getPort());
 
             //set password if passed in
             if (password != null && !password.equals("")) {
@@ -239,16 +237,17 @@ public class SSHUtil {
             config.put("StrictHostKeyChecking", "no");
             session.setConfig(config);
             session.connect(SESSION_TIMEOUT);
-            authAndAddPubKey(hostSystemStatus, session);
+
+            addPubKey(hostSystem, session, appKey.getPublicKey());
 
         } catch (Exception e) {
-            hostSystemStatus.setErrorMsg(e.getMessage());
+            hostSystem.setErrorMsg(e.getMessage());
             if (e.getMessage().toLowerCase().contains("userauth fail")) {
-                hostSystemStatus.setStatusCd(SystemStatus.PUBLIC_KEY_FAIL_STATUS);
+                hostSystem.setStatusCd(HostSystem.PUBLIC_KEY_FAIL_STATUS);
             } else if (e.getMessage().toLowerCase().contains("auth fail") || e.getMessage().toLowerCase().contains("auth cancel")) {
-                hostSystemStatus.setStatusCd(SystemStatus.AUTH_FAIL_STATUS);
+                hostSystem.setStatusCd(HostSystem.AUTH_FAIL_STATUS);
             } else {
-                hostSystemStatus.setStatusCd(SystemStatus.GENERIC_FAIL_STATUS);
+                hostSystem.setStatusCd(HostSystem.GENERIC_FAIL_STATUS);
             }
 
 
@@ -257,8 +256,8 @@ public class SSHUtil {
         if (session != null) {
             session.disconnect();
         }
-        SystemStatusDB.updateSystemStatus(hostSystemStatus);
-        return hostSystemStatus;
+
+        return hostSystem;
 
 
     }
@@ -267,16 +266,16 @@ public class SSHUtil {
     /**
      * distributes uploaded item to system defined
      *
-     * @param hostSystemStatus object contains host system information
-     * @param session          an established SSH session
-     * @param source           source file
-     * @param destination      destination file
+     * @param hostSystem  object contains host system information
+     * @param session     an established SSH session
+     * @param source      source file
+     * @param destination destination file
      * @return status uploaded file
      */
-    public static SystemStatus pushUpload(SystemStatus hostSystemStatus, Session session, String source, String destination) {
+    public static HostSystem pushUpload(HostSystem hostSystem, Session session, String source, String destination) {
 
 
-        hostSystemStatus.setStatusCd(SystemStatus.SUCCESS_STATUS);
+        hostSystem.setStatusCd(HostSystem.SUCCESS_STATUS);
         Channel channel = null;
         ChannelSftp c = null;
 
@@ -298,8 +297,8 @@ public class SSHUtil {
 
 
         } catch (Exception e) {
-            hostSystemStatus.setErrorMsg(e.getMessage());
-            hostSystemStatus.setStatusCd(SystemStatus.GENERIC_FAIL_STATUS);
+            hostSystem.setErrorMsg(e.getMessage());
+            hostSystem.setStatusCd(HostSystem.GENERIC_FAIL_STATUS);
         }
         //exit
         if (c != null) {
@@ -310,7 +309,7 @@ public class SSHUtil {
             channel.disconnect();
         }
 
-        return hostSystemStatus;
+        return hostSystem;
 
 
     }
@@ -319,11 +318,12 @@ public class SSHUtil {
     /**
      * distributes authorized keys for host system
      *
-     * @param hostSystemStatus object contains host system information
-     * @param session          an established SSH session
+     * @param hostSystem object contains host system information
+     * @param session    an established SSH session
+     * @param appPublicKey application public key value
      * @return status of key distribution
      */
-    public static SystemStatus authAndAddPubKey(SystemStatus hostSystemStatus, Session session) {
+    public static HostSystem addPubKey(HostSystem hostSystem, Session session, String appPublicKey) {
 
 
         Channel channel = null;
@@ -331,23 +331,30 @@ public class SSHUtil {
 
         try {
 
-
             channel = session.openChannel("sftp");
             channel.setInputStream(System.in);
             channel.setOutputStream(System.out);
             channel.connect(CHANNEL_TIMEOUT);
 
             c = (ChannelSftp) channel;
-            String authorizedKeys = hostSystemStatus.getHostSystem().getAuthorizedKeys().replaceAll("~\\/|~", "");
 
             //return public key list into a input stream
-            InputStream inputStreamAuthKeyVal = new ByteArrayInputStream(hostSystemStatus.getAuthKeyVal().getBytes());
+            String authorizedKeys = hostSystem.getAuthorizedKeys().replaceAll("~\\/|~", "");
+
+            String keyValue=appPublicKey.replace("\n", "").trim();
+
+            for(String str : PublicKeyDB.getPublicKeysForSystem(hostSystem.getId())){
+                keyValue=keyValue+"\n" +str.replace("\n", "").trim();
+            }
+            keyValue=keyValue+"\n";
+
+            InputStream inputStreamAuthKeyVal = new ByteArrayInputStream(keyValue.getBytes());
             c.put(inputStreamAuthKeyVal, authorizedKeys);
 
 
         } catch (Exception e) {
-            hostSystemStatus.setErrorMsg(e.getMessage());
-            hostSystemStatus.setStatusCd(SystemStatus.GENERIC_FAIL_STATUS);
+            hostSystem.setErrorMsg(e.getMessage());
+            hostSystem.setStatusCd(HostSystem.GENERIC_FAIL_STATUS);
         }
         //exit
         if (c != null) {
@@ -358,34 +365,42 @@ public class SSHUtil {
             channel.disconnect();
         }
 
-        return hostSystemStatus;
+        return hostSystem;
 
 
     }
 
 
-    /**
-     * open SSH session host system
-     *
-     * @param hostSystemStatus object contains host system information
-     * @param passphrase       ssh key passphrase
-     * @param password         password to host system if needed
-     * @return status of key distribution
-     */
-    public static SystemStatus openSSHTermOnSystem(SystemStatus hostSystemStatus, String passphrase, String password, Map<Long, SchSession> schSessionMap) {
+   /**
+    * open new ssh session on host system
+    *
+    * @param passphrase key passphrase for instance
+    * @param password password for instance
+    * @param userId user id
+    * @param sessionId session id
+    * @param hostSystem host system
+    * @param userSessionMap user session map
+    * @return status of systems
+    */
+    public static HostSystem openSSHTermOnSystem(String passphrase, String password, Long userId, Long sessionId, HostSystem hostSystem,  Map<Long, UserSchSessions> userSessionMap) {
 
         JSch jsch = new JSch();
 
-        hostSystemStatus.setStatusCd(SystemStatus.SUCCESS_STATUS);
+        hostSystem.setStatusCd(HostSystem.SUCCESS_STATUS);
 
         SchSession schSession = null;
 
         try {
+            ApplicationKey appKey = PrivateKeyDB.getApplicationKey();
+            //check to see if passphrase has been provided
+            if (passphrase == null || passphrase.trim().equals("")) {
+                passphrase = appKey.getPassphrase();
+            }
             //add private key
-            jsch.addIdentity(KEY_PATH + "/" + KEY_NAME, passphrase);
+            jsch.addIdentity(appKey.getId().toString(), appKey.getPrivateKey().trim().getBytes(), appKey.getPublicKey().getBytes(), passphrase.getBytes());
 
             //create session
-            Session session = jsch.getSession(hostSystemStatus.getHostSystem().getUser(), hostSystemStatus.getHostSystem().getHost(), hostSystemStatus.getHostSystem().getPort());
+            Session session = jsch.getSession(hostSystem.getUser(), hostSystem.getHost(), hostSystem.getPort());
 
             //set password if it exists
             if (password != null && !password.trim().equals("")) {
@@ -399,9 +414,10 @@ public class SSHUtil {
             InputStream outFromChannel = channel.getInputStream();
 
 
-            Runnable run=new SessionOutputTask(hostSystemStatus.getHostSystem().getId(), outFromChannel);
+            Runnable run=new SessionOutputTask(sessionId, hostSystem.getId(), userId, outFromChannel);
             Thread thread = new Thread(run);
             thread.start();
+
 
 
             OutputStream inputToChannel = channel.getOutputStream();
@@ -411,33 +427,49 @@ public class SSHUtil {
             channel.connect();
 
             schSession = new SchSession();
+            schSession.setUserId(userId);
             schSession.setSession(session);
             schSession.setChannel(channel);
             schSession.setCommander(commander);
             schSession.setInputToChannel(inputToChannel);
             schSession.setOutFromChannel(outFromChannel);
-            schSession.setHostSystem(hostSystemStatus.getHostSystem());
+            schSession.setHostSystem(hostSystem);
 
 
         } catch (Exception e) {
-            hostSystemStatus.setErrorMsg(e.getMessage());
+            hostSystem.setErrorMsg(e.getMessage());
             if (e.getMessage().toLowerCase().contains("userauth fail")) {
-                hostSystemStatus.setStatusCd(SystemStatus.PUBLIC_KEY_FAIL_STATUS);
+                hostSystem.setStatusCd(HostSystem.PUBLIC_KEY_FAIL_STATUS);
             } else if (e.getMessage().toLowerCase().contains("auth fail") || e.getMessage().toLowerCase().contains("auth cancel")) {
-                hostSystemStatus.setStatusCd(SystemStatus.AUTH_FAIL_STATUS);
+                hostSystem.setStatusCd(HostSystem.AUTH_FAIL_STATUS);
             } else {
-                hostSystemStatus.setStatusCd(SystemStatus.GENERIC_FAIL_STATUS);
+                hostSystem.setStatusCd(HostSystem.GENERIC_FAIL_STATUS);
             }
         }
 
+
         //add session to map
-        if (hostSystemStatus.getStatusCd().equals(SystemStatus.SUCCESS_STATUS)) {
-            schSessionMap.put(hostSystemStatus.getHostSystem().getId(), schSession);
+        if (hostSystem.getStatusCd().equals(HostSystem.SUCCESS_STATUS)) {
+            //get the server maps for user
+            UserSchSessions userSchSessions = userSessionMap.get(userId);
+
+            //if no user session create a new one
+            if (userSchSessions == null) {
+                userSchSessions = new UserSchSessions();
+            }
+            Map<Long, SchSession> schSessionMap = userSchSessions.getSchSessionMap();
+
+            //add server information
+            schSessionMap.put(hostSystem.getId(), schSession);
+            userSchSessions.setSchSessionMap(schSessionMap);
+            //add back to map
+            userSessionMap.put(userId, userSchSessions);
         }
 
-        SystemStatusDB.updateSystemStatus(hostSystemStatus);
+        SystemStatusDB.updateSystemStatus(hostSystem, userId);
+        SystemDB.updateSystem(hostSystem);
 
-        return hostSystemStatus;
+        return hostSystem;
     }
 
 

@@ -18,6 +18,7 @@ package com.keybox.manage.db;
 import com.keybox.manage.model.SortedSet;
 import com.keybox.manage.model.User;
 import com.keybox.manage.util.DBUtils;
+import com.keybox.manage.util.EncryptionUtil;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -33,6 +34,8 @@ public class UserDB {
     public static final String SORT_BY_FIRST_NM="first_nm";
     public static final String SORT_BY_LAST_NM="last_nm";
     public static final String SORT_BY_EMAIL="email";
+    public static final String SORT_BY_USERNAME="username";
+    public static final String SORT_BY_USER_TYPE="user_type";
 
     /**
      * returns users based on sort order defined
@@ -48,21 +51,22 @@ public class UserDB {
         if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
             orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
         }
-        String sql = "select * from  users " + orderBy;
+        String sql = "select * from  users where enabled=true " + orderBy;
 
         Connection con = null;
         try {
             con = DBUtils.getConn();
             PreparedStatement stmt = con.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
-
             while (rs.next()) {
                 User user = new User();
                 user.setId(rs.getLong("id"));
                 user.setFirstNm(rs.getString("first_nm"));
                 user.setLastNm(rs.getString("last_nm"));
                 user.setEmail(rs.getString("email"));
-                user.setPublicKey(rs.getString("public_key"));
+                user.setUsername(rs.getString("username"));
+                user.setPassword(rs.getString("password"));
+                user.setUserType(rs.getString("user_type"));
                 userList.add(user);
 
             }
@@ -101,9 +105,9 @@ public class UserDB {
         return user;
     }
 
- /**
+    /**
      * returns user base on id
-  * @param con DB connection
+     * @param con DB connection
      * @param userId user id
      * @return user object
      */
@@ -121,7 +125,9 @@ public class UserDB {
                 user.setFirstNm(rs.getString("first_nm"));
                 user.setLastNm(rs.getString("last_nm"));
                 user.setEmail(rs.getString("email"));
-                user.setPublicKey(rs.getString("public_key"));
+                user.setUsername(rs.getString("username"));
+                user.setPassword(rs.getString("password"));
+                user.setUserType(rs.getString("user_type"));
                 user.setProfileList(UserProfileDB.getProfilesByUser(con, userId));
             }
             DBUtils.closeRs(rs);
@@ -144,11 +150,13 @@ public class UserDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("insert into users (first_nm, last_nm, email, public_key) values (?,?,?,?)");
+            PreparedStatement stmt = con.prepareStatement("insert into users (first_nm, last_nm, email, username, user_type, password) values (?,?,?,?,?,?)");
             stmt.setString(1, user.getFirstNm());
             stmt.setString(2, user.getLastNm());
             stmt.setString(3, user.getEmail());
-            stmt.setString(4, user.getPublicKey());
+            stmt.setString(4, user.getUsername());
+            stmt.setString(5, user.getUserType());
+            stmt.setString(6, EncryptionUtil.hash(user.getPassword()));
             stmt.execute();
             DBUtils.closeStmt(stmt);
 
@@ -169,12 +177,14 @@ public class UserDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("update users set first_nm=?, last_nm=?, email=?, public_key=? where id=?");
+            PreparedStatement stmt = con.prepareStatement("update users set first_nm=?, last_nm=?, email=?, username=?, user_type=?, password=? where id=?");
             stmt.setString(1, user.getFirstNm());
             stmt.setString(2, user.getLastNm());
             stmt.setString(3, user.getEmail());
-            stmt.setString(4, user.getPublicKey());
-            stmt.setLong(5, user.getId());
+            stmt.setString(4, user.getUsername());
+            stmt.setString(5, user.getUserType());
+            stmt.setString(6, EncryptionUtil.hash(user.getPassword()));
+            stmt.setLong(7, user.getId());
             stmt.execute();
             DBUtils.closeStmt(stmt);
 
@@ -189,13 +199,13 @@ public class UserDB {
      * deletes user
      * @param userId user id
      */
-    public static void deleteUser(Long userId) {
+    public static void disableUser(Long userId) {
 
 
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("delete from users where id=?");
+            PreparedStatement stmt = con.prepareStatement("update users set enabled=false where id=?");
             stmt.setLong(1, userId);
             stmt.execute();
             DBUtils.closeStmt(stmt);
@@ -206,6 +216,42 @@ public class UserDB {
         DBUtils.closeConn(con);
 
     }
+
+    /**
+     * checks to see if username is unique while ignoring current user
+     *
+     * @param userId user id
+     * @param username username
+     * @return true false indicator
+     */
+    public static boolean isUnique(Long userId, String username){
+
+        boolean isUnique=true;
+        if(userId==null){
+            userId=-99L;
+        }
+
+        Connection con = null;
+        try {
+            con = DBUtils.getConn();
+            PreparedStatement stmt = con.prepareStatement("select * from users where enabled=true and lower(username) like lower(?) and id != ?");
+            stmt.setString(1,username);
+            stmt.setLong(2, userId);
+            ResultSet rs = stmt.executeQuery();
+            if(rs.next()) {
+                isUnique=false;
+            }
+            DBUtils.closeRs(rs);
+            DBUtils.closeStmt(stmt);
+        } catch(Exception ex){
+            ex.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+
+        return isUnique;
+
+    }
+
 
 
 }

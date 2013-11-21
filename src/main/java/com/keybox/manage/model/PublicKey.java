@@ -16,12 +16,30 @@
 package com.keybox.manage.model;
 
 /**
- * Value object that contains script information
+ * public key value object
  */
-public class Script {
+public class PublicKey {
     Long id;
-    String script="#!/bin/bash\n\n";
-    String displayNm;
+    String keyNm;
+    String publicKey;
+    Profile profile;
+
+
+    public String getKeyNm() {
+        return keyNm;
+    }
+
+    public void setKeyNm(String keyNm) {
+        this.keyNm = keyNm;
+    }
+
+    public String getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
+    }
 
     public Long getId() {
         return id;
@@ -31,20 +49,11 @@ public class Script {
         this.id = id;
     }
 
-    public String getScript() {
-        return script;
+    public Profile getProfile() {
+        return profile;
     }
 
-    public void setScript(String script) {
-        this.script = script;
+    public void setProfile(Profile profile) {
+        this.profile = profile;
     }
-
-    public String getDisplayNm() {
-        return displayNm;
-    }
-
-    public void setDisplayNm(String displayNm) {
-        this.displayNm = displayNm;
-    }
-
 }

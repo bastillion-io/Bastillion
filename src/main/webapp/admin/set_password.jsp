@@ -46,10 +46,10 @@
         <p>Change your administrative password below</p>
 
         <s:actionerror/>
-        <s:form action="passwordSubmit">
-            <s:password name="login.prevPassword" label="Current Password"  autocomplete="off"/>
-            <s:password name="login.password" label="New Password" autocomplete="off"/>
-            <s:password name="login.passwordConfirm" label="Confirm New Password"  autocomplete="off"/>
+        <s:form action="passwordSubmit" autocomplete="off">
+            <s:password name="auth.prevPassword" label="Current Password" />
+            <s:password name="auth.password" label="New Password" />
+            <s:password name="auth.passwordConfirm" label="Confirm New Password" />
             <tr> <td>&nbsp;</td>
                 <td align="right">  <div id="change_pass_btn" class="login" >Change Password</div></td>
             </tr>

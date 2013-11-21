@@ -190,7 +190,8 @@ public class UserProfileDB {
                 user.setFirstNm(rs.getString("first_nm"));
                 user.setLastNm(rs.getString("last_nm"));
                 user.setEmail(rs.getString("email"));
-                user.setPublicKey(rs.getString("public_key"));
+                user.setUsername(rs.getString("username"));
+                user.setPassword(rs.getString("password"));
                 userList.add(user);
             }
             DBUtils.closeRs(rs);

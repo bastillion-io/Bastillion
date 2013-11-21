@@ -43,7 +43,7 @@
             $(".scrollableTable tr:odd").css("background-color", "#e0e0e0");
             <s:if test="pendingSystemStatus!=null">
             //set scroll
-            var container = $('.tablescroll_wrapper'), scrollTo = $('#status_<s:property value="pendingSystemStatus.hostSystem.id"/>');
+            var container = $('.tablescroll_wrapper'), scrollTo = $('#status_<s:property value="pendingSystemStatus.id"/>');
             container.scrollTop(scrollTo.offset().top - container.offset().top + container.scrollTop() - 55);
             </s:if>
             <s:if test="currentSystemStatus!=null && currentSystemStatus.statusCd=='GENERICFAIL'">
@@ -66,7 +66,7 @@
 </h4>
 
 
-<s:if test="systemStatusList!= null && !systemStatusList.isEmpty()">
+<s:if test="hostSystemList!= null && !hostSystemList.isEmpty()">
     <table class="vborder scrollableTable">
         <thead>
 
@@ -83,15 +83,15 @@
         </thead>
         <tbody>
 
-        <s:iterator value="systemStatusList" status="stat">
+        <s:iterator value="hostSystemList" status="stat">
             <tr>
 
                 <td>
-                    <div id="status_<s:property value="hostSystem.id"/>"><s:property
-                            value="hostSystem.displayNm"/></div>
+                    <div id="status_<s:property value="id"/>"><s:property
+                            value="displayNm"/></div>
                 </td>
-                <td><s:property value="hostSystem.user"/></td>
-                <td><s:property value="hostSystem.host"/>:<s:property value="hostSystem.port"/></td>
+                <td><s:property value="user"/></td>
+                <td><s:property value="host"/>:<s:property value="port"/></td>
 
                 <td>
                    <s:if test="statusCd=='INITIAL'">
@@ -129,7 +129,7 @@
 <div id="error_dialog" title="Error">
     <p class="error">Error: <s:property value="currentSystemStatus.errorMsg"/></p>
 
-    <p>System: <s:property value="currentSystemStatus.hostSystem.displayLabel"/>
+    <p>System: <s:property value="currentSystemStatus.displayLabel"/>
 
     </p>
 

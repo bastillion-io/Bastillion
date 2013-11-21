@@ -34,6 +34,56 @@ public class SystemDB {
     public static final String SORT_BY_NAME="display_nm";
     public static final String SORT_BY_USER="user";
     public static final String SORT_BY_HOST="host";
+    public static final String SORT_BY_STATUS="status_cd";
+
+
+    /**
+     * method to do order by based on the sorted set object for systems for user
+     * @param sortedSet sorted set object
+     * @param userId user id
+     * @return sortedSet with list of host systems
+     */
+    public static SortedSet getUserSystemSet(SortedSet sortedSet, Long userId){
+        List<HostSystem> hostSystemList = new ArrayList<HostSystem>();
+
+        String orderBy="";
+        if(sortedSet.getOrderByField()!=null && !sortedSet.getOrderByField().trim().equals("")){
+            orderBy="order by " + sortedSet.getOrderByField()+ " " + sortedSet.getOrderByDirection();
+        }
+        String sql="select * from system where id in (select distinct system_id from  system_map m, user_map um where m.profile_id=um.profile_id and um.user_id=?) "+orderBy;
+
+        //get user for auth token
+        Connection con=null;
+        try {
+            con=DBUtils.getConn();
+            PreparedStatement stmt = con.prepareStatement(sql);
+            stmt.setLong(1,userId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                HostSystem hostSystem = new HostSystem();
+                hostSystem.setId(rs.getLong("id"));
+                hostSystem.setDisplayNm(rs.getString("display_nm"));
+                hostSystem.setUser(rs.getString("user"));
+                hostSystem.setHost(rs.getString("host"));
+                hostSystem.setPort(rs.getInt("port"));
+                hostSystem.setAuthorizedKeys(rs.getString("authorized_keys"));
+                hostSystem.setStatusCd(rs.getString("status_cd"));
+                hostSystemList.add(hostSystem);
+            }
+            DBUtils.closeRs(rs);
+            DBUtils.closeStmt(stmt);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+
+
+        sortedSet.setItemList(hostSystemList);
+        return sortedSet;
+
+    }
 
 
     /**
@@ -48,7 +98,7 @@ public class SystemDB {
         if(sortedSet.getOrderByField()!=null && !sortedSet.getOrderByField().trim().equals("")){
             orderBy="order by " + sortedSet.getOrderByField()+ " " + sortedSet.getOrderByDirection();
         }
-        String sql="select * from  system "+orderBy;
+        String sql="select * from  system "+ orderBy;
 
         Connection con=null;
         try {
@@ -64,6 +114,7 @@ public class SystemDB {
                 hostSystem.setHost(rs.getString("host"));
                 hostSystem.setPort(rs.getInt("port"));
                 hostSystem.setAuthorizedKeys(rs.getString("authorized_keys"));
+                hostSystem.setStatusCd(rs.getString("status_cd"));
                 hostSystemList.add(hostSystem);
             }
             DBUtils.closeRs(rs);
@@ -134,6 +185,7 @@ public class SystemDB {
                 hostSystem.setHost(rs.getString("host"));
                 hostSystem.setPort(rs.getInt("port"));
                 hostSystem.setAuthorizedKeys(rs.getString("authorized_keys"));
+                hostSystem.setStatusCd(rs.getString("status_cd"));
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
@@ -150,28 +202,36 @@ public class SystemDB {
     /**
      * inserts host system into DB
      * @param hostSystem host system object
+     * @return user id
      */
-    public static void insertSystem(HostSystem hostSystem) {
+    public static Long insertSystem(HostSystem hostSystem) {
 
 
         Connection con = null;
 
+        Long userId=null;
         try {
             con = DBUtils.getConn();
-
-            PreparedStatement stmt = con.prepareStatement("insert into system (display_nm, user, host, port, authorized_keys) values (?,?,?,?,?)");
+            PreparedStatement stmt = con.prepareStatement("insert into system (display_nm, user, host, port, authorized_keys, status_cd) values (?,?,?,?,?,?)",PreparedStatement.RETURN_GENERATED_KEYS );
             stmt.setString(1, hostSystem.getDisplayNm());
             stmt.setString(2, hostSystem.getUser());
             stmt.setString(3, hostSystem.getHost());
             stmt.setInt(4, hostSystem.getPort());
             stmt.setString(5, hostSystem.getAuthorizedKeys());
+            stmt.setString(6, hostSystem.getStatusCd());
             stmt.execute();
+
+           ResultSet rs =stmt.getGeneratedKeys();
+            if(rs.next()){
+                userId=rs.getLong(1);
+            }
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
+        return userId;
 
     }
 
@@ -187,13 +247,14 @@ public class SystemDB {
         try {
             con = DBUtils.getConn();
 
-            PreparedStatement stmt = con.prepareStatement("update system set display_nm=?, user=?, host=?, port=?,authorized_keys=?  where id=?");
+            PreparedStatement stmt = con.prepareStatement("update system set display_nm=?, user=?, host=?, port=?, authorized_keys=?, status_cd=?  where id=?");
             stmt.setString(1, hostSystem.getDisplayNm());
             stmt.setString(2, hostSystem.getUser());
             stmt.setString(3, hostSystem.getHost());
             stmt.setInt(4, hostSystem.getPort());
             stmt.setString(5, hostSystem.getAuthorizedKeys());
-            stmt.setLong(6, hostSystem.getId());
+            stmt.setString(6, hostSystem.getStatusCd());
+            stmt.setLong(7, hostSystem.getId());
             stmt.execute();
             DBUtils.closeStmt(stmt);
 
@@ -228,5 +289,66 @@ public class SystemDB {
 
     }
 
+    /**
+     * returns the host systems
+     *
+     * @param systemIdList list of host system ids
+     * @return host system with array of public keys
+     */
+    public static List<HostSystem> getSystems(List<Long> systemIdList) {
+
+
+        Connection con = null;
+        List<HostSystem> hostSystemListReturn = new ArrayList<HostSystem>();
+
+        try {
+            con = DBUtils.getConn();
+            for (Long systemId : systemIdList) {
+                HostSystem hostSystem = getSystem(con, systemId);
+                hostSystemListReturn.add(hostSystem);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+
+
+        return hostSystemListReturn;
+
+    }
+
+
+
+    /**
+     * returns all system ids
+     * @param con DB connection
+     * @param id system id
+     * @return system
+     */
+    public static List<Long> getAllSystemIds(Connection con) {
+
+        List<Long> systemIdList= new ArrayList<Long>();
+
+
+
+        try {
+            PreparedStatement stmt = con.prepareStatement("select * from  system");
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                systemIdList.add(rs.getLong("id"));
+            }
+            DBUtils.closeRs(rs);
+            DBUtils.closeStmt(stmt);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        return systemIdList;
+
+    }
 
 }

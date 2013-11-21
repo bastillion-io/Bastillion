@@ -119,6 +119,26 @@ public class ProfileDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
+           profile=getProfile(con, profileId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+
+        return profile;
+    }
+
+    /**
+     * returns profile based on id
+     *
+     * @param con db connection object
+     * @param profileId profile id
+     * @return profile
+     */
+    public static Profile getProfile(Connection con, Long profileId) {
+
+        Profile profile = null;
+        try {
             PreparedStatement stmt = con.prepareStatement("select * from profiles where id=?");
             stmt.setLong(1, profileId);
             ResultSet rs = stmt.executeQuery();
@@ -137,7 +157,6 @@ public class ProfileDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
 
         return profile;
     }

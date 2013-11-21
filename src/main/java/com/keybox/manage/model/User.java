@@ -20,22 +20,12 @@ import java.util.List;
 /**
  * Value object that contains user information
  */
-public class User {
-    Long id;
+public class User extends Auth {
     String firstNm;
     String lastNm;
     String email;
-    String publicKey;
     boolean checked=false;
     List<Profile> profileList;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public boolean getChecked() {
         return checked;
@@ -67,14 +57,6 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPublicKey() {
-        return publicKey;
-    }
-
-    public void setPublicKey(String publicKey) {
-        this.publicKey = publicKey;
     }
 
     public List<Profile> getProfileList() {

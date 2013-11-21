@@ -42,8 +42,8 @@ public class DBUtils {
             Class.forName("org.h2.Driver");
             // create a database connection
             String user="keybox";
-            String password="filepwd wHevzQ23uJst/Qg3V+4P+g1/L+rgwKQELW+QUne1";
-            con = DriverManager.getConnection("jdbc:h2:" + DB_PATH + "/keybox;CIPHER=AES", user, password);
+            String password="filepwd 45WJLnwhpA47EepT162hrVnDn3vYRvJhpZi0sVdvN9Sdsf";
+            con = DriverManager.getConnection("jdbc:h2:" + DB_PATH + "/keybox;CIPHER=AES",user,password);
 
 
         } catch (Exception ex) {

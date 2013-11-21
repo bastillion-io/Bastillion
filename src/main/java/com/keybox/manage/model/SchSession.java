@@ -28,6 +28,7 @@ import java.io.PrintStream;
 public class SchSession {
 
 
+    Long userId;
     Session session;
     Channel channel;
     PrintStream commander;
@@ -82,5 +83,13 @@ public class SchSession {
 
     public void setHostSystem(HostSystem hostSystem) {
         this.hostSystem = hostSystem;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

@@ -16,7 +16,6 @@
  */
 %>
 <%@ taglib prefix="s" uri="/struts-tags" %>
-<s:set id="selectForm"><s:property value="#parameters['selectForm']"/></s:set>
 <!DOCTYPE html>
 <html>
 <head>
@@ -29,14 +28,14 @@
             $("#add_dialog").dialog({
                 autoOpen: false,
                 height: 400,
-                width: 800,
+                width: 500,
                 modal: true
             });
 
             $(".edit_dialog").dialog({
                 autoOpen: false,
                 height: 400,
-                width: 800,
+                width: 500,
                 modal: true
             });
 
@@ -58,7 +57,7 @@
             });
             //submit add or edit form
             $(".submit_btn").button().click(function() {
-                $(this).prev().submit();
+                 $(this).parents('form:first').submit();
             });
             //close all forms
             $(".cancel_btn").button().click(function() {
@@ -101,7 +100,7 @@
         });
     </script>
 
-    <s:if test="fieldErrors.size > 0">
+    <s:if test="fieldErrors.size > 0 || actionErrors.size > 0">
         <script type="text/javascript">
             $(document).ready(function() {
                 <s:if test="user.id>0">
@@ -128,33 +127,22 @@
         <s:form action="viewUsers">
             <s:hidden name="sortedSet.orderByDirection" />
             <s:hidden name="sortedSet.orderByField"/>
-            <s:hidden name="selectForm"/>
         </s:form>
-        <s:if test="#selectForm=='true'">
-            <h3>Distribute Authorized Keys for Users</h3>
-            <jsp:include page="../_res/inc/key_nav.jsp"/>
 
-            <p>Select the users below to generate and set the authorized key file</p>
+        <h3>Manage Users</h3>
 
-        </s:if>
-        <s:else>
-            <h3>Manage Users</h3>
-
-            <p>Add / Delete users or select a user below to assign profile</p>
-        </s:else>
+        <p>Add / Delete users or select a user below to assign profile</p>
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
-            <s:form action="selectUsersForAuthKeys" id="gen_auth_keys" theme="simple">
                 <table class="vborder scrollableTable">
                     <thead>
 
                     <tr>
 
-                        <s:if test="#selectForm=='true'">
-                            <th><s:checkbox name="userSelectAll" cssClass="userSelect"
-                                            theme="simple"
-                                    /></th>
-                        </s:if>
+                        <th id="<s:property value="@com.keybox.manage.db.UserDB@SORT_BY_USERNAME"/>" class="sort">Username
+                        </th>
+                         <th id="<s:property value="@com.keybox.manage.db.UserDB@SORT_BY_USER_TYPE"/>" class="sort">User Type
+                                                </th>
                         <th id="<s:property value="@com.keybox.manage.db.UserDB@SORT_BY_LAST_NM"/>" class="sort">Last
                             Name
                         </th>
@@ -164,94 +152,94 @@
                         <th id="<s:property value="@com.keybox.manage.db.UserDB@SORT_BY_EMAIL"/>" class="sort">Email
                             Address
                         </th>
-                        <s:if test="#selectForm=='true'"></s:if>
-                        <s:else>
-                            <th>&nbsp;</th>
-                        </s:else>
+                        <th>&nbsp;</th>
                     </tr>
                     </thead>
                     <tbody>
                     <s:iterator var="user" value="sortedSet.itemList" status="stat">
                     <tr>
-                        <s:if test="#selectForm=='true'">
-                            <td>
-                                <s:checkboxlist name="userSelectId" list="#{id:''}" cssClass="userSelect"
-                                            theme="simple"/>
-                            </td>
-                        </s:if>
                         <td>
+                         <s:if test="userType==\"M\"">
+                            <s:property value="username"/>
+                         </s:if>
+                         <s:else>
                             <a href="viewUserProfiles.action?user.id=<s:property value="id"/>"
-                               title="Manage Profiles for User">
-                                <s:property value="lastNm"/>
+                            title="Manage Profiles for User">
+                                <s:property value="username"/>
                             </a>
+                         </s:else>
                         </td>
+                        <td>
+                         <s:if test="userType==\"A\"">
+                            Administrative Only
+                         </s:if>
+                         <s:else>
+                            Full Access
+                         </s:else>
+                        </td>
+                        <td><s:property value="lastNm"/></td>
                         <td><s:property value="firstNm"/></td>
                         <td><s:property value="email"/></td>
-                        <s:if test="#selectForm=='true'"></s:if>
-                        <s:else>
                             <td>
                                 <div id="edit_btn_<s:property value="id"/>" class="edit_btn" style="float:left">
                                     Edit
-                                </div>
-                                <div id="del_btn_<s:property value="id"/>" class="del_btn" style="float:left">
+                                </div><div id="del_btn_<s:property value="id"/>" class="del_btn" style="float:left">
                                     Delete
-                                </div>
-                                <div style="clear:both"></div>
+                                </div>&nbsp;&nbsp;&nbsp;<div style="clear:both"></div>
                             </td>
-                        </s:else>
                     </tr>
                     </s:iterator>
                     </tbody>
                 </table>
-            </s:form>
-        </s:if>
-
-        <s:if test="#selectForm=='true'">
-             <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
-                <div id="gen_auth_keys" class="gen_auth_keys_btn">Distribute Authorized Keys</div>
-              </s:if>
-             <s:else>
-                <div class="error">There are no users defined.  New users may be defined <a href="viewUsers.action">here</a>.</div>
-             </s:else>
         </s:if>
 
 
-        <s:else>
+
+
 
             <div id="add_btn">Add User</div>
             <div id="add_dialog" title="Add User">
-                <s:form action="saveUser" class="save_user_form_add">
+                <s:actionerror/>
+                <s:form action="saveUser" class="save_user_form_add" autocomplete="off">
+                    <s:textfield name="user.username" label="Username" size="15"/>
+                    <s:select name="user.userType" list="#{'A':'Administrative Only','M':'Full Access'}" label="UserType"/>
                     <s:textfield name="user.firstNm" label="First Name" size="15"/>
                     <s:textfield name="user.lastNm" label="Last Name" size="15"/>
                     <s:textfield name="user.email" label="Email Address" size="25"/>
-                    <s:textarea name="user.publicKey" label="Public Key" rows="10" cols="75"/>
+                    <s:password name="user.password" value="" label="Password" size="15"/>
+                    <s:password name="user.passwordConfirm" value="" label="Confirm Password" size="15"/>
                     <s:hidden name="sortedSet.orderByDirection"/>
                     <s:hidden name="sortedSet.orderByField"/>
-                    <s:hidden name="selectForm"/>
+                    <tr> <td>&nbsp;</td>
+                        <td align="left"><div class="submit_btn">Submit</div>
+                        <div class="cancel_btn">Cancel</div></td>
+                    </tr>
                 </s:form>
-                <div class="submit_btn">Submit</div>
-                <div class="cancel_btn">Cancel</div>
             </div>
 
 
             <s:iterator var="user" value="sortedSet.itemList" status="stat">
                 <div id="edit_dialog_<s:property value="id"/>" title="Edit User" class="edit_dialog">
-                    <s:form action="saveUser" id="save_user_form_edit_%{id}">
+                    <s:actionerror/>
+                    <s:form action="saveUser" id="save_user_form_edit_%{id}" autocomplete="off">
+                        <s:textfield name="user.username" value="%{username}" label="Username" size="15"/>
+                        <s:select name="user.userType" value="%{userType}" list="#{'A':'Administrative Only','M':'Full Access'}" label="UserType"/>
                         <s:textfield name="user.firstNm" value="%{firstNm}" label="First Name" size="15"/>
                         <s:textfield name="user.lastNm" value="%{lastNm}" label="Last Name" size="15"/>
                         <s:textfield name="user.email" value="%{email}" label="Email Address" size="25"/>
-                        <s:textarea name="user.publicKey" value="%{publicKey}" label="Public Key" rows="10" cols="75"/>
+                        <s:password name="user.password" value="" label="Password" size="15"/>
+                        <s:password name="user.passwordConfirm" value="" label="Confirm Password" size="15"/>
                         <s:hidden name="user.id" value="%{id}"/>
                         <s:hidden name="sortedSet.orderByDirection"/>
                         <s:hidden name="sortedSet.orderByField"/>
-                        <s:hidden name="selectForm"/>
+                        <tr> <td>&nbsp;</td>
+                            <td align="left"><div class="submit_btn">Submit</div>
+                            <div class="cancel_btn">Cancel</div></td>
+                        </tr>
                     </s:form>
-                    <div class="submit_btn">Submit</div>
-                    <div class="cancel_btn">Cancel</div>
                 </div>
             </s:iterator>
 
-        </s:else>
 
     </div>
 </div>

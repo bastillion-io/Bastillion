@@ -15,38 +15,43 @@
      * limitations under the License.
      */
 %>
+<%@ taglib prefix="s" uri="/struts-tags" %>
 <div class="nav">
 
     <div style="float: left;margin-top: 5px;margin-left: -10px"><img
             src="<%= request.getContextPath() %>/img/keybox_50x38.png"/></div>
 
     <h3>
-        <a href="menu.jsp">KeyBox</a>
+        <a href="../admin/menu.action">KeyBox</a>
     </h3>
+    <s:if test="%{#session.userType==\"M\"}">
+        <div class="nav_item">
+            <a href="../manage/viewSystems.action">Systems</a>
+        </div>
+        <div class="nav_item">
+            <a href="../manage/viewProfiles.action">Profiles</a>
+        </div>
+        <div class="nav_item">
+            <a href="../manage/viewUsers.action">Users</a>
+        </div>
+        <div class="nav_item">
+            <a href="../manage/viewKeys.action">Public Keys</a>
+        </div>
+    </s:if>
+     <div class="nav_item">
+        <a href="../admin/viewSystems.action">Composite SSH Terms</a>
+     </div>
+     <div class="nav_item">
+        <a href="../admin/viewScripts.action">Composite Scripts</a>
+     </div>
+    <s:if test="%{#session.userType==\"M\"}">
+    <div class="nav_item">
+        <a href="../manage/viewSessions.action">Audit Sessions</a>
+    </div>
 
+    </s:if>
     <div class="nav_item">
-        <a href="viewSystems.action">Systems</a>
-    </div>
-    <div class="nav_item">
-        <a href="viewUsers.action">Users</a>
-    </div>
-    <div class="nav_item">
-        <a href="viewProfiles.action">Profiles</a>
-    </div>
-    <div class="nav_item">
-        <a href="viewSystems.action?selectForm=true">Distribute SSH Keys</a>
-    </div>
-    <div class="nav_item">
-        <a href="viewScripts.action">Composite Scripts</a>
-    </div>
-    <div class="nav_item">
-        <a href="viewSystems.action?selectForm=true&terms=true">Composite SSH Terms</a>
-    </div>
-    <div class="nav_item">
-        <a href="setPassphrase.action">Change Passphrase</a>
-    </div>
-    <div class="nav_item">
-        <a href="setPassword.action">Change Password</a>
+        <a href="../admin/setPassword.action">Change Password</a>
     </div>
     <div class="nav_item">
         <a href="../logout.action">Logout</a>

@@ -15,8 +15,7 @@
  */
 package com.keybox.manage.util;
 
-import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
+import org.apache.commons.codec.binary.Base64;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -28,7 +27,7 @@ import java.security.MessageDigest;
 public class EncryptionUtil {
 
     //secret key
-    private static final byte[] key = new byte[]{'D', '3', '3', 'm', 'p', 'd', 'M', 'o', 'I', '8', 'x', 'z', 'a', 'P', 'o', 'd'};
+    private static final byte[] key = new byte[]{'d', '3', '2', 't', 'p', 'd', 'M', 'o', 'I', '8', 'x', 'z', 'a', 'P', 'o', 'd'};
 
 
     /**
@@ -42,7 +41,7 @@ public class EncryptionUtil {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             md.update(str.getBytes("UTF-8"));
-            hash = (new BASE64Encoder()).encode(md.digest());
+            hash = new String(Base64.encodeBase64(md.digest()));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -63,7 +62,7 @@ public class EncryptionUtil {
                 Cipher c = Cipher.getInstance("AES");
                 c.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, "AES"));
                 byte[] encVal = c.doFinal(str.getBytes());
-                retVal = new BASE64Encoder().encode(encVal);
+                retVal = new String(Base64.encodeBase64(encVal));
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -84,7 +83,7 @@ public class EncryptionUtil {
             try {
                 Cipher c = Cipher.getInstance("AES");
                 c.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, "AES"));
-                byte[] decodedVal = new BASE64Decoder().decodeBuffer(str);
+                byte[] decodedVal = Base64.decodeBase64(str.getBytes());
                 retVal = new String(c.doFinal(decodedVal));
             } catch (Exception ex) {
                 ex.printStackTrace();

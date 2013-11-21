@@ -29,33 +29,36 @@ public class SessionOutputTask implements Runnable {
 
     InputStream outFromChannel;
     Long sessionId;
+    Long hostSystemId;
+    Long userId;
 
-    public SessionOutputTask(Long sessionId, InputStream outFromChannel) {
+    public SessionOutputTask(Long sessionId, Long hostSystemId, Long userId, InputStream outFromChannel) {
 
         this.sessionId = sessionId;
+        this.hostSystemId = hostSystemId;
+        this.userId = userId;
         this.outFromChannel = outFromChannel;
     }
 
     public void run() {
         BufferedReader br = new BufferedReader(new InputStreamReader(outFromChannel));
-
         try {
-
             int value = 0;
 
             SessionOutput sessionOutput = new SessionOutput();
+            sessionOutput.setUserId(userId);
+            sessionOutput.setHostSystemId(hostSystemId);
             sessionOutput.setSessionId(sessionId);
-            SessionOutputUtil.addOutput(sessionOutput);
+
+            SessionOutputUtil.addOutput(userId,sessionOutput);
 
             while ((value = br.read()) != -1) {
                 // converts int to character
                 char c = (char) value;
-                SessionOutputUtil.addCharToOutput(sessionOutput, c);
+                SessionOutputUtil.addCharToOutput(userId,hostSystemId, c);
 
             }
-            //sleep for 5 sec before removing output object so that leftover output is displayed
-            Thread.sleep(5000);
-            SessionOutputUtil.removeOutput(sessionOutput);
+            SessionOutputUtil.removeOutput(userId,hostSystemId);
 
         } catch (Exception ex) {
 

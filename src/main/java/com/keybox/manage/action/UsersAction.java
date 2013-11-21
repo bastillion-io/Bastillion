@@ -16,6 +16,7 @@
 package com.keybox.manage.action;
 
 
+import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.db.ScriptDB;
 import com.keybox.manage.db.UserDB;
 import com.keybox.manage.model.Script;
@@ -24,17 +25,20 @@ import com.keybox.manage.model.User;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
+import org.apache.struts2.interceptor.ServletRequestAware;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
  * Action to manage users
  */
-public class UsersAction extends ActionSupport {
+public class UsersAction extends ActionSupport  implements ServletRequestAware {
 
     SortedSet sortedSet=new SortedSet();
     User user = new User();
     Script script=null;
+    HttpServletRequest servletRequest;
 
 
     @Action(value = "/manage/viewUsers",
@@ -43,10 +47,10 @@ public class UsersAction extends ActionSupport {
             }
     )
     public String viewUsers() {
-
+        Long userId= AuthUtil.getUserId(servletRequest.getSession());
         sortedSet = UserDB.getUserSet(sortedSet);
         if(script!=null && script.getId()!=null){
-            script=ScriptDB.getScript(script.getId());
+            script=ScriptDB.getScript(script.getId(),userId);
         }
         return SUCCESS;
     }
@@ -60,6 +64,10 @@ public class UsersAction extends ActionSupport {
     public String saveUser() {
 
         if (user.getId() != null) {
+            if(user.getPassword()==null || user.getPassword().trim().equals("")){
+                User tmpUser = UserDB.getUser(getUser().getId());
+                user.setPassword(tmpUser.getPassword());
+            }
             UserDB.updateUser(user);
         } else {
             UserDB.insertUser(user);
@@ -75,7 +83,7 @@ public class UsersAction extends ActionSupport {
     public String deleteUser() {
 
         if (user.getId() != null) {
-            UserDB.deleteUser(user.getId());
+            UserDB.disableUser(user.getId());
         }
         return SUCCESS;
     }
@@ -84,6 +92,12 @@ public class UsersAction extends ActionSupport {
      * Validates all fields for adding a user
      */
     public void validateSaveUser() {
+        if (user == null
+                || user.getUsername() == null
+                || user.getUsername().trim().equals("")) {
+            addFieldError("user.username", "Required");
+        }
+
         if (user == null
                 || user.getLastNm() == null
                 || user.getLastNm().trim().equals("")) {
@@ -95,18 +109,23 @@ public class UsersAction extends ActionSupport {
                 || user.getFirstNm().trim().equals("")) {
             addFieldError("user.firstNm", "Required");
         }
-        if (user == null
-                || user.getPublicKey() == null
-                || user.getPublicKey().trim().equals("")) {
-            addFieldError("user.publicKey", "Required");
-
+        if (user != null
+                && user.getPassword() != null
+                && !user.getPassword().trim().equals("")
+                && !user.getPassword().equals(user.getPasswordConfirm())) {
+            addActionError("Passwords do not match");
         }
 
+        if(user!=null && user.getId()==null && (user.getPassword()==null || user.getPassword().trim().equals(""))){
+            addActionError("Password is required");
+        }
 
-        if (!this.getFieldErrors().isEmpty()) {
+        if(user!=null && !UserDB.isUnique(user.getId(),user.getUsername())){
+            addActionError("Username has been taken");
+        }
+        if (!this.getFieldErrors().isEmpty()||!this.getActionErrors().isEmpty()) {
             sortedSet = UserDB.getUserSet(sortedSet);
         }
-
     }
 
 
@@ -132,5 +151,13 @@ public class UsersAction extends ActionSupport {
 
     public void setScript(Script script) {
         this.script = script;
+    }
+
+    public HttpServletRequest getServletRequest() {
+        return servletRequest;
+    }
+
+    public void setServletRequest(HttpServletRequest servletRequest) {
+        this.servletRequest = servletRequest;
     }
 }

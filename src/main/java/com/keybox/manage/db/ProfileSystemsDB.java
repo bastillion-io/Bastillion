@@ -42,16 +42,13 @@ public class ProfileSystemsDB {
 
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("delete from system_map where profile_id=? and system_id=?");
+
+
+            PreparedStatement stmt = con.prepareStatement("insert into system_map (profile_id, system_id) values (?,?)");
             stmt.setLong(1, profileId);
             stmt.setLong(2, systemId);
-            stmt.execute();
 
-            stmt = con.prepareStatement("insert into system_map (profile_id, system_id) values (?,?)");
-            stmt.setLong(1, profileId);
-            stmt.setLong(2, systemId);
             stmt.execute();
-
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
@@ -174,6 +171,36 @@ public class ProfileSystemsDB {
         }
 
         return hostSystemList;
+    }
+
+
+    /**
+     * returns a list of systems for a given profile
+     * @param con DB connection
+     * @param profileId profile id
+     * @return list of host systems
+     */
+    public static List<Long> getSystemIdsByProfile(Connection con, Long profileId) {
+
+        List<Long> systemIdList = new ArrayList<Long>();
+
+
+        try {
+            PreparedStatement stmt = con.prepareStatement("select * from  system s, system_map m where s.id=m.system_id and m.profile_id=? order by display_nm asc");
+            stmt.setLong(1, profileId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                systemIdList.add(rs.getLong("id"));
+            }
+            DBUtils.closeRs(rs);
+            DBUtils.closeStmt(stmt);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return systemIdList;
     }
 
 

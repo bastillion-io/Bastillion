@@ -15,34 +15,62 @@
  */
 package com.keybox.manage.action;
 
+import com.keybox.common.util.AuthUtil;
+import com.keybox.manage.db.PrivateKeyDB;
 import com.keybox.manage.db.ScriptDB;
 import com.keybox.manage.db.SystemDB;
+import com.keybox.manage.model.Auth;
 import com.keybox.manage.model.HostSystem;
 import com.keybox.manage.model.Script;
 import com.keybox.manage.model.SortedSet;
+import com.keybox.manage.util.EncryptionUtil;
+import com.keybox.manage.util.SSHUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
+import org.apache.struts2.interceptor.ServletRequestAware;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Action to manage systems
  */
-public class SystemAction extends ActionSupport {
+public class SystemAction extends ActionSupport implements ServletRequestAware {
 
     SortedSet sortedSet = new SortedSet();
     HostSystem hostSystem = new HostSystem();
-    Script script=null;
+    Script script = null;
+    HttpServletRequest servletRequest;
+    String password;
+    String passphrase;
+
+
+    @Action(value = "/admin/viewSystems",
+            results = {
+                    @Result(name = "success", location = "/admin/view_systems.jsp")
+            }
+    )
+    public String viewAdminSystems() {
+        Long userId = AuthUtil.getUserId(servletRequest.getSession());
+
+        if (Auth.MANAGER.equals(AuthUtil.getUserType(servletRequest.getSession()))) {
+            sortedSet = SystemDB.getSystemSet(sortedSet);
+        } else {
+            sortedSet = SystemDB.getUserSystemSet(sortedSet, userId);
+        }
+        if (script != null && script.getId() != null) {
+            script = ScriptDB.getScript(script.getId(), userId);
+        }
+        return SUCCESS;
+    }
 
     @Action(value = "/manage/viewSystems",
             results = {
                     @Result(name = "success", location = "/manage/view_systems.jsp")
             }
     )
-    public String viewSystems() {
+    public String viewManageSystems() {
         sortedSet = SystemDB.getSystemSet(sortedSet);
-        if(script!=null && script.getId()!=null){
-            script= ScriptDB.getScript(script.getId());
-        }
         return SUCCESS;
     }
 
@@ -53,14 +81,23 @@ public class SystemAction extends ActionSupport {
             }
     )
     public String saveSystem() {
+        String retVal=SUCCESS;
+
+
+
+        hostSystem = SSHUtil.authAndAddPubKey(hostSystem, passphrase, password);
 
         if (hostSystem.getId() != null) {
             SystemDB.updateSystem(hostSystem);
         } else {
-            SystemDB.insertSystem(hostSystem);
-
+            hostSystem.setId(SystemDB.insertSystem(hostSystem));
         }
-        return SUCCESS;
+        sortedSet = SystemDB.getSystemSet(sortedSet);
+
+        if (!HostSystem.SUCCESS_STATUS.equals(hostSystem.getStatusCd())) {
+            retVal=INPUT;
+        }
+        return retVal;
     }
 
     @Action(value = "/manage/deleteSystem",
@@ -104,7 +141,7 @@ public class SystemAction extends ActionSupport {
 
         if (hostSystem == null
                 || hostSystem.getAuthorizedKeys() == null
-                || hostSystem.getAuthorizedKeys().trim().equals("")|| hostSystem.getAuthorizedKeys().trim().equals("~")) {
+                || hostSystem.getAuthorizedKeys().trim().equals("") || hostSystem.getAuthorizedKeys().trim().equals("~")) {
             addFieldError("hostSystem.authorizedKeys", "Required");
         }
 
@@ -139,4 +176,29 @@ public class SystemAction extends ActionSupport {
     public void setScript(Script script) {
         this.script = script;
     }
+
+    public HttpServletRequest getServletRequest() {
+        return servletRequest;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getPassphrase() {
+        return passphrase;
+    }
+
+    public void setPassphrase(String passphrase) {
+        this.passphrase = passphrase;
+    }
+
+    public void setServletRequest(HttpServletRequest servletRequest) {
+        this.servletRequest = servletRequest;
+    }
+
 }

@@ -15,47 +15,52 @@
  */
 package com.keybox.manage.action;
 
-import com.keybox.manage.db.PrivateKeyDB;
-import com.keybox.manage.db.ScriptDB;
+import com.keybox.common.util.AppConfigLkup;
+import com.keybox.common.util.AuthUtil;
+import com.keybox.manage.db.*;
+import com.keybox.manage.util.DBUtils;
 import com.keybox.manage.util.EncryptionUtil;
 import com.keybox.manage.util.SessionOutputUtil;
-import com.keybox.manage.db.SystemStatusDB;
 import com.keybox.manage.model.*;
 import com.keybox.manage.util.SSHUtil;
+import com.google.gson.Gson;
 import com.opensymphony.xwork2.ActionSupport;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONSerializer;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
+import org.apache.struts2.interceptor.ServletRequestAware;
 import org.apache.struts2.interceptor.ServletResponseAware;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.sql.Connection;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This action will create composite ssh terminals to be used
  */
-public class SecureShellAction extends ActionSupport implements ServletResponseAware {
+public class SecureShellAction extends ActionSupport implements ServletRequestAware, ServletResponseAware {
 
-    static Map<Long, SchSession> schSessionMap = new ConcurrentHashMap<Long, SchSession>();
     List<SessionOutput> outputList;
     String command;
     HttpServletResponse servletResponse;
+    HttpServletRequest servletRequest;
     Integer keyCode = null;
     List<Long> idList = new ArrayList<Long>();
     List<Long> systemSelectId;
-    List<Long> profileSelectId;
-    SystemStatus currentSystemStatus;
-    SystemStatus pendingSystemStatus;
+    HostSystem currentSystemStatus;
+    HostSystem pendingSystemStatus;
     String password;
-    static String passphrase;
+    String passphrase;
+    List<HostSystem> systemList = new ArrayList<HostSystem>();
+
+    static Map<Long, UserSchSessions> userSchSessionMap = new ConcurrentHashMap<Long, UserSchSessions>();
+
+
     Script script = new Script();
+
 
     /**
      * Maps key press events to the ascii values
@@ -144,122 +149,145 @@ public class SecureShellAction extends ActionSupport implements ServletResponseA
     /**
      * Runs commands across sessions
      */
-    @Action(value = "/manage/runCmd")
+    @Action(value = "/terms/runCmd")
     public String runCmd() {
-        try {
-            //if id then write to single system output buffer
-            if (idList != null && idList.size() > 0) {
-                for (Long id : idList) {
-                    SchSession schSession = schSessionMap.get(id);
-                    if (keyCode != null) {
-                        if (keyMap.containsKey(keyCode)) {
-                            schSession.getCommander().write(keyMap.get(keyCode));
+        Long userId = AuthUtil.getUserId(servletRequest.getSession());
+        if (userId != null) {
+            try {
+                //if id then write to single system output buffer
+                if (idList != null && idList.size() > 0) {
+                    for (Long id : idList) {
+                        //get servletRequest.getSession() for user
+                        UserSchSessions userSchSessions = userSchSessionMap.get(userId);
+                        if (userSchSessions != null) {
+                            SchSession schSession = userSchSessions.getSchSessionMap().get(id);
+                            if (keyCode != null) {
+                                if (keyMap.containsKey(keyCode)) {
+                                    schSession.getCommander().write(keyMap.get(keyCode));
+                                }
+                            } else {
+                                schSession.getCommander().print(command);
+                            }
                         }
-                    } else {
-                        schSession.getCommander().print(command);
                     }
                 }
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        }else{
+            AuthUtil.deleteAllSession(servletRequest.getSession());
         }
+
         return null;
     }
 
     /**
      * returns terminal output as a json string
      */
-    @Action(value = "/manage/getOutputJSON"
-    )
+    @Action(value = "/terms/getOutputJSON")
     public String getOutputJSON() {
-        outputList = SessionOutputUtil.getOutput();
-        JSONArray json = (JSONArray) JSONSerializer.toJSON(outputList);
-        try {
-            servletResponse.getOutputStream().write(json.toString().getBytes());
-        } catch (Exception ex) {
-            ex.printStackTrace();
+
+
+        Connection con = DBUtils.getConn();
+        //this checks to see if session is valid
+        Long userId = AuthDB.getUserIdByAuthToken(con, AuthUtil.getAuthToken(servletRequest.getSession()));
+        if (userId != null) {
+            //update timeout
+            AuthUtil.setTimeout(servletRequest.getSession());
+            List<SessionOutput> outputList = SessionOutputUtil.getOutput(con, userId);
+            String json = new Gson().toJson(outputList);
+            try {
+                servletResponse.getOutputStream().write(json.getBytes());
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }else{
+            AuthUtil.deleteAllSession(servletRequest.getSession());
         }
+
+        DBUtils.closeConn(con);
         return null;
+
     }
 
 
     /**
      * creates composite terminals if there are errors or authentication issues.
      */
-    @Action(value = "/manage/createTerms",
+    @Action(value = "/admin/createTerms",
             results = {
-                    @Result(name = "success", location = "/manage/secure_shell.jsp")
+                    @Result(name = "success", location = "/admin/secure_shell.jsp")
             }
     )
     public String createTerms() {
 
-
+        Long userId = AuthUtil.getUserId(servletRequest.getSession());
+        Long sessionId = AuthUtil.getSessionId(servletRequest.getSession());
         if (pendingSystemStatus != null && pendingSystemStatus.getId() != null) {
 
-            //check to see if passphrase has been provided
-            String  passphrase = EncryptionUtil.decrypt(PrivateKeyDB.getPassphrase());
-            //set use provided passphrase
-            if (passphrase == null || passphrase.trim().equals("")) {
-                passphrase = this.getPassphrase();
-            }
 
             //get status
-            currentSystemStatus = SystemStatusDB.getSystemStatus(pendingSystemStatus.getId());
+            currentSystemStatus = SystemStatusDB.getSystemStatus(pendingSystemStatus.getId(), userId);
             //if initial status run script
             if (currentSystemStatus != null
-                    && (SystemStatus.INITIAL_STATUS.equals(currentSystemStatus.getStatusCd())
-                    || SystemStatus.AUTH_FAIL_STATUS.equals(currentSystemStatus.getStatusCd())
-                    || SystemStatus.PUBLIC_KEY_FAIL_STATUS.equals(currentSystemStatus.getStatusCd()))
+                    && (HostSystem.INITIAL_STATUS.equals(currentSystemStatus.getStatusCd())
+                    || HostSystem.AUTH_FAIL_STATUS.equals(currentSystemStatus.getStatusCd())
+                    || HostSystem.PUBLIC_KEY_FAIL_STATUS.equals(currentSystemStatus.getStatusCd()))
                     ) {
 
                 //set current session
-                currentSystemStatus = SSHUtil.openSSHTermOnSystem(currentSystemStatus, passphrase, password, schSessionMap);
+                currentSystemStatus = SSHUtil.openSSHTermOnSystem(passphrase, password, userId, sessionId, currentSystemStatus, userSchSessionMap);
 
             }
             if (currentSystemStatus != null
-                    && (SystemStatus.AUTH_FAIL_STATUS.equals(currentSystemStatus.getStatusCd())
-                    || SystemStatus.PUBLIC_KEY_FAIL_STATUS.equals(currentSystemStatus.getStatusCd()))) {
+                    && (HostSystem.AUTH_FAIL_STATUS.equals(currentSystemStatus.getStatusCd())
+                    || HostSystem.PUBLIC_KEY_FAIL_STATUS.equals(currentSystemStatus.getStatusCd()))) {
 
                 pendingSystemStatus = currentSystemStatus;
 
             } else {
 
 
-                pendingSystemStatus = SystemStatusDB.getNextPendingSystem();
+                pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
                 //if success loop through systems until finished or need password
-                while (pendingSystemStatus != null && currentSystemStatus != null && SystemStatus.SUCCESS_STATUS.equals(currentSystemStatus.getStatusCd())) {
-                    currentSystemStatus = SSHUtil.openSSHTermOnSystem(pendingSystemStatus, passphrase, null, schSessionMap);
-                    pendingSystemStatus = SystemStatusDB.getNextPendingSystem();
+                while (pendingSystemStatus != null && currentSystemStatus != null && HostSystem.SUCCESS_STATUS.equals(currentSystemStatus.getStatusCd())) {
+                    currentSystemStatus = SSHUtil.openSSHTermOnSystem(passphrase, password, userId, sessionId, pendingSystemStatus, userSchSessionMap);
+                    pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
                 }
-
 
 
             }
-            passphrase=null;
 
         }
-        if (SystemStatusDB.getNextPendingSystem()== null) {
-            this.passphrase=null;
+        if (SystemStatusDB.getNextPendingSystem(userId) == null) {
 
-            //run script it exists
-            if (script != null && script.getId() != null && script.getId() > 0) {
 
-                script = ScriptDB.getScript(script.getId());
+            //check user map
+            if (userSchSessionMap != null && !userSchSessionMap.isEmpty()) {
+
+                //get user sessions
+                Map<Long, SchSession> schSessionMap = userSchSessionMap.get(userId).getSchSessionMap();
+
 
                 for (SchSession schSession : schSessionMap.values()) {
-                    BufferedReader reader = new BufferedReader(new StringReader(script.getScript()));
-                    String line;
-                    try {
+                    //add to host system list
+                    systemList.add(schSession.getHostSystem());
+                    //run script it exists
+                    if (script != null && script.getId() != null && script.getId() > 0) {
+                        script = ScriptDB.getScript(script.getId(), userId);
+                        BufferedReader reader = new BufferedReader(new StringReader(script.getScript()));
+                        String line;
+                        try {
 
-                        while ((line = reader.readLine()) != null) {
-                            schSession.getCommander().println(line);
+                            while ((line = reader.readLine()) != null) {
+                                schSession.getCommander().println(line);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-
                     }
                 }
-
             }
         }
 
@@ -268,96 +296,101 @@ public class SecureShellAction extends ActionSupport implements ServletResponseA
     }
 
 
-    @Action(value = "/manage/getNextPendingSystemForTerms",
+    @Action(value = "/admin/getNextPendingSystemForTerms",
             results = {
-                    @Result(name = "success", location = "/manage/secure_shell.jsp")
+                    @Result(name = "success", location = "/admin/secure_shell.jsp")
             }
     )
     public String getNextPendingSystemForTerms() {
-        currentSystemStatus = SystemStatusDB.getSystemStatus(pendingSystemStatus.getId());
+        Long userId = AuthUtil.getUserId(servletRequest.getSession());
+        currentSystemStatus = SystemStatusDB.getSystemStatus(pendingSystemStatus.getId(), userId);
         currentSystemStatus.setErrorMsg("Auth fail");
-        currentSystemStatus.setStatusCd(SystemStatus.GENERIC_FAIL_STATUS);
+        currentSystemStatus.setStatusCd(HostSystem.GENERIC_FAIL_STATUS);
 
 
-        SystemStatusDB.updateSystemStatus(currentSystemStatus);
-        pendingSystemStatus = SystemStatusDB.getNextPendingSystem();
+        SystemStatusDB.updateSystemStatus(currentSystemStatus, userId);
+        pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
 
         return SUCCESS;
     }
 
-    @Action(value = "/manage/selectSystemsForCompositeTerms",
+    @Action(value = "/admin/selectSystemsForCompositeTerms",
             results = {
-                    @Result(name = "success", location = "/manage/secure_shell.jsp")
+                    @Result(name = "success", location = "/admin/secure_shell.jsp")
             }
     )
     public String selectSystemsForCompositeTerms() {
 
+
+        Long userId = AuthUtil.getUserId(servletRequest.getSession());
         //exit any previous terms
         exitTerms();
         if (systemSelectId != null && !systemSelectId.isEmpty()) {
 
+            SystemStatusDB.setInitialSystemStatus(systemSelectId, userId);
+            pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
 
-            List<SystemStatus> systemStatusList = SystemStatusDB.setInitialSystemStatus(SystemStatusDB.findAuthKeysForSystems(systemSelectId));
-            pendingSystemStatus = SystemStatusDB.getNextPendingSystem();
-            //check to see if passphrase has been provided
-            String  passphrase = EncryptionUtil.decrypt(PrivateKeyDB.getPassphrase());
-            //set use provided passphrase
-            if (pendingSystemStatus!=null && (passphrase == null || passphrase.trim().equals(""))) {
-               pendingSystemStatus.setStatusCd(SystemStatus.PUBLIC_KEY_FAIL_STATUS);
-            }
+            AuthUtil.setSessionId(servletRequest.getSession(), SessionAuditDB.createSessionLog(userId));
+
 
         }
         return SUCCESS;
     }
 
 
-    @Action(value = "/manage/selectProfilesForCompositeTerms",
+    @Action(value = "/admin/exitTerms",
             results = {
-                    @Result(name = "success", location = "/manage/secure_shell.jsp")
-            }
-    )
-    public String selectProfilesForCompositeTerms() {
-
-
-        //exit any previous terms
-        exitTerms();
-        if (profileSelectId != null && !profileSelectId.isEmpty()) {
-
-
-            List<SystemStatus> systemStatusList = SystemStatusDB.setInitialSystemStatus(SystemStatusDB.findAuthKeysForProfile(profileSelectId));
-            pendingSystemStatus = SystemStatusDB.getNextPendingSystem();
-            //check to see if passphrase has been provided
-            String  passphrase = EncryptionUtil.decrypt(PrivateKeyDB.getPassphrase());
-            //set use provided passphrase
-            if (pendingSystemStatus!=null && (passphrase == null || passphrase.trim().equals(""))) {
-                pendingSystemStatus.setStatusCd(SystemStatus.PUBLIC_KEY_FAIL_STATUS);
-            }
-
-        }
-        return SUCCESS;
-    }
-
-
-    @Action(value = "/manage/exitTerms",
-            results = {
-                    @Result(name = "success", location = "/manage/menu.jsp", type = "redirect")
+                    @Result(name = "success", location = "/admin/menu.action", type = "redirect")
 
             }
     )
     public String exitTerms() {
 
 
-        for (SchSession schSession : schSessionMap.values()) {
-            schSession.getChannel().disconnect();
-            schSession.getSession().disconnect();
-            schSession.setChannel(null);
-            schSession.setSession(null);
-            schSession.setInputToChannel(null);
-            schSession.setCommander(null);
-            schSession.setOutFromChannel(null);
-            schSession = null;
+        Long userId = AuthUtil.getUserId(servletRequest.getSession());
+        //check user map
+        if (userSchSessionMap != null && !userSchSessionMap.isEmpty()) {
+
+            //get user servletRequest.getSession()s
+            for (Long userKey : userSchSessionMap.keySet()) {
+                UserSchSessions userSchSessions = userSchSessionMap.get(userKey);
+
+                //get current time and subtract number of hours set to determine expire time
+                Calendar expireTime = Calendar.getInstance();
+                expireTime.add(Calendar.HOUR, (-1 * Integer.parseInt(AppConfigLkup.getProperty("timeoutSshAfter"))));//subtract hours to get expire time
+
+                //if current user or session has timed out remove ssh session
+                if (userId.equals(userKey) || userSchSessions.getStartTime().before(expireTime.getTime())) {
+                    Map<Long, SchSession> schSessionMap = userSchSessionMap.get(userKey).getSchSessionMap();
+
+                    for (Long sessionKey : schSessionMap.keySet()) {
+
+                        SchSession schSession = schSessionMap.get(sessionKey);
+
+                        //disconnect ssh session
+                        schSession.getChannel().disconnect();
+                        schSession.getSession().disconnect();
+                        schSession.setChannel(null);
+                        schSession.setSession(null);
+                        schSession.setInputToChannel(null);
+                        schSession.setCommander(null);
+                        schSession.setOutFromChannel(null);
+                        schSession = null;
+                        //remove from map
+                        schSessionMap.remove(sessionKey);
+
+                    }
+
+
+                    //clear and remove session map for user
+                    schSessionMap.clear();
+                    userSchSessionMap.remove(userKey);
+                    SessionOutputUtil.removeUserSession(userKey);
+
+                }
+            }
+
         }
-        schSessionMap.clear();
 
 
         return SUCCESS;
@@ -396,13 +429,6 @@ public class SecureShellAction extends ActionSupport implements ServletResponseA
         this.keyCode = keyCode;
     }
 
-    public static Map<Long, SchSession> getSchSessionMap() {
-        return schSessionMap;
-    }
-
-    public static void setSchSessionMap(Map<Long, SchSession> schSessionMap) {
-        SecureShellAction.schSessionMap = schSessionMap;
-    }
 
     public List<Long> getIdList() {
         return idList;
@@ -420,14 +446,6 @@ public class SecureShellAction extends ActionSupport implements ServletResponseA
         this.systemSelectId = systemSelectId;
     }
 
-    public List<Long> getProfileSelectId() {
-        return profileSelectId;
-    }
-
-    public void setProfileSelectId(List<Long> profileSelectId) {
-        this.profileSelectId = profileSelectId;
-    }
-
 
     public String getPassword() {
         return password;
@@ -437,19 +455,19 @@ public class SecureShellAction extends ActionSupport implements ServletResponseA
         this.password = password;
     }
 
-    public SystemStatus getCurrentSystemStatus() {
+    public HostSystem getCurrentSystemStatus() {
         return currentSystemStatus;
     }
 
-    public void setCurrentSystemStatus(SystemStatus currentSystemStatus) {
+    public void setCurrentSystemStatus(HostSystem currentSystemStatus) {
         this.currentSystemStatus = currentSystemStatus;
     }
 
-    public SystemStatus getPendingSystemStatus() {
+    public HostSystem getPendingSystemStatus() {
         return pendingSystemStatus;
     }
 
-    public void setPendingSystemStatus(SystemStatus pendingSystemStatus) {
+    public void setPendingSystemStatus(HostSystem pendingSystemStatus) {
         this.pendingSystemStatus = pendingSystemStatus;
     }
 
@@ -467,6 +485,30 @@ public class SecureShellAction extends ActionSupport implements ServletResponseA
 
     public void setPassphrase(String passphrase) {
         this.passphrase = passphrase;
+    }
+
+    public HttpServletRequest getServletRequest() {
+        return servletRequest;
+    }
+
+    public void setServletRequest(HttpServletRequest servletRequest) {
+        this.servletRequest = servletRequest;
+    }
+
+    public List<HostSystem> getSystemList() {
+        return systemList;
+    }
+
+    public void setSystemList(List<HostSystem> systemList) {
+        this.systemList = systemList;
+    }
+
+    public static Map<Long, UserSchSessions> getUserSchSessionMap() {
+        return userSchSessionMap;
+    }
+
+    public static void setUserSchSessionMap(Map<Long, UserSchSessions> userSchSessionMap) {
+        SecureShellAction.userSchSessionMap = userSchSessionMap;
     }
 }
 

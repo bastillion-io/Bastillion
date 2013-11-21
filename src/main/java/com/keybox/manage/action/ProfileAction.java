@@ -16,7 +16,6 @@
 package com.keybox.manage.action;
 
 import com.keybox.manage.db.ProfileDB;
-import com.keybox.manage.db.ScriptDB;
 import com.keybox.manage.model.Profile;
 import com.keybox.manage.model.Script;
 import com.keybox.manage.model.SortedSet;
@@ -44,9 +43,6 @@ public class ProfileAction extends ActionSupport {
 
         sortedSet = ProfileDB.getProfileSet(sortedSet);
 
-        if(script!=null && script.getId()!=null){
-            script= ScriptDB.getScript(script.getId());
-        }
         return SUCCESS;
     }
 
@@ -120,4 +116,5 @@ public class ProfileAction extends ActionSupport {
     public void setScript(Script script) {
         this.script = script;
     }
+
 }

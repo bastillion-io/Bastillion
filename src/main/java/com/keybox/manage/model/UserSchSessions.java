@@ -15,36 +15,31 @@
  */
 package com.keybox.manage.model;
 
-/**
- * Value object that contains script information
- */
-public class Script {
-    Long id;
-    String script="#!/bin/bash\n\n";
-    String displayNm;
 
-    public Long getId() {
-        return id;
+
+import java.util.Date;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+public class UserSchSessions {
+
+    Map<Long, SchSession> schSessionMap = new ConcurrentHashMap<Long, SchSession>();
+    Date startTime=new Date();
+
+
+    public Map<Long, SchSession> getSchSessionMap() {
+        return schSessionMap;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setSchSessionMap(Map<Long, SchSession> schSessionMap) {
+        this.schSessionMap = schSessionMap;
     }
 
-    public String getScript() {
-        return script;
+    public Date getStartTime() {
+        return startTime;
     }
 
-    public void setScript(String script) {
-        this.script = script;
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
     }
-
-    public String getDisplayNm() {
-        return displayNm;
-    }
-
-    public void setDisplayNm(String displayNm) {
-        this.displayNm = displayNm;
-    }
-
 }

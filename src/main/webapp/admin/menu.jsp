@@ -52,8 +52,6 @@
 
     <div class="content">
 
-
-
         <table class="vborder">
             <thead>
             <tr>
@@ -63,10 +61,11 @@
 
             <tbody>
 
+            <s:if test="%{#session.userType==\"M\"}">
             <tr>
 
                 <td>
-                    <a href="viewSystems.action">Manage Systems</a>
+                    <a href="../manage/viewSystems.action">Systems</a>
 
                 </td>
 
@@ -77,8 +76,16 @@
 
             </tr>
             <tr>
+               <td>
+                    <a href="../manage/viewProfiles.action">Profiles</a>
+               </td>
+               <td>
+                    Create profiles and assign systems so that users will be granted access when the authorized key file is distributed to systems.
+               </td>
+            </tr>
+            <tr>
                 <td>
-                    <a href="viewUsers.action">Manage Users</a>
+                    <a href="../manage/viewUsers.action">Users</a>
 
                 </td>
                 <td>
@@ -88,66 +95,50 @@
             </tr>
             <tr>
                 <td>
-                    <a href="viewProfiles.action">Manage Profiles</a>
-
+                    <a href="../manage/viewKeys.action">Public Keys</a>
                 </td>
                 <td>
-                    Create profiles and assign systems so that users will be granted access when the authorized key file is distributed
-                    to systems.
+                    Set additional public keys for systems
                 </td>
             </tr>
 
+            </s:if>
 
-            <tr>
+
+             <tr>
                 <td>
-                    <a href="viewSystems.action?selectForm=true">Distribute SSH Keys</a>
-
+                    <a href="../admin/viewSystems.action">Composite SSH Terms</a>
                 </td>
                 <td>
-                    Distribute the authorized key file to systems that have been defined. The authorized key file will
-                    contain entries based on the systems assigned to the user's profile.
+                Execute multiple-simultaneous web-terminals on selected systems.
                 </td>
-            </tr>
-
-            <tr>
+             </tr>
+             <tr>
                 <td>
-                    <a href="viewScripts.action">Composite Scripts</a>
-
+                    <a href="../admin/viewScripts.action">Composite Scripts</a>
                 </td>
                 <td>
                     Create scripts to be executed on selected systems simultaneously through a web-terminal
                 </td>
+             </tr>
+             <s:if test="%{#session.userType==\"M\"}">
+             <tr>
+                <td>
+                    <a href="../manage/viewSessions.action">Audit Sessions</a>
+                </td>
+                <td>
+                    Audit administrator's sessions and terminal history
+                </td>
             </tr>
+            </s:if>
             <tr>
                 <td>
-                    <a href="viewSystems.action?selectForm=true&terms=true">Composite SSH Terms</a>
-
-                </td>
-                <td>
-                    Execute multiple-simultaneous web-terminals on selected systems.
-                </td>
-            </tr>
-
-            <tr>
-                <td>
-                    <a href="setPassphrase.action">Change Passphrase</a>
-
-                </td>
-                <td>
-                    Generate system key with a custom passphrase to access defined systems. This enables added security
-                    and you will be prompted for a passphrase each time you access a system or systems. You will have to re-distribute the authorized key file after setting a passphrase.
-                </td>
-            </tr>
-              <tr>
-                <td>
-                  <a href="setPassword.action">Change Password</a>
+                  <a href="../admin/setPassword.action">Change Password</a>
                 </td>
                 <td>
                     Change administrative login to application
                 </td>
             </tr>
-
-
             </tbody>
         </table>
     </div>

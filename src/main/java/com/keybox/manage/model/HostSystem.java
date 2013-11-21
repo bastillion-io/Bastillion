@@ -29,7 +29,17 @@ public class HostSystem {
     String displayLabel;
     String authorizedKeys="~/.ssh/authorized_keys";
     boolean checked=false;
+    String statusCd=INITIAL_STATUS;
+    String errorMsg;
     List<String> publicKeyList;
+
+    public static final String INITIAL_STATUS="INITIAL";
+    public static final String AUTH_FAIL_STATUS="AUTHFAIL";
+    public static final String PUBLIC_KEY_FAIL_STATUS="KEYAUTHFAIL";
+    public static final String GENERIC_FAIL_STATUS="GENERICFAIL";
+    public static final String SUCCESS_STATUS="SUCCESS";
+
+
 
     public Long getId() {
         return id;
@@ -42,14 +52,6 @@ public class HostSystem {
 
     public String getDisplayNm() {
         return displayNm;
-    }
-
-    public List<String> getPublicKeyList() {
-        return publicKeyList;
-    }
-
-    public void setPublicKeyList(List<String> publicKeyList) {
-        this.publicKeyList = publicKeyList;
     }
 
     public void setDisplayNm(String displayNm) {
@@ -104,5 +106,29 @@ public class HostSystem {
 
     public void setChecked(boolean checked) {
         this.checked = checked;
+    }
+
+    public String getStatusCd() {
+        return statusCd;
+    }
+
+    public void setStatusCd(String statusCd) {
+        this.statusCd = statusCd;
+    }
+
+    public String getErrorMsg() {
+        return errorMsg;
+    }
+
+    public void setErrorMsg(String errorMsg) {
+        this.errorMsg = errorMsg;
+    }
+
+    public List<String> getPublicKeyList() {
+        return publicKeyList;
+    }
+
+    public void setPublicKeyList(List<String> publicKeyList) {
+        this.publicKeyList = publicKeyList;
     }
 }
