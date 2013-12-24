@@ -27,8 +27,7 @@ import java.sql.Statement;
 public class DBUtils {
 
 
-    //system path to the sqlite DB
-    private static String DB_PATH = DBUtils.class.getClassLoader().getResource("com/keybox/common/db").getPath();
+
 
     /**
      * returns DB connection
@@ -37,14 +36,8 @@ public class DBUtils {
      */
     public static Connection getConn() {
         Connection con = null;
-        try {
-
-            Class.forName("org.h2.Driver");
-            // create a database connection
-            String user="keybox";
-            String password="filepwd 45WJLnwhpA47EepT162hrVnDn3vYRvJhpZi0sVdvN9Sdsf";
-            con = DriverManager.getConnection("jdbc:h2:" + DB_PATH + "/keybox;CIPHER=AES",user,password);
-
+        try{
+            con=DSPool.getDataSource().getConnection();
 
         } catch (Exception ex) {
             ex.printStackTrace();

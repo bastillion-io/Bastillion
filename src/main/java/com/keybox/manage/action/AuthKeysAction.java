@@ -15,6 +15,7 @@
  */
 package com.keybox.manage.action;
 
+import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.db.*;
 import com.keybox.manage.model.HostSystem;
 import com.keybox.manage.model.Profile;
@@ -41,7 +42,13 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
     List<Profile> profileList;
     PublicKey publicKey;
     SortedSet sortedSet = new SortedSet();
+    List<Long> systemSelectId;
 
+    HostSystem pendingSystem =null;
+    HostSystem hostSystem=new HostSystem();
+
+    String password;
+    String passphrase;
 
     @Action(value = "/manage/viewKeys",
             results = {
@@ -69,14 +76,7 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
             PublicKeyDB.insertPublicKey(publicKey);
         }
 
-        String retVal = updateKeysForSystems();
-        if (this.hasActionErrors()) {
-            profileList = ProfileDB.getAllProfiles();
-            sortedSet = PublicKeyDB.getPublicKeySet(sortedSet);
-        }
-
-
-        return retVal;
+        return SUCCESS;
     }
 
     @Action(value = "/manage/deletePublicKey",
@@ -91,24 +91,42 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
             PublicKeyDB.deletePublicKey(publicKey.getId());
         }
 
-        String retVal = updateKeysForSystems();
-        if (this.hasActionErrors()) {
-            profileList = ProfileDB.getAllProfiles();
-            sortedSet = PublicKeyDB.getPublicKeySet(sortedSet);
-        }
-
-        return retVal;
+        return SUCCESS;
     }
 
-    /**
-     * update keys for systems
-     *
-     * @return success or fail value
-     */
-    private String updateKeysForSystems() {
-        String retVal = SUCCESS;
-        List<HostSystem> hostSystemList = new ArrayList<HostSystem>();
 
+    @Action(value = "/manage/distributeKeysByProfile",
+            results = {
+                    @Result(name = "success", location = "/manage/distribute_keys.jsp")
+            }
+    )
+    public String distributeKeysByProfile() {
+
+        profileList = ProfileDB.getAllProfiles();
+        return SUCCESS;
+    }
+
+    @Action(value = "/manage/distributeKeysBySystem",
+            results = {
+                    @Result(name = "success", location = "/manage/distribute_keys.jsp")
+            }
+    )
+    public String distributeKeysBySystem() {
+
+        sortedSet = SystemDB.getSystemSet(sortedSet);
+        return SUCCESS;
+    }
+
+
+    @Action(value = "/manage/selectProfileForAuthKeys",
+            results = {
+                    @Result(name = "success", location = "/manage/view_systems.jsp")
+            }
+    )
+    public String selectProfileForAuthKeys() {
+
+        Long userId = AuthUtil.getUserId(servletRequest.getSession());
+        List<HostSystem> hostSystemList = new ArrayList<HostSystem>();
         //get all host systems if no profile
         if (publicKey.getProfile() != null && publicKey.getProfile().getId() != null) {
             hostSystemList = ProfileSystemsDB.getSystemsByProfile(publicKey.getProfile().getId());
@@ -119,23 +137,133 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
                 hostSystemList = (ArrayList<HostSystem>) sortedSet.getItemList();
             }
         }
+        if (!hostSystemList.isEmpty()) {
+
+            SystemStatusDB.setInitialSystemStatusByHostSystem(hostSystemList, userId);
+            //set first system to set auth keys
+            pendingSystem = SystemStatusDB.getNextPendingSystem(userId);
+
+            if (pendingSystem != null) {
+                pendingSystem.setStatusCd(HostSystem.PUBLIC_KEY_FAIL_STATUS);
+            }
+        }
+        sortedSet = SystemStatusDB.getSortedSetStatus(userId);
 
 
-        for (HostSystem hostSystem : hostSystemList) {
-            hostSystem = SSHUtil.authAndAddPubKey(hostSystem, null, null);
+        return SUCCESS;
+    }
 
+
+    @Action(value = "/manage/selectSystemsForAuthKeys",
+            results = {
+                    @Result(name = "success", location = "/manage/view_systems.jsp")
+            }
+    )
+    public String selectSystemsForAuthKeys() {
+        Long userId = AuthUtil.getUserId(servletRequest.getSession());
+
+
+        if (systemSelectId != null && !systemSelectId.isEmpty()) {
+
+            SystemStatusDB.setInitialSystemStatus(systemSelectId, userId);
+            //set first system to set auth keys
+            pendingSystem = SystemStatusDB.getNextPendingSystem(userId);
+
+            if (pendingSystem != null) {
+                pendingSystem.setStatusCd(HostSystem.PUBLIC_KEY_FAIL_STATUS);
+            }
+
+
+        }
+
+
+        sortedSet = SystemStatusDB.getSortedSetStatus(userId);
+        return SUCCESS;
+    }
+
+    @Action(value = "/manage/genAuthKeyForSystem",
+            results = {
+                    @Result(name = "success", location = "/manage/view_systems.jsp")
+            }
+    )
+    public String genAuthKeyForSystem() {
+
+        Long userId = AuthUtil.getUserId(servletRequest.getSession());
+
+        if (pendingSystem != null && pendingSystem.getId() != null) {
+
+            //get key gen status and set current system
+            hostSystem = SystemStatusDB.getSystemStatus(pendingSystem.getId(), userId);
+
+
+
+            //try and sftp key to remote server
+            hostSystem = SSHUtil.authAndAddPubKey(hostSystem, passphrase, password);
+
+            SystemStatusDB.updateSystemStatus(hostSystem, userId);
             SystemDB.updateSystem(hostSystem);
 
-            if (this.getActionErrors().isEmpty() && !HostSystem.SUCCESS_STATUS.equals(hostSystem.getStatusCd())) {
+            if (HostSystem.AUTH_FAIL_STATUS.equals(hostSystem.getStatusCd()) || HostSystem.PUBLIC_KEY_FAIL_STATUS.equals(hostSystem.getStatusCd())) {
+                pendingSystem = hostSystem;
 
-                addActionError("Public keys failed for some systems. Please refresh 'Failed' systems <a href='../manage/viewSystems.action'>here</a>");
-                retVal = INPUT;
+            } else {
+                pendingSystem = SystemStatusDB.getNextPendingSystem(userId);
+
+
+                //if success loop through systems until finished or need password
+                while (pendingSystem != null && hostSystem != null && HostSystem.SUCCESS_STATUS.equals(hostSystem.getStatusCd())) {
+                    hostSystem = SSHUtil.authAndAddPubKey(pendingSystem, passphrase, password);
+
+                    SystemStatusDB.updateSystemStatus(hostSystem, userId);
+                    SystemDB.updateSystem(hostSystem);
+
+                    pendingSystem = SystemStatusDB.getNextPendingSystem(userId);
+                }
             }
 
         }
-        return retVal;
 
+        //finished - no more pending systems
+        if(pendingSystem==null) {
+            hostSystem=new HostSystem();
+        }
+
+
+
+
+        sortedSet = SystemStatusDB.getSortedSetStatus(userId);
+
+        return SUCCESS;
     }
+
+
+    @Action(value = "/manage/getNextPendingSystem",
+            results = {
+                    @Result(name = "success", location = "/manage/view_systems.jsp")
+            }
+    )
+    public String getNextPendingSystem() {
+
+        Long userId = AuthUtil.getUserId(servletRequest.getSession());
+
+        pendingSystem = SystemStatusDB.getSystemStatus(pendingSystem.getId(), userId);
+        pendingSystem.setErrorMsg("Auth fail");
+        pendingSystem.setStatusCd(HostSystem.GENERIC_FAIL_STATUS);
+
+
+        SystemStatusDB.updateSystemStatus(pendingSystem, userId);
+        SystemDB.updateSystem(pendingSystem);
+
+
+        pendingSystem = SystemStatusDB.getNextPendingSystem(userId);
+
+        sortedSet = SystemStatusDB.getSortedSetStatus(userId);
+
+        return SUCCESS;
+    }
+
+
+
 
     /**
      * Validates all fields for adding a public key
@@ -193,5 +321,44 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
         this.sortedSet = sortedSet;
     }
 
+    public List<Long> getSystemSelectId() {
+        return systemSelectId;
+    }
 
+    public void setSystemSelectId(List<Long> systemSelectId) {
+        this.systemSelectId = systemSelectId;
+    }
+
+
+    public HostSystem getPendingSystem() {
+        return pendingSystem;
+    }
+
+    public void setPendingSystem(HostSystem pendingSystem) {
+        this.pendingSystem = pendingSystem;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getPassphrase() {
+        return passphrase;
+    }
+
+    public void setPassphrase(String passphrase) {
+        this.passphrase = passphrase;
+    }
+
+    public HostSystem getHostSystem() {
+        return hostSystem;
+    }
+
+    public void setHostSystem(HostSystem hostSystem) {
+        this.hostSystem = hostSystem;
+    }
 }

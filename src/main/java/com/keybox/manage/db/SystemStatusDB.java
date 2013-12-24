@@ -17,6 +17,7 @@ package com.keybox.manage.db;
 
 import com.keybox.manage.model.HostSystem;
 import com.keybox.manage.model.Profile;
+import com.keybox.manage.model.SortedSet;
 import com.keybox.manage.model.User;
 import com.keybox.manage.util.DBUtils;
 import com.keybox.manage.util.SSHUtil;
@@ -37,6 +38,38 @@ import java.util.Map;
  */
 public class SystemStatusDB {
 
+
+
+    /**
+     * set the initial status for selected systems
+     *
+     * @param hostSystemList systems ids to set initial status
+     * @param userId user id
+     */
+    public static void setInitialSystemStatusByHostSystem(List<HostSystem> hostSystemList, Long userId) {
+        Connection con = null;
+        try {
+            con = DBUtils.getConn();
+
+            //deletes all old systems
+            deleteAllSystemStatus(con,userId);
+            for (HostSystem hostSystem : hostSystemList) {
+
+                hostSystem.setId(hostSystem.getId());
+                hostSystem.setStatusCd(HostSystem.INITIAL_STATUS);
+
+                //insert new status
+                insertSystemStatus(con, hostSystem, userId);
+
+
+
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+    }
 
 
     /**
@@ -165,6 +198,19 @@ public class SystemStatusDB {
 
     }
 
+
+    /**
+     * returns all key placement statuses
+     * @param userId user id
+     */
+    public static SortedSet getSortedSetStatus(Long userId){
+
+        SortedSet sortedSet= new SortedSet();
+
+        sortedSet.setItemList(getAllSystemStatus(userId));
+        return sortedSet;
+
+    }
     /**
      * returns all key placement statuses
      * @param userId user id

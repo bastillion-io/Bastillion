@@ -95,12 +95,21 @@
             </tr>
             <tr>
                 <td>
-                    <a href="../manage/viewKeys.action">Public Keys</a>
+                    <a href="../manage/viewKeys.action">Public SSH Keys</a>
                 </td>
                 <td>
-                    Set additional public keys for systems
+                    Set additional public SSH keys for systems
                 </td>
             </tr>
+
+                <tr>
+                    <td>
+                        <a href="../manage/distributeKeysByProfile.action">Distribute SSH Keys</a>
+                    </td>
+                    <td>
+                        Distribute public SSH keys for systems
+                    </td>
+                </tr>
 
             </s:if>
 

@@ -309,6 +309,8 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
 
 
         SystemStatusDB.updateSystemStatus(currentSystemStatus, userId);
+        SystemDB.updateSystem(currentSystemStatus);
+
         pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
 
         return SUCCESS;

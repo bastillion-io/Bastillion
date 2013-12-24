@@ -35,7 +35,10 @@
             <a href="../manage/viewUsers.action">Users</a>
         </div>
         <div class="nav_item">
-            <a href="../manage/viewKeys.action">Public Keys</a>
+            <a href="../manage/viewKeys.action">Public SSH Keys</a>
+        </div>
+        <div class="nav_item">
+            <a href="../manage/distributeKeysByProfile.action">Distribute SSH Keys</a>
         </div>
     </s:if>
      <div class="nav_item">
