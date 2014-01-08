@@ -5,20 +5,26 @@ About
 -----
 A web-based ssh console to execute commands and manage multiple systems simultaneously. KeyBox allows you to
 share terminal commands and upload files to all your systems. Once the sessions have been opened you can select
-a single system or any combination to run your commands.  Also, additional system administrators can be added
-and their terminal sessions and history can be audited.
+a single system or any combination to run your commands.  Additional system administrators can be added and
+their terminal sessions and history can be audited.  Also, KeyBox can manage and distribute public keys that
+have been setup and defined.
 
 
 Prerequisites
 -------------
-Java JDK 1.6 or greater
+Java JDK 1.7 or greater
 http://www.oracle.com/technetwork/java/javase/overview/index.html
 
-Maven 3 or greater  ( Only needed if building from source )
-http://maven.apache.org
+Browser with Web Sockets support
+http://caniuse.com/websockets
+
+**Note: In Safari if using a self-signed certificate you must import the certificate into your Keychain.
+Select 'Show Certificate' -> 'Always Trust' when prompted in Safari
 
 Must run on *nix with OpenSSH version 2
 
+Maven 3 or greater  ( Only needed if building from source )
+http://maven.apache.org
 
 To Run Bundled with Jetty
 ------

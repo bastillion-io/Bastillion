@@ -24,7 +24,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class UserSchSessions {
 
     Map<Long, SchSession> schSessionMap = new ConcurrentHashMap<Long, SchSession>();
-    Date startTime=new Date();
 
 
     public Map<Long, SchSession> getSchSessionMap() {
@@ -35,11 +34,4 @@ public class UserSchSessions {
         this.schSessionMap = schSessionMap;
     }
 
-    public Date getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
-    }
 }

@@ -97,13 +97,14 @@ public class UploadAndPushAction extends ActionSupport implements ServletRequest
     public String push() {
 
         Long userId=AuthUtil.getUserId(servletRequest.getSession());
+        Long sessionId=AuthUtil.getSessionId(servletRequest.getSession());
         try {
 
             //get next pending system
             pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
             if (pendingSystemStatus != null) {
                 //get session for system
-                SchSession session = SecureShellAction.getUserSchSessionMap().get(userId).getSchSessionMap().get(pendingSystemStatus.getId());
+                SchSession session = SecureShellAction.getUserSchSessionMap().get(sessionId).getSchSessionMap().get(pendingSystemStatus.getId());
                 //push upload to system
                 currentSystemStatus = SSHUtil.pushUpload(pendingSystemStatus, session.getSession(), UPLOAD_PATH + "/" + uploadFileName, pushDir + "/" + uploadFileName);
 

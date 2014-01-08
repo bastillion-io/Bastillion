@@ -25,18 +25,14 @@ import java.io.InputStreamReader;
 /**
  * Task to watch for output read from the ssh session stream
  */
-public class SessionOutputTask implements Runnable {
+public class SecureShellTask implements Runnable {
 
     InputStream outFromChannel;
-    Long sessionId;
-    Long hostSystemId;
-    Long userId;
+    SessionOutput sessionOutput;
 
-    public SessionOutputTask(Long sessionId, Long hostSystemId, Long userId, InputStream outFromChannel) {
+    public SecureShellTask(SessionOutput sessionOutput, InputStream outFromChannel) {
 
-        this.sessionId = sessionId;
-        this.hostSystemId = hostSystemId;
-        this.userId = userId;
+        this.sessionOutput = sessionOutput;
         this.outFromChannel = outFromChannel;
     }
 
@@ -45,20 +41,16 @@ public class SessionOutputTask implements Runnable {
         try {
             int value = 0;
 
-            SessionOutput sessionOutput = new SessionOutput();
-            sessionOutput.setUserId(userId);
-            sessionOutput.setHostSystemId(hostSystemId);
-            sessionOutput.setSessionId(sessionId);
 
-            SessionOutputUtil.addOutput(userId,sessionOutput);
+            SessionOutputUtil.addOutput(sessionOutput.getSessionId(), sessionOutput);
 
             while ((value = br.read()) != -1) {
                 // converts int to character
                 char c = (char) value;
-                SessionOutputUtil.addCharToOutput(userId,hostSystemId, c);
+                SessionOutputUtil.addCharToOutput(sessionOutput.getSessionId(), sessionOutput.getHostSystemId(), c);
 
             }
-            SessionOutputUtil.removeOutput(userId,hostSystemId);
+            SessionOutputUtil.removeOutput(sessionOutput.getSessionId(), sessionOutput.getHostSystemId());
 
         } catch (Exception ex) {
 

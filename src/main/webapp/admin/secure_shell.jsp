@@ -25,7 +25,6 @@
 <script type="text/javascript">
 $(document).ready(function() {
 
-    $.ajaxSetup({ cache: false });
 
     $('#dummy').focus();
 
@@ -136,9 +135,7 @@ $(document).ready(function() {
         </s:elseif>
         <s:else>
             <s:if test="currentSystemStatus==null ||currentSystemStatus.statusCd!='GENERICFAIL'">
-                setInterval(function() {
-                    $("#composite_terms_frm").submit();
-                 }, 2000);
+                $("#composite_terms_frm").submit();
             </s:if>
         </s:else>
     </s:elseif>
@@ -151,18 +148,22 @@ $(document).ready(function() {
     <s:if test="pendingSystemStatus==null">
 
         var keys = {};
+
         $(document).keypress(function(e) {
             var keyCode= (e.keyCode)? e.keyCode: e.charCode;
 
-            var idListStr = '';
+            var idList=[];
             $(".run_cmd_active").each(function(index) {
                 var id = $(this).attr("id").replace("run_cmd_", "");
-                idListStr = idListStr + '&idList=' + id;
+                idList.push(id);
             });
 
-            if(String.fromCharCode(keyCode) && String.fromCharCode(keyCode)!='' && !keys[17]  && !keys[91] && !keys[93] && !keys[224]){
-                var cmdStr=String.fromCharCode(keyCode).replace(/\+/g,"%2b");
-                $.ajax({ url: '../terms/runCmd.action?command=' +cmdStr+ idListStr, cache: false});
+            if(String.fromCharCode(keyCode) && String.fromCharCode(keyCode)!=''
+                    && !keys[91] && !keys[93] && !keys[224] && !keys[27]
+                    && !keys[37] && !keys[38] && !keys[39]  && !keys[40]
+                    && !keys[13] && !keys[8]  && !keys[9]   && !keys[17]){
+                var cmdStr=String.fromCharCode(keyCode);
+                connection.send(JSON.stringify({id:idList,command:cmdStr}));
             }
 
         });
@@ -180,13 +181,14 @@ $(document).ready(function() {
             //9 - TAB
             //17 - CTRL
             if (keys[27] || keys[37] || keys[38] || keys[39] || keys[40] ||  keys[13] || keys[8] || keys[9] || keys[17]) {
-                    var idListStr = '';
+                    var idList=[];
                     $(".run_cmd_active").each(function(index) {
                         var id = $(this).attr("id").replace("run_cmd_", "");
-                        idListStr = idListStr + '&idList=' + id;
+                        idList.push(id);
                     });
-                    $.ajax({ url: '../terms/runCmd.action?keyCode=' + keyCode + idListStr,cache: false});
-                }
+
+                    connection.send(JSON.stringify({id:idList,keyCode:keyCode}));
+            }
 
         });
 
@@ -204,13 +206,13 @@ $(document).ready(function() {
         $("#dummy").bind('paste', function(e) {
             $('#dummy').val('');
             setTimeout(function() {
-                    var idListStr = '';
+                    var idList=[];
                     $(".run_cmd_active").each(function(index) {
                             var id = $(this).attr("id").replace("run_cmd_", "");
-                            idListStr = idListStr + '&idList=' + id;
+                            idList.push(id);
                     });
-                    var cmdStr=escape($('#dummy').val()).replace(/\+/g,"%2b");
-                    $.ajax({ url: '../terms/runCmd.action?command=' +cmdStr + idListStr,cache: false});
+                    var cmdStr=$('#dummy').val();
+                    connection.send(JSON.stringify({id:idList,command:cmdStr}));
             }, 100);
         });
 
@@ -225,19 +227,33 @@ $(document).ready(function() {
     });
 
 
-    var lock=false;
-    setInterval(function() {
-        if(!lock){
-            lock=true;
-            $.getJSON('../terms/getOutputJSON.action?t='+new Date().getTime(), function(data) {
-                $.each(data, function(key, val) {
+    var loc = window.location, ws_uri;
+    if (loc.protocol === "https:") {
+        ws_uri = "wss:";
+    } else {
+        ws_uri = "ws:";
+    }
+    ws_uri += "//" + loc.host+ '/terms.ws?t='+new Date().getTime();
+
+    var connection = new WebSocket(ws_uri);
+
+
+           // Log errors
+           connection.onerror = function (error) {
+             console.log('WebSocket Error ' + error);
+           };
+
+           // Log messages from the server
+           connection.onmessage = function (e) {
+               var json=jQuery.parseJSON(e.data);
+               $.each(json, function(key, val) {
                     if (val.output != '') {
-                            termMap[val.hostSystemId].write(val.output);
-                        }
-                    });
-                }).always(function() { lock=false; });
-            }
-        }, 500);
+                        termMap[val.hostSystemId].write(val.output);
+                    }
+                });
+
+           };
+
     </s:if>
 
 });

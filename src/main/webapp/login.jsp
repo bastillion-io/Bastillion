@@ -23,6 +23,9 @@
     <jsp:include page="_res/inc/header.jsp"/>
 
     <script type="text/javascript">
+        //break if loaded in frame
+        if(top != self) top.location.replace(location);
+
         $(document).ready(function() {
 
 

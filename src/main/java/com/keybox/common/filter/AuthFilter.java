@@ -105,7 +105,9 @@ public class AuthFilter implements Filter {
             AuthUtil.deleteAllSession(servletRequest.getSession());
             servletResponse.sendRedirect(servletRequest.getContextPath() + "/login.action");
         }
-        chain.doFilter(req, resp);
+        else{
+            chain.doFilter(req, resp);
+        }
     }
 
 

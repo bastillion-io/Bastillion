@@ -19,6 +19,7 @@ import com.keybox.manage.db.SessionAuditDB;
 import com.keybox.manage.model.SessionOutput;
 import com.keybox.manage.model.UserSessionsOutput;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.util.*;
@@ -34,28 +35,28 @@ public class SessionOutputUtil {
 
 
     /**
-     * removes session for user
+     * removes session for user session
      *
-     * @param userId user id
+     * @param sessionId session id
      */
-    public static void removeUserSession(Long userId) {
-        UserSessionsOutput userSessionsOutput =userSessionsOutputMap.get(userId);
-        if(userSessionsOutput!=null){
+    public static void removeUserSession(Long sessionId) {
+        UserSessionsOutput userSessionsOutput = userSessionsOutputMap.get(sessionId);
+        if (userSessionsOutput != null) {
             userSessionsOutput.getSessionOutputMap().clear();
         }
-        userSessionsOutputMap.remove(userId);
+        userSessionsOutputMap.remove(sessionId);
 
     }
 
     /**
      * removes session output for host system
      *
-     * @param userId user id
+     * @param sessionId    session id
      * @param hostSystemId host system id
      */
-    public static void removeOutput(Long userId, Long hostSystemId) {
+    public static void removeOutput(Long sessionId, Long hostSystemId) {
 
-        UserSessionsOutput userSessionsOutput = userSessionsOutputMap.get(userId);
+        UserSessionsOutput userSessionsOutput = userSessionsOutputMap.get(sessionId);
         if (userSessionsOutput != null) {
             userSessionsOutput.getSessionOutputMap().remove(hostSystemId);
         }
@@ -64,15 +65,15 @@ public class SessionOutputUtil {
     /**
      * adds a new output
      *
-     * @param userId user id
+     * @param sessionId     session id
      * @param sessionOutput session output object
      */
-    public static void addOutput(Long userId, SessionOutput sessionOutput) {
+    public static void addOutput(Long sessionId, SessionOutput sessionOutput) {
 
-        UserSessionsOutput userSessionsOutput = userSessionsOutputMap.get(userId);
+        UserSessionsOutput userSessionsOutput = userSessionsOutputMap.get(sessionId);
         if (userSessionsOutput == null) {
-            userSessionsOutputMap.put(userId, new UserSessionsOutput());
-            userSessionsOutput = userSessionsOutputMap.get(userId);
+            userSessionsOutputMap.put(sessionId, new UserSessionsOutput());
+            userSessionsOutput = userSessionsOutputMap.get(sessionId);
         }
         userSessionsOutput.getSessionOutputMap().put(sessionOutput.getHostSystemId(), sessionOutput);
 
@@ -83,14 +84,14 @@ public class SessionOutputUtil {
     /**
      * adds a new output
      *
-     * @param userId       user id
+     * @param sessionId    session id
      * @param hostSystemId host system id
      * @param c            character
      */
-    public static void addCharToOutput(Long userId, Long hostSystemId, char c) {
+    public static void addCharToOutput(Long sessionId, Long hostSystemId, char c) {
 
 
-        UserSessionsOutput userSessionsOutput = userSessionsOutputMap.get(userId);
+        UserSessionsOutput userSessionsOutput = userSessionsOutputMap.get(sessionId);
         if (userSessionsOutput != null) {
             SessionOutput sessionOutput = userSessionsOutput.getSessionOutputMap().get(hostSystemId);
             if (sessionOutput != null) {
@@ -104,14 +105,14 @@ public class SessionOutputUtil {
     /**
      * returns list of output lines
      *
-     * @param userId user id
-     * @return sessionId session id object
+     * @param sessionId session id object
+     * @return session output list
      */
-    public static List<SessionOutput> getOutput(Connection con,Long userId) {
+    public static List<SessionOutput> getOutput(Connection con, Long sessionId) {
         List<SessionOutput> outputList = new ArrayList<SessionOutput>();
 
 
-        UserSessionsOutput userSessionsOutput = userSessionsOutputMap.get(userId);
+        UserSessionsOutput userSessionsOutput = userSessionsOutputMap.get(sessionId);
         if (userSessionsOutput != null) {
 
 
@@ -119,13 +120,17 @@ public class SessionOutputUtil {
 
                 //get output chars and set to output
                 try {
-                    SessionOutput sessionOutput = (SessionOutput) BeanUtils.cloneBean(userSessionsOutput.getSessionOutputMap().get(key));
+                    SessionOutput sessionOutput = null;
+                    if (userSessionsOutput.getSessionOutputMap().get(key) != null) {
+                        sessionOutput = (SessionOutput) BeanUtils.cloneBean(userSessionsOutput.getSessionOutputMap().get(key));
+                        if (StringUtils.isNotEmpty(sessionOutput.getOutput())) {
+                            outputList.add(sessionOutput);
 
-                    outputList.add(sessionOutput);
+                            SessionAuditDB.insertTerminalLog(con, sessionOutput);
 
-                    SessionAuditDB.insertTerminalLog(con, sessionOutput);
-
-                    userSessionsOutput.getSessionOutputMap().get(key).setOutput("");
+                            userSessionsOutput.getSessionOutputMap().get(key).setOutput("");
+                        }
+                    }
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }

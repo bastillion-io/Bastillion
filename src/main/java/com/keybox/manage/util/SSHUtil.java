@@ -21,11 +21,8 @@ import com.keybox.manage.db.PrivateKeyDB;
 import com.keybox.manage.db.PublicKeyDB;
 import com.keybox.manage.db.SystemDB;
 import com.keybox.manage.db.SystemStatusDB;
-import com.keybox.manage.model.ApplicationKey;
-import com.keybox.manage.model.HostSystem;
-import com.keybox.manage.model.SchSession;
-import com.keybox.manage.model.UserSchSessions;
-import com.keybox.manage.task.SessionOutputTask;
+import com.keybox.manage.model.*;
+import com.keybox.manage.task.SecureShellTask;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
@@ -35,7 +32,6 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.*;
 
 /**
  * SSH utility class used to create public/private key for system and distribute authorized key files
@@ -414,7 +410,14 @@ public class SSHUtil {
             InputStream outFromChannel = channel.getInputStream();
 
 
-            Runnable run=new SessionOutputTask(sessionId, hostSystem.getId(), userId, outFromChannel);
+            //new session output
+            SessionOutput sessionOutput=new SessionOutput();
+            sessionOutput.setUserId(userId);
+            sessionOutput.setHostSystemId(hostSystem.getId());
+            sessionOutput.setSessionId(sessionId);
+
+
+            Runnable run=new SecureShellTask(sessionOutput, outFromChannel);
             Thread thread = new Thread(run);
             thread.start();
 
@@ -451,7 +454,7 @@ public class SSHUtil {
         //add session to map
         if (hostSystem.getStatusCd().equals(HostSystem.SUCCESS_STATUS)) {
             //get the server maps for user
-            UserSchSessions userSchSessions = userSessionMap.get(userId);
+            UserSchSessions userSchSessions = userSessionMap.get(sessionId);
 
             //if no user session create a new one
             if (userSchSessions == null) {
@@ -463,7 +466,7 @@ public class SSHUtil {
             schSessionMap.put(hostSystem.getId(), schSession);
             userSchSessions.setSchSessionMap(schSessionMap);
             //add back to map
-            userSessionMap.put(userId, userSchSessions);
+            userSessionMap.put(sessionId, userSchSessions);
         }
 
         SystemStatusDB.updateSystemStatus(hostSystem, userId);
