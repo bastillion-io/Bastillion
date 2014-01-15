@@ -1,19 +1,19 @@
 <%
-/**
- * Copyright 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+    /**
+     * Copyright 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
+     *
+     * Licensed under the Apache License, Version 2.0 (the "License");
+     * you may not use this file except in compliance with the License.
+     * You may obtain a copy of the License at
+     *
+     * http://www.apache.org/licenses/LICENSE-2.0
+     *
+     * Unless required by applicable law or agreed to in writing, software
+     * distributed under the License is distributed on an "AS IS" BASIS,
+     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     * See the License for the specific language governing permissions and
+     * limitations under the License.
+     */
 %>
 <%@ taglib prefix="s" uri="/struts-tags" %>
 <!DOCTYPE html>
@@ -23,7 +23,7 @@
 <jsp:include page="../_res/inc/header.jsp"/>
 
 <script type="text/javascript">
-$(document).ready(function() {
+$(document).ready(function () {
 
 
     $('#dummy').focus();
@@ -39,11 +39,11 @@ $(document).ready(function() {
         height: 200,
         minWidth: 550,
         modal: true
-   });
+    });
     $("#error_dialog").dialog({
         autoOpen: false,
         height: 200,
-        minWidth:550,
+        minWidth: 550,
         modal: true
     });
     $("#upload_push_dialog").dialog({
@@ -51,38 +51,38 @@ $(document).ready(function() {
         height: 375,
         minWidth: 725,
         modal: true,
-        open: function(event, ui) {
+        open: function (event, ui) {
             $(".ui-dialog-titlebar-close").show();
         },
-        close: function() {
+        close: function () {
             $("#upload_push_frame").attr("src", "");
         }
     });
 
     $(".termwrapper").sortable({
-            helper : 'clone'
+        helper: 'clone'
     });
 
     //submit add or edit form
-    $(".submit_btn").button().click(function() {
+    $(".submit_btn").button().click(function () {
         <s:if test="pendingSystemStatus!=null">
         $(this).parents('form:first').submit();
         </s:if>
         $("#error_dialog").dialog("close");
     });
     //close all forms
-    $(".cancel_btn").button().click(function() {
+    $(".cancel_btn").button().click(function () {
         $("#set_password_dialog").dialog("close");
         window.location = 'getNextPendingSystemForTerms.action?pendingSystemStatus.id=<s:property value="pendingSystemStatus.id"/>&script.id=<s:if test="script!=null"><s:property value="script.id"/></s:if>';
 
     });
 
 
-      //if terminal window toggle active for commands
-      $(".run_cmd").click(function() {
+    //if terminal window toggle active for commands
+    $(".run_cmd").click(function () {
 
         //check for cmd-click / ctr-click
-	if(!keys[17] && !keys[91] && !keys[93] && !keys[224]) {
+        if (!keys[17] && !keys[91] && !keys[93] && !keys[224]) {
             $(".run_cmd").removeClass('run_cmd_active');
         }
 
@@ -92,25 +92,24 @@ $(document).ready(function() {
             $(this).addClass('run_cmd_active')
         }
 
-      });
+    });
 
-    $('#select_all').click(function() {
+    $('#select_all').click(function () {
         $(".run_cmd").addClass('run_cmd_active');
     });
 
 
-
-    $('#upload_push').click(function() {
+    $('#upload_push').click(function () {
 
 
         //get id list from selected terminals
         var ids = [];
-        $(".run_cmd_active").each(function(index) {
+        $(".run_cmd_active").each(function (index) {
             var id = $(this).attr("id").replace("run_cmd_", "");
             ids.push(id);
         });
         var idListStr = '?action=upload';
-        ids.forEach(function(entry) {
+        ids.forEach(function (entry) {
             idListStr = idListStr + '&idList=' + entry;
         });
 
@@ -121,23 +120,21 @@ $(document).ready(function() {
     });
 
 
-
-
     <s:if test="currentSystemStatus!=null && currentSystemStatus.statusCd=='GENERICFAIL'">
-        $("#error_dialog").dialog("open");
+    $("#error_dialog").dialog("open");
     </s:if>
     <s:elseif test="pendingSystemStatus!=null">
-        <s:if test="pendingSystemStatus.statusCd=='AUTHFAIL'">
-            $("#set_password_dialog").dialog("open");
-        </s:if>
-        <s:elseif test="pendingSystemStatus.statusCd=='KEYAUTHFAIL'">
-            $("#set_passphrase_dialog").dialog("open");
-        </s:elseif>
-        <s:else>
-            <s:if test="currentSystemStatus==null ||currentSystemStatus.statusCd!='GENERICFAIL'">
-                $("#composite_terms_frm").submit();
-            </s:if>
-        </s:else>
+    <s:if test="pendingSystemStatus.statusCd=='AUTHFAIL'">
+    $("#set_password_dialog").dialog("open");
+    </s:if>
+    <s:elseif test="pendingSystemStatus.statusCd=='KEYAUTHFAIL'">
+    $("#set_passphrase_dialog").dialog("open");
+    </s:elseif>
+    <s:else>
+    <s:if test="currentSystemStatus==null ||currentSystemStatus.statusCd!='GENERICFAIL'">
+    $("#composite_terms_frm").submit();
+    </s:if>
+    </s:else>
     </s:elseif>
 
 
@@ -147,82 +144,81 @@ $(document).ready(function() {
 
     <s:if test="pendingSystemStatus==null">
 
-        var keys = {};
+    var keys = {};
 
-        $(document).keypress(function(e) {
-            var keyCode= (e.keyCode)? e.keyCode: e.charCode;
+    $(document).keypress(function (e) {
+        var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
 
-            var idList=[];
-            $(".run_cmd_active").each(function(index) {
+        var idList = [];
+        $(".run_cmd_active").each(function (index) {
+            var id = $(this).attr("id").replace("run_cmd_", "");
+            idList.push(id);
+        });
+
+        if (String.fromCharCode(keyCode) && String.fromCharCode(keyCode) != ''
+                && !keys[91] && !keys[93] && !keys[224] && !keys[27]
+                && !keys[37] && !keys[38] && !keys[39] && !keys[40]
+                && !keys[13] && !keys[8] && !keys[9] && !keys[17]) {
+            var cmdStr = String.fromCharCode(keyCode);
+            connection.send(JSON.stringify({id: idList, command: cmdStr}));
+        }
+
+    });
+    //function for command keys (ie ESC, CTRL, etc..)
+    $(document).keydown(function (e) {
+        var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
+        keys[keyCode] = true;
+        //27 - ESC
+        //37 - LEFT
+        //38 - UP
+        //39 - RIGHT
+        //40 - DOWN
+        //13 - ENTER
+        //8 - BS
+        //9 - TAB
+        //17 - CTRL
+        if (keys[27] || keys[37] || keys[38] || keys[39] || keys[40] || keys[13] || keys[8] || keys[9] || keys[17]) {
+            var idList = [];
+            $(".run_cmd_active").each(function (index) {
                 var id = $(this).attr("id").replace("run_cmd_", "");
                 idList.push(id);
             });
 
-            if(String.fromCharCode(keyCode) && String.fromCharCode(keyCode)!=''
-                    && !keys[91] && !keys[93] && !keys[224] && !keys[27]
-                    && !keys[37] && !keys[38] && !keys[39]  && !keys[40]
-                    && !keys[13] && !keys[8]  && !keys[9]   && !keys[17]){
-                var cmdStr=String.fromCharCode(keyCode);
-                connection.send(JSON.stringify({id:idList,command:cmdStr}));
-            }
+            connection.send(JSON.stringify({id: idList, keyCode: keyCode}));
+        }
 
-        });
-        //function for command keys (ie ESC, CTRL, etc..)
-        $(document).keydown(function (e) {
-            var keyCode= (e.keyCode)? e.keyCode: e.charCode;
-            keys[keyCode]=true;
-            //27 - ESC
-            //37 - LEFT
-            //38 - UP
-            //39 - RIGHT
-            //40 - DOWN
-            //13 - ENTER
-            //8 - BS
-            //9 - TAB
-            //17 - CTRL
-            if (keys[27] || keys[37] || keys[38] || keys[39] || keys[40] ||  keys[13] || keys[8] || keys[9] || keys[17]) {
-                    var idList=[];
-                    $(".run_cmd_active").each(function(index) {
-                        var id = $(this).attr("id").replace("run_cmd_", "");
-                        idList.push(id);
-                    });
+    });
 
-                    connection.send(JSON.stringify({id:idList,keyCode:keyCode}));
-            }
+    $(document).keyup(function (e) {
+        var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
+        delete keys[keyCode];
+        $('#dummy').focus();
+    });
 
-        });
+    $(document).click(function (e) {
+        $('#dummy').focus();
+    });
 
-        $(document).keyup(function (e) {
-            var keyCode= (e.keyCode)? e.keyCode: e.charCode;
-            delete keys[keyCode];
-            $('#dummy').focus();
-        });
-
-        $(document).click(function (e) {
-            $('#dummy').focus();
-        });
-
-        //get cmd text from paste
-        $("#dummy").bind('paste', function(e) {
-            $('#dummy').val('');
-            setTimeout(function() {
-                    var idList=[];
-                    $(".run_cmd_active").each(function(index) {
-                            var id = $(this).attr("id").replace("run_cmd_", "");
-                            idList.push(id);
-                    });
-                    var cmdStr=$('#dummy').val();
-                    connection.send(JSON.stringify({id:idList,command:cmdStr}));
-            }, 100);
-        });
-
+    //get cmd text from paste
+    $("#dummy").bind('paste', function (e) {
+        $('#dummy').val('');
+        setTimeout(function () {
+            var idList = [];
+            $(".run_cmd_active").each(function (index) {
+                var id = $(this).attr("id").replace("run_cmd_", "");
+                idList.push(id);
+            });
+            var cmdStr = $('#dummy').val();
+            connection.send(JSON.stringify({id: idList, command: cmdStr}));
+        }, 100);
+    });
 
 
     var termMap = {};
 
-    $(".output").each(function(index) {
+    $(".output").each(function (index) {
         var id = $(this).attr("id").replace("output_", "");
-        termMap[id] =  new Terminal(80, 24);
+        termMap[id] = new Terminal(80, 24);
         termMap[id].open($(this));
     });
 
@@ -233,26 +229,30 @@ $(document).ready(function() {
     } else {
         ws_uri = "ws:";
     }
-    ws_uri += "//" + loc.host+ '/terms.ws?t='+new Date().getTime();
+    ws_uri += "//" + loc.host + '/terms.ws?t=' + new Date().getTime();
 
     var connection = new WebSocket(ws_uri);
 
 
-           // Log errors
-           connection.onerror = function (error) {
-             console.log('WebSocket Error ' + error);
-           };
+    // Log errors
+    connection.onerror = function (error) {
+        console.log('WebSocket Error ' + error);
+    };
 
-           // Log messages from the server
-           connection.onmessage = function (e) {
-               var json=jQuery.parseJSON(e.data);
-               $.each(json, function(key, val) {
-                    if (val.output != '') {
-                        termMap[val.hostSystemId].write(val.output);
-                    }
-                });
+    // Log messages from the server
+    connection.onmessage = function (e) {
+        var json = jQuery.parseJSON(e.data);
+        $.each(json, function (key, val) {
+            if (val.output != '') {
+                termMap[val.hostSystemId].write(val.output);
+            }
+        });
 
-           };
+    };
+
+    setInterval(function () {
+        connection.send('');
+    }, 500);
 
     </s:if>
 
@@ -261,12 +261,13 @@ $(document).ready(function() {
 <style type="text/css">
     .content {
         width: 99%;
-        padding:5px;
-        margin:0;
-        border:none;
+        padding: 5px;
+        margin: 0;
+        border: none;
     }
+
     .page {
-        padding:10px;
+        padding: 10px;
     }
 </style>
 
@@ -285,8 +286,10 @@ $(document).ready(function() {
 
                 <div id="select_all" class="top_link">Select All</div>
                 <div id="upload_push" class="top_link">Upload &amp; Push</div>
-                 <div class="top_link" ><a href="exitTerms.action">Exit Terminals</a></div>
-                 <div class="note" style="float:right;">(Use CMD-Click or CTRL-Click to select multiple individual terminals)</div>
+                <div class="top_link"><a href="exitTerms.action">Exit Terminals</a></div>
+                <div class="note" style="float:right;">(Use CMD-Click or CTRL-Click to select multiple individual
+                    terminals)
+                </div>
                 <div class="clear"></div>
 
             </s:if>
@@ -318,17 +321,18 @@ $(document).ready(function() {
                         <s:hidden name="script.id"/>
                     </s:if>
                     <tr>
-                   <td colspan="2">
-                    <div class="submit_btn">Submit</div>
-                    <div class="cancel_btn">Cancel</div>
-                    </td>
-                  </tr>
+                        <td colspan="2">
+                            <div class="submit_btn">Submit</div>
+                            <div class="cancel_btn">Cancel</div>
+                        </td>
+                    </tr>
                 </s:form>
             </div>
 
             <div id="set_passphrase_dialog" title="Enter Passphrase">
                 <p class="error"><s:property value="pendingSystemStatus.errorMsg"/></p>
-                 <p>Enter passphrase for <s:property value="pendingSystemStatus.displayLabel"/></p>
+
+                <p>Enter passphrase for <s:property value="pendingSystemStatus.displayLabel"/></p>
                 <s:form id="passphrase_frm" action="createTerms">
                     <s:hidden name="pendingSystemStatus.id"/>
                     <s:password name="passphrase" label="Passphrase" size="15" value="" autocomplete="off"/>
@@ -336,11 +340,11 @@ $(document).ready(function() {
                         <s:hidden name="script.id"/>
                     </s:if>
                     <tr>
-                    <td colspan="2">
-                     <div class="submit_btn">Submit</div>
-                     <div class="cancel_btn">Cancel</div>
-                     </td>
-                   </tr>
+                        <td colspan="2">
+                            <div class="submit_btn">Submit</div>
+                            <div class="cancel_btn">Cancel</div>
+                        </td>
+                    </tr>
                 </s:form>
             </div>
 
@@ -358,9 +362,9 @@ $(document).ready(function() {
                         <s:hidden name="script.id"/>
                     </s:if>
                     <tr>
-                    <td colspan="2">
-                    <div class="submit_btn">OK</div>
-                    </td>
+                        <td colspan="2">
+                            <div class="submit_btn">OK</div>
+                        </td>
                     </tr>
                 </s:form>
             </div>
@@ -392,8 +396,10 @@ $(document).ready(function() {
     </s:else>
 
 </div>
-<div style="float:right;"><textarea name="dummy" id="dummy" size="1" style="border:none;color:#FFFFFF;width:1px;height:1px"></textarea></div>
-<div style="float:right;"><input type="text" name="dummy2" id="dummy2" size="1" style="border:none;color:#FFFFFF;width:1px;height:1px"/>
+<div style="float:right;"><textarea name="dummy" id="dummy" size="1"
+                                    style="border:none;color:#FFFFFF;width:1px;height:1px"></textarea></div>
+<div style="float:right;"><input type="text" name="dummy2" id="dummy2" size="1"
+                                 style="border:none;color:#FFFFFF;width:1px;height:1px"/>
 </div>
 </body>
 </html>

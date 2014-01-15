@@ -19,8 +19,9 @@ import com.google.gson.Gson;
 import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.action.SecureShellAction;
 import com.keybox.manage.model.SchSession;
+import com.keybox.manage.model.SessionOutput;
 import com.keybox.manage.model.UserSchSessions;
-import com.keybox.manage.task.SendWSOutputTask;
+import com.keybox.manage.util.DBUtils;
 import com.keybox.manage.util.SessionOutputUtil;
 import org.apache.commons.lang3.StringUtils;
 
@@ -28,8 +29,10 @@ import javax.servlet.http.HttpSession;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,6 +45,23 @@ public class SecureShellWS {
     private Session session;
     private Long sessionId = null;
 
+    /**
+     * sends output to socket
+     */
+    private void sendOutput() {
+        Connection con = DBUtils.getConn();
+        try {
+            List<SessionOutput> outputList = SessionOutputUtil.getOutput(con, sessionId);
+            if (outputList != null && !outputList.isEmpty()) {
+                String json = new Gson().toJson(outputList);
+                //send json to session
+                this.session.getBasicRemote().sendText(json);
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+    }
 
     @OnOpen
     public void onOpen(Session session, EndpointConfig config) {
@@ -50,69 +70,55 @@ public class SecureShellWS {
         this.httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
         this.sessionId = AuthUtil.getSessionId(httpSession);
         this.session = session;
-        if (this.sessionId != null) {
-
-            Runnable run = new SendWSOutputTask(sessionId, session);
-            Thread thread = new Thread(run);
-            thread.start();
-
-
-        } else {
-            try {
-                this.session.close();
-
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-            AuthUtil.deleteAllSession(httpSession);
-        }
-
 
     }
 
     @OnMessage
     public void onMessage(String message) {
 
-        if (session.isOpen() && StringUtils.isNotEmpty(message)) {
+        if (session.isOpen()) {
+
+            if (StringUtils.isNotEmpty(message)) {
 
 
-            Map jsonRoot = new Gson().fromJson(message, Map.class);
+                Map jsonRoot = new Gson().fromJson(message, Map.class);
 
-            String command = (String) jsonRoot.get("command");
+                String command = (String) jsonRoot.get("command");
 
-            Integer keyCode = null;
-            Double keyCodeDbl = (Double) jsonRoot.get("keyCode");
-            if (keyCodeDbl != null) {
-                keyCode = keyCodeDbl.intValue();
-            }
-
-
-            for (String idStr : (ArrayList<String>) jsonRoot.get("id")) {
-                Long id = Long.parseLong(idStr);
-
-
-                //get servletRequest.getSession() for user
-                UserSchSessions userSchSessions = SecureShellAction.getUserSchSessionMap().get(sessionId);
-                if (userSchSessions != null) {
-                    SchSession schSession = userSchSessions.getSchSessionMap().get(id);
-                    if (keyCode != null) {
-                        if (keyMap.containsKey(keyCode)) {
-                            try {
-                                schSession.getCommander().write(keyMap.get(keyCode));
-                            } catch (IOException ex) {
-                                ex.printStackTrace();
-                            }
-                        }
-                    } else {
-                        schSession.getCommander().print(command);
-                    }
+                Integer keyCode = null;
+                Double keyCodeDbl = (Double) jsonRoot.get("keyCode");
+                if (keyCodeDbl != null) {
+                    keyCode = keyCodeDbl.intValue();
                 }
 
+                for (String idStr : (ArrayList<String>) jsonRoot.get("id")) {
+                    Long id = Long.parseLong(idStr);
+
+
+                    //get servletRequest.getSession() for user
+                    UserSchSessions userSchSessions = SecureShellAction.getUserSchSessionMap().get(sessionId);
+                    if (userSchSessions != null) {
+                        SchSession schSession = userSchSessions.getSchSessionMap().get(id);
+                        if (keyCode != null) {
+                            if (keyMap.containsKey(keyCode)) {
+                                try {
+                                    schSession.getCommander().write(keyMap.get(keyCode));
+                                } catch (IOException ex) {
+                                    ex.printStackTrace();
+                                }
+                            }
+                        } else {
+                            schSession.getCommander().print(command);
+                        }
+                    }
+
+                }
+                //update timeout
+                AuthUtil.setTimeout(httpSession);
+
+
             }
-            //update timeout
-            AuthUtil.setTimeout(httpSession);
-
-
+            this.sendOutput();
         }
 
 

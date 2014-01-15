@@ -3,11 +3,13 @@ KeyBox
 
 About
 -----
-A web-based ssh console to execute commands and manage multiple systems simultaneously. KeyBox allows you to
-share terminal commands and upload files to all your systems. Once the sessions have been opened you can select
-a single system or any combination to run your commands.  Additional system administrators can be added and
-their terminal sessions and history can be audited.  Also, KeyBox can manage and distribute public keys that
-have been setup and defined.
+A web-based ssh console to execute commands and manage multiple systems
+simultaneously. KeyBox allows you to share terminal commands and upload files to
+all your systems. Once the sessions have been opened you can select a single
+system or any combination to run your commands.  Additional system
+administrators can be added and their terminal sessions and history can be
+audited. Also, KeyBox can manage and distribute public keys that have been setup
+and defined.
 
 
 Prerequisites
