@@ -11,6 +11,14 @@ administrators can be added and their terminal sessions and history can be
 audited. Also, KeyBox can manage and distribute public keys that have been setup
 and defined.
 
+Screenshots
+-----------
+
+![Terminals](https://freecode.com/screenshots/50/13/5013534c50aa2fa3e83857cbc33c70dc_medium.png)
+
+![More Terminals](https://freecode.com/screenshots/ec/ef/ecef1bfdc5a91bb24685451b71184b22_medium.png)
+
+![Upload Files](https://freecode.com/screenshots/a9/84/a98458e5ee9fe6b7c6e9a3ed46de5871_medium.png)
 
 Prerequisites
 -------------
