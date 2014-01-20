@@ -117,8 +117,9 @@ public class SecureShellWS {
                 AuthUtil.setTimeout(httpSession);
 
 
+            } else {
+                this.sendOutput();
             }
-            this.sendOutput();
         }
 
 
