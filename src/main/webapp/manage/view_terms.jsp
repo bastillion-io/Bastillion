@@ -107,11 +107,13 @@ $(document).ready(function() {
 
 </script>
 <style type="text/css">
-
+    .run_cmd {
+        min-width:620px ;
+	}
     .terminal {
         background-color: rgb(240, 240, 240);
         color: rgb(77, 77, 77);
-        width:550px;
+        width:600px;
         height:300px;
         overflow-y:scroll;
 
