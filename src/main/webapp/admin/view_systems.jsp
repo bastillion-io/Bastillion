@@ -86,10 +86,10 @@
 </head>
 <body>
 
-<div class="page">
+
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
-    <div class="content">
+    <div class="container">
         <s:form action="viewSystems">
             <s:hidden name="sortedSet.orderByDirection"/>
             <s:hidden name="sortedSet.orderByField"/>
@@ -123,6 +123,7 @@
                  </s:if>
                 <table class="vborder scrollableTable">
                     <thead>
+
                     <tr>
                         <th><s:checkbox name="systemSelectAll" cssClass="systemSelect"
                                             theme="simple"/></th>
@@ -136,6 +137,7 @@
                     </tr>
                     </thead>
                     <tbody>
+
                     <s:iterator var="system" value="sortedSet.itemList" status="stat">
                         <tr>
 
@@ -156,16 +158,16 @@
 	    </s:form>
         </s:if>
         <s:if test="script!=null && sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
-            <div class="select_frm_btn">Execute Script</div>
+            <div class="btn btn-default select_frm_btn">Execute Script</div>
         </s:if>
         <s:elseif test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
-            <div class="select_frm_btn">Create SSH Terminals</div>
+            <div class="btn btn-default select_frm_btn">Create SSH Terminals</div>
         </s:elseif>
         <s:else>
             <div class="error">There are no systems defined. </div>
         </s:else>
     </div>
-</div>
+
 
 </body>
 </html>

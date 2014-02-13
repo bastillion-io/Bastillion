@@ -37,10 +37,10 @@
 </head>
 <body>
 
-<div class="page">
+
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
-    <div class="content">
+    <div class="container">
 
         <h3>Set Admin Password</h3>
         <p>Change your administrative password below</p>
@@ -51,14 +51,13 @@
             <s:password name="auth.password" label="New Password" />
             <s:password name="auth.passwordConfirm" label="Confirm New Password" />
             <tr> <td>&nbsp;</td>
-                <td align="right">  <div id="change_pass_btn" class="login" >Change Password</div></td>
+                <td align="right">  <div id="change_pass_btn" class="btn btn-default" >Change Password</div></td>
             </tr>
         </s:form>
 
     </div>
 
 
-</div>
 
 </body>
 </html>

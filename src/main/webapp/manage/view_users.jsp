@@ -120,10 +120,10 @@
 </head>
 <body>
 
-<div class="page">
+
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
-    <div class="content">
+    <div class="container">
         <s:form action="viewUsers">
             <s:hidden name="sortedSet.orderByDirection" />
             <s:hidden name="sortedSet.orderByField"/>
@@ -135,8 +135,8 @@
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
                 <table class="vborder scrollableTable">
-                    <thead>
 
+                    <thead>
                     <tr>
 
                         <th id="<s:property value="@com.keybox.manage.db.UserDB@SORT_BY_USERNAME"/>" class="sort">Username
@@ -181,11 +181,13 @@
                         <td><s:property value="firstNm"/></td>
                         <td><s:property value="email"/></td>
                             <td>
-                                <div id="edit_btn_<s:property value="id"/>" class="edit_btn" style="float:left">
+                                <div style="width:160px">
+                                <div id="edit_btn_<s:property value="id"/>" class="btn btn-default edit_btn" style="float:left">
                                     Edit
-                                </div><div id="del_btn_<s:property value="id"/>" class="del_btn" style="float:left">
+                                </div><div id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn" style="float:left">
                                     Delete
                                 </div>&nbsp;&nbsp;&nbsp;<div style="clear:both"></div>
+                                    </div>
                             </td>
                     </tr>
                     </s:iterator>
@@ -197,7 +199,7 @@
 
 
 
-            <div id="add_btn">Add User</div>
+            <div id="add_btn" class="btn btn-default">Add User</div>
             <div id="add_dialog" title="Add User">
                 <s:actionerror/>
                 <s:form action="saveUser" class="save_user_form_add" autocomplete="off">
@@ -211,8 +213,8 @@
                     <s:hidden name="sortedSet.orderByDirection"/>
                     <s:hidden name="sortedSet.orderByField"/>
                     <tr> <td>&nbsp;</td>
-                        <td align="left"><div class="submit_btn">Submit</div>
-                        <div class="cancel_btn">Cancel</div></td>
+                        <td align="left"><div class="btn btn-default submit_btn">Submit</div>
+                        <div class="btn btn-default cancel_btn">Cancel</div></td>
                     </tr>
                 </s:form>
             </div>
@@ -233,8 +235,8 @@
                         <s:hidden name="sortedSet.orderByDirection"/>
                         <s:hidden name="sortedSet.orderByField"/>
                         <tr> <td>&nbsp;</td>
-                            <td align="left"><div class="submit_btn">Submit</div>
-                            <div class="cancel_btn">Cancel</div></td>
+                            <td align="left"><div class="btn btn-default submit_btn">Submit</div>
+                            <div class="btn btn-default cancel_btn">Cancel</div></td>
                         </tr>
                     </s:form>
                 </div>
@@ -242,6 +244,6 @@
 
 
     </div>
-</div>
+
 </body>
 </html>

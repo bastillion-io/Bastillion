@@ -62,10 +62,10 @@
 </head>
 <body>
 
-<div class="page">
+
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
-    <div class="content">
+    <div class="container">
         <h3>Grant System Access</h3>
              <p>Add / Delete profiles to be assigned to the current user.</p>
 
@@ -79,7 +79,9 @@
         <s:if test="user.profileList!= null && !user.profileList.isEmpty()">
 
             <table class="vborder scrollableTable">
-            <thead>
+                <thead>
+
+
 
                 <tr>
                     <th>Profile Name</th>
@@ -87,6 +89,8 @@
                 </tr>
                 </thead>
                 <tbody>
+
+
 
 
 
@@ -101,29 +105,31 @@
                         </td>
 
                         <td>
-                            <div id="del_btn_<s:property value="id"/>" class="del_btn">Delete</div>
+                            <div id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn">Delete</div>
 
                         </td>
 
 
                     </tr>
+                </tbody>
+
 
 
                 </s:iterator>
-                </tbody>
+
             </table>
         </s:if>
 
         <s:if test="profileList!= null && !profileList.isEmpty()">
-            <div id="add_btn">Add Profile</div>
+            <div id="add_btn" class="btn btn-default">Add Profile</div>
             <div id="add_dialog" title="Add Profile">
             <s:form action="addProfileToUser">
                 <s:select name="profileId" list="profileList" headerKey="" headerValue="- Select One -"
                           listKey="id" listValue="%{nm}"/>
                 <s:hidden name="user.id"/>
             </s:form>
-             <div class="submit_btn">Submit</div>
-                <div class="cancel_btn">Cancel</div>
+             <div class="btn btn-default submit_btn">Submit</div>
+                <div class="btn btn-default cancel_btn">Cancel</div>
              </div>
         </s:if>
         <s:else>
@@ -136,6 +142,6 @@
 
 
     </div>
-</div>
+
 </body>
 </html>

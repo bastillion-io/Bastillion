@@ -16,48 +16,72 @@
      */
 %>
 <%@ taglib prefix="s" uri="/struts-tags" %>
-<div class="nav">
 
-    <div style="float: left;margin-top: 5px;margin-left: -10px"><img
-            src="<%= request.getContextPath() %>/img/keybox_50x38.png"/></div>
 
-    <h3>
-        <a href="../admin/menu.action">KeyBox</a>
-    </h3>
-    <s:if test="%{#session.userType==\"M\"}">
-        <div class="nav_item">
-            <a href="../manage/viewSystems.action">Systems</a>
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <div class="navbar-header">
+            <div class="navbar-brand">
+                <div class="nav-img"><img src="<%= request.getContextPath() %>/img/keybox_50x38.png"/></div>
+                KeyBox
+            </div>
         </div>
-        <div class="nav_item">
-            <a href="../manage/viewProfiles.action">Profiles</a>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="../admin/menu.action">Home</a></li>
+
+
+                <s:if test="%{#session.userType==\"M\"}">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Manage <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+
+
+                            <li><a href="../manage/viewSystems.action">Systems</a></li>
+
+
+                            <li><a href="../manage/viewProfiles.action">Profiles</a></li>
+
+
+                            <li><a href="../manage/viewUsers.action">Users</a></li>
+
+                            <li class="divider"></li>
+
+                            <li><a href="../manage/viewKeys.action">Public SSH Keys</a></li>
+
+                            <li><a href="../manage/distributeKeysByProfile.action">Distribute SSH Keys</a></li>
+
+
+                        </ul>
+                    </li>
+
+
+                </s:if>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Secure Shell <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+
+                        <li><a href="../admin/viewSystems.action">Composite SSH Terms</a></li>
+                        <li><a href="../admin/viewScripts.action">Composite Scripts</a></li>
+
+
+                    </ul>
+                </li>
+
+
+                <s:if test="%{#session.userType==\"M\"}">
+
+                    <li><a href="../manage/viewSessions.action">Audit Sessions</a></li>
+
+                </s:if>
+
+                <li><a href="../admin/setPassword.action">Change Password</a></li>
+
+                <li><a href="../logout.action">Logout</a></li>
+            </ul>
         </div>
-        <div class="nav_item">
-            <a href="../manage/viewUsers.action">Users</a>
-        </div>
-        <div class="nav_item">
-            <a href="../manage/viewKeys.action">Public SSH Keys</a>
-        </div>
-        <div class="nav_item">
-            <a href="../manage/distributeKeysByProfile.action">Distribute SSH Keys</a>
-        </div>
-    </s:if>
-     <div class="nav_item">
-        <a href="../admin/viewSystems.action">Composite SSH Terms</a>
-     </div>
-     <div class="nav_item">
-        <a href="../admin/viewScripts.action">Composite Scripts</a>
-     </div>
-    <s:if test="%{#session.userType==\"M\"}">
-    <div class="nav_item">
-        <a href="../manage/viewSessions.action">Audit Sessions</a>
+        <!--/.nav-collapse -->
     </div>
-
-    </s:if>
-    <div class="nav_item">
-        <a href="../admin/setPassword.action">Change Password</a>
-    </div>
-    <div class="nav_item">
-        <a href="../logout.action">Logout</a>
-    </div>
-
 </div>
+

@@ -1,26 +1,39 @@
-html, body {
-}
 
 body {
-    border: none;
-    margin: 0;
-    padding: 0;
-    font-family: ArialMT, Arial, sans-serif;
-    font-size: small;
-    background-color: #CCCCCC;
+    padding-top: 50px;
 }
-
+a {
+    color: #666666;
+}
 table {
     border-collapse: collapse;
-    font-family: ArialMT, Arial, sans-serif;
     font-size: small;
-    color: #4d4d4d;
+
+}
+
+table tbody {
+    overflow-x: auto;
+}
+
+.container a {
+    text-decoration: underline;
+}
+
+.navbar .container a {
+    text-decoration: none;
+}
+
+.wwFormTable {
+    background-color: #FFFFFF;
+}
+
+.wwFormTable input {
+    padding: 2px;
 }
 
 table td, table th {
     padding: 5px;
     vertical-align: middle;
-    overflow: hidden;
 }
 
 .vborder {
@@ -28,17 +41,20 @@ table td, table th {
 }
 
 .tablescroll_head th {
-
     background-color: #e0e0e0;
 }
 
 .vborder td, .vborder th, .tablescroll_head th {
     padding: 10px 15px 10px 15px;
+
+}
+
+.vborder td, .vborder th, .tablescroll_head th {
     border: 1px solid #CCCCCC;
     white-space: nowrap;
 }
 
-.vborder td a, .vborder th a, .tablescroll_head th a{
+.vborder td a, .vborder th a, .tablescroll_head th a {
     white-space: nowrap;
 }
 
@@ -51,48 +67,13 @@ table td, table th {
     color: #cc0000;
 }
 
-.nav {
-    float: left;
-    width: 125px;
 
-}
-
-.nav_item {
-    padding: 8px 5px 8px 0px;
-    font-size: 11px;
-}
-
-.nav a {
-    color: #4d4d4d;
-}
-
-.content {
-    margin: 0px 0px 0px 10px;
-    padding: 0px 15px 15px 15px;
-    float: left;
-    width: 70%;
-    border-left: 1px solid #CCCCCC;
-}
-
-.page {
-    float: left;
-    margin: 10px 10px 10px 10px;
-    padding: 15px 15px 15px 15px;
-    background-color: #ffffff;
-    color: #4d4d4d;
-    width: 95%;
-
-}
-
-.page a {
-    color: #4d4d4d;
-}
-
-label, .label {
+.wwFormTable label,
+.wwFormTable  .label {
     font-size: small;
     font-weight: bold;
-    color: #4d4d4d;
-    paddding: 2px 2px 2px 2px;
+    color: #666666;
+    padding: 2px 2px 2px 2px;
 }
 
 div.block {
@@ -158,21 +139,22 @@ div.term {
     border: 1px solid #CCCCCC;
 }
 
-
-
 div.termwrapper {
     width: 100%;
-    height: 620px;
+    height: 665px;
     overflow-x: auto;
     border: 1px solid #CCCCCC;
     overflow-y: scroll;
 }
 
 div.termwrapper div {
+
 }
+
 
 div.termwrapper div h4 {
     margin: 8px 0 0 8px;
+    font-size: 12px;
 }
 
 .top_nav {
@@ -189,21 +171,19 @@ div.termwrapper div h4 {
     background: #4d4d4d;
 }
 
-.run_cmd_active  h4 {
+.run_cmd_active h4 {
     color: #FFFFFF;
 }
 
 .run_cmd {
     border: 1px solid #CCCCCC;
     float: left;
-    min-width:580px;
+    min-width: 630px;
 }
 
 .term {
     background-color: #000000;
 }
-
-
 
 .top_link {
     float: left;
@@ -214,53 +194,69 @@ div.termwrapper div h4 {
 
 }
 
-#select_all {
- padding: 0 0 10px 0;
-}
-
-
 .clear {
     clear: both;
 }
 
-.ui-dialog-titlebar-close  {
-    display:none;
-}
-.errorsBg{
-	background-color:#fdd;
-	color:red;
-	border: 1px solid;
+.ui-dialog-titlebar-close {
+    display: none;
 }
 
-.errorMessage{
-	padding:0px 8px;
+.errorsBg {
+    background-color: #fdd;
+    color: red;
+    border: 1px solid;
+}
+
+.errorMessage {
+    padding: 0px 8px;
 }
 
 .output {
-z-index:100;
+    z-index: 100;
 }
-
-
-
 
 .terminal {
-  border: #f0f0f0 solid 5px;
-  font-family: "DejaVu Sans Mono", "Liberation Mono", monospace;
-  font-size: 10px;
-  color: #000000;
-  background: #f0f0f0;
+    border: #f0f0f0 solid 5px;
+    font-family: "DejaVu Sans Mono", "Liberation Mono", monospace;
+    font-size: 10px;
+    color: #000000;
+    background: #f0f0f0;
+    line-height: 1.231;
 }
 
-
+.terminal pre {
+    font-family: "DejaVu Sans Mono", "Liberation Mono", monospace;
+    font-size: 10px;
+    border: none;
+    line-height: 1.231;
+}
 
 .reverse-video {
-  color: #f0f0f0;
-  background: #4d4d4d;
+    color: #f0f0f0;
+    background: #4d4d4d;
 }
+
 .note {
-   font-style:italic;
-   font-size:smaller;
+    font-style: italic;
+    font-size: smaller;
 }
+
+.template {
+    padding: 40px 15px;
+}
+
+.btn {
+    padding: 5px;
+    margin: 5px;
+}
+
+.nav-img {
+    float: left;
+    margin-top: -8px;
+    margin-left: -50px;
+}
+
 
 
 

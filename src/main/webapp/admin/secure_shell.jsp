@@ -30,7 +30,7 @@ $(document).ready(function () {
 
     $("#set_password_dialog").dialog({
         autoOpen: false,
-        height: 200,
+        height: 225,
         minWidth: 550,
         modal: true
     });
@@ -42,7 +42,7 @@ $(document).ready(function () {
     });
     $("#error_dialog").dialog({
         autoOpen: false,
-        height: 200,
+        height: 225,
         minWidth: 550,
         modal: true
     });
@@ -218,7 +218,7 @@ $(document).ready(function () {
 
     $(".output").each(function (index) {
         var id = $(this).attr("id").replace("output_", "");
-        termMap[id] = new Terminal(80, 24);
+        termMap[id] = new Terminal(100, 22);
         termMap[id].open($(this));
     });
 
@@ -258,42 +258,47 @@ $(document).ready(function () {
 
 });
 </script>
-<style type="text/css">
-    .content {
-        width: 99%;
-        padding: 5px;
-        margin: 0;
-        border: none;
-    }
-
-    .page {
-        padding: 10px;
-    }
-</style>
 
 <title>KeyBox - Composite Terms</title>
 
 </head>
 <body>
+<s:if test="(systemList!= null && !systemList.isEmpty()) || pendingSystemStatus!=null">
 
-<div class="page">
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container" >
 
-    <s:if test="(systemList!= null && !systemList.isEmpty()) || pendingSystemStatus!=null">
-        <div class="content">
-
+        <div class="navbar-header">
+            <div class="navbar-brand" >
+            <div class="nav-img"><img src="<%= request.getContextPath() %>/img/keybox_50x38.png"/></div>
+             KeyBox</div>
+        </div>
+        <div class="collapse navbar-collapse">
             <s:if test="pendingSystemStatus==null">
 
 
-                <div id="select_all" class="top_link">Select All</div>
-                <div id="upload_push" class="top_link">Upload &amp; Push</div>
-                <div class="top_link"><a href="exitTerms.action">Exit Terminals</a></div>
-                <div class="note" style="float:right;">(Use CMD-Click or CTRL-Click to select multiple individual
-                    terminals)
-                </div>
-                <div class="clear"></div>
 
+            <ul class="nav navbar-nav">
+                <li><a id="select_all" href="#">Select All</a></li>
+                 <li><a id="upload_push" href="#">Upload &amp; Push</a></li>
+                 <li><a href="exitTerms.action">Exit Terminals</a></li>
+            </ul>
+            <div class="note" style="float:right;">(Use CMD-Click or CTRL-Click to select multiple individual
+                                terminals)
+                            </div>
+            <div class="clear"></div>
             </s:if>
-            <div class="termwrapper">
+        </div>
+        <!--/.nav-collapse -->
+    </div>
+</div>
+
+
+
+        <div class="container"  style="width:100%;padding: 0px; margin: 0px;border:none;">
+
+
+            <div class="termwrapper" >
                 <s:iterator value="systemList">
                     <div id="run_cmd_<s:property value="id"/>" class="run_cmd_active run_cmd">
 
@@ -321,9 +326,10 @@ $(document).ready(function () {
                         <s:hidden name="script.id"/>
                     </s:if>
                     <tr>
-                        <td colspan="2">
-                            <div class="submit_btn">Submit</div>
-                            <div class="cancel_btn">Cancel</div>
+                        <td>&nbsp;</td>
+                        <td align="left">
+                            <div class="btn btn-default submit_btn">Submit</div>
+                            <div class="btn btn-default cancel_btn">Cancel</div>
                         </td>
                     </tr>
                 </s:form>
@@ -341,8 +347,8 @@ $(document).ready(function () {
                     </s:if>
                     <tr>
                         <td colspan="2">
-                            <div class="submit_btn">Submit</div>
-                            <div class="cancel_btn">Cancel</div>
+                            <div class="btn btn-default submit_btn">Submit</div>
+                            <div class="btn btn-default cancel_btn">Cancel</div>
                         </td>
                     </tr>
                 </s:form>
@@ -363,7 +369,7 @@ $(document).ready(function () {
                     </s:if>
                     <tr>
                         <td colspan="2">
-                            <div class="submit_btn">OK</div>
+                            <div class="btn btn-default submit_btn">OK</div>
                         </td>
                     </tr>
                 </s:form>
@@ -390,16 +396,16 @@ $(document).ready(function () {
     <s:else>
         <jsp:include page="../_res/inc/navigation.jsp"/>
 
-        <div class="content" style="width: 70%">
+        <div class="container">
             <p class="error">No sessions could be created</p>
         </div>
     </s:else>
 
-</div>
 <div style="float:right;"><textarea name="dummy" id="dummy" size="1"
                                     style="border:none;color:#FFFFFF;width:1px;height:1px"></textarea></div>
 <div style="float:right;"><input type="text" name="dummy2" id="dummy2" size="1"
                                  style="border:none;color:#FFFFFF;width:1px;height:1px"/>
 </div>
+
 </body>
 </html>

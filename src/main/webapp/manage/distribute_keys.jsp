@@ -71,10 +71,10 @@
 </head>
 <body>
 
-<div class="page">
+
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
-    <div class="content">
+    <div class="container">
 
         <s:if test="sortedSet.itemList!= null">
 
@@ -108,6 +108,7 @@
 
                     <table class="vborder scrollableTable">
                         <thead>
+
                         <tr>
 
                             <th><s:checkbox name="systemSelectAll" cssClass="systemSelect"
@@ -126,6 +127,7 @@
                         </tr>
                         </thead>
                         <tbody>
+
                         <s:iterator var="system" value="sortedSet.itemList" status="stat">
                             <tr>
 
@@ -146,7 +148,7 @@
                         </tbody>
                     </table>
                 </s:form>
-                <div class="submit_btn">Distribute Keys</div>
+                <div class="btn btn-default submit_btn">Distribute Keys</div>
             </s:else>
 
 
@@ -168,12 +170,12 @@
 
 
             </s:form>
-            <div class="submit_btn">Distribute Keys</div>
+            <div class="btn btn-default submit_btn">Distribute Keys</div>
 
         </s:else>
 
 
     </div>
-</div>
+
 </body>
 </html>

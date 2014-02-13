@@ -32,6 +32,11 @@
         });
 
     </script>
+    <style>
+        body {
+            padding: 10px;
+        }
+    </style>
 
     <title>KeyBox - Upload &amp; Push</title>
 </head>
@@ -45,7 +50,7 @@
     <tr>
         <td>&nbsp;</td>
         <td>
-            <div id="upload_btn" class="upload">Upload</div>
+            <div id="upload_btn" class="btn btn-default upload">Upload</div>
         </td>
     </tr>
 </s:form>

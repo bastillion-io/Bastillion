@@ -56,6 +56,11 @@
 
         });
     </script>
+    <style>
+        body {
+            padding: 10px;
+        }
+    </style>
 
 
 </head>
@@ -134,7 +139,7 @@
     </p>
 
 
-    <div class="submit_btn">OK</div>
+    <div class="btn btn-default submit_btn">OK</div>
 </div>
 
 </body>

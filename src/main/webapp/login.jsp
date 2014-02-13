@@ -39,30 +39,33 @@
 </head>
 <body>
 
-<div class="page">
-    <div style="float: left;margin-top: 5px;margin-left: -10px"><img
-            src="<%= request.getContextPath() %>/img/keybox_50x38.png"/></div>
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="container" >
 
-    <h3>
+            <div class="navbar-header">
+                <div class="navbar-brand" >
+                    <div class="nav-img"><img src="<%= request.getContextPath() %>/img/keybox_50x38.png"/></div>
+                 KeyBox</div>
+            </div>
+            <!--/.nav-collapse -->
+        </div>
+    </div>
 
-        KeyBox - Login
-    </h3>
-
-    <div class="content" style="border-left:none;">
-
+    <div class="container">
+        <p>
         <s:actionerror/>
         <s:form action="loginSubmit"  autocomplete="off">
             <s:textfield name="auth.username" label="Username"/>
             <s:password name="auth.password" label="Password"/>
             <tr> <td>&nbsp;</td>
-                <td align="right">  <div id="login_btn" class="login" >Login</div></td>
+                <td align="right">  <div id="login_btn" class="btn btn-default login" >Login</div></td>
             </tr>
         </s:form>
+        </p>
 
 
 
     </div>
-</div>
 
 </body>
 </html>

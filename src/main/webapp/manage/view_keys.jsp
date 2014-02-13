@@ -27,14 +27,14 @@
 
             $("#add_dialog").dialog({
                 autoOpen: false,
-                height: 350,
+                height: 400,
                 width: 800,
                 modal: true
             });
 
             $(".edit_dialog").dialog({
                 autoOpen: false,
-                height: 350,
+                height: 400,
                 width: 800,
                 modal: true
             });
@@ -111,10 +111,10 @@
 </head>
 <body>
 
-<div class="page">
+
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
-    <div class="content">
+    <div class="container">
         <s:form action="viewKeys">
             <s:hidden name="sortedSet.orderByDirection"/>
             <s:hidden name="sortedSet.orderByField"/>
@@ -128,6 +128,8 @@
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
             <table class="vborder scrollableTable">
                 <thead>
+
+
 
                 <tr>
 
@@ -155,10 +157,10 @@
                         </td>
                         <td>
                             <div style="width:150px">
-                                <div id="edit_btn_<s:property value="id"/>" class="edit_btn" style="float:left">
+                                <div id="edit_btn_<s:property value="id"/>" class="btn btn-default edit_btn" style="float:left">
                                     Edit
                                 </div>
-                                <div id="del_btn_<s:property value="id"/>" class="del_btn" style="float:left">
+                                <div id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn" style="float:left">
                                     Delete
                                 </div>
                                 &nbsp;&nbsp;&nbsp;
@@ -172,7 +174,7 @@
         </s:if>
 
 
-        <div id="add_btn">Add Public Key</div>
+        <div id="add_btn" class="btn btn-default">Add Public Key</div>
         <div id="add_dialog" title="Add Public Key">
             <s:form action="savePublicKey" class="save_public_key_form_add" autocomplete="off">
                 <s:textfield name="publicKey.keyNm" label="Key Name" size="15"/>
@@ -184,8 +186,8 @@
                 <tr>
                     <td>&nbsp;</td>
                     <td align="left">
-                        <div class="submit_btn">Submit</div>
-                        <div class="cancel_btn">Cancel</div>
+                        <div class="btn btn-default submit_btn">Submit</div>
+                        <div class="btn btn-default cancel_btn">Cancel</div>
                     </td>
                 </tr>
             </s:form>
@@ -206,8 +208,8 @@
                     <tr>
                         <td>&nbsp;</td>
                         <td align="left">
-                            <div class="submit_btn">Submit</div>
-                            <div class="cancel_btn">Cancel</div>
+                            <div class="btn btn-default submit_btn">Submit</div>
+                            <div class="btn btn-default cancel_btn">Cancel</div>
                         </td>
                     </tr>
                 </s:form>
@@ -216,6 +218,6 @@
 
 
     </div>
-</div>
+
 </body>
 </html>

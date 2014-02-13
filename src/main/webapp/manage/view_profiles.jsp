@@ -25,22 +25,17 @@
         $(document).ready(function () {
             $("#add_dialog").dialog({
                 autoOpen: false,
-                height: 255,
-                width: 400,
+                height: 300,
+                width: 425,
                 modal: true
             });
             $(".edit_dialog").dialog({
                 autoOpen: false,
-                height: 255,
-                width: 400,
+                height: 300,
+                width: 425,
                 modal: true
             });
-            $("#script_dia").dialog({
-                autoOpen: false,
-                height: 350,
-                width: 350,
-                modal: true
-            });
+
             //open add dialog
             $("#add_btn").button().click(function () {
                 $("#add_dialog").dialog("open");
@@ -52,9 +47,7 @@
                 $("#edit_dialog_" + id).dialog("open");
 
             });
-            $("#script_btn").click(function () {
-                $("#script_dia").dialog("open");
-            });
+
             //call delete action
             $(".del_btn").button().click(function () {
                 var id = $(this).attr('id').replace("del_btn_", "");
@@ -109,10 +102,10 @@
 </head>
 <body>
 
-<div class="page">
+
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
-    <div class="content">
+    <div class="container">
         <s:form action="viewProfiles">
             <s:hidden name="sortedSet.orderByDirection"/>
             <s:hidden name="sortedSet.orderByField"/>
@@ -133,6 +126,7 @@
                 <thead>
 
 
+
                 <tr>
                     <th id="<s:property value="@com.keybox.manage.db.ProfileDB@SORT_BY_PROFILE_NM"/>" class="sort">
                         Profile Name
@@ -141,6 +135,8 @@
                 </tr>
                 </thead>
                 <tbody>
+
+
 
 
                 <s:iterator var="profile" value="sortedSet.itemList" status="stat">
@@ -154,9 +150,9 @@
 
                         <td>
                             <div style="width:150px">
-                                <div id="edit_btn_<s:property value="id"/>" class="edit_btn" style="float:left">Edit
+                                <div id="edit_btn_<s:property value="id"/>" class="btn btn-default edit_btn" style="float:left">Edit
                                 </div>
-                                <div id="del_btn_<s:property value="id"/>" class="del_btn" style="float:left">Delete
+                                <div id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn" style="float:left">Delete
                                 </div>
                                 <div style="clear:both"/>
                             </div>
@@ -170,7 +166,7 @@
         </s:if>
 
 
-        <div id="add_btn">Add Profile</div>
+        <div id="add_btn" class="btn btn-default">Add Profile</div>
         <div id="add_dialog" title="Add Profile">
             <s:form action="saveProfile" class="save_profile_form_add">
                 <s:textfield name="profile.nm" label="Profile Name" size="15"/>
@@ -180,8 +176,8 @@
                 <tr>
                     <td>&nbsp;</td>
                     <td align="left">
-                        <div class="submit_btn">Submit</div>
-                        <div class="cancel_btn">Cancel</div>
+                        <div class="btn btn-default submit_btn">Submit</div>
+                        <div class="btn btn-default cancel_btn">Cancel</div>
                     </td>
                 </tr>
             </s:form>
@@ -200,8 +196,8 @@
                     <tr>
                         <td>&nbsp;</td>
                         <td align="left">
-                            <div class="submit_btn">Submit</div>
-                            <div class="cancel_btn">Cancel</div>
+                            <div class="btn btn-default submit_btn">Submit</div>
+                            <div class="btn btn-default cancel_btn">Cancel</div>
                         </td>
                     </tr>
                 </s:form>
@@ -210,7 +206,6 @@
     </div>
 
 
-</div>
 
 </body>
 </html>

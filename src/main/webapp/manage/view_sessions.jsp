@@ -64,10 +64,10 @@
 </head>
 <body>
 
-<div class="page">
+
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
-    <div class="content">
+    <div class="container">
 
 
             <s:form action="viewSessions" theme="simple">
@@ -105,7 +105,7 @@
                             <td><s:property value="user.firstNm"/></td>
                             <td><s:date name="sessionTm"/></td>
                             <td>
-                            <div id="terminals_btn_<s:property value='id'/>" class="terminals_btn">Audit</div>
+                            <div id="terminals_btn_<s:property value='id'/>" class="btn btn-default terminals_btn">Audit</div>
                             </td>
 
 
@@ -120,7 +120,7 @@
                 </s:else>
 
     </div>
-</div>
+
 
 </body>
 </html>

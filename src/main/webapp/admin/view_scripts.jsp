@@ -27,15 +27,15 @@
 
             $("#add_dialog").dialog({
                 autoOpen: false,
-                height: 425,
-                width: 600,
+                height: 450,
+                width: 500,
                 modal: true
             });
 
             $(".edit_dialog").dialog({
                 autoOpen: false,
-                height: 425,
-                width: 600,
+                height: 450,
+                width: 500,
                 modal: true
             });
 
@@ -108,10 +108,10 @@
 </head>
 <body>
 
-<div class="page">
+
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
-    <div class="content">
+    <div class="container">
         <s:form action="viewScripts">
             <s:hidden name="sortedSet.orderByDirection" />
             <s:hidden name="sortedSet.orderByField"/>
@@ -123,6 +123,7 @@
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
                 <table class="vborder scrollableTable">
                     <thead>
+
                     <tr>
 
                         <th id="<s:property value="@com.keybox.manage.db.ScriptDB@SORT_BY_DISPLAY_NM"/>" class="sort">Script Name</th>
@@ -130,20 +131,24 @@
                     </tr>
                     </thead>
                     <tbody>
+
                     <s:iterator var="script" value="sortedSet.itemList" status="stat">
                     <tr>
                         <td>
                                 <a title="Execute Script" href="viewSystems.action?script.id=<s:property value="id"/>""><s:property value="displayNm"/></a>
                         </td>
                             <td>
-                                <div id="edit_btn_<s:property value="id"/>" class="edit_btn" style="float:left">
+                                <div style="width:120px">
+                                <div id="edit_btn_<s:property value="id"/>" class="btn btn-default edit_btn" style="float:left">
                                     Edit
                                 </div>
-                                <div id="del_btn_<s:property value="id"/>" class="del_btn" style="float:left">
+                                <div id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn" style="float:left">
                                     Delete
                                 </div>
                                 <div style="clear:both"></div>
+                                    </div>
                             </td>
+
                     </tr>
                     </s:iterator>
                     </tbody>
@@ -152,7 +157,7 @@
 
 
 
-            <div id="add_btn">Add Script</div>
+            <div id="add_btn" class="btn btn-default">Add Script</div>
             <div id="add_dialog" title="Add Script">
                 <s:form action="saveScript" class="save_script_form_add">
                     <s:textfield name="script.displayNm" label="Script Name" size="15"/>
@@ -160,8 +165,8 @@
                     <s:hidden name="sortedSet.orderByDirection"/>
                     <s:hidden name="sortedSet.orderByField"/>
                     <tr> <td>&nbsp;</td>
-                        <td align="left"><div class="submit_btn">Submit</div>
-                        <div class="cancel_btn">Cancel</div></td>
+                        <td align="left"><div class="btn btn-default submit_btn">Submit</div>
+                        <div class="btn btn-default cancel_btn">Cancel</div></td>
                     </tr>
                 </s:form>
 
@@ -177,8 +182,8 @@
                        <s:hidden name="sortedSet.orderByDirection"/>
                        <s:hidden name="sortedSet.orderByField"/>
                        <tr> <td>&nbsp;</td>
-                        <td align="left"><div class="submit_btn">Submit</div>
-                        <div class="cancel_btn">Cancel</div></td>
+                        <td align="left"><div class="btn btn-default submit_btn">Submit</div>
+                        <div class="btn btn-default cancel_btn">Cancel</div></td>
                         </tr>
                     </s:form>
                 </div>
@@ -186,6 +191,6 @@
 
 
     </div>
-</div>
+
 </body>
 </html>

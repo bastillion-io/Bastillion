@@ -23,9 +23,20 @@
 <script src="<%= request.getContextPath() %>/_res/js/jquery-ui.js"></script>
 <script src="<%= request.getContextPath() %>/_res/js/jquery.tablescroll.js"></script>
 <script src="<%= request.getContextPath() %>/_res/js/tty/terms.js"></script>
+<script src="<%= request.getContextPath() %>/_res/js/bootstrap.min.js"></script>
+
+  <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+  <![endif]-->
+
+
+
 
 
 <link rel="stylesheet" href="<%= request.getContextPath() %>/_res/css/jquery-ui/base/jquery-ui.css"/>
+<link rel="stylesheet" href="<%= request.getContextPath() %>/_res/css/bootstrap.css"/>
 <link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/_res/css/keybox.css"/>
 <link rel="icon" href="<%= request.getContextPath() %>/img/keybox.ico" type="image/x-icon"/>
 
@@ -36,7 +47,7 @@
     });
    $(function() {
      var tabindex = 1;
-     $('input,textarea,select,.ui-button').each(function() {
+     $('input,textarea,select,.btn').each(function() {
         if (this.type != "hidden") {
           var $input = $(this);
           $input.attr("tabindex", tabindex);
@@ -44,7 +55,7 @@
         }
      });
 
-     $(".ui-button").keyup(function(event){
+     $(".btn").keyup(function(event){
          if(event.keyCode == 13){
              $(this).click();
          }

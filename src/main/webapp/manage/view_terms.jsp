@@ -107,15 +107,7 @@ $(document).ready(function() {
 
 </script>
 <style type="text/css">
-    .content {
-        width: 99%;
-        padding:5px;
-        margin:0;
-        border:none;
-    }
-    .page {
-        padding:10px;
-    }
+
     .terminal {
         background-color: rgb(240, 240, 240);
         color: rgb(77, 77, 77);
@@ -129,8 +121,9 @@ $(document).ready(function() {
         margin:2px;
         white-space: pre-wrap;
         word-wrap: break-word;
-
+        background-color: #F5F5F5;
     }
+
 
 </style>
 
@@ -138,10 +131,30 @@ $(document).ready(function() {
 
 </head>
 <body>
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container" >
 
-<div class="page">
+        <div class="navbar-header">
+            <div class="navbar-brand" >
+            <div class="nav-img"><img src="<%= request.getContextPath() %>/img/keybox_50x38.png"/></div>
+             KeyBox</div>
+        </div>
+        <div class="collapse navbar-collapse">
+            <s:if test="pendingSystemStatus==null">
 
- <div class="content">
+            <ul class="nav navbar-nav">
+                 <li><a href="viewSessions.action">Exit Audit</a></li>
+            </ul>
+
+            <div class="clear"></div>
+            </s:if>
+        </div>
+        <!--/.nav-collapse -->
+    </div>
+</div>
+
+
+ <div class="container" style="width: 99%;padding: 6px; margin: 10px 0px 10px 0px; border:none;">
  <s:if test="sessionAudit!= null">
  <div style="float:left;">
     <b>Audit  ( <s:property value="sessionAudit.user.username"/>
@@ -149,14 +162,14 @@ $(document).ready(function() {
         - <s:property value="sessionAudit.user.lastNm"/>, <s:property value="sessionAudit.user.firstNm"/>
     </s:if> ) </b>
  </div>
- <div class="top_link" ><a href="viewSessions.action">Exit Audit</a></div>
+ <div class="top_link" ></div>
 
 <div class="clear"></div>
 
 <div style="float:left;padding-bottom:10px;">
 <s:form id="filter_frm" theme="simple">
 <s:label value=""/>
-<s:textfield name="filter" type="text"/><div class="submit_btn">Filter</div><div class="clear_btn">Clear</div>
+<s:textfield name="filter" type="text"/><div class="btn btn-default submit_btn">Filter</div><div class="btn btn-default clear_btn">Clear</div>
 </s:form>
 </div>
         <div class="clear"></div>
@@ -188,7 +201,7 @@ $(document).ready(function() {
 </div>
 
 
-</div>
+
 
 </body>
 </html>

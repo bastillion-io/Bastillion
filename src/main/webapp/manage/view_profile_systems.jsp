@@ -78,10 +78,10 @@
 </head>
 <body>
 
-<div class="page">
+
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
-    <div class="content">
+    <div class="container">
 
        <s:form action="viewProfileSystems">
             <s:hidden name="sortedSet.orderByDirection"/>
@@ -105,6 +105,8 @@
                     <thead>
 
 
+
+
                     <tr>
                         <th><s:checkbox name="systemSelectAll" cssClass="systemSelect" theme="simple"/></th>
                         <th id="<s:property value="@com.keybox.manage.db.SystemDB@SORT_BY_NAME"/>" class="sort">Display Name</th>
@@ -112,8 +114,9 @@
                         <th id="<s:property value="@com.keybox.manage.db.SystemDB@SORT_BY_HOST"/>" class="sort">Host</th>
                     </tr>
                     </thead>
-
                     <tbody>
+
+
 
 
                     <s:iterator var="system" value="sortedSet.itemList" status="stat">
@@ -134,7 +137,7 @@
                     </tbody>
                 </table>
             </s:form>
-            <div id="assign_sys" class="assign_sys_btn">Assign</div>
+            <div id="assign_sys" class="btn btn-default assign_sys_btn">Assign</div>
         </s:if>
         <s:else>
             <div class="error">There are no systems defined.  New systems may be defined <a href="viewSystems.action">here</a>.</div>
@@ -144,6 +147,6 @@
 
 
     </div>
-</div>
+
 </body>
 </html>

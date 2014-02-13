@@ -109,19 +109,19 @@
 
             $("#error_dialog").dialog({
                 autoOpen: false,
-                height: 200,
+                height: 225,
                 width: 500,
                 modal: true
             });
             $("#set_password_dialog").dialog({
                 autoOpen: false,
-                height: 200,
+                height: 225,
                 width: 500,
                 modal: true
             });
             $("#set_passphrase_dialog").dialog({
                 autoOpen: false,
-                height: 200,
+                height: 225,
                 width: 500,
                 modal: true
             });
@@ -172,10 +172,10 @@
 </head>
 <body>
 
-<div class="page">
+
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
-    <div class="content">
+    <div class="container">
 
         <s:form id="gen_key_frm" action="genAuthKeyForSystem">
             <s:hidden name="pendingSystem.id"/>
@@ -194,6 +194,8 @@
 
             <table class="vborder scrollableTable">
                 <thead>
+
+
                 <tr>
                     <th id="<s:property value="@com.keybox.manage.db.SystemDB@SORT_BY_NAME"/>" class="sort">Display
                         Name
@@ -208,6 +210,8 @@
                 </tr>
                 </thead>
                 <tbody>
+
+
                 <s:iterator var="system" value="sortedSet.itemList" status="stat">
                     <tr>
                         <td>
@@ -234,14 +238,14 @@
                         </td>
                         <td>
 
-                            <div style="width:175px">
+                            <div style="width:160px">
 
-                                <img src="../../img/refresh.png" alt="Refresh" style="float:left" class="refresh_btn"
+                                <img src="../../img/refresh.png" alt="Refresh" style="float:left;width:32px;height:32px;" class="btn btn-default refresh_btn"
                                      id="refresh_btn_<s:property value="id"/>"/>
 
-                                <div id="edit_btn_<s:property value="id"/>" class="edit_btn" style="float:left">Edit
+                                <div id="edit_btn_<s:property value="id"/>" class="btn btn-default edit_btn" style="float:left">Edit
                                 </div>
-                                <div id="del_btn_<s:property value="id"/>" class="del_btn" style="float:left">Delete
+                                <div id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn" style="float:left">Delete
                                 </div>
                                 <div style="clear:both"></div>
                             </div>
@@ -250,10 +254,11 @@
 
                 </s:iterator>
                 </tbody>
+
             </table>
 
         </s:if>
-        <div id="add_btn" class="add_btn">Add System</div>
+        <div id="add_btn" class="btn btn-default add_btn">Add System</div>
         <div id="add_dialog" class="dialog" title="Add System">
             <s:form action="saveSystem" class="save_sys_form_add">
                 <s:textfield name="hostSystem.displayNm" label="Display Name" size="10"/>
@@ -266,8 +271,8 @@
                 <tr>
                     <td>&nbsp;</td>
                     <td align="left">
-                        <div class="submit_btn">Submit</div>
-                        <div class="cancel_btn">Cancel</div>
+                        <div class="btn btn-default submit_btn">Submit</div>
+                        <div class="btn btn-default cancel_btn">Cancel</div>
                     </td>
                 </tr>
             </s:form>
@@ -290,8 +295,8 @@
                     <tr>
                         <td>&nbsp;</td>
                         <td align="left">
-                            <div class="submit_btn">Submit</div>
-                            <div class="cancel_btn">Cancel</div>
+                            <div class="btn btn-default submit_btn">Submit</div>
+                            <div class="btn btn-default cancel_btn">Cancel</div>
                         </td>
                     </tr>
                 </s:form>
@@ -318,8 +323,8 @@
                 <tr>
                     <td>&nbsp;</td>
                     <td align="left">
-                        <div class="submit_btn">Submit</div>
-                        <div class="cancel_btn">Cancel</div>
+                        <div class="btn btn-default submit_btn">Submit</div>
+                        <div class="btn btn-default cancel_btn">Cancel</div>
                     </td>
                 </tr>
             </s:form>
@@ -341,8 +346,8 @@
                 <tr>
                     <td>&nbsp;</td>
                     <td align="left">
-                        <div class="submit_btn">Submit</div>
-                        <div class="cancel_btn">Cancel</div>
+                        <div class="btn btn-default submit_btn">Submit</div>
+                        <div class="btn btn-default cancel_btn">Cancel</div>
                     </td>
                 </tr>
             </s:form>
@@ -361,7 +366,7 @@
                 <tr>
                     <td>&nbsp;</td>
                     <td align="left">
-                        <div class="cancel_btn">OK</div>
+                        <div class="btn btn-default cancel_btn">OK</div>
                     </td>
                 </tr>
             </s:form>
@@ -369,7 +374,7 @@
 
 
     </div>
-</div>
+
 
 </body>
 </html>

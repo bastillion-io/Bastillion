@@ -46,11 +46,13 @@
 </head>
 
 
-<body style="background: #FFFFFF">
-<div class="page">
+<body >
+
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
-    <div class="content">
+    <div class="container">
+        <div class="template">
+
 
         <table class="vborder">
             <thead>
@@ -65,7 +67,7 @@
             <tr>
 
                 <td>
-                    <a href="../manage/viewSystems.action">Systems</a>
+                    <a  href="../manage/viewSystems.action">Systems</a>
 
                 </td>
 
@@ -151,6 +153,6 @@
             </tbody>
         </table>
     </div>
-</div>
+        </div>
 </body>
 </html>
