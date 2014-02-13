@@ -218,7 +218,7 @@ $(document).ready(function () {
 
     $(".output").each(function (index) {
         var id = $(this).attr("id").replace("output_", "");
-        termMap[id] = new Terminal(100, 22);
+        termMap[id] = new Terminal(80, 24);
         termMap[id].open($(this));
     });
 
