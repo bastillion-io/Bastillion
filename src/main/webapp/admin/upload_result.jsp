@@ -72,7 +72,7 @@
 
 
 <s:if test="hostSystemList!= null && !hostSystemList.isEmpty()">
-    <table class="vborder scrollableTable">
+    <table class="table-striped scrollableTable">
         <thead>
 
         <tr>

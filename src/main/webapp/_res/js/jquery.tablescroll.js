@@ -133,7 +133,7 @@ var w = 0;
 
 $('th, td',thead_tr_first).each(function(i)
 {
-w = $(this).width()+32;
+w = $(this).width()+25;
 
 $('th:eq('+i+'), td:eq('+i+')',thead_tr_first).css('width',w+'px');
 $('th:eq('+i+'), td:eq('+i+')',tbody_tr_first).css('width',w+'px');

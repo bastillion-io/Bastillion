@@ -23,7 +23,7 @@
 <script src="<%= request.getContextPath() %>/_res/js/jquery-ui.js"></script>
 <script src="<%= request.getContextPath() %>/_res/js/jquery.tablescroll.js"></script>
 <script src="<%= request.getContextPath() %>/_res/js/tty/terms.js"></script>
-<script src="<%= request.getContextPath() %>/_res/js/bootstrap.min.js"></script>
+<script src="<%= request.getContextPath() %>/_res/js/bootstrap.js"></script>
 
   <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!--[if lt IE 9]>

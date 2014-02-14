@@ -121,7 +121,7 @@
   	             <s:if test="script!=null">
                         <s:hidden name="script.id"/>
                  </s:if>
-                <table class="vborder scrollableTable">
+                <table class="table-striped scrollableTable">
                     <thead>
 
                     <tr>
@@ -164,7 +164,13 @@
             <div class="btn btn-default select_frm_btn">Create SSH Terminals</div>
         </s:elseif>
         <s:else>
-            <div class="error">There are no systems defined. </div>
+            <div class="actionMessage">
+                <p class="error">Systems not available.
+                    <s:if test="%{#session.userType==\"M\"}">
+                    Define systems <a href="../manage/viewSystems.action">here</a>
+                    </s:if>
+                 </p>
+                </div>
         </s:else>
     </div>
 

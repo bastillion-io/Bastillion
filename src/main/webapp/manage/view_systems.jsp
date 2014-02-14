@@ -24,14 +24,14 @@
         $(document).ready(function () {
             $("#add_dialog").dialog({
                 autoOpen: false,
-                height: 300,
-                width: 425,
+                height: 325,
+                width: 450,
                 modal: true
             });
             $(".edit_dialog").dialog({
                 autoOpen: false,
-                height: 300,
-                width: 425,
+                height: 325,
+                width: 450,
                 modal: true
             });
             $("#script_dia").dialog({
@@ -192,7 +192,7 @@
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
 
-            <table class="vborder scrollableTable">
+            <table class="table-striped scrollableTable">
                 <thead>
 
 

@@ -82,7 +82,7 @@
                 <p>Select a session to audit below</p>
 
 
-                <table class="vborder scrollableTable">
+                <table class="table-striped scrollableTable">
                     <thead>
                     <tr>
 

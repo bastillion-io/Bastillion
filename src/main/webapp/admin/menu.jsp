@@ -36,11 +36,7 @@
     </script>
 
 
-    <style type="text/css">
-        .vborder td {
-            white-space: normal;
-        }
-    </style>
+
 
 
 </head>
@@ -54,7 +50,7 @@
         <div class="template">
 
 
-        <table class="vborder">
+        <table class="table-striped">
             <thead>
             <tr>
                 <th colspan="2">Main Menu</th>

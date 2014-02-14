@@ -27,14 +27,14 @@
 
             $("#add_dialog").dialog({
                 autoOpen: false,
-                height: 400,
+                height: 450,
                 width: 800,
                 modal: true
             });
 
             $(".edit_dialog").dialog({
                 autoOpen: false,
-                height: 400,
+                height: 450,
                 width: 800,
                 modal: true
             });
@@ -126,7 +126,7 @@
 
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
-            <table class="vborder scrollableTable">
+            <table class="table-striped scrollableTable">
                 <thead>
 
 

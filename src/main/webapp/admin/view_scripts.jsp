@@ -27,14 +27,14 @@
 
             $("#add_dialog").dialog({
                 autoOpen: false,
-                height: 450,
+                height: 500,
                 width: 500,
                 modal: true
             });
 
             $(".edit_dialog").dialog({
                 autoOpen: false,
-                height: 450,
+                height: 500,
                 width: 500,
                 modal: true
             });
@@ -63,7 +63,7 @@
             $(".cancel_btn").button().click(function() {
                 $("#add_dialog").dialog("close");
                 $(".edit_dialog").dialog("close");
-            });  //regenerate auth keys btn
+            });
             $(".sort,.sortAsc,.sortDesc").click(function() {
                 var id = $(this).attr('id')
 
@@ -121,7 +121,7 @@
             <p>Add / Delete scripts or select a script below to execute</p>
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
-                <table class="vborder scrollableTable">
+                <table class="table-striped scrollableTable">
                     <thead>
 
                     <tr>

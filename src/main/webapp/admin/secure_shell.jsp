@@ -251,7 +251,9 @@ $(document).ready(function () {
     };
 
     setInterval(function () {
-        connection.send('');
+        try {
+            connection.send('');
+        }catch(ex){}
     }, 500);
 
     </s:if>
@@ -265,147 +267,144 @@ $(document).ready(function () {
 <body>
 <s:if test="(systemList!= null && !systemList.isEmpty()) || pendingSystemStatus!=null">
 
-<div class="navbar navbar-default navbar-fixed-top" role="navigation">
-    <div class="container" >
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="container" >
 
-        <div class="navbar-header">
-            <div class="navbar-brand" >
-            <div class="nav-img"><img src="<%= request.getContextPath() %>/img/keybox_50x38.png"/></div>
-             KeyBox</div>
+            <div class="navbar-header">
+                <div class="navbar-brand" >
+                    <div class="nav-img"><img src="<%= request.getContextPath() %>/img/keybox_50x38.png"/></div>
+                    KeyBox</div>
+            </div>
+            <div class="collapse navbar-collapse">
+                <s:if test="pendingSystemStatus==null">
+
+
+
+                    <ul class="nav navbar-nav">
+                        <li><a id="select_all" href="#">Select All</a></li>
+                        <li><a id="upload_push" href="#">Upload &amp; Push</a></li>
+                        <li><a href="exitTerms.action">Exit Terminals</a></li>
+                    </ul>
+                    <div class="note">(Use CMD-Click or CTRL-Click to select multiple individual terminals)</div>
+                    <div class="clear"></div>
+                </s:if>
+            </div>
+            <!--/.nav-collapse -->
         </div>
-        <div class="collapse navbar-collapse">
-            <s:if test="pendingSystemStatus==null">
-
-
-
-            <ul class="nav navbar-nav">
-                <li><a id="select_all" href="#">Select All</a></li>
-                 <li><a id="upload_push" href="#">Upload &amp; Push</a></li>
-                 <li><a href="exitTerms.action">Exit Terminals</a></li>
-            </ul>
-            <div class="note" style="float:right;">(Use CMD-Click or CTRL-Click to select multiple individual
-                                terminals)
-                            </div>
-            <div class="clear"></div>
-            </s:if>
-        </div>
-        <!--/.nav-collapse -->
     </div>
-</div>
+    <div style="float:right;"><textarea name="dummy" id="dummy" size="1"
+                                        style="border:none;color:#FFFFFF;width:1px;height:1px"></textarea></div>
+    <div style="float:right;"><input type="text" name="dummy2" id="dummy2" size="1"
+                                     style="border:none;color:#FFFFFF;width:1px;height:1px"/>
+    </div>
+    <div class="container"  style="width:100%;padding: 0px; margin: 0px;border:none;">
 
 
+        <div class="termwrapper" >
+            <s:iterator value="systemList">
+                <div id="run_cmd_<s:property value="id"/>" class="run_cmd_active run_cmd">
 
-        <div class="container"  style="width:100%;padding: 0px; margin: 0px;border:none;">
+                    <h4><s:property value="displayLabel"/></h4>
 
-
-            <div class="termwrapper" >
-                <s:iterator value="systemList">
-                    <div id="run_cmd_<s:property value="id"/>" class="run_cmd_active run_cmd">
-
-                        <h4><s:property value="displayLabel"/></h4>
-
-                        <div id="term" class="term">
-                            <div id="output_<s:property value="id"/>" class="output"></div>
-                        </div>
-
+                    <div id="term" class="term">
+                        <div id="output_<s:property value="id"/>" class="output"></div>
                     </div>
-                </s:iterator>
-            </div>
+
+                </div>
+            </s:iterator>
+        </div>
 
 
-            <div id="set_password_dialog" title="Enter Password">
-                <p class="error"><s:property value="pendingSystemStatus.errorMsg"/></p>
+        <div id="set_password_dialog" title="Enter Password">
+            <p class="error"><s:property value="pendingSystemStatus.errorMsg"/></p>
 
-                <p>Enter password for <s:property value="pendingSystemStatus.displayLabel"/>
+            <p>Enter password for <s:property value="pendingSystemStatus.displayLabel"/>
 
-                </p>
-                <s:form id="password_frm" action="createTerms">
-                    <s:hidden name="pendingSystemStatus.id"/>
-                    <s:password name="password" label="Password" size="15" value="" autocomplete="off"/>
-                    <s:if test="script!=null">
-                        <s:hidden name="script.id"/>
-                    </s:if>
-                    <tr>
-                        <td>&nbsp;</td>
-                        <td align="left">
-                            <div class="btn btn-default submit_btn">Submit</div>
-                            <div class="btn btn-default cancel_btn">Cancel</div>
-                        </td>
-                    </tr>
-                </s:form>
-            </div>
+            </p>
+            <s:form id="password_frm" action="createTerms">
+                <s:hidden name="pendingSystemStatus.id"/>
+                <s:password name="password" label="Password" size="15" value="" autocomplete="off"/>
+                <s:if test="script!=null">
+                    <s:hidden name="script.id"/>
+                </s:if>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td align="left">
+                        <div class="btn btn-default submit_btn">Submit</div>
+                        <div class="btn btn-default cancel_btn">Cancel</div>
+                    </td>
+                </tr>
+            </s:form>
+        </div>
 
-            <div id="set_passphrase_dialog" title="Enter Passphrase">
-                <p class="error"><s:property value="pendingSystemStatus.errorMsg"/></p>
+        <div id="set_passphrase_dialog" title="Enter Passphrase">
+            <p class="error"><s:property value="pendingSystemStatus.errorMsg"/></p>
 
-                <p>Enter passphrase for <s:property value="pendingSystemStatus.displayLabel"/></p>
-                <s:form id="passphrase_frm" action="createTerms">
-                    <s:hidden name="pendingSystemStatus.id"/>
-                    <s:password name="passphrase" label="Passphrase" size="15" value="" autocomplete="off"/>
-                    <s:if test="script!=null">
-                        <s:hidden name="script.id"/>
-                    </s:if>
-                    <tr>
-                        <td colspan="2">
-                            <div class="btn btn-default submit_btn">Submit</div>
-                            <div class="btn btn-default cancel_btn">Cancel</div>
-                        </td>
-                    </tr>
-                </s:form>
-            </div>
-
-
-            <div id="error_dialog" title="Error">
-                <p class="error">Error: <s:property value="currentSystemStatus.errorMsg"/></p>
-
-                <p>System: <s:property value="currentSystemStatus.displayLabel"/>
-
-                </p>
-
-                <s:form id="error_frm" action="createTerms">
-                    <s:hidden name="pendingSystemStatus.id"/>
-                    <s:if test="script!=null">
-                        <s:hidden name="script.id"/>
-                    </s:if>
-                    <tr>
-                        <td colspan="2">
-                            <div class="btn btn-default submit_btn">OK</div>
-                        </td>
-                    </tr>
-                </s:form>
-            </div>
-
-            <div id="upload_push_dialog" title="Upload &amp; Push">
-                <iframe id="upload_push_frame" width="700px" height="300px" style="border: none;">
-
-                </iframe>
+            <p>Enter passphrase for <s:property value="pendingSystemStatus.displayLabel"/></p>
+            <s:form id="passphrase_frm" action="createTerms">
+                <s:hidden name="pendingSystemStatus.id"/>
+                <s:password name="passphrase" label="Passphrase" size="15" value="" autocomplete="off"/>
+                <s:if test="script!=null">
+                    <s:hidden name="script.id"/>
+                </s:if>
+                <tr>
+                    <td colspan="2">
+                        <div class="btn btn-default submit_btn">Submit</div>
+                        <div class="btn btn-default cancel_btn">Cancel</div>
+                    </td>
+                </tr>
+            </s:form>
+        </div>
 
 
-            </div>
+        <div id="error_dialog" title="Error">
+            <p class="error">Error: <s:property value="currentSystemStatus.errorMsg"/></p>
 
+            <p>System: <s:property value="currentSystemStatus.displayLabel"/>
 
-            <s:form id="composite_terms_frm" action="createTerms">
+            </p>
+
+            <s:form id="error_frm" action="createTerms">
                 <s:hidden name="pendingSystemStatus.id"/>
                 <s:if test="script!=null">
                     <s:hidden name="script.id"/>
                 </s:if>
+                <tr>
+                    <td colspan="2">
+                        <div class="btn btn-default submit_btn">OK</div>
+                    </td>
+                </tr>
             </s:form>
+        </div>
+
+        <div id="upload_push_dialog" title="Upload &amp; Push">
+            <iframe id="upload_push_frame" width="700px" height="300px" style="border: none;">
+
+            </iframe>
+
 
         </div>
-    </s:if>
-    <s:else>
-        <jsp:include page="../_res/inc/navigation.jsp"/>
 
-        <div class="container">
-            <p class="error">No sessions could be created</p>
-        </div>
-    </s:else>
 
-<div style="float:right;"><textarea name="dummy" id="dummy" size="1"
-                                    style="border:none;color:#FFFFFF;width:1px;height:1px"></textarea></div>
-<div style="float:right;"><input type="text" name="dummy2" id="dummy2" size="1"
-                                 style="border:none;color:#FFFFFF;width:1px;height:1px"/>
-</div>
+        <s:form id="composite_terms_frm" action="createTerms">
+            <s:hidden name="pendingSystemStatus.id"/>
+            <s:if test="script!=null">
+                <s:hidden name="script.id"/>
+            </s:if>
+        </s:form>
+
+    </div>
+</s:if>
+<s:else>
+    <jsp:include page="../_res/inc/navigation.jsp"/>
+
+    <div class="container">
+        <h3>Composite SSH Terms</h3>
+        <p class="error">No sessions could be created</p>
+    </div>
+</s:else>
+
+
 
 </body>
 </html>

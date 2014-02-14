@@ -78,10 +78,8 @@
 
         <s:if test="user.profileList!= null && !user.profileList.isEmpty()">
 
-            <table class="vborder scrollableTable">
+            <table class="table-striped scrollableTable">
                 <thead>
-
-
 
                 <tr>
                     <th>Profile Name</th>
@@ -89,8 +87,6 @@
                 </tr>
                 </thead>
                 <tbody>
-
-
 
 
 
@@ -111,11 +107,11 @@
 
 
                     </tr>
-                </tbody>
-
-
 
                 </s:iterator>
+
+                </tbody>
+
 
             </table>
         </s:if>

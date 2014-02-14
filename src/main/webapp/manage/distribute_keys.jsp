@@ -106,7 +106,7 @@
 
                 <s:form action="selectSystemsForAuthKeys" id="select_frm" theme="simple">
 
-                    <table class="vborder scrollableTable">
+                    <table class="table-striped scrollableTable">
                         <thead>
 
                         <tr>

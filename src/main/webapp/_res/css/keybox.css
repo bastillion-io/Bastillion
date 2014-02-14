@@ -8,6 +8,7 @@ a {
 table {
     border-collapse: collapse;
     font-size: small;
+    min-width: 50%;
 
 }
 
@@ -22,21 +23,30 @@ table tbody {
 .navbar .container a {
     text-decoration: none;
 }
-
+.navbar .note {
+    padding: 20px 2px 2px 0px;
+    float: right;
+}
 .wwFormTable {
     background-color: #FFFFFF;
+    min-width:10px;
 }
 
 .wwFormTable input {
     padding: 2px;
 }
-
-table td, table th {
+.wwFormTable td {
     padding: 5px;
-    vertical-align: middle;
 }
 
-.vborder {
+table td, table th {
+    vertical-align: middle;
+    line-height: 1.42857;
+    padding:10px;
+}
+
+
+.table-striped {
     border: 1px solid #CCCCCC;
 }
 
@@ -44,17 +54,23 @@ table td, table th {
     background-color: #e0e0e0;
 }
 
-.vborder td, .vborder th, .tablescroll_head th {
-    padding: 10px 15px 10px 15px;
+.table-striped th, .tablescroll_head th {
+    padding: 10px 15px 10px 10px;
 
 }
+.table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
+    border: 1px solid #DDDDDD;
+    line-height: 1.42857;
+    padding: 10px;
+    vertical-align: middle;
+}
 
-.vborder td, .vborder th, .tablescroll_head th {
+.table-striped td, .table-striped th, .tablescroll_head th {
     border: 1px solid #CCCCCC;
     white-space: nowrap;
 }
 
-.vborder td a, .vborder th a, .tablescroll_head th a {
+.table-striped td a, .table-striped th a, .tablescroll_head th a {
     white-space: nowrap;
 }
 

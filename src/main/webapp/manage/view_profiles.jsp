@@ -122,7 +122,7 @@
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
 
-            <table class="vborder scrollableTable">
+            <table class="table-striped scrollableTable">
                 <thead>
 
 

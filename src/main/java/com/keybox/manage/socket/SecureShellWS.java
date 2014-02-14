@@ -128,33 +128,34 @@ public class SecureShellWS {
     @OnClose
     public void onClose() {
 
-        SecureShellAction.getUserSchSessionMap().get(sessionId).getSchSessionMap();
-        UserSchSessions userSchSessions = SecureShellAction.getUserSchSessionMap().get(sessionId);
-        if (userSchSessions != null) {
-            Map<Long, SchSession> schSessionMap = userSchSessions.getSchSessionMap();
+        if (SecureShellAction.getUserSchSessionMap() != null) {
+            UserSchSessions userSchSessions = SecureShellAction.getUserSchSessionMap().get(sessionId);
+            if (userSchSessions != null) {
+                Map<Long, SchSession> schSessionMap = userSchSessions.getSchSessionMap();
 
-            for (Long sessionKey : schSessionMap.keySet()) {
+                for (Long sessionKey : schSessionMap.keySet()) {
 
-                SchSession schSession = schSessionMap.get(sessionKey);
+                    SchSession schSession = schSessionMap.get(sessionKey);
 
-                //disconnect ssh session
-                schSession.getChannel().disconnect();
-                schSession.getSession().disconnect();
-                schSession.setChannel(null);
-                schSession.setSession(null);
-                schSession.setInputToChannel(null);
-                schSession.setCommander(null);
-                schSession.setOutFromChannel(null);
-                schSession = null;
-                //remove from map
-                schSessionMap.remove(sessionKey);
+                    //disconnect ssh session
+                    schSession.getChannel().disconnect();
+                    schSession.getSession().disconnect();
+                    schSession.setChannel(null);
+                    schSession.setSession(null);
+                    schSession.setInputToChannel(null);
+                    schSession.setCommander(null);
+                    schSession.setOutFromChannel(null);
+                    schSession = null;
+                    //remove from map
+                    schSessionMap.remove(sessionKey);
+                }
+
+
+                //clear and remove session map for user
+                schSessionMap.clear();
+                SecureShellAction.getUserSchSessionMap().remove(sessionId);
+                SessionOutputUtil.removeUserSession(sessionId);
             }
-
-
-            //clear and remove session map for user
-            schSessionMap.clear();
-            SecureShellAction.getUserSchSessionMap().remove(sessionId);
-            SessionOutputUtil.removeUserSession(sessionId);
         }
 
 
