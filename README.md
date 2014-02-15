@@ -14,18 +14,25 @@ and defined.
 Screenshots
 -----------
 
-![Terminals](https://freecode.com/screenshots/50/13/5013534c50aa2fa3e83857cbc33c70dc_medium.png)
+![Terminals](https://freecode.com/screenshots/a0/44/a044b3e11cc1af453e8fe5b9731bd6a5_medium.png)
 
-![More Terminals](https://freecode.com/screenshots/ec/ef/ecef1bfdc5a91bb24685451b71184b22_medium.png)
+![More Terminals](https://freecode.com/screenshots/64/42/64429c74e1a5b4d9b7d26c490282150a_medium.png)
 
-![Upload Files](https://freecode.com/screenshots/a9/84/a98458e5ee9fe6b7c6e9a3ed46de5871_medium.png)
+![Upload Files](https://freecode.com/screenshots/e6/76/e676fe542b08188cff1fdbceea15adf4_medium.png)
+
+![Manage Systems](https://freecode.com/screenshots/71/e6/71e6464744ae95d2d03ab5bbe5a576e1_medium.png)
+
+![Manage Users](https://freecode.com/screenshots/c0/a3/c0a3b758c80c3a634e3327f55c4293f2_medium.png)
+
+![Define SSH Keys](https://freecode.com/screenshots/16/f9/16f94a2734f3b509df2dca9efe79cbc5_medium.png)
+
 
 Prerequisites
 -------------
 Java JDK 1.7 or greater
 http://www.oracle.com/technetwork/java/javase/overview/index.html
 
-Browser with Web Sockets support
+Browser with Web Socket support
 http://caniuse.com/websockets
 
 **Note: In Safari if using a self-signed certificate you must import the certificate into your Keychain.
