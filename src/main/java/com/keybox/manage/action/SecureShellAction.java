@@ -18,12 +18,8 @@ package com.keybox.manage.action;
 import com.keybox.common.util.AppConfigLkup;
 import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.db.*;
-import com.keybox.manage.util.DBUtils;
-import com.keybox.manage.util.EncryptionUtil;
-import com.keybox.manage.util.SessionOutputUtil;
 import com.keybox.manage.model.*;
 import com.keybox.manage.util.SSHUtil;
-import com.google.gson.Gson;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
@@ -34,7 +30,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.StringReader;
-import java.sql.Connection;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -54,12 +49,12 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
     String password;
     String passphrase;
     List<HostSystem> systemList = new ArrayList<HostSystem>();
+    String terminalRefreshRate = AppConfigLkup.getProperty("terminalRefreshRate");
 
     static Map<Long, UserSchSessions> userSchSessionMap = new ConcurrentHashMap<Long, UserSchSessions>();
 
 
     Script script = new Script();
-
 
 
     /**
@@ -200,7 +195,6 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
     public String exitTerms() {
 
 
-
         return SUCCESS;
     }
 
@@ -309,6 +303,10 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
     public static void setUserSchSessionMap(Map<Long, UserSchSessions> userSchSessionMap) {
         SecureShellAction.userSchSessionMap = userSchSessionMap;
     }
+
+    public String getTerminalRefreshRate() { return terminalRefreshRate; }
+
+    public void setTerminalRefreshRate(String terminalRefreshRate) { this.terminalRefreshRate = terminalRefreshRate; }
 }
 
 

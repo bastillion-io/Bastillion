@@ -180,8 +180,8 @@ public class SecureShellWS {
         keyMap.put(39, new byte[]{(byte) 0x1b, (byte) 0x4f, (byte) 0x43});
         //DOWN
         keyMap.put(40, new byte[]{(byte) 0x1b, (byte) 0x4f, (byte) 0x42});
-        //BS
-        keyMap.put(8, new byte[]{(byte) 0x08});
+        //DEL
+        keyMap.put(8, new byte[]{(byte) 0x7f});
         //TAB
         keyMap.put(9, new byte[]{(byte) 0x09});
         //CTR

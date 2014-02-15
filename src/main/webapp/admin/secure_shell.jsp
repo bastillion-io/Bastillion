@@ -254,7 +254,7 @@ $(document).ready(function () {
         try {
             connection.send('');
         }catch(ex){}
-    }, 500);
+    }, <s:property value="terminalRefreshRate"/>);
 
     </s:if>
 
