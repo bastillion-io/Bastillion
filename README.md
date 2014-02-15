@@ -14,9 +14,9 @@ and defined.
 Screenshots
 -----------
 
-![Terminals](https://freecode.com/screenshots/a0/44/a044b3e11cc1af453e8fe5b9731bd6a5_medium.png)
+![Terminals](https://freecode.com/screenshots/64/42/64429c74e1a5b4d9b7d26c490282150a_medium.png)
 
-![More Terminals](https://freecode.com/screenshots/64/42/64429c74e1a5b4d9b7d26c490282150a_medium.png)
+![More Terminals](https://freecode.com/screenshots/a0/44/a044b3e11cc1af453e8fe5b9731bd6a5_medium.png)
 
 ![Upload Files](https://freecode.com/screenshots/e6/76/e676fe542b08188cff1fdbceea15adf4_medium.png)
 
