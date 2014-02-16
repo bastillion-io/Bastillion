@@ -174,7 +174,7 @@ $(document).ready(function () {
         //39 - RIGHT
         //40 - DOWN
         //13 - ENTER
-        //8 - BS
+        //8 - DEL
         //9 - TAB
         //17 - CTRL
         if (keys[27] || keys[37] || keys[38] || keys[39] || keys[40] || keys[13] || keys[8] || keys[9] || keys[17]) {
