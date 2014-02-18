@@ -31,33 +31,34 @@ import java.util.List;
  */
 public class SystemDB {
 
-    public static final String SORT_BY_NAME="display_nm";
-    public static final String SORT_BY_USER="user";
-    public static final String SORT_BY_HOST="host";
-    public static final String SORT_BY_STATUS="status_cd";
+    public static final String SORT_BY_NAME = "display_nm";
+    public static final String SORT_BY_USER = "user";
+    public static final String SORT_BY_HOST = "host";
+    public static final String SORT_BY_STATUS = "status_cd";
 
 
     /**
      * method to do order by based on the sorted set object for systems for user
+     *
      * @param sortedSet sorted set object
-     * @param userId user id
+     * @param userId    user id
      * @return sortedSet with list of host systems
      */
-    public static SortedSet getUserSystemSet(SortedSet sortedSet, Long userId){
+    public static SortedSet getUserSystemSet(SortedSet sortedSet, Long userId) {
         List<HostSystem> hostSystemList = new ArrayList<HostSystem>();
 
-        String orderBy="";
-        if(sortedSet.getOrderByField()!=null && !sortedSet.getOrderByField().trim().equals("")){
-            orderBy="order by " + sortedSet.getOrderByField()+ " " + sortedSet.getOrderByDirection();
+        String orderBy = "";
+        if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
+            orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
         }
-        String sql="select * from system where id in (select distinct system_id from  system_map m, user_map um where m.profile_id=um.profile_id and um.user_id=?) "+orderBy;
+        String sql = "select * from system where id in (select distinct system_id from  system_map m, user_map um where m.profile_id=um.profile_id and um.user_id=?) " + orderBy;
 
         //get user for auth token
-        Connection con=null;
+        Connection con = null;
         try {
-            con=DBUtils.getConn();
+            con = DBUtils.getConn();
             PreparedStatement stmt = con.prepareStatement(sql);
-            stmt.setLong(1,userId);
+            stmt.setLong(1, userId);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -88,21 +89,22 @@ public class SystemDB {
 
     /**
      * method to do order by based on the sorted set object for systems
+     *
      * @param sortedSet sorted set object
      * @return sortedSet with list of host systems
      */
-    public static SortedSet getSystemSet(SortedSet sortedSet){
+    public static SortedSet getSystemSet(SortedSet sortedSet) {
         List<HostSystem> hostSystemList = new ArrayList<HostSystem>();
 
-        String orderBy="";
-        if(sortedSet.getOrderByField()!=null && !sortedSet.getOrderByField().trim().equals("")){
-            orderBy="order by " + sortedSet.getOrderByField()+ " " + sortedSet.getOrderByDirection();
+        String orderBy = "";
+        if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
+            orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
         }
-        String sql="select * from  system "+ orderBy;
+        String sql = "select * from  system " + orderBy;
 
-        Connection con=null;
+        Connection con = null;
         try {
-            con=DBUtils.getConn();
+            con = DBUtils.getConn();
             PreparedStatement stmt = con.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
 
@@ -132,9 +134,9 @@ public class SystemDB {
     }
 
 
-
     /**
      * returns system by id
+     *
      * @param id system id
      * @return system
      */
@@ -162,8 +164,9 @@ public class SystemDB {
 
     /**
      * returns system by id
+     *
      * @param con DB connection
-     * @param id system id
+     * @param id  system id
      * @return system
      */
     public static HostSystem getSystem(Connection con, Long id) {
@@ -201,6 +204,7 @@ public class SystemDB {
 
     /**
      * inserts host system into DB
+     *
      * @param hostSystem host system object
      * @return user id
      */
@@ -209,10 +213,10 @@ public class SystemDB {
 
         Connection con = null;
 
-        Long userId=null;
+        Long userId = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("insert into system (display_nm, user, host, port, authorized_keys, status_cd) values (?,?,?,?,?,?)",PreparedStatement.RETURN_GENERATED_KEYS );
+            PreparedStatement stmt = con.prepareStatement("insert into system (display_nm, user, host, port, authorized_keys, status_cd) values (?,?,?,?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
             stmt.setString(1, hostSystem.getDisplayNm());
             stmt.setString(2, hostSystem.getUser());
             stmt.setString(3, hostSystem.getHost());
@@ -221,9 +225,9 @@ public class SystemDB {
             stmt.setString(6, hostSystem.getStatusCd());
             stmt.execute();
 
-           ResultSet rs =stmt.getGeneratedKeys();
-            if(rs.next()){
-                userId=rs.getLong(1);
+            ResultSet rs = stmt.getGeneratedKeys();
+            if (rs.next()) {
+                userId = rs.getLong(1);
             }
             DBUtils.closeStmt(stmt);
 
@@ -237,6 +241,7 @@ public class SystemDB {
 
     /**
      * updates host system record
+     *
      * @param hostSystem host system object
      */
     public static void updateSystem(HostSystem hostSystem) {
@@ -267,6 +272,7 @@ public class SystemDB {
 
     /**
      * deletes host system
+     *
      * @param hostSystemId host system id
      */
     public static void deleteSystem(Long hostSystemId) {
@@ -319,17 +325,15 @@ public class SystemDB {
     }
 
 
-
     /**
      * returns all system ids
+     *
      * @param con DB connection
-     * @param id system id
      * @return system
      */
     public static List<Long> getAllSystemIds(Connection con) {
 
-        List<Long> systemIdList= new ArrayList<Long>();
-
+        List<Long> systemIdList = new ArrayList<Long>();
 
 
         try {
@@ -346,6 +350,49 @@ public class SystemDB {
             e.printStackTrace();
         }
 
+
+        return systemIdList;
+
+    }
+
+
+    /**
+     * method to check system permissions for user
+     *
+     * @param systemSelectIdList list of system ids to check
+     * @param userId             user id
+     * @return only system ids that user has perms for
+     */
+    public static List<Long> checkSystemPerms(List<Long> systemSelectIdList, Long userId) {
+
+        List<Long> systemIdList = new ArrayList<Long>();
+        if (systemSelectIdList != null && !systemSelectIdList.isEmpty()) {
+
+
+            //get user for auth token
+            Connection con = null;
+            try {
+                con = DBUtils.getConn();
+                String sql = "select * from system where id in (select distinct system_id from  system_map m, user_map um where m.profile_id=um.profile_id and um.user_id=?) ";
+                PreparedStatement stmt = con.prepareStatement(sql);
+                stmt.setLong(1, userId);
+                ResultSet rs = stmt.executeQuery();
+
+                while (rs.next()) {
+                    Long systemId = rs.getLong("id");
+                    if (systemSelectIdList.contains(systemId)) {
+                        systemIdList.add(systemId);
+                    }
+                }
+                DBUtils.closeRs(rs);
+                DBUtils.closeStmt(stmt);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            DBUtils.closeConn(con);
+
+        }
 
         return systemIdList;
 

@@ -174,6 +174,10 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         //exit any previous terms
         exitTerms();
         if (systemSelectId != null && !systemSelectId.isEmpty()) {
+            //check to see if user has perms to access selected systems
+            if (!Auth.MANAGER.equals(AuthUtil.getUserType(servletRequest.getSession()))) {
+                systemSelectId = SystemDB.checkSystemPerms(systemSelectId, userId);
+            }
 
             SystemStatusDB.setInitialSystemStatus(systemSelectId, userId);
             pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
@@ -304,9 +308,13 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         SecureShellAction.userSchSessionMap = userSchSessionMap;
     }
 
-    public String getTerminalRefreshRate() { return terminalRefreshRate; }
+    public String getTerminalRefreshRate() {
+        return terminalRefreshRate;
+    }
 
-    public void setTerminalRefreshRate(String terminalRefreshRate) { this.terminalRefreshRate = terminalRefreshRate; }
+    public void setTerminalRefreshRate(String terminalRefreshRate) {
+        this.terminalRefreshRate = terminalRefreshRate;
+    }
 }
 
 
