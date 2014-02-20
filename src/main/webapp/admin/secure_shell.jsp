@@ -60,8 +60,40 @@ $(document).ready(function () {
     });
 
     $(".termwrapper").sortable({
-        helper: 'clone'
+        zIndex: 10000,
+        helper: 'clone',
+        delay: 150,
+        placeholder: 'ui-state-highlight',
+        start: function (e, ui) {        // new lines to
+            $(ui.placeholder).slideUp(); // remove popping
+        },                             // effect on start
+        change: function (e, ui) {
+            $(ui.placeholder).hide().slideDown();
+        }
+
+    }).disableSelection();
+
+
+    $.ajaxSetup({ cache: false });
+    $('.droppable').droppable({
+        zIndex: 10000,
+        tolerance: "touch",
+        over: function (event, ui) {
+            $('.ui-sortable-helper').addClass('dragdropHover');
+
+        },
+        out: function (event, ui) {
+            $('.ui-sortable-helper').removeClass('dragdropHover');
+        },
+
+        drop: function (event, ui) {
+            var id = ui.draggable.attr("id").replace("run_cmd_", "");
+            $.ajax({ url: '../admin/disconnectTerm.action?id=' + id, cache: false});
+            ui.draggable.remove();
+
+        }
     });
+
 
     //submit add or edit form
     $(".submit_btn").button().click(function () {
@@ -253,13 +285,24 @@ $(document).ready(function () {
     setInterval(function () {
         try {
             connection.send('');
-        }catch(ex){}
+        } catch (ex) {
+        }
     }, <s:property value="terminalRefreshRate"/>);
 
     </s:if>
 
 });
 </script>
+
+<style>
+    .dragdropHover {
+        background-color: red;
+    }
+    .droppable {
+        padding: 10px 2px 2px 10px;
+        float: right;
+    }
+</style>
 
 <title>KeyBox - Composite Terms</title>
 
@@ -268,16 +311,16 @@ $(document).ready(function () {
 <s:if test="(systemList!= null && !systemList.isEmpty()) || pendingSystemStatus!=null">
 
     <div class="navbar navbar-default navbar-fixed-top" role="navigation">
-        <div class="container" >
+        <div class="container">
 
             <div class="navbar-header">
-                <div class="navbar-brand" >
+                <div class="navbar-brand">
                     <div class="nav-img"><img src="<%= request.getContextPath() %>/img/keybox_50x38.png"/></div>
-                    KeyBox</div>
+                    KeyBox
+                </div>
             </div>
             <div class="collapse navbar-collapse">
                 <s:if test="pendingSystemStatus==null">
-
 
 
                     <ul class="nav navbar-nav">
@@ -285,7 +328,10 @@ $(document).ready(function () {
                         <li><a id="upload_push" href="#">Upload &amp; Push</a></li>
                         <li><a href="exitTerms.action">Exit Terminals</a></li>
                     </ul>
-                    <div class="note">(Use CMD-Click or CTRL-Click to select multiple individual terminals)</div>
+                    <div class="droppable">
+                        <a href="#" title="Drag to disconnect">
+                            <img src="<%= request.getContextPath() %>/img/disconnect.png"/></a></div>
+                    <div class="note">Use CMD-Click or CTRL-Click to select multiple individual terminals<br/>Drag terminal window to icon to disconnect</div>
                     <div class="clear"></div>
                 </s:if>
             </div>
@@ -297,10 +343,10 @@ $(document).ready(function () {
     <div style="float:right;"><input type="text" name="dummy2" id="dummy2" size="1"
                                      style="border:none;color:#FFFFFF;width:1px;height:1px"/>
     </div>
-    <div class="container"  style="width:100%;padding: 0px; margin: 0px;border:none;">
+    <div class="container" style="width:100%;padding: 0px; margin: 0px;border:none;">
 
 
-        <div class="termwrapper" >
+        <div class="termwrapper">
             <s:iterator value="systemList">
                 <div id="run_cmd_<s:property value="id"/>" class="run_cmd_active run_cmd">
 
@@ -348,7 +394,8 @@ $(document).ready(function () {
                     <s:hidden name="script.id"/>
                 </s:if>
                 <tr>
-                    <td colspan="2">
+                    <td>&nbsp;</td>
+                    <td align="left">
                         <div class="btn btn-default submit_btn">Submit</div>
                         <div class="btn btn-default cancel_btn">Cancel</div>
                     </td>
@@ -400,10 +447,10 @@ $(document).ready(function () {
 
     <div class="container">
         <h3>Composite SSH Terms</h3>
+
         <p class="error">No sessions could be created</p>
     </div>
 </s:else>
-
 
 
 </body>

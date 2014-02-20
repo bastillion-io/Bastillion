@@ -107,6 +107,3 @@ Author
 + https://twitter.com/spkavanagh6
 
 
-[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/1d63734e95044db2bb95500235c0df9e "githalytics.com")](http://githalytics.com/skavanagh/KeyBox)
-
-

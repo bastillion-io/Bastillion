@@ -42,12 +42,12 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
     String command;
     HttpServletResponse servletResponse;
     HttpServletRequest servletRequest;
-    List<Long> idList = new ArrayList<Long>();
     List<Long> systemSelectId;
     HostSystem currentSystemStatus;
     HostSystem pendingSystemStatus;
     String password;
     String passphrase;
+    Long id;
     List<HostSystem> systemList = new ArrayList<HostSystem>();
     String terminalRefreshRate = AppConfigLkup.getProperty("terminalRefreshRate");
 
@@ -202,6 +202,33 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         return SUCCESS;
     }
 
+    @Action(value = "/admin/disconnectTerm")
+    public String disconnectTerm() {
+        Long sessionId = AuthUtil.getSessionId(servletRequest.getSession());
+        if (SecureShellAction.getUserSchSessionMap() != null) {
+            UserSchSessions userSchSessions = SecureShellAction.getUserSchSessionMap().get(sessionId);
+            if (userSchSessions != null) {
+                    SchSession schSession = userSchSessions.getSchSessionMap().get(id);
+
+                    //disconnect ssh session
+                    schSession.getChannel().disconnect();
+                    schSession.getSession().disconnect();
+                    schSession.setChannel(null);
+                    schSession.setSession(null);
+                    schSession.setInputToChannel(null);
+                    schSession.setCommander(null);
+                    schSession.setOutFromChannel(null);
+                    schSession = null;
+                    //remove from map
+                    userSchSessions.getSchSessionMap().remove(id);
+                }
+
+
+        }
+
+
+        return null;
+    }
 
     public List<SessionOutput> getOutputList() {
         return outputList;
@@ -227,13 +254,7 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         this.servletResponse = servletResponse;
     }
 
-    public List<Long> getIdList() {
-        return idList;
-    }
 
-    public void setIdList(List<Long> idList) {
-        this.idList = idList;
-    }
 
     public List<Long> getSystemSelectId() {
         return systemSelectId;
@@ -243,6 +264,13 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         this.systemSelectId = systemSelectId;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getPassword() {
         return password;
