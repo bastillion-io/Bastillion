@@ -22,6 +22,8 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+
+
 /**
  * Task to watch for output read from the ssh session stream
  */
@@ -37,19 +39,22 @@ public class SecureShellTask implements Runnable {
     }
 
     public void run() {
-        BufferedReader br = new BufferedReader(new InputStreamReader(outFromChannel));
+        InputStreamReader isr = new InputStreamReader(outFromChannel);
+        BufferedReader br = new BufferedReader(isr);
         try {
-            int value = 0;
-
 
             SessionOutputUtil.addOutput(sessionOutput.getSessionId(), sessionOutput);
 
-            while ((value = br.read()) != -1) {
-                // converts int to character
-                char c = (char) value;
-                SessionOutputUtil.addCharToOutput(sessionOutput.getSessionId(), sessionOutput.getHostSystemId(), c);
+            char[] buff = new char[1024];
+            int read;
+            while((read = br.read(buff)) != -1) {
 
+                SessionOutputUtil.addToOutput(sessionOutput.getSessionId(), sessionOutput.getHostSystemId(), buff,0,read);
+                Thread.sleep(50);
             }
+
+
+
             SessionOutputUtil.removeOutput(sessionOutput.getSessionId(), sessionOutput.getHostSystemId());
 
         } catch (Exception ex) {

@@ -15,10 +15,10 @@
  */
 package com.keybox.manage.util;
 
+import com.keybox.common.util.AppConfigLkup;
 import com.keybox.manage.db.SessionAuditDB;
 import com.keybox.manage.model.SessionOutput;
 import com.keybox.manage.model.UserSessionsOutput;
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
@@ -32,6 +32,7 @@ public class SessionOutputUtil {
 
 
     private static Map<Long, UserSessionsOutput> userSessionsOutputMap = new ConcurrentHashMap<Long, UserSessionsOutput>();
+    private static String enableAudit = AppConfigLkup.getProperty("enableAudit");
 
 
     /**
@@ -75,7 +76,7 @@ public class SessionOutputUtil {
             userSessionsOutputMap.put(sessionId, new UserSessionsOutput());
             userSessionsOutput = userSessionsOutputMap.get(sessionId);
         }
-        userSessionsOutput.getSessionOutputMap().put(sessionOutput.getHostSystemId(), sessionOutput);
+        userSessionsOutput.getSessionOutputMap().put(sessionOutput.getHostSystemId(), new StringBuilder());
 
 
     }
@@ -86,17 +87,16 @@ public class SessionOutputUtil {
      *
      * @param sessionId    session id
      * @param hostSystemId host system id
-     * @param c            character
+     * @param value        Array that is the source of characters
+     * @param offset       The initial offset
+     * @param count        The length
      */
-    public static void addCharToOutput(Long sessionId, Long hostSystemId, char c) {
+    public static void addToOutput(Long sessionId, Long hostSystemId, char value[], int offset, int count) {
 
 
         UserSessionsOutput userSessionsOutput = userSessionsOutputMap.get(sessionId);
         if (userSessionsOutput != null) {
-            SessionOutput sessionOutput = userSessionsOutput.getSessionOutputMap().get(hostSystemId);
-            if (sessionOutput != null) {
-                sessionOutput.setOutput(sessionOutput.getOutput() + Character.toString(c));
-            }
+            userSessionsOutput.getSessionOutputMap().get(hostSystemId).append(value, offset, count);
         }
 
     }
@@ -120,15 +120,22 @@ public class SessionOutputUtil {
 
                 //get output chars and set to output
                 try {
-                    SessionOutput sessionOutput = null;
-                    if (userSessionsOutput.getSessionOutputMap().get(key) != null) {
-                        sessionOutput = (SessionOutput) BeanUtils.cloneBean(userSessionsOutput.getSessionOutputMap().get(key));
+                    StringBuilder sb = userSessionsOutput.getSessionOutputMap().get(key);
+                    if (sb != null) {
+                        SessionOutput sessionOutput = new SessionOutput();
+                        sessionOutput.setSessionId(sessionId);
+                        sessionOutput.setHostSystemId(key);
+
+                        sessionOutput.setOutput(sb.toString());
+
                         if (StringUtils.isNotEmpty(sessionOutput.getOutput())) {
                             outputList.add(sessionOutput);
 
-                            SessionAuditDB.insertTerminalLog(con, sessionOutput);
+                            if ("true".equals(enableAudit)) {
+                                SessionAuditDB.insertTerminalLog(con, sessionOutput);
+                            }
 
-                            userSessionsOutput.getSessionOutputMap().get(key).setOutput("");
+                            userSessionsOutput.getSessionOutputMap().put(key, new StringBuilder());
                         }
                     }
                 } catch (Exception ex) {

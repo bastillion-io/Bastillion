@@ -26,8 +26,6 @@
 $(document).ready(function () {
 
 
-    $('#dummy').focus();
-
     $("#set_password_dialog").dialog({
         autoOpen: false,
         height: 225,
@@ -61,16 +59,7 @@ $(document).ready(function () {
 
     $(".termwrapper").sortable({
         zIndex: 10000,
-        helper: 'clone',
-        delay: 150,
-        placeholder: 'ui-state-highlight',
-        start: function (e, ui) {        // new lines to
-            $(ui.placeholder).slideUp(); // remove popping
-        },                             // effect on start
-        change: function (e, ui) {
-            $(ui.placeholder).hide().slideDown();
-        }
-
+        helper: 'clone'
     }).disableSelection();
 
 
@@ -176,47 +165,62 @@ $(document).ready(function () {
 
     <s:if test="pendingSystemStatus==null">
 
+    $('#dummy').focus();
     var keys = {};
 
-    $(document).keypress(function (e) {
-        var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
 
-        var idList = [];
-        $(".run_cmd_active").each(function (index) {
-            var id = $(this).attr("id").replace("run_cmd_", "");
-            idList.push(id);
-        });
-
-        if (String.fromCharCode(keyCode) && String.fromCharCode(keyCode) != ''
-                && !keys[91] && !keys[93] && !keys[224] && !keys[27]
-                && !keys[37] && !keys[38] && !keys[39] && !keys[40]
-                && !keys[13] && !keys[8] && !keys[9] && !keys[17]) {
-            var cmdStr = String.fromCharCode(keyCode);
-            connection.send(JSON.stringify({id: idList, command: cmdStr}));
-        }
-
+    var termFocus = true;
+    $("#match").focus(function () {
+        termFocus = false;
     });
-    //function for command keys (ie ESC, CTRL, etc..)
-    $(document).keydown(function (e) {
-        var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
-        keys[keyCode] = true;
-        //27 - ESC
-        //37 - LEFT
-        //38 - UP
-        //39 - RIGHT
-        //40 - DOWN
-        //13 - ENTER
-        //8 - DEL
-        //9 - TAB
-        //17 - CTRL
-        if (keys[27] || keys[37] || keys[38] || keys[39] || keys[40] || keys[13] || keys[8] || keys[9] || keys[17]) {
+    $("#match").blur(function () {
+        termFocus = true;
+    });
+
+
+    $(document).keypress(function (e) {
+        if (termFocus) {
+            var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
+
             var idList = [];
             $(".run_cmd_active").each(function (index) {
                 var id = $(this).attr("id").replace("run_cmd_", "");
                 idList.push(id);
             });
 
-            connection.send(JSON.stringify({id: idList, keyCode: keyCode}));
+            if (String.fromCharCode(keyCode) && String.fromCharCode(keyCode) != ''
+                    && !keys[91] && !keys[93] && !keys[224] && !keys[27]
+                    && !keys[37] && !keys[38] && !keys[39] && !keys[40]
+                    && !keys[13] && !keys[8] && !keys[9] && !keys[17]) {
+                var cmdStr = String.fromCharCode(keyCode);
+                connection.send(JSON.stringify({id: idList, command: cmdStr}));
+            }
+
+        }
+    });
+    //function for command keys (ie ESC, CTRL, etc..)
+    $(document).keydown(function (e) {
+        if (termFocus) {
+            var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
+            keys[keyCode] = true;
+            //27 - ESC
+            //37 - LEFT
+            //38 - UP
+            //39 - RIGHT
+            //40 - DOWN
+            //13 - ENTER
+            //8 - DEL
+            //9 - TAB
+            //17 - CTRL
+            if (keys[27] || keys[37] || keys[38] || keys[39] || keys[40] || keys[13] || keys[8] || keys[9] || keys[17]) {
+                var idList = [];
+                $(".run_cmd_active").each(function (index) {
+                    var id = $(this).attr("id").replace("run_cmd_", "");
+                    idList.push(id);
+                });
+
+                connection.send(JSON.stringify({id: idList, keyCode: keyCode}));
+            }
         }
 
     });
@@ -224,12 +228,18 @@ $(document).ready(function () {
     $(document).keyup(function (e) {
         var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
         delete keys[keyCode];
-        $('#dummy').focus();
+        if (termFocus) {
+            $('#dummy').focus();
+        }
     });
 
     $(document).click(function (e) {
-        $('#dummy').focus();
+        if (!$(e.target).is('#match')) {
+            $('#dummy').focus();
+        }
+
     });
+
 
     //get cmd text from paste
     $("#dummy").bind('paste', function (e) {
@@ -282,24 +292,91 @@ $(document).ready(function () {
 
     };
 
-    setInterval(function () {
-        try {
-            connection.send('');
-        } catch (ex) {
+    $('#match_btn').unbind().click(function () {
+        $('#match_frm').submit();
+    });
+
+    $('#match_frm').submit(function () {
+        runRegExMatch();
+        return false;
+    });
+
+
+    var matchFunction = null;
+
+    function runRegExMatch() {
+
+        if ($('#match_btn').hasClass('btn-success')) {
+
+            $('#match_btn').switchClass('btn-success', 'btn-danger', 0);
+            $('#match_btn').text("Stop");
+
+            matchFunction = setInterval(function () {
+
+                var termMap = [];
+                var existingTerms = [];
+                $(".run_cmd").each(function () {
+                    var matchRegEx = null;
+                    try {
+                        matchRegEx = new RegExp($('#match').val(), 'g');
+                    } catch (ex) {
+                    }
+                    if (matchRegEx != null) {
+                        var attrId = $(this).attr("id");
+                        if (attrId && attrId != '') {
+                            var id = attrId.replace("run_cmd_", "");
+
+                            var match = $('#output_' + id + ' > .terminal').text().match(matchRegEx);
+
+                            if (match != null) {
+                                termMap.push({id: id, no_matches: match.length});
+                            }
+                            existingTerms.push({id: id});
+                        }
+                    }
+                });
+
+
+                var sorted = termMap.slice(0).sort(function (a, b) {
+                    return a.no_matches - b.no_matches;
+                });
+
+
+                for (var i = 0; i < sorted.length; ++i) {
+                    var termId = sorted[i].id;
+                    $('#run_cmd_' + termId).prependTo('.termwrapper');
+                    if (sorted[sorted.length - i - 1].id != existingTerms[i].id) {
+                        $('#run_cmd_' + termId).fadeTo(100, .5).fadeTo(100, 1);
+                    }
+                }
+
+
+            }, 5000);
+
+
+        } else {
+            $('#match_btn').switchClass('btn-danger', 'btn-success', 0);
+            $('#match_btn').text("Start");
+            clearInterval(matchFunction)
         }
-    }, <s:property value="terminalRefreshRate"/>);
+
+    }
+
 
     </s:if>
 
 });
+
+
 </script>
 
 <style>
     .dragdropHover {
         background-color: red;
     }
-    .droppable {
-        padding: 10px 2px 2px 10px;
+
+    .align-right {
+        padding: 10px 2px 10px 10px;
         float: right;
     }
 </style>
@@ -328,21 +405,42 @@ $(document).ready(function () {
                         <li><a id="upload_push" href="#">Upload &amp; Push</a></li>
                         <li><a href="exitTerms.action">Exit Terminals</a></li>
                     </ul>
-                    <div class="droppable">
+                    <div class="droppable align-right">
                         <a href="#" title="Drag to disconnect">
                             <img src="<%= request.getContextPath() %>/img/disconnect.png"/></a></div>
-                    <div class="note">Use CMD-Click or CTRL-Click to select multiple individual terminals<br/>Drag terminal window to icon to disconnect</div>
+                    <div class="note">Use CMD-Click or CTRL-Click to select multiple individual terminals<br/>Drag
+                        terminal window to icon to disconnect
+                    </div>
                     <div class="clear"></div>
                 </s:if>
             </div>
             <!--/.nav-collapse -->
         </div>
     </div>
-    <div style="float:right;"><textarea name="dummy" id="dummy" size="1"
-                                        style="border:none;color:#FFFFFF;width:1px;height:1px"></textarea></div>
-    <div style="float:right;"><input type="text" name="dummy2" id="dummy2" size="1"
-                                     style="border:none;color:#FFFFFF;width:1px;height:1px"/>
+    <div class="container">
+
+        <div class="align-right">
+
+            <div style="float:right;margin:0;padding:0">
+                <textarea name="dummy" id="dummy" size="1"
+                          style="border:none;color:#FFFFFF;width:1px;height:1px"></textarea>
+                <input type="text" name="dummy2" id="dummy2" size="1"
+                       style="border:none;color:#FFFFFF;width:1px;height:1px"/>
+            </div>
+            <div style="float:right">
+                <s:form id="match_frm" theme="simple">
+                    <label>Sort By</label>&nbsp;&nbsp;<s:textfield id="match" name="match" placeholder="Bring terminals to top that match RegExp"
+                                 size="40"
+                                 theme="simple"/>
+                    <div id="match_btn" class="btn btn-success">Start</div>
+                </s:form>
+            </div>
+
+
+        </div>
+
     </div>
+
     <div class="container" style="width:100%;padding: 0px; margin: 0px;border:none;">
 
 

@@ -24,25 +24,10 @@ import java.util.List;
  */
 public class SessionOutput {
     Long sessionId;
-    Long userId;
     Long hostSystemId;
-    String output="";
+    String output;
 
-    public String getOutput() {
-        return output;
-    }
 
-    public void setOutput(String output) {
-        this.output = output;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
 
     public Long getHostSystemId() {
         return hostSystemId;
@@ -58,5 +43,14 @@ public class SessionOutput {
 
     public void setSessionId(Long sessionId) {
         this.sessionId = sessionId;
+    }
+
+
+    public String getOutput() {
+        return output;
+    }
+
+    public void setOutput(String output) {
+        this.output = output;
     }
 }

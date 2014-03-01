@@ -19,9 +19,8 @@ import com.google.gson.Gson;
 import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.action.SecureShellAction;
 import com.keybox.manage.model.SchSession;
-import com.keybox.manage.model.SessionOutput;
 import com.keybox.manage.model.UserSchSessions;
-import com.keybox.manage.util.DBUtils;
+import com.keybox.manage.task.SentOutputTask;
 import com.keybox.manage.util.SessionOutputUtil;
 import org.apache.commons.lang3.StringUtils;
 
@@ -29,10 +28,8 @@ import javax.servlet.http.HttpSession;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -45,23 +42,7 @@ public class SecureShellWS {
     private Session session;
     private Long sessionId = null;
 
-    /**
-     * sends output to socket
-     */
-    private void sendOutput() {
-        Connection con = DBUtils.getConn();
-        try {
-            List<SessionOutput> outputList = SessionOutputUtil.getOutput(con, sessionId);
-            if (outputList != null && !outputList.isEmpty()) {
-                String json = new Gson().toJson(outputList);
-                //send json to session
-                this.session.getBasicRemote().sendText(json);
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        DBUtils.closeConn(con);
-    }
+
 
     @OnOpen
     public void onOpen(Session session, EndpointConfig config) {
@@ -70,6 +51,10 @@ public class SecureShellWS {
         this.httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
         this.sessionId = AuthUtil.getSessionId(httpSession);
         this.session = session;
+
+        Runnable run=new SentOutputTask(sessionId, session);
+        Thread thread = new Thread(run);
+        thread.start();
 
     }
 
@@ -117,8 +102,6 @@ public class SecureShellWS {
                 AuthUtil.setTimeout(httpSession);
 
 
-            } else {
-                this.sendOutput();
             }
         }
 

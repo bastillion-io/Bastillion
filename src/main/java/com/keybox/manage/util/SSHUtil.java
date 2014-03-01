@@ -74,6 +74,7 @@ public class SSHUtil {
             executor.execute(cmdLine);
             publicKey = out.toString();
         } catch (ExecuteException ex) {
+            ex.printStackTrace();
             System.out.println(out.toString());
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -108,6 +109,7 @@ public class SSHUtil {
             executor.execute(cmdLine);
             privateKey = out.toString();
         } catch (ExecuteException ex) {
+            ex.printStackTrace();
             System.out.println(out.toString());
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -136,8 +138,9 @@ public class SSHUtil {
         Map<String, String> replaceMap = new HashMap<String, String>();
         replaceMap.put("keyPath", KEY_PATH);
         replaceMap.put("keyName", KEY_NAME);
-        replaceMap.put("pubKeyPath", KEY_PATH);
-        replaceMap.put("pubKeyName", PUB_KEY_NAME);
+        //replaceMap.put("pubKeyPath", KEY_PATH);
+        //replaceMap.put("pubKeyName", PUB_KEY_NAME);
+
         //delete previous ssh keys
         String cmdStr = AppConfigLkup.getProperty("deleteSshKeys", replaceMap);
 
@@ -150,6 +153,7 @@ public class SSHUtil {
         try {
             executor.execute(cmdLine);
         } catch (ExecuteException ex) {
+            ex.printStackTrace();
             System.out.println(out.toString());
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -188,6 +192,7 @@ public class SSHUtil {
         try {
             executor.execute(cmdLine);
         } catch (ExecuteException ex) {
+            ex.printStackTrace();
             System.out.println(out.toString());
         } catch (IOException ex) {
             ex.printStackTrace();
@@ -412,7 +417,6 @@ public class SSHUtil {
 
             //new session output
             SessionOutput sessionOutput=new SessionOutput();
-            sessionOutput.setUserId(userId);
             sessionOutput.setHostSystemId(hostSystem.getId());
             sessionOutput.setSessionId(sessionId);
 

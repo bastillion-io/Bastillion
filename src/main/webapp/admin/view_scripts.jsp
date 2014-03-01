@@ -135,10 +135,14 @@
                     <s:iterator var="script" value="sortedSet.itemList" status="stat">
                     <tr>
                         <td>
-                                <a title="Execute Script" href="viewSystems.action?script.id=<s:property value="id"/>""><s:property value="displayNm"/></a>
+                                <a href="viewSystems.action?script.id=<s:property value="id"/>"><s:property value="displayNm"/></a>
                         </td>
                             <td>
-                                <div style="width:120px">
+                                <div style="width:240px">
+                                <a href="viewSystems.action?script.id=<s:property value="id"/>">
+                                <div id="exec_btn_<s:property value="id"/>" class="btn btn-default edit_btn" style="float:left">
+                                    Execute Script
+                                </div></a>
                                 <div id="edit_btn_<s:property value="id"/>" class="btn btn-default edit_btn" style="float:left">
                                     Edit
                                 </div>

@@ -101,6 +101,9 @@
                         </td>
 
                         <td>
+
+                            <a href="viewProfileSystems.action?profile.id=<s:property value="id"/>">
+                            <div id="assign_btn_<s:property value="id"/>" class="btn btn-default edit_btn" style="float:left">Assign Systems</div></a>
                             <div id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn">Delete</div>
 
                         </td>

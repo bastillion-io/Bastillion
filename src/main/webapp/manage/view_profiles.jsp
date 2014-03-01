@@ -149,11 +149,11 @@
                         </td>
 
                         <td>
-                            <div style="width:150px">
-                                <div id="edit_btn_<s:property value="id"/>" class="btn btn-default edit_btn" style="float:left">Edit
-                                </div>
-                                <div id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn" style="float:left">Delete
-                                </div>
+                            <div style="width:240px">
+                                <a href="viewProfileSystems.action?profile.id=<s:property value="id"/>">
+                                <div id="assign_btn_<s:property value="id"/>" class="btn btn-default edit_btn" style="float:left">Assign Systems</div></a>
+                                <div id="edit_btn_<s:property value="id"/>" class="btn btn-default edit_btn" style="float:left">Edit</div>
+                                <div id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn" style="float:left">Delete</div>
                                 <div style="clear:both"/>
                             </div>
                         </td>

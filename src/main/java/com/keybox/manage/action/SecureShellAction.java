@@ -15,7 +15,6 @@
  */
 package com.keybox.manage.action;
 
-import com.keybox.common.util.AppConfigLkup;
 import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.db.*;
 import com.keybox.manage.model.*;
@@ -49,7 +48,6 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
     String passphrase;
     Long id;
     List<HostSystem> systemList = new ArrayList<HostSystem>();
-    String terminalRefreshRate = AppConfigLkup.getProperty("terminalRefreshRate");
 
     static Map<Long, UserSchSessions> userSchSessionMap = new ConcurrentHashMap<Long, UserSchSessions>();
 
@@ -254,8 +252,6 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         this.servletResponse = servletResponse;
     }
 
-
-
     public List<Long> getSystemSelectId() {
         return systemSelectId;
     }
@@ -336,13 +332,6 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         SecureShellAction.userSchSessionMap = userSchSessionMap;
     }
 
-    public String getTerminalRefreshRate() {
-        return terminalRefreshRate;
-    }
-
-    public void setTerminalRefreshRate(String terminalRefreshRate) {
-        this.terminalRefreshRate = terminalRefreshRate;
-    }
 }
 
 
