@@ -25,16 +25,6 @@
 <script src="<%= request.getContextPath() %>/_res/js/tty/terms.js"></script>
 <script src="<%= request.getContextPath() %>/_res/js/bootstrap.js"></script>
 
-  <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-  <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-  <![endif]-->
-
-
-
-
-
 <link rel="stylesheet" href="<%= request.getContextPath() %>/_res/css/jquery-ui/base/jquery-ui.css"/>
 <link rel="stylesheet" href="<%= request.getContextPath() %>/_res/css/bootstrap.css"/>
 <link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/_res/css/keybox.css"/>
