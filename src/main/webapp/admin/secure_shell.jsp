@@ -429,9 +429,10 @@ $(document).ready(function () {
             </div>
             <div style="float:right">
                 <s:form id="match_frm" theme="simple">
-                    <label>Sort By</label>&nbsp;&nbsp;<s:textfield id="match" name="match" placeholder="Bring terminals to top that match RegExp"
-                                 size="40"
-                                 theme="simple"/>
+                    <label>Sort By</label>&nbsp;&nbsp;<s:textfield id="match" name="match"
+                                                                   placeholder="Bring terminals to top that match RegExp"
+                                                                   size="40"
+                                                                   theme="simple"/>
                     <div id="match_btn" class="btn btn-success">Start</div>
                 </s:form>
             </div>
@@ -459,69 +460,6 @@ $(document).ready(function () {
         </div>
 
 
-        <div id="set_password_dialog" title="Enter Password">
-            <p class="error"><s:property value="pendingSystemStatus.errorMsg"/></p>
-
-            <p>Enter password for <s:property value="pendingSystemStatus.displayLabel"/>
-
-            </p>
-            <s:form id="password_frm" action="createTerms">
-                <s:hidden name="pendingSystemStatus.id"/>
-                <s:password name="password" label="Password" size="15" value="" autocomplete="off"/>
-                <s:if test="script!=null">
-                    <s:hidden name="script.id"/>
-                </s:if>
-                <tr>
-                    <td>&nbsp;</td>
-                    <td align="left">
-                        <div class="btn btn-default submit_btn">Submit</div>
-                        <div class="btn btn-default cancel_btn">Cancel</div>
-                    </td>
-                </tr>
-            </s:form>
-        </div>
-
-        <div id="set_passphrase_dialog" title="Enter Passphrase">
-            <p class="error"><s:property value="pendingSystemStatus.errorMsg"/></p>
-
-            <p>Enter passphrase for <s:property value="pendingSystemStatus.displayLabel"/></p>
-            <s:form id="passphrase_frm" action="createTerms">
-                <s:hidden name="pendingSystemStatus.id"/>
-                <s:password name="passphrase" label="Passphrase" size="15" value="" autocomplete="off"/>
-                <s:if test="script!=null">
-                    <s:hidden name="script.id"/>
-                </s:if>
-                <tr>
-                    <td>&nbsp;</td>
-                    <td align="left">
-                        <div class="btn btn-default submit_btn">Submit</div>
-                        <div class="btn btn-default cancel_btn">Cancel</div>
-                    </td>
-                </tr>
-            </s:form>
-        </div>
-
-
-        <div id="error_dialog" title="Error">
-            <p class="error">Error: <s:property value="currentSystemStatus.errorMsg"/></p>
-
-            <p>System: <s:property value="currentSystemStatus.displayLabel"/>
-
-            </p>
-
-            <s:form id="error_frm" action="createTerms">
-                <s:hidden name="pendingSystemStatus.id"/>
-                <s:if test="script!=null">
-                    <s:hidden name="script.id"/>
-                </s:if>
-                <tr>
-                    <td colspan="2">
-                        <div class="btn btn-default submit_btn">OK</div>
-                    </td>
-                </tr>
-            </s:form>
-        </div>
-
         <div id="upload_push_dialog" title="Upload &amp; Push">
             <iframe id="upload_push_frame" width="700px" height="300px" style="border: none;">
 
@@ -530,13 +468,6 @@ $(document).ready(function () {
 
         </div>
 
-
-        <s:form id="composite_terms_frm" action="createTerms">
-            <s:hidden name="pendingSystemStatus.id"/>
-            <s:if test="script!=null">
-                <s:hidden name="script.id"/>
-            </s:if>
-        </s:form>
 
     </div>
 </s:if>
@@ -550,6 +481,74 @@ $(document).ready(function () {
     </div>
 </s:else>
 
+<div id="set_password_dialog" title="Enter Password">
+    <p class="error"><s:property value="pendingSystemStatus.errorMsg"/></p>
+
+    <p>Enter password for <s:property value="pendingSystemStatus.displayLabel"/>
+
+    </p>
+    <s:form id="password_frm" action="createTerms">
+        <s:hidden name="pendingSystemStatus.id"/>
+        <s:password name="password" label="Password" size="15" value="" autocomplete="off"/>
+        <s:if test="script!=null">
+            <s:hidden name="script.id"/>
+        </s:if>
+        <tr>
+            <td>&nbsp;</td>
+            <td align="left">
+                <div class="btn btn-default submit_btn">Submit</div>
+                <div class="btn btn-default cancel_btn">Cancel</div>
+            </td>
+        </tr>
+    </s:form>
+</div>
+
+<div id="set_passphrase_dialog" title="Enter Passphrase">
+    <p class="error"><s:property value="pendingSystemStatus.errorMsg"/></p>
+
+    <p>Enter passphrase for <s:property value="pendingSystemStatus.displayLabel"/></p>
+    <s:form id="passphrase_frm" action="createTerms">
+        <s:hidden name="pendingSystemStatus.id"/>
+        <s:password name="passphrase" label="Passphrase" size="15" value="" autocomplete="off"/>
+        <s:if test="script!=null">
+            <s:hidden name="script.id"/>
+        </s:if>
+        <tr>
+            <td>&nbsp;</td>
+            <td align="left">
+                <div class="btn btn-default submit_btn">Submit</div>
+                <div class="btn btn-default cancel_btn">Cancel</div>
+            </td>
+        </tr>
+    </s:form>
+</div>
+
+<div id="error_dialog" title="Error">
+    <p class="error">Error: <s:property value="currentSystemStatus.errorMsg"/></p>
+
+    <p>System: <s:property value="currentSystemStatus.displayLabel"/>
+
+    </p>
+
+    <s:form id="error_frm" action="createTerms">
+        <s:hidden name="pendingSystemStatus.id"/>
+        <s:if test="script!=null">
+            <s:hidden name="script.id"/>
+        </s:if>
+        <tr>
+            <td colspan="2">
+                <div class="btn btn-default submit_btn">OK</div>
+            </td>
+        </tr>
+    </s:form>
+</div>
+
+<s:form id="composite_terms_frm" action="createTerms">
+    <s:hidden name="pendingSystemStatus.id"/>
+    <s:if test="script!=null">
+        <s:hidden name="script.id"/>
+    </s:if>
+</s:form>
 
 </body>
 </html>

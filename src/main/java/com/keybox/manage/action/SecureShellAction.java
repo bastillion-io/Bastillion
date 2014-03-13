@@ -91,7 +91,6 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
 
             } else {
 
-
                 pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
                 //if success loop through systems until finished or need password
                 while (pendingSystemStatus != null && currentSystemStatus != null && HostSystem.SUCCESS_STATUS.equals(currentSystemStatus.getStatusCd())) {
@@ -103,36 +102,9 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
             }
 
         }
+        //set system list if no pending systems
         if (SystemStatusDB.getNextPendingSystem(userId) == null) {
-
-
-            //check user map
-            if (userSchSessionMap != null && !userSchSessionMap.isEmpty()) {
-
-                //get user sessions
-                Map<Long, SchSession> schSessionMap = userSchSessionMap.get(sessionId).getSchSessionMap();
-
-
-                for (SchSession schSession : schSessionMap.values()) {
-                    //add to host system list
-                    systemList.add(schSession.getHostSystem());
-                    //run script it exists
-                    if (script != null && script.getId() != null && script.getId() > 0) {
-                        script = ScriptDB.getScript(script.getId(), userId);
-                        BufferedReader reader = new BufferedReader(new StringReader(script.getScript()));
-                        String line;
-                        try {
-
-                            while ((line = reader.readLine()) != null) {
-                                schSession.getCommander().println(line);
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-
-                        }
-                    }
-                }
-            }
+            setSystemList(userId, sessionId);
         }
 
 
@@ -156,6 +128,11 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         SystemDB.updateSystem(currentSystemStatus);
 
         pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
+
+        //set system list if no pending systems
+        if (pendingSystemStatus == null) {
+            setSystemList(userId, AuthUtil.getSessionId(servletRequest.getSession()));
+        }
 
         return SUCCESS;
     }
@@ -206,26 +183,65 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         if (SecureShellAction.getUserSchSessionMap() != null) {
             UserSchSessions userSchSessions = SecureShellAction.getUserSchSessionMap().get(sessionId);
             if (userSchSessions != null) {
-                    SchSession schSession = userSchSessions.getSchSessionMap().get(id);
+                SchSession schSession = userSchSessions.getSchSessionMap().get(id);
 
-                    //disconnect ssh session
-                    schSession.getChannel().disconnect();
-                    schSession.getSession().disconnect();
-                    schSession.setChannel(null);
-                    schSession.setSession(null);
-                    schSession.setInputToChannel(null);
-                    schSession.setCommander(null);
-                    schSession.setOutFromChannel(null);
-                    schSession = null;
-                    //remove from map
-                    userSchSessions.getSchSessionMap().remove(id);
-                }
+                //disconnect ssh session
+                schSession.getChannel().disconnect();
+                schSession.getSession().disconnect();
+                schSession.setChannel(null);
+                schSession.setSession(null);
+                schSession.setInputToChannel(null);
+                schSession.setCommander(null);
+                schSession.setOutFromChannel(null);
+                schSession = null;
+                //remove from map
+                userSchSessions.getSchSessionMap().remove(id);
+            }
 
 
         }
 
 
         return null;
+    }
+
+    /**
+     * set system list once all connections have been attempted
+     *
+     * @param userId    user id
+     * @param sessionId session id
+     */
+    private void setSystemList(Long userId, Long sessionId) {
+
+
+        //check user map
+        if (userSchSessionMap != null && !userSchSessionMap.isEmpty() && userSchSessionMap.get(sessionId)!=null) {
+
+            //get user sessions
+            Map<Long, SchSession> schSessionMap = userSchSessionMap.get(sessionId).getSchSessionMap();
+
+
+            for (SchSession schSession : schSessionMap.values()) {
+                //add to host system list
+                systemList.add(schSession.getHostSystem());
+                //run script it exists
+                if (script != null && script.getId() != null && script.getId() > 0) {
+                    script = ScriptDB.getScript(script.getId(), userId);
+                    BufferedReader reader = new BufferedReader(new StringReader(script.getScript()));
+                    String line;
+                    try {
+
+                        while ((line = reader.readLine()) != null) {
+                            schSession.getCommander().println(line);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+
+                    }
+                }
+            }
+        }
+
     }
 
     public List<SessionOutput> getOutputList() {
