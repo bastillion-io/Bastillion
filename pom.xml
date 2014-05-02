@@ -77,7 +77,6 @@
 
     </dependencies>
 
-
     <build>
         <plugins>
             <plugin>
@@ -101,7 +100,6 @@
                     <jettyXml>${basedir}/src/test/resources/jetty.xml,${basedir}/src/test/resources/jetty-ssl.xml,${basedir}/src/test/resources/jetty-https.xml</jettyXml>
                     <scanIntervalSeconds>-1</scanIntervalSeconds>
                 </configuration>
-
             </plugin>
         </plugins>
     </build>
