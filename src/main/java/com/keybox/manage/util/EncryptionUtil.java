@@ -16,10 +16,12 @@
 package com.keybox.manage.util;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.MessageDigest;
+import java.security.SecureRandom;
 
 /**
  * Utility to encrypt, decrypt, and hash
@@ -29,6 +31,39 @@ public class EncryptionUtil {
     //secret key
     private static final byte[] key = new byte[]{'d', '3', '2', 't', 'p', 'd', 'M', 'o', 'I', '8', 'x', 'z', 'a', 'P', 'o', 'd'};
 
+    /**
+     * generate salt for hash
+     *
+     * @return salt
+     */
+    public static String generateSalt() {
+        byte[] salt = new byte[32];
+        SecureRandom secureRandom = new SecureRandom();
+        secureRandom.nextBytes(salt);
+        return new String(Base64.encodeBase64(salt));
+    }
+
+    /**
+     * return hash value of string
+     *
+     * @param str  unhashed string
+     * @param salt salt for hash
+     * @return hash value of string
+     */
+    public static String hash(String str, String salt) {
+        String hash = null;
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            if (StringUtils.isNotEmpty(salt)) {
+                md.update(Base64.decodeBase64(salt.getBytes()));
+            }
+            md.update(str.getBytes("UTF-8"));
+            hash = new String(Base64.encodeBase64(md.digest()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return hash;
+    }
 
     /**
      * return hash value of string
@@ -37,15 +72,7 @@ public class EncryptionUtil {
      * @return hash value of string
      */
     public static String hash(String str) {
-        String hash = null;
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            md.update(str.getBytes("UTF-8"));
-            hash = new String(Base64.encodeBase64(md.digest()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return hash;
+        return hash(str, null);
     }
 
     /**

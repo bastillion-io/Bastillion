@@ -30,6 +30,7 @@ public class Auth {
     String passwordConfirm;
     String prevPassword;
     String authToken;
+    String salt;
     String userType=ADMINISTRATOR;
 
     public String getUsername() {
@@ -86,5 +87,13 @@ public class Auth {
 
     public void setUserType(String userType) {
         this.userType = userType;
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 }

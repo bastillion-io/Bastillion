@@ -15,7 +15,7 @@
  */
 package com.keybox.manage.action;
 
-import com.keybox.common.util.AppConfigLkup;
+import com.keybox.common.util.AppConfig;
 import com.keybox.manage.db.SessionAuditDB;
 import com.keybox.manage.model.SessionAudit;
 import com.keybox.manage.model.SortedSet;
@@ -37,7 +37,7 @@ public class SessionAuditAction extends ActionSupport implements ServletResponse
     Long hostSystemId;
     SessionAudit sessionAudit;
     HttpServletResponse servletResponse;
-    String enableAudit = AppConfigLkup.getProperty("enableAudit");
+    String enableAudit = AppConfig.getProperty("enableAudit");
 
     @Action(value = "/manage/viewSessions",
             results = {

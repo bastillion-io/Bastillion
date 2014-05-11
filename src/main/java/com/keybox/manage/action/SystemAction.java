@@ -16,14 +16,12 @@
 package com.keybox.manage.action;
 
 import com.keybox.common.util.AuthUtil;
-import com.keybox.manage.db.PrivateKeyDB;
 import com.keybox.manage.db.ScriptDB;
 import com.keybox.manage.db.SystemDB;
 import com.keybox.manage.model.Auth;
 import com.keybox.manage.model.HostSystem;
 import com.keybox.manage.model.Script;
 import com.keybox.manage.model.SortedSet;
-import com.keybox.manage.util.EncryptionUtil;
 import com.keybox.manage.util.SSHUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;

@@ -15,7 +15,7 @@
  */
 package com.keybox.manage.util;
 
-import com.keybox.common.util.AppConfigLkup;
+import com.keybox.common.util.AppConfig;
 import com.keybox.manage.db.SessionAuditDB;
 import com.keybox.manage.model.SessionOutput;
 import com.keybox.manage.model.UserSessionsOutput;
@@ -32,7 +32,7 @@ public class SessionOutputUtil {
 
 
     private static Map<Long, UserSessionsOutput> userSessionsOutputMap = new ConcurrentHashMap<Long, UserSessionsOutput>();
-    private static String enableAudit = AppConfigLkup.getProperty("enableAudit");
+    private static String enableAudit = AppConfig.getProperty("enableAudit");
 
 
     /**

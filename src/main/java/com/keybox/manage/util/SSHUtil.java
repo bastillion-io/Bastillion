@@ -16,7 +16,7 @@
 package com.keybox.manage.util;
 
 import com.jcraft.jsch.*;
-import com.keybox.common.util.AppConfigLkup;
+import com.keybox.common.util.AppConfig;
 import com.keybox.manage.db.PrivateKeyDB;
 import com.keybox.manage.db.PublicKeyDB;
 import com.keybox.manage.db.SystemDB;
@@ -27,6 +27,7 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.PumpStreamHandler;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.util.HashMap;
@@ -38,12 +39,17 @@ import java.util.UUID;
  */
 public class SSHUtil {
 
-    //private key name
-    public static final String KEY_NAME = "id_dsa";
-    //public key name
-    public static final String PUB_KEY_NAME = KEY_NAME + ".pub";
+
+
+
     //system path to public/private key
     public static String KEY_PATH = DBUtils.class.getClassLoader().getResource("com/keybox/common/db").getPath();
+
+    //private key name
+    public static final String PVT_KEY = KEY_PATH + "/id_dsa";
+    //public key name
+    public static final String PUB_KEY = KEY_PATH + "/id_dsa.pub";
+
 
     public static final int SESSION_TIMEOUT = 60000;
     public static final int CHANNEL_TIMEOUT = 60000;
@@ -59,10 +65,9 @@ public class SSHUtil {
 
         //get ssh-keygen cmd from properties file
         Map<String, String> replaceMap = new HashMap<String, String>();
-        replaceMap.put("pubKeyPath", KEY_PATH);
-        replaceMap.put("pubKeyName", PUB_KEY_NAME);
+        replaceMap.put("pubKey", PUB_KEY);
         //cat public ssh key
-        String cmdStr = AppConfigLkup.getProperty("catPublicKeyCmd", replaceMap);
+        String cmdStr = AppConfig.getProperty("setPublicKeyCmd", replaceMap);
 
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -94,11 +99,10 @@ public class SSHUtil {
 
         //get ssh-keygen cmd from properties file
         Map<String, String> replaceMap = new HashMap<String, String>();
-        replaceMap.put("keyPath", KEY_PATH);
-        replaceMap.put("keyName", KEY_NAME);
-        //cat public ssh key
-        String cmdStr = AppConfigLkup.getProperty("catPrivateKeyCmd", replaceMap);
+        replaceMap.put("pvtKey", PVT_KEY);
 
+        //cat public ssh key
+        String cmdStr = AppConfig.getProperty("setPrivateKeyCmd", replaceMap);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         CommandLine cmdLine = CommandLine.parse(cmdStr);
@@ -123,43 +127,53 @@ public class SSHUtil {
      * @return passphrase for system generated key
      */
     public static String keyGen() {
-        return keyGen(null);
+
+
+        //get passphrase cmd from properties file
+        Map<String, String> replaceMap = new HashMap<String, String>();
+        replaceMap.put("randomPassphrase", UUID.randomUUID().toString());
+
+        String passphrase= AppConfig.getProperty("defaultSSHPassphrase", replaceMap);
+
+        AppConfig.updateProperty("defaultSSHPassphrase", "${randomPassphrase}");
+
+        return keyGen(passphrase);
 
     }
 
     /**
      * delete SSH keys
-     *
      */
     public static void deleteSshKeys() {
 
 
         //get ssh-keygen cmd from properties file
         Map<String, String> replaceMap = new HashMap<String, String>();
-        replaceMap.put("keyPath", KEY_PATH);
-        replaceMap.put("keyName", KEY_NAME);
-        //replaceMap.put("pubKeyPath", KEY_PATH);
-        //replaceMap.put("pubKeyName", PUB_KEY_NAME);
+        replaceMap.put("pvtKey", PVT_KEY);
+        replaceMap.put("pubKey", PUB_KEY);
 
         //delete previous ssh keys
-        String cmdStr = AppConfigLkup.getProperty("deleteSshKeys", replaceMap);
+        String cmdStr = AppConfig.getProperty("deleteSSHKeys", replaceMap);
+        if (StringUtils.isNotEmpty(cmdStr)) {
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        CommandLine cmdLine = CommandLine.parse(cmdStr);
-        DefaultExecutor executor = new DefaultExecutor();
-        PumpStreamHandler streamHandler = new PumpStreamHandler(out);
-        executor.setStreamHandler(streamHandler);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            CommandLine cmdLine = CommandLine.parse(cmdStr);
+            DefaultExecutor executor = new DefaultExecutor();
+            PumpStreamHandler streamHandler = new PumpStreamHandler(out);
+            executor.setStreamHandler(streamHandler);
 
-        try {
-            executor.execute(cmdLine);
-        } catch (ExecuteException ex) {
-            ex.printStackTrace();
-            System.out.println(out.toString());
-        } catch (IOException ex) {
-            ex.printStackTrace();
+            try {
+                executor.execute(cmdLine);
+            } catch (ExecuteException ex) {
+                ex.printStackTrace();
+                System.out.println(out.toString());
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+
         }
-
     }
+
     /**
      * generates system's public/private key par and returns passphrase
      *
@@ -167,37 +181,33 @@ public class SSHUtil {
      */
     public static String keyGen(String passphrase) {
 
-
         deleteSshKeys();
-
-        //if no passphrase set to random GUID
-        if (passphrase == null || passphrase.trim().equals("")) {
-            passphrase = UUID.randomUUID().toString();
-        }
 
         //get ssh-keygen cmd from properties file
         Map<String, String> replaceMap = new HashMap<String, String>();
-        replaceMap.put("keyPath", KEY_PATH);
-        replaceMap.put("keyName", KEY_NAME);
+        replaceMap.put("pvtKey", PVT_KEY);
+        replaceMap.put("pubKey", PUB_KEY);
         replaceMap.put("passphrase", passphrase);
         //create new ssh keys
-        String cmdStr = AppConfigLkup.getProperty("sshKeyGenCmd", replaceMap);
+        String cmdStr = AppConfig.getProperty("sshKeyGenCmd", replaceMap);
+        if (StringUtils.isNotEmpty(cmdStr)) {
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        CommandLine cmdLine = CommandLine.parse(cmdStr);
-        DefaultExecutor executor = new DefaultExecutor();
-        PumpStreamHandler streamHandler = new PumpStreamHandler(out);
-        executor.setStreamHandler(streamHandler);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            CommandLine cmdLine = CommandLine.parse(cmdStr);
+            DefaultExecutor executor = new DefaultExecutor();
+            PumpStreamHandler streamHandler = new PumpStreamHandler(out);
+            executor.setStreamHandler(streamHandler);
 
-        try {
-            executor.execute(cmdLine);
-        } catch (ExecuteException ex) {
-            ex.printStackTrace();
-            System.out.println(out.toString());
-        } catch (IOException ex) {
-            ex.printStackTrace();
+            try {
+                executor.execute(cmdLine);
+            } catch (ExecuteException ex) {
+                ex.printStackTrace();
+                System.out.println(out.toString());
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+
         }
-
 
         return passphrase;
 
@@ -223,6 +233,10 @@ public class SSHUtil {
             //check to see if passphrase has been provided
             if (passphrase == null || passphrase.trim().equals("")) {
                 passphrase = appKey.getPassphrase();
+                //check for null inorder to use key without passphrase
+                if(passphrase==null){
+                    passphrase="";
+                }
             }
             //add private key
             jsch.addIdentity(appKey.getId().toString(), appKey.getPrivateKey().trim().getBytes(), appKey.getPublicKey().getBytes(), passphrase.getBytes());
@@ -319,8 +333,8 @@ public class SSHUtil {
     /**
      * distributes authorized keys for host system
      *
-     * @param hostSystem object contains host system information
-     * @param session    an established SSH session
+     * @param hostSystem   object contains host system information
+     * @param session      an established SSH session
      * @param appPublicKey application public key value
      * @return status of key distribution
      */
@@ -342,12 +356,12 @@ public class SSHUtil {
             //return public key list into a input stream
             String authorizedKeys = hostSystem.getAuthorizedKeys().replaceAll("~\\/|~", "");
 
-            String keyValue=appPublicKey.replace("\n", "").trim();
+            String keyValue = appPublicKey.replace("\n", "").trim();
 
-            for(String str : PublicKeyDB.getPublicKeysForSystem(hostSystem.getId())){
-                keyValue=keyValue+"\n" +str.replace("\n", "").trim();
+            for (String str : PublicKeyDB.getPublicKeysForSystem(hostSystem.getId())) {
+                keyValue = keyValue + "\n" + str.replace("\n", "").trim();
             }
-            keyValue=keyValue+"\n";
+            keyValue = keyValue + "\n";
 
             InputStream inputStreamAuthKeyVal = new ByteArrayInputStream(keyValue.getBytes());
             c.put(inputStreamAuthKeyVal, authorizedKeys);
@@ -372,18 +386,18 @@ public class SSHUtil {
     }
 
 
-   /**
-    * open new ssh session on host system
-    *
-    * @param passphrase key passphrase for instance
-    * @param password password for instance
-    * @param userId user id
-    * @param sessionId session id
-    * @param hostSystem host system
-    * @param userSessionMap user session map
-    * @return status of systems
-    */
-    public static HostSystem openSSHTermOnSystem(String passphrase, String password, Long userId, Long sessionId, HostSystem hostSystem,  Map<Long, UserSchSessions> userSessionMap) {
+    /**
+     * open new ssh session on host system
+     *
+     * @param passphrase     key passphrase for instance
+     * @param password       password for instance
+     * @param userId         user id
+     * @param sessionId      session id
+     * @param hostSystem     host system
+     * @param userSessionMap user session map
+     * @return status of systems
+     */
+    public static HostSystem openSSHTermOnSystem(String passphrase, String password, Long userId, Long sessionId, HostSystem hostSystem, Map<Long, UserSchSessions> userSessionMap) {
 
         JSch jsch = new JSch();
 
@@ -396,6 +410,10 @@ public class SSHUtil {
             //check to see if passphrase has been provided
             if (passphrase == null || passphrase.trim().equals("")) {
                 passphrase = appKey.getPassphrase();
+                //check for null inorder to use key without passphrase
+                if(passphrase==null){
+                    passphrase="";
+                }
             }
             //add private key
             jsch.addIdentity(appKey.getId().toString(), appKey.getPrivateKey().trim().getBytes(), appKey.getPublicKey().getBytes(), passphrase.getBytes());
@@ -416,15 +434,14 @@ public class SSHUtil {
 
 
             //new session output
-            SessionOutput sessionOutput=new SessionOutput();
+            SessionOutput sessionOutput = new SessionOutput();
             sessionOutput.setHostSystemId(hostSystem.getId());
             sessionOutput.setSessionId(sessionId);
 
 
-            Runnable run=new SecureShellTask(sessionOutput, outFromChannel);
+            Runnable run = new SecureShellTask(sessionOutput, outFromChannel);
             Thread thread = new Thread(run);
             thread.start();
-
 
 
             OutputStream inputToChannel = channel.getOutputStream();
