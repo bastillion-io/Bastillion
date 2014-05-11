@@ -83,6 +83,8 @@ Supplying a Custom Public/Private SSH Key
 ------
 KeyBox generates its own public/private SSH key upon initial startup for use when registering systems.  You can specify a custom SSH key though the KeyBoxConfig.properties file.  This file is located in the jetty/keybox/WEB-INF/classes directory. (or the src/main/resources directory if building from source)
 
+For example:
+
 	#set to true to regenerate and import SSH keys  --set to true
 	resetApplicationSSHKey=true
 	
