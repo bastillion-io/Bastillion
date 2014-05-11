@@ -79,6 +79,31 @@ In the directory that contains the pom.xml run
 
 **Note: Doing a mvn clean will delete the H2 DB and wipe out all the data.
 
+Supplying a Custom Public/Private SSH Key
+------
+KeyBox generates its own public/private SSH key upon initial startup for use when registering systems.  You can specify a custom SSH key though the KeyBoxConfig.properties file.  This file is located in the jetty/keybox/WEB-INF/classes directory. (or the src/main/resources directory if building from source)
+
+	#set to true to regenerate and import SSH keys  --set to true
+	resetApplicationSSHKey=true
+	
+	#Linux - command used to support ssh-keygen  --comment out
+	#sshKeyGenCmd=ssh-keygen -t dsa -f ${pvtKey} -oq -N ${passphrase}
+	
+	#Mac OS X - command used to support ssh-keygen  --comment out
+	#sshKeyGenCmd=ssh-keygen -t dsa -f ${pvtKey} -q -N ${passphrase}
+	
+	#cat public key  --set pub key
+	setPublicKeyCmd=cat /Users/kavanagh/.ssh/id_rsa.pub
+	
+	#cat private key  --set pvt key
+	setPrivateKeyCmd=cat /Users/kavanagh/.ssh/id_rsa
+	
+	#remove generated keys  --comment out
+	#deleteSSHKeys=rm -f ${pvtKey} ${pubKey}
+	
+	#default passphrase  --leave blank if passphrase is empty
+	defaultSSHPassphrase=myPa$$w0rd
+
 Using KeyBox
 ------
 Open browser to https://\<whatever ip\>:8443
@@ -95,7 +120,7 @@ Steps:
 3. Assign systems to profile
 4. Assign profiles to users
 5. Users can login to create sessions on assigned systems
-6. Start composite-ssh sessions or create and execute a script across multiple sessions
+6. Start a composite SSH session or create and execute a script across multiple sessions
 7. Add additional public keys to systems
 8. Audit session history
 
