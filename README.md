@@ -94,10 +94,10 @@ For example:
 	#Mac OS X - command used to support ssh-keygen  --comment out
 	#sshKeyGenCmd=ssh-keygen -t dsa -f ${pvtKey} -q -N ${passphrase}
 	
-	#cat public key  --set pub key
+	#public key  --set pub key
 	publicKey=/Users/kavanagh/.ssh/id_rsa.pub
 	
-	#cat private key  --set pvt key
+	#private key  --set pvt key
 	privateKey=/Users/kavanagh/.ssh/id_rsa
 	
 	#remove generated keys  --comment out
