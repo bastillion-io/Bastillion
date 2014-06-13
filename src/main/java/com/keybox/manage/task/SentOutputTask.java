@@ -44,15 +44,18 @@ public class SentOutputTask implements Runnable {
         Connection con = DBUtils.getConn();
         while (session.isOpen()) {
             List<SessionOutput> outputList = SessionOutputUtil.getOutput(con, sessionId);
-            if (outputList != null && !outputList.isEmpty()) {
-                String json = new Gson().toJson(outputList);
-                try {
+            try {
+                if (outputList != null && !outputList.isEmpty()) {
+                    String json = new Gson().toJson(outputList);
                     //send json to session
                     this.session.getBasicRemote().sendText(json);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
                 }
+                Thread.sleep(50);
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
+
+
         }
 
         DBUtils.closeConn(con);

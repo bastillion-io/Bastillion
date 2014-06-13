@@ -34,7 +34,7 @@ $(document).ready(function () {
     });
     $("#set_passphrase_dialog").dialog({
         autoOpen: false,
-        height: 200,
+        height: 225,
         minWidth: 550,
         modal: true
     });

@@ -27,6 +27,7 @@ import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
 import org.apache.commons.exec.PumpStreamHandler;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
@@ -38,8 +39,6 @@ import java.util.UUID;
  * SSH utility class used to create public/private key for system and distribute authorized key files
  */
 public class SSHUtil {
-
-
 
 
     //system path to public/private key
@@ -66,24 +65,15 @@ public class SSHUtil {
         //get ssh-keygen cmd from properties file
         Map<String, String> replaceMap = new HashMap<String, String>();
         replaceMap.put("pubKey", PUB_KEY);
-        //cat public ssh key
-        String cmdStr = AppConfig.getProperty("setPublicKeyCmd", replaceMap);
 
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        CommandLine cmdLine = CommandLine.parse(cmdStr);
-        DefaultExecutor executor = new DefaultExecutor();
-        PumpStreamHandler streamHandler = new PumpStreamHandler(out);
-        executor.setStreamHandler(streamHandler);
+        //read pvt ssh key
+        File file = new File(AppConfig.getProperty("publicKey", replaceMap));
         try {
-            executor.execute(cmdLine);
-            publicKey = out.toString();
-        } catch (ExecuteException ex) {
-            ex.printStackTrace();
-            System.out.println(out.toString());
-        } catch (IOException ex) {
+            publicKey = FileUtils.readFileToString(file);
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
+
         return publicKey;
     }
 
@@ -96,28 +86,18 @@ public class SSHUtil {
     public static String getPrivateKey() {
         String privateKey = null;
 
-
         //get ssh-keygen cmd from properties file
         Map<String, String> replaceMap = new HashMap<String, String>();
         replaceMap.put("pvtKey", PVT_KEY);
 
-        //cat public ssh key
-        String cmdStr = AppConfig.getProperty("setPrivateKeyCmd", replaceMap);
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        CommandLine cmdLine = CommandLine.parse(cmdStr);
-        DefaultExecutor executor = new DefaultExecutor();
-        PumpStreamHandler streamHandler = new PumpStreamHandler(out);
-        executor.setStreamHandler(streamHandler);
+        //read pvt ssh key
+        File file = new File(AppConfig.getProperty("privateKey", replaceMap));
         try {
-            executor.execute(cmdLine);
-            privateKey = out.toString();
-        } catch (ExecuteException ex) {
-            ex.printStackTrace();
-            System.out.println(out.toString());
-        } catch (IOException ex) {
+            privateKey = FileUtils.readFileToString(file);
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
+
         return privateKey;
     }
 
@@ -133,7 +113,7 @@ public class SSHUtil {
         Map<String, String> replaceMap = new HashMap<String, String>();
         replaceMap.put("randomPassphrase", UUID.randomUUID().toString());
 
-        String passphrase= AppConfig.getProperty("defaultSSHPassphrase", replaceMap);
+        String passphrase = AppConfig.getProperty("defaultSSHPassphrase", replaceMap);
 
         AppConfig.updateProperty("defaultSSHPassphrase", "${randomPassphrase}");
 
@@ -234,8 +214,8 @@ public class SSHUtil {
             if (passphrase == null || passphrase.trim().equals("")) {
                 passphrase = appKey.getPassphrase();
                 //check for null inorder to use key without passphrase
-                if(passphrase==null){
-                    passphrase="";
+                if (passphrase == null) {
+                    passphrase = "";
                 }
             }
             //add private key
@@ -411,8 +391,8 @@ public class SSHUtil {
             if (passphrase == null || passphrase.trim().equals("")) {
                 passphrase = appKey.getPassphrase();
                 //check for null inorder to use key without passphrase
-                if(passphrase==null){
-                    passphrase="";
+                if (passphrase == null) {
+                    passphrase = "";
                 }
             }
             //add private key

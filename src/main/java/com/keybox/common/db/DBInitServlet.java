@@ -85,11 +85,11 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 
             }
 
+
             //if reset ssh application key then generate new key
             if (resetSSHKey) {
-                //delete ssh keys
+                //make sure old keys are deleted
                 SSHUtil.deleteSshKeys();
-
                 //delete old key entry
                 PreparedStatement pStmt = connection.prepareStatement("delete from application_key");
                 pStmt.execute();
@@ -120,7 +120,11 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 
                 //set to false
                 AppConfig.updateProperty("resetApplicationSSHKey", "false");
+
             }
+
+            //delete ssh keys
+            SSHUtil.deleteSshKeys();
 
 
             DBUtils.closeRs(rs);

@@ -95,10 +95,10 @@ For example:
 	#sshKeyGenCmd=ssh-keygen -t dsa -f ${pvtKey} -q -N ${passphrase}
 	
 	#cat public key  --set pub key
-	setPublicKeyCmd=cat /Users/kavanagh/.ssh/id_rsa.pub
+	publicKey=/Users/kavanagh/.ssh/id_rsa.pub
 	
 	#cat private key  --set pvt key
-	setPrivateKeyCmd=cat /Users/kavanagh/.ssh/id_rsa
+	privateKey=/Users/kavanagh/.ssh/id_rsa
 	
 	#remove generated keys  --comment out
 	#deleteSSHKeys=rm -f ${pvtKey} ${pubKey}
