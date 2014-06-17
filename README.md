@@ -133,4 +133,4 @@ Author
 + sean.p.kavanagh6@gmail.com
 + https://twitter.com/spkavanagh6
 
-
+[![Analytics](https://ga-beacon.appspot.com/UA-38369800-3/skavanagh/KeyBox?pixel)](https://github.com/igrigorik/ga-beacon)
