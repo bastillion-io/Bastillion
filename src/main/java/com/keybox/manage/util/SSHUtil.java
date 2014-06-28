@@ -23,10 +23,6 @@ import com.keybox.manage.db.SystemDB;
 import com.keybox.manage.db.SystemStatusDB;
 import com.keybox.manage.model.*;
 import com.keybox.manage.task.SecureShellTask;
-import org.apache.commons.exec.CommandLine;
-import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.ExecuteException;
-import org.apache.commons.exec.PumpStreamHandler;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -42,12 +38,15 @@ public class SSHUtil {
 
 
     //system path to public/private key
-    public static String KEY_PATH = DBUtils.class.getClassLoader().getResource("com/keybox/common/db").getPath();
+    public static String KEY_PATH = DBUtils.class.getClassLoader().getResource("keydb").getPath();
+
+    //key type - rsa or dsa
+    public static final String KEY_TYPE = AppConfig.getProperty("sshKeyType");
 
     //private key name
-    public static final String PVT_KEY = KEY_PATH + "/id_dsa";
+    public static final String PVT_KEY = KEY_PATH + "/id_" + KEY_TYPE;
     //public key name
-    public static final String PUB_KEY = KEY_PATH + "/id_dsa.pub";
+    public static final String PUB_KEY = PVT_KEY + ".pub";
 
 
     public static final int SESSION_TIMEOUT = 60000;
@@ -59,15 +58,14 @@ public class SSHUtil {
      * @return system's public key
      */
     public static String getPublicKey() {
-        String publicKey = null;
 
-
-        //get ssh-keygen cmd from properties file
-        Map<String, String> replaceMap = new HashMap<String, String>();
-        replaceMap.put("pubKey", PUB_KEY);
-
+        String publicKey=PUB_KEY;
+        //check to see if pub/pvt are defined in properties
+        if (StringUtils.isNotEmpty(AppConfig.getProperty("privateKey")) && StringUtils.isNotEmpty(AppConfig.getProperty("publicKey"))) {
+           publicKey = AppConfig.getProperty("publicKey");
+        }
         //read pvt ssh key
-        File file = new File(AppConfig.getProperty("publicKey", replaceMap));
+        File file = new File(publicKey);
         try {
             publicKey = FileUtils.readFileToString(file);
         } catch (Exception ex) {
@@ -84,14 +82,15 @@ public class SSHUtil {
      * @return system's public key
      */
     public static String getPrivateKey() {
-        String privateKey = null;
 
-        //get ssh-keygen cmd from properties file
-        Map<String, String> replaceMap = new HashMap<String, String>();
-        replaceMap.put("pvtKey", PVT_KEY);
+        String privateKey=PVT_KEY;
+        //check to see if pub/pvt are defined in properties
+        if (StringUtils.isNotEmpty(AppConfig.getProperty("privateKey")) && StringUtils.isNotEmpty(AppConfig.getProperty("publicKey"))) {
+            privateKey = AppConfig.getProperty("privateKey");
+        }
 
         //read pvt ssh key
-        File file = new File(AppConfig.getProperty("privateKey", replaceMap));
+        File file = new File(privateKey);
         try {
             privateKey = FileUtils.readFileToString(file);
         } catch (Exception ex) {
@@ -124,34 +123,31 @@ public class SSHUtil {
     /**
      * delete SSH keys
      */
-    public static void deleteSshKeys() {
+    public static void deleteGenSSHKeys() {
 
-
-        //get ssh-keygen cmd from properties file
-        Map<String, String> replaceMap = new HashMap<String, String>();
-        replaceMap.put("pvtKey", PVT_KEY);
-        replaceMap.put("pubKey", PUB_KEY);
-
-        //delete previous ssh keys
-        String cmdStr = AppConfig.getProperty("deleteSSHKeys", replaceMap);
-        if (StringUtils.isNotEmpty(cmdStr)) {
-
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            CommandLine cmdLine = CommandLine.parse(cmdStr);
-            DefaultExecutor executor = new DefaultExecutor();
-            PumpStreamHandler streamHandler = new PumpStreamHandler(out);
-            executor.setStreamHandler(streamHandler);
-
-            try {
-                executor.execute(cmdLine);
-            } catch (ExecuteException ex) {
-                ex.printStackTrace();
-                System.out.println(out.toString());
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-
+        deletePvtGenSSHKey();
+        //delete public key
+        try {
+            File file = new File(PUB_KEY);
+            FileUtils.forceDelete(file);
+        } catch (Exception ex) {
         }
+    }
+
+
+    /**
+     * delete SSH keys
+     */
+    public static void deletePvtGenSSHKey() {
+
+        //delete private key
+        try {
+            File file = new File(PVT_KEY);
+            FileUtils.forceDelete(file);
+        } catch (Exception ex) {
+        }
+
+
     }
 
     /**
@@ -161,33 +157,29 @@ public class SSHUtil {
      */
     public static String keyGen(String passphrase) {
 
-        deleteSshKeys();
+        deleteGenSSHKeys();
 
-        //get ssh-keygen cmd from properties file
-        Map<String, String> replaceMap = new HashMap<String, String>();
-        replaceMap.put("pvtKey", PVT_KEY);
-        replaceMap.put("pubKey", PUB_KEY);
-        replaceMap.put("passphrase", passphrase);
-        //create new ssh keys
-        String cmdStr = AppConfig.getProperty("sshKeyGenCmd", replaceMap);
-        if (StringUtils.isNotEmpty(cmdStr)) {
+        if (StringUtils.isEmpty(AppConfig.getProperty("privateKey")) || StringUtils.isEmpty(AppConfig.getProperty("publicKey"))) {
 
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            CommandLine cmdLine = CommandLine.parse(cmdStr);
-            DefaultExecutor executor = new DefaultExecutor();
-            PumpStreamHandler streamHandler = new PumpStreamHandler(out);
-            executor.setStreamHandler(streamHandler);
+            //set key type
+            int type = KEY_TYPE.equals("rsa") ? KeyPair.RSA : KeyPair.DSA;
+            String comment = "KeyBox generated key pair";
+
+            JSch jsch = new JSch();
 
             try {
-                executor.execute(cmdLine);
-            } catch (ExecuteException ex) {
-                ex.printStackTrace();
-                System.out.println(out.toString());
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
 
+                KeyPair keyPair = KeyPair.genKeyPair(jsch, type);
+
+                keyPair.writePrivateKey(PVT_KEY, passphrase.getBytes());
+                keyPair.writePublicKey(PUB_KEY, comment);
+                System.out.println("Finger print: " + keyPair.getFingerPrint());
+                keyPair.dispose();
+            } catch (Exception e) {
+                System.out.println(e);
+            }
         }
+
 
         return passphrase;
 

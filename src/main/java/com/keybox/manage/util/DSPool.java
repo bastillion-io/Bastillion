@@ -25,7 +25,7 @@ import org.apache.commons.pool.impl.GenericObjectPool;
 public class DSPool {
 
     //system path to the H2 DB
-    private static String DB_PATH = DBUtils.class.getClassLoader().getResource("com/keybox/common/db").getPath();
+    private static String DB_PATH = DBUtils.class.getClassLoader().getResource("keydb").getPath();
 
 
     private static PoolingDataSource dsPool;

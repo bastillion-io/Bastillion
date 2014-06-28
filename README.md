@@ -38,8 +38,6 @@ http://caniuse.com/websockets
 **Note: In Safari if using a self-signed certificate you must import the certificate into your Keychain.
 Select 'Show Certificate' -> 'Always Trust' when prompted in Safari
 
-Must run on *nix with OpenSSH version 2
-
 Maven 3 or greater  ( Only needed if building from source )
 http://maven.apache.org
 
@@ -53,12 +51,25 @@ https://github.com/skavanagh/KeyBox/releases
 
 Export environment variables
 
+for Linux/Unix/OSX
+
      export JAVA_HOME=/path/to/jdk
      export PATH=$JAVA_HOME/bin:$PATH
 
+for Windows
+
+     set JAVA_HOME=C:\path\to\jdk
+     set PATH=%JAVA_HOME%\bin;%PATH%
+
 Start KeyBox
 
+for Linux/Unix/OSX
+
         ./startKeyBox.sh
+
+for Windows
+
+        startKeyBox.bat
 
 How to Configure SSL in Jetty
 (it is a good idea to add or generate your own unique certificate)
@@ -87,21 +98,15 @@ For example:
 
 	#set to true to regenerate and import SSH keys  --set to true
 	resetApplicationSSHKey=true
-	
-	#Linux - command used to support ssh-keygen  --comment out
-	#sshKeyGenCmd=ssh-keygen -t dsa -f ${pvtKey} -oq -N ${passphrase}
-	
-	#Mac OS X - command used to support ssh-keygen  --comment out
-	#sshKeyGenCmd=ssh-keygen -t dsa -f ${pvtKey} -q -N ${passphrase}
-	
+
+	#SSH Key Type 'dsa' or 'rsa'
+    sshKeyType=rsa
+
+	#private key  --set pvt key
+    privateKey=/Users/kavanagh/.ssh/id_rsa
+
 	#public key  --set pub key
 	publicKey=/Users/kavanagh/.ssh/id_rsa.pub
-	
-	#private key  --set pvt key
-	privateKey=/Users/kavanagh/.ssh/id_rsa
-	
-	#remove generated keys  --comment out
-	#deleteSSHKeys=rm -f ${pvtKey} ${pubKey}
 	
 	#default passphrase  --leave blank if passphrase is empty
 	defaultSSHPassphrase=myPa$$w0rd
@@ -126,11 +131,21 @@ Steps:
 7. Add additional public keys to systems
 8. Audit session history
 
+Acknowledgments
+------
+Special thanks goes to these amazing projects which makes this (and other great projects) possible.
+
++ [JSch](http://www.jcraft.com/jsch) Java Secure Channel - by @ymnk
++ [term.js](https://github.com/chjj/term.js) A terminal written in javascript - by @chjj
+
 Author
 ------
 **Sean Kavanagh**
 
 + sean.p.kavanagh6@gmail.com
 + https://twitter.com/spkavanagh6
+
+(Follow me on twitter for release updates, but mostly nonsense)
+
 
 
