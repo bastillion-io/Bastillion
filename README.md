@@ -144,8 +144,11 @@ Author
 
 + sean.p.kavanagh6@gmail.com
 + https://twitter.com/spkavanagh6
+<<<<<<< HEAD
 
 (Follow me on twitter for release updates, but mostly nonsense)
 
 
 
+=======
+>>>>>>> FETCH_HEAD
