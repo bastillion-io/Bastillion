@@ -135,8 +135,8 @@ Acknowledgments
 ------
 Special thanks goes to these amazing projects which makes this (and other great projects) possible.
 
-+ [JSch](http://www.jcraft.com/jsch) Java Secure Channel - by @ymnk
-+ [term.js](https://github.com/chjj/term.js) A terminal written in javascript - by @chjj
++ [JSch](http://www.jcraft.com/jsch) Java Secure Channel - by [ymnk](https://github.com/ymnk)
++ [term.js](https://github.com/chjj/term.js) A terminal written in javascript - by [chjj](https://github.com/chjj)
 
 Author
 ------
