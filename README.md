@@ -14,17 +14,17 @@ and defined.
 Screenshots
 -----------
 
-![Terminals](https://freecode.com/screenshots/64/42/64429c74e1a5b4d9b7d26c490282150a_medium.png)
+![Terminals](http://sshkeybox.com/img/screenshots/medium/terms.png)
 
-![More Terminals](https://freecode.com/screenshots/a0/44/a044b3e11cc1af453e8fe5b9731bd6a5_medium.png)
+![More Terminals](http://sshkeybox.com/img/screenshots/medium/more_terms.png)
 
-![Upload Files](https://freecode.com/screenshots/e6/76/e676fe542b08188cff1fdbceea15adf4_medium.png)
+![Upload Files](http://sshkeybox.com/img/screenshots/medium/upload_files.png)
 
-![Manage Systems](https://freecode.com/screenshots/71/e6/71e6464744ae95d2d03ab5bbe5a576e1_medium.png)
+![Manage Systems](http://sshkeybox.com/img/screenshots/medium/manage_systems.png)
 
-![Manage Users](https://freecode.com/screenshots/c0/a3/c0a3b758c80c3a634e3327f55c4293f2_medium.png)
+![Manage Users](http://sshkeybox.com/img/screenshots/medium/manage_users.png)
 
-![Define SSH Keys](https://freecode.com/screenshots/16/f9/16f94a2734f3b509df2dca9efe79cbc5_medium.png)
+![Define SSH Keys](http://sshkeybox.com/img/screenshots/medium/manage_keys.png)
 
 
 Prerequisites
