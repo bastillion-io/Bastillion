@@ -58,9 +58,11 @@ $(document).ready(function () {
     });
 
     $(".termwrapper").sortable({
+        connectWith: ".run_cmd",
+        handle: ".term-header",
         zIndex: 10000,
         helper: 'clone'
-    }).disableSelection();
+    });
 
 
     $.ajaxSetup({ cache: false });
@@ -177,6 +179,10 @@ $(document).ready(function () {
         termFocus = true;
     });
 
+    $(".output").mouseover().mousedown(function () {
+        termFocus = false;
+    });
+
 
     $(document).keypress(function (e) {
         if (termFocus) {
@@ -234,15 +240,19 @@ $(document).ready(function () {
     });
 
     $(document).click(function (e) {
-        if (!$(e.target).is('#match')) {
+        if (termFocus) {
             $('#dummy').focus();
         }
-
+        //always change focus unless in match sort
+        if (e.target.id!='match') {
+            termFocus = true;
+        }
     });
 
 
     //get cmd text from paste
     $("#dummy").bind('paste', function (e) {
+        $('#dummy').focus();
         $('#dummy').val('');
         setTimeout(function () {
             var idList = [];
@@ -365,6 +375,7 @@ $(document).ready(function () {
 
     </s:if>
 
+
 });
 
 
@@ -378,6 +389,12 @@ $(document).ready(function () {
     .align-right {
         padding: 10px 2px 10px 10px;
         float: right;
+    }
+
+    .term-container {
+        width: 100%;
+        padding: 25px 0px;
+        margin: 0px;
     }
 </style>
 
@@ -395,79 +412,82 @@ $(document).ready(function () {
                     <div class="nav-img"><img src="<%= request.getContextPath() %>/img/keybox_50x38.png"/></div>
                     KeyBox
                 </div>
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                         <span class="sr-only">Toggle navigation</span>
+                         <span class="icon-bar"></span>
+                         <span class="icon-bar"></span>
+                         <span class="icon-bar"></span>
+                </button>
             </div>
             <div class="collapse navbar-collapse">
                 <s:if test="pendingSystemStatus==null">
 
 
                     <ul class="nav navbar-nav">
-                        <li><a id="select_all" href="#">Select All</a></li>
+                        <li><a id="select_all" href="#"
+                               title="Use CMD-Click or CTRL-Click to select multiple individual terminals">Select
+                            All</a></li>
                         <li><a id="upload_push" href="#">Upload &amp; Push</a></li>
                         <li><a href="exitTerms.action">Exit Terminals</a></li>
                     </ul>
+                    <div style="float:right;width:1px;">
+                                       <textarea name="dummy" id="dummy" size="1"
+                                                 style="border:none;color:#FFFFFF;width:1px;height:1px"></textarea>
+                                       <input type="text" name="dummy2" id="dummy2" size="1"
+                                              style="border:none;color:#FFFFFF;width:1px;height:1px"/>
+                                   </div>
                     <div class="droppable align-right">
-                        <a href="#" title="Drag to disconnect">
-                            <img src="<%= request.getContextPath() %>/img/disconnect.png"/></a></div>
-                    <div class="note">Use CMD-Click or CTRL-Click to select multiple individual terminals<br/>Drag
-                        terminal window to icon to disconnect
+                        <a href="#" title="Drag terminal window here to disconnect">
+                        <img src="<%= request.getContextPath() %>/img/disconnect.png"/></a>
                     </div>
+                    <div class="align-right">
+                        <s:form id="match_frm" theme="simple">
+                            <label>Sort By</label>&nbsp;&nbsp;<s:textfield id="match" name="match"
+                                                                           placeholder="Bring terminals to top that match RegExp"
+                                                                           size="40"
+                                                                           theme="simple"/>
+                            <div id="match_btn" class="btn btn-success">Start</div>
+                        </s:form>
+                    </div>
+
                     <div class="clear"></div>
                 </s:if>
             </div>
             <!--/.nav-collapse -->
         </div>
-    </div>
-    <div class="container">
 
-        <div class="align-right">
-
-            <div style="float:right;margin:0;padding:0">
-                <textarea name="dummy" id="dummy" size="1"
-                          style="border:none;color:#FFFFFF;width:1px;height:1px"></textarea>
-                <input type="text" name="dummy2" id="dummy2" size="1"
-                       style="border:none;color:#FFFFFF;width:1px;height:1px"/>
-            </div>
-            <div style="float:right">
-                <s:form id="match_frm" theme="simple">
-                    <label>Sort By</label>&nbsp;&nbsp;<s:textfield id="match" name="match"
-                                                                   placeholder="Bring terminals to top that match RegExp"
-                                                                   size="40"
-                                                                   theme="simple"/>
-                    <div id="match_btn" class="btn btn-success">Start</div>
-                </s:form>
-            </div>
-
-
-        </div>
 
     </div>
 
-    <div class="container" style="width:100%;padding: 0px; margin: 0px;border:none;">
+    <div class="term-container container">
 
 
         <div class="termwrapper">
+
+
             <s:iterator value="systemList">
                 <div id="run_cmd_<s:property value="id"/>" class="run_cmd_active run_cmd">
 
-                    <h4><s:property value="displayLabel"/></h4>
+                    <h6 class="term-header"><s:property value="displayLabel"/></h6>
 
-                    <div id="term" class="term">
+
+                    <div class="term">
                         <div id="output_<s:property value="id"/>" class="output"></div>
                     </div>
 
                 </div>
             </s:iterator>
+
+
+            <div id="upload_push_dialog" title="Upload &amp; Push">
+                <iframe id="upload_push_frame" width="700px" height="300px" style="border: none;">
+
+                </iframe>
+
+
+            </div>
+
         </div>
-
-
-        <div id="upload_push_dialog" title="Upload &amp; Push">
-            <iframe id="upload_push_frame" width="700px" height="300px" style="border: none;">
-
-            </iframe>
-
-
-        </div>
-
 
     </div>
 </s:if>

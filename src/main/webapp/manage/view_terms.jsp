@@ -126,6 +126,16 @@ $(document).ready(function() {
         background-color: #F5F5F5;
     }
 
+    .align-right {
+        padding: 10px 2px 10px 10px;
+        float: right;
+    }
+
+    .term-container {
+        width: 100%;
+        padding: 25px 0px;
+        margin: 0px;
+    }
 
 </style>
 
@@ -140,6 +150,12 @@ $(document).ready(function() {
             <div class="navbar-brand" >
             <div class="nav-img"><img src="<%= request.getContextPath() %>/img/keybox_50x38.png"/></div>
              KeyBox</div>
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
         </div>
         <div class="collapse navbar-collapse">
             <s:if test="pendingSystemStatus==null">
@@ -148,6 +164,19 @@ $(document).ready(function() {
                  <li><a href="viewSessions.action">Exit Audit</a></li>
             </ul>
 
+
+                <div class="align-right">
+                    <s:form id="filter_frm" theme="simple">
+                        <s:label value=""/>
+                        <s:textfield name="filter" type="text"/><div class="btn btn-default submit_btn">Filter</div><div class="btn btn-default clear_btn">Clear</div>
+                    </s:form>
+                </div>
+                <div class="align-right" style="padding-top: 20px">
+                    <b>Audit  ( <s:property value="sessionAudit.user.username"/>
+                    <s:if test="sessionAudit.user!=null && sessionAudit.user.lastNm!=null">
+                        - <s:property value="sessionAudit.user.lastNm"/>, <s:property value="sessionAudit.user.firstNm"/>
+                    </s:if> ) </b>
+                </div>
             <div class="clear"></div>
             </s:if>
         </div>
@@ -156,31 +185,16 @@ $(document).ready(function() {
 </div>
 
 
- <div class="container" style="width: 99%;padding: 6px; margin: 10px 0px 10px 0px; border:none;">
+<div class="term-container container">
  <s:if test="sessionAudit!= null">
- <div style="float:left;">
-    <b>Audit  ( <s:property value="sessionAudit.user.username"/>
-    <s:if test="sessionAudit.user!=null && sessionAudit.user.lastNm!=null">
-        - <s:property value="sessionAudit.user.lastNm"/>, <s:property value="sessionAudit.user.firstNm"/>
-    </s:if> ) </b>
- </div>
- <div class="top_link" ></div>
 
-<div class="clear"></div>
 
-<div style="float:left;padding-bottom:10px;">
-<s:form id="filter_frm" theme="simple">
-<s:label value=""/>
-<s:textfield name="filter" type="text"/><div class="btn btn-default submit_btn">Filter</div><div class="btn btn-default clear_btn">Clear</div>
-</s:form>
-</div>
-        <div class="clear"></div>
 
             <div class="termwrapper">
                 <s:iterator value="sessionAudit.hostSystemList">
                     <div id="run_cmd_<s:property value="id"/>" class="run_cmd_active run_cmd">
 
-                        <h4><s:property value="displayLabel"/></h4>
+                        <h6 class="term-header"><s:property value="displayLabel"/></h6>
 
                         <div id="term" class="term">
                             <div id="output_<s:property value="id"/>" class="output">
@@ -197,7 +211,7 @@ $(document).ready(function() {
                     </div>
                 </s:iterator>
             </div>
-            </s:if>
+</s:if>
 
 
 </div>
