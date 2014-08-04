@@ -169,7 +169,7 @@
         <div id="add_btn" class="btn btn-default">Add Profile</div>
         <div id="add_dialog" title="Add Profile">
             <s:form action="saveProfile" class="save_profile_form_add">
-                <s:textfield name="profile.nm" label="Profile Name" size="15"/>
+                <s:textfield name="profile.nm" label="Name" size="15"/>
                 <s:textarea name="profile.desc" label="Profile Description" rows="5" cols="25"/>
                 <s:hidden name="sortedSet.orderByDirection"/>
                 <s:hidden name="sortedSet.orderByField"/>
@@ -187,7 +187,7 @@
         <s:iterator var="profile" value="sortedSet.itemList" status="stat">
             <div id="edit_dialog_<s:property value="id"/>" title="Edit Profile" class="edit_dialog">
                 <s:form action="saveProfile" id="save_profile_form_edit_%{id}">
-                    <s:textfield name="profile.nm" value="%{nm}" label="Profile Name" size="15"/>
+                    <s:textfield name="profile.nm" value="%{nm}" label="Name" size="15"/>
                     <s:textarea name="profile.desc" value="%{desc}" label="Profile Description" rows="5"
                                 cols="25"/>
                     <s:hidden name="profile.id" value="%{id}"/>

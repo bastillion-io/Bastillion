@@ -167,7 +167,7 @@
             <div class="actionMessage">
                 <p class="error">Systems not available.
                     <s:if test="%{#session.userType==\"M\"}">
-                    Define systems <a href="../manage/viewSystems.action">here</a>
+                    Define systems (<a href="../manage/viewSystems.action">Manage Systems</a>).
                     </s:if>
                  </p>
                 </div>

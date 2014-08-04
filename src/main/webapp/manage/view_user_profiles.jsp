@@ -44,7 +44,7 @@
 
             //submit add or edit form
             $(".submit_btn").button().click(function() {
-                $(this).prev().submit();
+                $(this).parents('form:first').submit();
             });
             //close all forms
             $(".cancel_btn").button().click(function() {
@@ -69,8 +69,8 @@
         <h3>Grant System Access</h3>
              <p>Add / Delete profiles to be assigned to the current user.</p>
 
-        <h4><s:property value="user.lastNm"/>,&nbsp;<s:property value="user.firstNm"/>
-            &nbsp;( <s:property value="user.email"/> )
+        <h4><s:property value="user.username"/>&nbsp;:&nbsp;<s:property value="user.lastNm"/>,&nbsp;<s:property value="user.firstNm"/>
+            &nbsp;(<s:property value="user.email"/>)
 
         </h4>
 
@@ -82,7 +82,7 @@
                 <thead>
 
                 <tr>
-                    <th>Profile Name</th>
+                    <th>Name</th>
                     <th>&nbsp;</th>
                 </tr>
                 </thead>
@@ -126,13 +126,17 @@
                 <s:select name="profileId" list="profileList" headerKey="" headerValue="- Select One -"
                           listKey="id" listValue="%{nm}"/>
                 <s:hidden name="user.id"/>
+                <tr>
+                    <td>&nbsp;</td>
+                    <td align="left">
+                        <div class="btn btn-default submit_btn">Submit</div>
+                        <div class="btn btn-default cancel_btn">Cancel</div>
+                    </td>
+                </tr>
             </s:form>
-             <div class="btn btn-default submit_btn">Submit</div>
-                <div class="btn btn-default cancel_btn">Cancel</div>
-             </div>
         </s:if>
         <s:else>
-            <div class="error">There are no profiles defined.  New profiles may be defined <a href="viewProfiles.action">here</a>.</div>
+            <div class="error">There are no profiles defined (<a href="viewProfiles.action">View Profiles</a>).</div>
         </s:else>
 
 

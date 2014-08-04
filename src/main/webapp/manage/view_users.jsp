@@ -134,7 +134,7 @@
         <p>Add / Delete users or select a user below to assign profile</p>
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
-                <table class="table-striped  scrollableTable" style="min-width: 80%">
+                <table class="table-striped  scrollableTable" style="min-width: 85%">
 
                     <thead>
                     <tr>
@@ -181,7 +181,7 @@
                         <td><s:property value="firstNm"/></td>
                         <td><s:property value="email"/></td>
                             <td>
-                                <div style="width:220px">
+                                <div style="width:235px">
 
                                 <div id="edit_btn_<s:property value="id"/>" class="btn btn-default edit_btn" style="float:left">
                                     Edit
@@ -191,7 +191,7 @@
                                 <s:if test="userType==\"A\"">
                                     <a href="viewUserProfiles.action?user.id=<s:property value="id"/>">
                                         <div id="profile_btn_<s:property value="id"/>" class="btn btn-default edit_btn" style="float:left">
-                                                User Profiles
+                                            Assign Profiles
                                         </div></a>
                                 </s:if>
                                 <div style="clear:both"></div>

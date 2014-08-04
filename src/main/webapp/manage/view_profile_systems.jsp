@@ -140,7 +140,7 @@
             <div id="assign_sys" class="btn btn-default assign_sys_btn">Assign</div>
         </s:if>
         <s:else>
-            <div class="error">There are no systems defined.  New systems may be defined <a href="viewSystems.action">here</a>.</div>
+            <div class="error">There are no systems defined (<a href="viewSystems.action">Manage Systems</a>).</div>
         </s:else>
 
 

@@ -7,12 +7,12 @@
 <!-- and either jetty-https.xml or jetty-spdy.xml (but not both)   -->
 <!-- ============================================================= -->
 <Configure id="sslContextFactory" class="org.eclipse.jetty.util.ssl.SslContextFactory">
-  <Set name="KeyStorePath">src/test/resources/keystore</Set>
-  <Set name="KeyStorePassword"><Property name="jetty.keystore.password" default="sshb0x1234"/></Set>
-  <Set name="KeyManagerPassword"><Property name="jetty.keymanager.password" default="sshb0x1234"/></Set>
-  <Set name="TrustStorePath">src/test/resources/keystore</Set>
-  <Set name="TrustStorePassword"><Property name="jetty.truststore.password" default="sshb0x1234"/></Set>
+  <Set name="KeyStorePath"><Property name="jetty.base" default="." />/<Property name="jetty.keystore" default="src/test/resources/keystore"/></Set>
+  <Set name="KeyStorePassword"><Property name="jetty.keystore.password" default="OBF:1ini1l4t1mfb1x8616dq20zj16cw1x8o1mbb1l8h1ikw"/></Set>
+  <Set name="KeyManagerPassword"><Property name="jetty.keymanager.password" default="OBF:1ini1l4t1mfb1x8616dq20zj16cw1x8o1mbb1l8h1ikw"/></Set>
   <Set name="EndpointIdentificationAlgorithm"></Set>
+  <Set name="NeedClientAuth"><Property name="jetty.ssl.needClientAuth" default="false"/></Set>
+  <Set name="WantClientAuth"><Property name="jetty.ssl.wantClientAuth" default="false"/></Set>
   <Set name="ExcludeCipherSuites">
     <Array type="String">
       <Item>SSL_RSA_WITH_DES_CBC_SHA</Item>
