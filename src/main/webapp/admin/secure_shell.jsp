@@ -197,7 +197,7 @@ $(document).ready(function () {
             if (String.fromCharCode(keyCode) && String.fromCharCode(keyCode) != ''
                     && !keys[91] && !keys[93] && !keys[224] && !keys[27]
                     && !keys[37] && !keys[38] && !keys[39] && !keys[40]
-                    && !keys[13] && !keys[8] && !keys[9] && !keys[17]) {
+                    && !keys[13] && !keys[8] && !keys[9] && !keys[17]  && !keys[46]) {
                 var cmdStr = String.fromCharCode(keyCode);
                 connection.send(JSON.stringify({id: idList, command: cmdStr}));
             }
@@ -209,16 +209,22 @@ $(document).ready(function () {
         if (termFocus) {
             var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
             keys[keyCode] = true;
+            //prevent default for unix ctrl commands
+            if(keys[17] && (keys[83]||keys[81]||keys[67]||keys[220]||keys[90]||keys[72]||keys[87]||keys[85]||keys[82]||keys[68])){
+                e.preventDefault();
+            }
+
             //27 - ESC
             //37 - LEFT
             //38 - UP
             //39 - RIGHT
             //40 - DOWN
             //13 - ENTER
-            //8 - DEL
+            //8 - BS
             //9 - TAB
             //17 - CTRL
-            if (keys[27] || keys[37] || keys[38] || keys[39] || keys[40] || keys[13] || keys[8] || keys[9] || keys[17]) {
+            //46 - DEL
+            if (keys[27] || keys[37] || keys[38] || keys[39] || keys[40] || keys[13] || keys[8] || keys[9] || keys[17] || keys[46]) {
                 var idList = [];
                 $(".run_cmd_active").each(function (index) {
                     var id = $(this).attr("id").replace("run_cmd_", "");
