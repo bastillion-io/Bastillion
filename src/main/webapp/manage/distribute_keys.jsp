@@ -96,7 +96,7 @@
             </s:if>
             <s:else>
 
-                <p>Select the systems below to distribute SSH public keys</p>
+                <p>Select the systems below to distribute SSH public keys.<br/><span class="note">Assigning and distributing keys will overwrite the existing authorized keys file.</span></p>
 
 
                 <s:form action="distributeKeysBySystem">
@@ -161,7 +161,7 @@
             </ul>
             <div class="clear"></div>
 
-            <p>Select a profile below to distribute SSH public keys</p>
+            <p>Select a profile below to distribute SSH public keys.<br/><span class="note">Assigning and distributing keys will overwrite the existing authorized keys file.</span></p>
 
 
             <s:form action="selectProfileForAuthKeys">

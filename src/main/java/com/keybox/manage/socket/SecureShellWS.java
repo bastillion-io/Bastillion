@@ -178,7 +178,7 @@ public class SecureShellWS {
         //CTR
         keyMap.put(17, new byte[]{});
         //DEL
-        keyMap.put(46, new byte[]{(byte) 0x7f});
+        keyMap.put(46, "\033[3~".getBytes());
         //CTR-A
         keyMap.put(65, new byte[]{(byte) 0x01});
         //CTR-B

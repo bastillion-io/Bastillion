@@ -122,7 +122,7 @@
 
         <h3>Manage Keys</h3>
 
-        <p>Add / Delete keys and assign to profile</p>
+        <p>Add / Delete keys and assign to profile in order to be distributed (<a href="../manage/distributeKeysByProfile.action">Distribute Keys</a>).<br/><span class="note">Assigning and distributing keys will overwrite the existing authorized keys file.</span></p>
 
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">

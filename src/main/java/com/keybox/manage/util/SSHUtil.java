@@ -28,6 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -59,10 +60,10 @@ public class SSHUtil {
      */
     public static String getPublicKey() {
 
-        String publicKey=PUB_KEY;
+        String publicKey = PUB_KEY;
         //check to see if pub/pvt are defined in properties
         if (StringUtils.isNotEmpty(AppConfig.getProperty("privateKey")) && StringUtils.isNotEmpty(AppConfig.getProperty("publicKey"))) {
-           publicKey = AppConfig.getProperty("publicKey");
+            publicKey = AppConfig.getProperty("publicKey");
         }
         //read pvt ssh key
         File file = new File(publicKey);
@@ -83,7 +84,7 @@ public class SSHUtil {
      */
     public static String getPrivateKey() {
 
-        String privateKey=PVT_KEY;
+        String privateKey = PVT_KEY;
         //check to see if pub/pvt are defined in properties
         if (StringUtils.isNotEmpty(AppConfig.getProperty("privateKey")) && StringUtils.isNotEmpty(AppConfig.getProperty("publicKey"))) {
             privateKey = AppConfig.getProperty("privateKey");
@@ -189,12 +190,13 @@ public class SSHUtil {
     /**
      * distributes authorized keys for host system
      *
-     * @param hostSystem object contains host system information
-     * @param passphrase ssh key passphrase
-     * @param password   password to host system if needed
+     * @param hostSystem      object contains host system information
+     * @param passphrase      ssh key passphrase
+     * @param password        password to host system if needed
+     * @param alwaysOverwrite indicate whether to overwrite key file when no keys have been assigned
      * @return status of key distribution
      */
-    public static HostSystem authAndAddPubKey(HostSystem hostSystem, String passphrase, String password) {
+    public static HostSystem authAndAddPubKey(HostSystem hostSystem, String passphrase, String password, boolean alwaysOverwrite) {
 
 
         JSch jsch = new JSch();
@@ -225,7 +227,8 @@ public class SSHUtil {
             session.setConfig(config);
             session.connect(SESSION_TIMEOUT);
 
-            addPubKey(hostSystem, session, appKey.getPublicKey());
+
+            addPubKey(hostSystem, session, appKey.getPublicKey(), alwaysOverwrite);
 
         } catch (Exception e) {
             hostSystem.setErrorMsg(e.getMessage());
@@ -305,12 +308,13 @@ public class SSHUtil {
     /**
      * distributes authorized keys for host system
      *
-     * @param hostSystem   object contains host system information
-     * @param session      an established SSH session
-     * @param appPublicKey application public key value
+     * @param hostSystem      object contains host system information
+     * @param session         an established SSH session
+     * @param appPublicKey    application public key value
+     * @param alwaysOverwrite indicate whether to overwrite key file when no keys have been assigned
      * @return status of key distribution
      */
-    public static HostSystem addPubKey(HostSystem hostSystem, Session session, String appPublicKey) {
+    public static HostSystem addPubKey(HostSystem hostSystem, Session session, String appPublicKey, boolean alwaysOverwrite) {
 
 
         Channel channel = null;
@@ -328,12 +332,36 @@ public class SSHUtil {
             //return public key list into a input stream
             String authorizedKeys = hostSystem.getAuthorizedKeys().replaceAll("~\\/|~", "");
 
-            String keyValue = appPublicKey.replace("\n", "").trim();
+            String appPubKey = appPublicKey.replace("\n", "").trim();
 
-            for (String str : PublicKeyDB.getPublicKeysForSystem(hostSystem.getId())) {
-                keyValue = keyValue + "\n" + str.replace("\n", "").trim();
+            //get keys assigned to system
+            List<String> assignedKeys = PublicKeyDB.getPublicKeysForSystem(hostSystem.getId());
+
+            String keyValue = "";
+            //if no assigned keys and no overwrite then append to previous auth keys file
+            if (assignedKeys.isEmpty() && !alwaysOverwrite) {
+
+                try {
+                    InputStream is = c.get(authorizedKeys);
+
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+                    String existingKey;
+                    while ((existingKey = reader.readLine()) != null) {
+                        existingKey = existingKey.replace("\n", "").trim();
+                        if (!appPubKey.equals(existingKey)) {
+                            keyValue = keyValue + existingKey +"\n";
+                        }
+                    }
+                } catch (Exception ex) {
+                    //ignore exception if file doesn't exist
+                }
+
+            } else {
+                for (String existingKey : assignedKeys) {
+                    keyValue = keyValue + existingKey.replace("\n", "").trim() +"\n";
+                }
             }
-            keyValue = keyValue + "\n";
+            keyValue = keyValue + appPubKey + "\n";
 
             InputStream inputStreamAuthKeyVal = new ByteArrayInputStream(keyValue.getBytes());
             c.put(inputStreamAuthKeyVal, authorizedKeys);

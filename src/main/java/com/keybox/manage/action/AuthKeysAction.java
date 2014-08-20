@@ -198,7 +198,7 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 
 
             //try and sftp key to remote server
-            hostSystem = SSHUtil.authAndAddPubKey(hostSystem, passphrase, password);
+            hostSystem = SSHUtil.authAndAddPubKey(hostSystem, passphrase, password, true);
 
             SystemStatusDB.updateSystemStatus(hostSystem, userId);
             SystemDB.updateSystem(hostSystem);
@@ -212,7 +212,7 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 
                 //if success loop through systems until finished or need password
                 while (pendingSystem != null && hostSystem != null && HostSystem.SUCCESS_STATUS.equals(hostSystem.getStatusCd())) {
-                    hostSystem = SSHUtil.authAndAddPubKey(pendingSystem, passphrase, password);
+                    hostSystem = SSHUtil.authAndAddPubKey(pendingSystem, passphrase, password, true);
 
                     SystemStatusDB.updateSystemStatus(hostSystem, userId);
                     SystemDB.updateSystem(hostSystem);
