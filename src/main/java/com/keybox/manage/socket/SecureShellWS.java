@@ -36,7 +36,7 @@ import java.util.Map;
 /**
  * class to run commands and start thread to send web socket terminal output
  */
-@ServerEndpoint(value = "/terms.ws", configurator = GetHttpSessionConfigurator.class)
+@ServerEndpoint(value = "/admin/terms.ws", configurator = GetHttpSessionConfigurator.class)
 @SuppressWarnings("unchecked")
 public class SecureShellWS {
     private HttpSession httpSession;

@@ -287,7 +287,7 @@ $(document).ready(function () {
     } else {
         ws_uri = "ws:";
     }
-    ws_uri += "//" + loc.host + '/terms.ws?t=' + new Date().getTime();
+    ws_uri += "//" + loc.host + loc.pathname + '/../terms.ws?t=' + new Date().getTime();
 
     var connection = new WebSocket(ws_uri);
 
