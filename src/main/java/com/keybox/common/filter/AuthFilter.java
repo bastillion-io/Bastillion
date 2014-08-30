@@ -69,7 +69,7 @@ public class AuthFilter implements Filter {
                 String uri = servletRequest.getRequestURI();
                 if (Auth.MANAGER.equals(userType)) {
                     isAdmin = true;
-                } else if (uri.matches("^\\/admin\\/.*") && Auth.ADMINISTRATOR.equals(userType)) {
+                } else if (uri.matches("^"+servletRequest.getContextPath().replaceAll("/","\\\\/")+"\\/admin\\/.*") && Auth.ADMINISTRATOR.equals(userType)) {
                     isAdmin = true;
                 }
                 AuthUtil.setUserType(servletRequest.getSession(), userType);
