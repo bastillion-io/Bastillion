@@ -428,6 +428,9 @@ public class SSHUtil {
             session.setConfig("StrictHostKeyChecking", "no");
             session.connect(SESSION_TIMEOUT);
             Channel channel = session.openChannel("shell");
+            if("true".equals(AppConfig.getProperty("agentForwarding"))) {
+                ((ChannelShell) channel).setAgentForwarding(true);
+            }
             ((ChannelShell) channel).setPtyType("vt102");
 
             InputStream outFromChannel = channel.getInputStream();
