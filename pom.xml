@@ -73,9 +73,16 @@
     </dependencies>
     <build>
         <resources>
+	    <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>KeyBoxConfig.properties</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
             <resource>
                 <directory>src/main/resources</directory>
-                <filtering>true</filtering>
+                <filtering>false</filtering>
             </resource>
         </resources>
         <plugins>
