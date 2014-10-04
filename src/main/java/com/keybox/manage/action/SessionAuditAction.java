@@ -17,14 +17,19 @@ package com.keybox.manage.action;
 
 import com.keybox.common.util.AppConfig;
 import com.keybox.manage.db.SessionAuditDB;
+import com.keybox.manage.db.SystemDB;
+import com.keybox.manage.db.UserDB;
+import com.keybox.manage.model.HostSystem;
 import com.keybox.manage.model.SessionAudit;
 import com.keybox.manage.model.SortedSet;
 import com.google.gson.Gson;
+import com.keybox.manage.model.User;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletResponseAware;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * Action to audit sessions and terminal history
@@ -38,6 +43,8 @@ public class SessionAuditAction extends ActionSupport implements ServletResponse
     SessionAudit sessionAudit;
     HttpServletResponse servletResponse;
     String enableAudit = AppConfig.getProperty("enableAudit");
+    List<HostSystem> systemList= SystemDB.getSystemSet(new SortedSet(SystemDB.SORT_BY_NAME)).getItemList();
+    List<User> userList= UserDB.getUserSet(new SortedSet(SessionAuditDB.SORT_BY_USERNAME)).getItemList();
 
     @Action(value = "/manage/viewSessions",
             results = {
@@ -67,9 +74,7 @@ public class SessionAuditAction extends ActionSupport implements ServletResponse
     )
     public String getTermsForSession() {
 
-
         sessionAudit=SessionAuditDB.getSessionsTerminals(sessionId);
-
         return SUCCESS;
 
     }
@@ -86,6 +91,22 @@ public class SessionAuditAction extends ActionSupport implements ServletResponse
 
         return null;
 
+    }
+
+    public List<HostSystem> getSystemList() {
+        return systemList;
+    }
+
+    public void setSystemList(List<HostSystem> systemList) {
+        this.systemList = systemList;
+    }
+
+    public List<User> getUserList() {
+        return userList;
+    }
+
+    public void setUserList(List<User> userList) {
+        this.userList = userList;
     }
 
     public SortedSet getSortedSet() {
@@ -135,4 +156,5 @@ public class SessionAuditAction extends ActionSupport implements ServletResponse
     public void setEnableAudit(String enableAudit) {
         this.enableAudit = enableAudit;
     }
+
 }

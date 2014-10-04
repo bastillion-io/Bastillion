@@ -31,6 +31,11 @@
                     $(".ui-dialog-titlebar-close").show();
                 }
             });
+
+            $("#view_btn").button().click(function () {
+                $("#viewSystemsFilter").submit();
+            });
+
             $("#script_btn").click(function() {
                 $("#script_dia").dialog("open");
              });
@@ -90,9 +95,10 @@
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
     <div class="container">
-        <s:form action="viewSystems">
+        <s:form action="viewSystems" theme="simple">
             <s:hidden name="sortedSet.orderByDirection"/>
             <s:hidden name="sortedSet.orderByField"/>
+            <s:hidden name="profileId"/>
             <s:if test="script!=null">
               <s:hidden name="script.id"/>
             </s:if>
@@ -100,21 +106,47 @@
 
             <s:if test="script!=null">
                 <h3>Execute Script on Systems</h3>
-                <p>Run <b>
+                Run <b>
                 <a id="script_btn" href="#"><s:property value="script.displayNm"/></a></b> on the selected systems below
-                </p>
+
                 <div id="script_dia" title="View Script">
                     <pre><s:property value="script.script"/></pre>
                 </div>
             </s:if>
             <s:else>
                 <h3>Composite SSH Terminals</h3>
-                <p>Select the systems below to generate composite SSH sessions in multiple terminals</p>
+                Select the systems below to generate composite SSH sessions in multiple terminals
             </s:else>
 
-
-
-
+       <s:if test="profileList!= null && !profileList.isEmpty()">
+        <table style="min-width:0px">
+            <tr>
+                <td class="align_left">
+                    <s:form id="viewSystemsFilter" action="viewSystems" theme="simple">
+                        <s:hidden name="sortedSet.orderByDirection"/>
+                        <s:hidden name="sortedSet.orderByField"/>
+                        <s:if test="script!=null">
+                            <s:hidden name="script.id"/>
+                        </s:if>
+                        <table style="min-width:0px">
+                        <tr>
+                            <td style="padding-left:0px;">
+                                <s:select name="sortedSet.filterMap['%{@com.keybox.manage.db.SystemDB@FILTER_BY_PROFILE_ID}']" listKey="id" listValue="nm"
+                                class="view_frm_select"
+                                list="profileList"
+                                headerKey=""
+                                headerValue="-Select Profile-"/>
+                            </td>
+                            <td style="padding:5px 5px 0px 5px;">
+                                <div id="view_btn" class="btn btn-default">Filter</div>
+                            </td>
+                        </tr>
+                        </table>
+                    </s:form>
+                </td>
+            </tr>
+       </table>
+       </s:if>
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
 
   	        <s:form action="selectSystemsForCompositeTerms" id="select_frm" theme="simple">

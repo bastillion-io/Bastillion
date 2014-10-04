@@ -46,7 +46,7 @@ public class UploadAndPushAction extends ActionSupport implements ServletRequest
     HostSystem currentSystemStatus;
     HttpServletRequest servletRequest;
 
-    public static String UPLOAD_PATH = DBUtils.class.getClassLoader().getResource(".").getPath() + "../upload";
+    public static final String UPLOAD_PATH = DBUtils.class.getClassLoader().getResource(".").getPath() + "../upload";
 
 
     @Action(value = "/admin/setUpload",

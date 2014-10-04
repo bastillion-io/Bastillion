@@ -279,6 +279,14 @@ div.termwrapper div h6 {
     margin-top: -8px;
     margin-left: -50px;
 }
+.align_left {
+    padding-left :0px;
+    margin-left :0px;
+}
+.align_right {
+    padding-right :0px;
+    margin-right :0px;
+}
 
 
 

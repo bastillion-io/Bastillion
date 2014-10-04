@@ -16,12 +16,11 @@
 package com.keybox.manage.action;
 
 import com.keybox.common.util.AuthUtil;
+import com.keybox.manage.db.ProfileDB;
 import com.keybox.manage.db.ScriptDB;
 import com.keybox.manage.db.SystemDB;
-import com.keybox.manage.model.Auth;
-import com.keybox.manage.model.HostSystem;
-import com.keybox.manage.model.Script;
-import com.keybox.manage.model.SortedSet;
+import com.keybox.manage.db.UserProfileDB;
+import com.keybox.manage.model.*;
 import com.keybox.manage.util.SSHUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
@@ -29,6 +28,8 @@ import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Action to manage systems
@@ -41,6 +42,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
     HttpServletRequest servletRequest;
     String password;
     String passphrase;
+    List<Profile> profileList= new ArrayList<>();
 
 
     @Action(value = "/admin/viewSystems",
@@ -53,12 +55,15 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
 
         if (Auth.MANAGER.equals(AuthUtil.getUserType(servletRequest.getSession()))) {
             sortedSet = SystemDB.getSystemSet(sortedSet);
+            profileList=ProfileDB.getAllProfiles();
         } else {
             sortedSet = SystemDB.getUserSystemSet(sortedSet, userId);
+            profileList= UserProfileDB.getProfilesByUser(userId);
         }
         if (script != null && script.getId() != null) {
             script = ScriptDB.getScript(script.getId(), userId);
         }
+
         return SUCCESS;
     }
 
@@ -68,7 +73,9 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
             }
     )
     public String viewManageSystems() {
-        sortedSet = SystemDB.getSystemSet(sortedSet);
+
+        sortedSet = SystemDB.getSystemSet(sortedSet); 
+
         return SUCCESS;
     }
 
@@ -150,6 +157,15 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
 
     }
 
+   
+
+    public List<Profile> getProfileList() {
+        return profileList;
+    }
+
+    public void setProfileList(List<Profile> profileList) {
+        this.profileList = profileList;
+    }
 
     public HostSystem getHostSystem() {
         return hostSystem;

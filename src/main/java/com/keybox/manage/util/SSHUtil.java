@@ -39,7 +39,7 @@ public class SSHUtil {
 
 
     //system path to public/private key
-    public static String KEY_PATH = DBUtils.class.getClassLoader().getResource("keydb").getPath();
+    public static final String KEY_PATH = DBUtils.class.getClassLoader().getResource("keydb").getPath();
 
     //key type - rsa or dsa
     public static final String KEY_TYPE = AppConfig.getProperty("sshKeyType");
@@ -343,22 +343,24 @@ public class SSHUtil {
 
                 try {
                     InputStream is = c.get(authorizedKeys);
-
                     BufferedReader reader = new BufferedReader(new InputStreamReader(is));
                     String existingKey;
                     while ((existingKey = reader.readLine()) != null) {
                         existingKey = existingKey.replace("\n", "").trim();
                         if (!appPubKey.equals(existingKey)) {
-                            keyValue = keyValue + existingKey +"\n";
+                            keyValue = keyValue + existingKey + "\n";
                         }
                     }
-                } catch (Exception ex) {
+                    is.close();
+                    reader.close();
+                } catch (SftpException ex) {
                     //ignore exception if file doesn't exist
                 }
 
+
             } else {
                 for (String existingKey : assignedKeys) {
-                    keyValue = keyValue + existingKey.replace("\n", "").trim() +"\n";
+                    keyValue = keyValue + existingKey.replace("\n", "").trim() + "\n";
                 }
             }
             keyValue = keyValue + appPubKey + "\n";
@@ -428,7 +430,7 @@ public class SSHUtil {
             session.setConfig("StrictHostKeyChecking", "no");
             session.connect(SESSION_TIMEOUT);
             Channel channel = session.openChannel("shell");
-            if("true".equals(AppConfig.getProperty("agentForwarding"))) {
+            if ("true".equals(AppConfig.getProperty("agentForwarding"))) {
                 ((ChannelShell) channel).setAgentForwarding(true);
             }
             ((ChannelShell) channel).setPtyType("vt102");

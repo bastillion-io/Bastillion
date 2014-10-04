@@ -48,11 +48,13 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 
         super.init(config);
 
+        Connection connection = null;
+        Statement statement = null;
         //check if reset ssh application key is set
         boolean resetSSHKey = "true".equals(AppConfig.getProperty("resetApplicationSSHKey"));
         try {
-            Connection connection = DBUtils.getConn();
-            Statement statement = connection.createStatement();
+            connection = DBUtils.getConn();
+            statement = connection.createStatement();
 
             ResultSet rs = statement.executeQuery("select * from information_schema.tables where upper(table_name) = 'USERS' and table_schema='PUBLIC'");
             if (rs == null || !rs.next()) {
@@ -84,7 +86,7 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
                 DBUtils.closeStmt(pStmt);
 
             }
-
+            DBUtils.closeRs(rs);
 
             //if reset ssh application key then generate new key
             if (resetSSHKey) {
@@ -126,14 +128,15 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
             SSHUtil.deletePvtGenSSHKey();
 
 
-            DBUtils.closeRs(rs);
-            DBUtils.closeStmt(statement);
-            DBUtils.closeConn(connection);
+
 
 
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+
+        DBUtils.closeStmt(statement);
+        DBUtils.closeConn(connection);
     }
 
 }

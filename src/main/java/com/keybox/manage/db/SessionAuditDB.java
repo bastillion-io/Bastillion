@@ -22,6 +22,7 @@ import com.keybox.manage.model.SessionAudit;
 import com.keybox.manage.model.SessionOutput;
 import com.keybox.manage.model.SortedSet;
 import com.keybox.manage.util.DBUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -38,6 +39,9 @@ import java.util.List;
 public class SessionAuditDB {
 
 
+    public static final String FILTER_BY_USER_ID = "user_id";
+    public static final String FILTER_BY_SYSTEM_ID = "system_id";
+    
     public static final String SORT_BY_FIRST_NM = "first_nm";
     public static final String SORT_BY_LAST_NM = "last_nm";
     public static final String SORT_BY_EMAIL = "email";
@@ -95,13 +99,25 @@ public class SessionAuditDB {
         }
 
 
-        String sql = "select * from session_log, users where users.id= session_log.user_id " + orderBy;
+        String sql = "select * from session_log, users where users.id= session_log.user_id ";
+        sql+= StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_USER_ID)) ? " and session_log.user_id=? " : "";
+        sql+= StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_ID)) ? " and session_log.id in ( select session_id from terminal_log where terminal_log.system_id=? ) " : "";
+        sql+= orderBy;
+
         try {
 
             con = DBUtils.getConn();
             deleteAuditHistory(con);
 
             PreparedStatement stmt = con.prepareStatement(sql);
+            int i=1;
+            //set filters in prepared statement
+            if(StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_USER_ID))){
+                stmt.setLong(i++, Long.valueOf(sortedSet.getFilterMap().get(FILTER_BY_USER_ID)));
+            }
+            if(StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_ID))){
+                stmt.setLong(i++, Long.valueOf(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_ID)));
+            }
 
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {

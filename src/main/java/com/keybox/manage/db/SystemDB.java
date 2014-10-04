@@ -18,6 +18,7 @@ package com.keybox.manage.db;
 import com.keybox.manage.model.HostSystem;
 import com.keybox.manage.model.SortedSet;
 import com.keybox.manage.util.DBUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -31,6 +32,8 @@ import java.util.List;
  */
 public class SystemDB {
 
+    public static final String FILTER_BY_PROFILE_ID = "profile_id";
+    
     public static final String SORT_BY_NAME = "display_nm";
     public static final String SORT_BY_USER = "user";
     public static final String SORT_BY_HOST = "host";
@@ -51,7 +54,10 @@ public class SystemDB {
         if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
             orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
         }
-        String sql = "select * from system where id in (select distinct system_id from  system_map m, user_map um where m.profile_id=um.profile_id and um.user_id=?) " + orderBy;
+        String sql = "select * from system where id in (select distinct system_id from  system_map m, user_map um where m.profile_id=um.profile_id and um.user_id=? ";
+        //if profile id exists add to statement
+        sql+= StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID)) ? " and um.profile_id=? " :"";
+        sql+=") " + orderBy;
 
         //get user for auth token
         Connection con = null;
@@ -59,6 +65,11 @@ public class SystemDB {
             con = DBUtils.getConn();
             PreparedStatement stmt = con.prepareStatement(sql);
             stmt.setLong(1, userId);
+            //filter by profile id if exists
+            if(StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID))) {
+                stmt.setLong(2, Long.valueOf(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID)));
+            }
+
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -100,12 +111,18 @@ public class SystemDB {
         if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
             orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
         }
-        String sql = "select * from  system " + orderBy;
+        String sql = "select * from  system s ";
+        //if profile id exists add to statement
+        sql += StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID)) ? ",system_map m where s.id=m.system_id and m.profile_id=?" : "";
+        sql += orderBy;
 
         Connection con = null;
         try {
             con = DBUtils.getConn();
             PreparedStatement stmt = con.prepareStatement(sql);
+            if(StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID))){
+                stmt.setLong(1, Long.valueOf(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID)));
+            }
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {

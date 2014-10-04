@@ -39,10 +39,11 @@ public class UserProfileDB {
 
 
         Connection con = null;
+        PreparedStatement stmt = null;
 
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("delete from user_map where profile_id=? and user_id=?");
+            stmt = con.prepareStatement("delete from user_map where profile_id=? and user_id=?");
             stmt.setLong(1, profileId);
             stmt.setLong(2, userId);
             stmt.execute();
@@ -57,6 +58,7 @@ public class UserProfileDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        DBUtils.closeStmt(stmt);
         DBUtils.closeConn(con);
 
 

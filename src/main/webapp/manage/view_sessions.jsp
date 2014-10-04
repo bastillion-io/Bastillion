@@ -29,6 +29,10 @@
                 window.location = 'getTermsForSession.action?sessionId=' + id;
             });
 
+            $("#view_btn").button().click(function () {
+                $("#viewSessionsFilter").submit();
+            });
+
             //submit add or edit form
             $(".submit_btn").button().click(function () {
                 $(this).parents('form:first').submit();
@@ -72,15 +76,50 @@
     <s:form action="viewSessions" theme="simple">
         <s:hidden name="sortedSet.orderByDirection"/>
         <s:hidden name="sortedSet.orderByField"/>
+        <s:hidden name="userId"/>
+        <s:hidden name="systemId"/>
     </s:form>
 
     <h3>Audit Sessions</h3>
 
     <s:if test="enableAudit=='true'">
+           Audit sessions below
+                <table style="min-width:0px">
+                    <tr>
+                        <td class="align_left">
+                            <s:form id="viewSessionsFilter" action="viewSessions" theme="simple">
+                                <s:hidden name="sortedSet.orderByDirection"/>
+                                <s:hidden name="sortedSet.orderByField"/>
+                                <table style="min-width:0px">
+                                <tr>
+                                    <s:if test="userList!= null && !userList.isEmpty()">
+                                        <td style="padding-left:0px;">
+                                           <s:select name="sortedSet.filterMap['%{@com.keybox.manage.db.SessionAuditDB@FILTER_BY_USER_ID}']" listKey="id" listValue="username"
+                                           class="view_frm_select"
+                                            list="userList"
+                                            headerKey=""
+                                            headerValue="-Select User-"/>
+                                        </td>
+                                     </s:if>
+                                    <s:if test="systemList!= null && !systemList.isEmpty()">
+                                            <td style="padding-left:0px;">
+                                            <s:select name="sortedSet.filterMap['%{@com.keybox.manage.db.SessionAuditDB@FILTER_BY_SYSTEM_ID}']" listKey="id" listValue="displayLabel"
+                                            class="view_frm_select"
+                                            list="systemList"
+                                            headerKey=""
+                                            headerValue="-Select System-"/>
+                                        </td>
+                                    </s:if>
+                                    <td style="padding:5px 5px 0px 5px;">
+                                        <div id="view_btn" class="btn btn-default">Filter</div>
+                                    </td>
+                                </tr>
+                                </table>
+                            </s:form>
+                        </td>
+                    </tr>
+               </table>
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
-
-            <p>Select a session to audit below</p>
-
 
             <table class="table-striped scrollableTable">
                 <thead>
