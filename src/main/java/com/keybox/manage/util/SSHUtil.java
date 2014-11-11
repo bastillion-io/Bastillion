@@ -433,7 +433,7 @@ public class SSHUtil {
             if ("true".equals(AppConfig.getProperty("agentForwarding"))) {
                 ((ChannelShell) channel).setAgentForwarding(true);
             }
-            ((ChannelShell) channel).setPtyType("vt102");
+            ((ChannelShell) channel).setPtyType("xterm");
 
             InputStream outFromChannel = channel.getInputStream();
 
