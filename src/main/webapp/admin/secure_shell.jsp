@@ -46,8 +46,8 @@ $(document).ready(function () {
     });
     $("#upload_push_dialog").dialog({
         autoOpen: false,
-        height: 375,
-        minWidth: 725,
+        height: 400,
+        minWidth: 735,
         modal: true,
         open: function (event, ui) {
             $(".ui-dialog-titlebar-close").show();

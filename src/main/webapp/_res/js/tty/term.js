@@ -726,7 +726,7 @@
         this.initGlobal();
 
         // Ensure there is a Terminal.focus.
-        this.focus();
+        //this.focus();
 
         // Start blinking the cursor.
         this.startBlink();
@@ -787,9 +787,10 @@
 
         // This can be useful for pasting,
         // as well as the iPad fix.
+        /*
         setTimeout(function() {
             self.element.focus();
-        }, 100);
+        }, 100);*/
     };
 
 // XTerm mouse events
@@ -1322,7 +1323,7 @@
     };
 
     Terminal.prototype._cursorBlink = function() {
-        if (Terminal.focus !== this) return;
+        //if (Terminal.focus !== this) return;
         this.cursorState ^= 1;
         this.refresh(this.y, this.y);
     };
