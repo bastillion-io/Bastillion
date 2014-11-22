@@ -11,25 +11,6 @@ administrators can be added and their terminal sessions and history can be
 audited. Also, KeyBox can manage and distribute public keys that have been setup
 and defined.
 
-Screenshots
------------
-![Login](http://sshkeybox.com/img/screenshots/medium/login.png)
-
-![Two-Factor](http://sshkeybox.com/img/screenshots/medium/two-factor.png)
-
-![Terminals](http://sshkeybox.com/img/screenshots/medium/terms.png)
-
-![More Terminals](http://sshkeybox.com/img/screenshots/medium/more_terms.png)
-
-![Upload Files](http://sshkeybox.com/img/screenshots/medium/upload_files.png)
-
-![Manage Systems](http://sshkeybox.com/img/screenshots/medium/manage_systems.png)
-
-![Manage Users](http://sshkeybox.com/img/screenshots/medium/manage_users.png)
-
-![Define SSH Keys](http://sshkeybox.com/img/screenshots/medium/manage_keys.png)
-
-
 Prerequisites
 -------------
 * Java JDK 1.7 or greater
@@ -38,7 +19,7 @@ http://www.oracle.com/technetwork/java/javase/overview/index.html
 * Browser with Web Socket support
 http://caniuse.com/websockets
 
-**Note: In Safari if using a self-signed certificate you must import the certificate into your Keychain.
+⋅⋅* Note: In Safari if using a self-signed certificate you must import the certificate into your Keychain.
 Select 'Show Certificate' -> 'Always Trust' when prompted in Safari
 
 * Maven 3 or greater  ( Only needed if building from source )
@@ -145,6 +126,24 @@ Steps:
 6. Start a composite SSH session or create and execute a script across multiple sessions
 7. Add additional public keys to systems
 8. Audit session history
+
+Screenshots
+-----------
+![Login](http://sshkeybox.com/img/screenshots/medium/login.png)
+
+![Two-Factor](http://sshkeybox.com/img/screenshots/medium/two-factor.png)
+
+![Terminals](http://sshkeybox.com/img/screenshots/medium/terms.png)
+
+![More Terminals](http://sshkeybox.com/img/screenshots/medium/more_terms.png)
+
+![Upload Files](http://sshkeybox.com/img/screenshots/medium/upload_files.png)
+
+![Manage Systems](http://sshkeybox.com/img/screenshots/medium/manage_systems.png)
+
+![Manage Users](http://sshkeybox.com/img/screenshots/medium/manage_users.png)
+
+![Define SSH Keys](http://sshkeybox.com/img/screenshots/medium/manage_keys.png)
 
 Acknowledgments
 ------
