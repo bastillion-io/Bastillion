@@ -1,6 +1,8 @@
 KeyBox
 ======
 
+![Terminals](http://sshkeybox.com/img/screenshots/medium/terms.png)
+
 About
 -----
 A web-based ssh console to execute commands and manage multiple systems
@@ -130,8 +132,6 @@ Screenshots
 ![Login](http://sshkeybox.com/img/screenshots/medium/login.png)
 
 ![Two-Factor](http://sshkeybox.com/img/screenshots/medium/two-factor.png)
-
-![Terminals](http://sshkeybox.com/img/screenshots/medium/terms.png)
 
 ![More Terminals](http://sshkeybox.com/img/screenshots/medium/more_terms.png)
 
