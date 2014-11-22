@@ -32,7 +32,7 @@ http://maven.apache.org
 | Google Authenticator| Link                                                                                                                                                                                   |
 |:------------------- |:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
 | Android             | [Google Play](https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2)|
-| iOS                 | [iTunes](https://itunes.apple.com/us/app/google-authenticator/id388497605)                                                                                                              |
+| iOS                 | [iTunes](https://itunes.apple.com/us/app/google-authenticator/id388497605)                                                                                                             |
 
 To Run Bundled with Jetty
 ------
