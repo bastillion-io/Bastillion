@@ -13,6 +13,9 @@ and defined.
 
 Screenshots
 -----------
+![Login](http://sshkeybox.com/img/screenshots/medium/login.png)
+
+![Two-Factor](http://sshkeybox.com/img/screenshots/medium/two-factor.png)
 
 ![Terminals](http://sshkeybox.com/img/screenshots/medium/terms.png)
 
@@ -40,6 +43,18 @@ Select 'Show Certificate' -> 'Always Trust' when prompted in Safari
 
 Maven 3 or greater  ( Only needed if building from source )
 http://maven.apache.org
+
+Install [FreeOTP](https://fedorahosted.org/freeotp) or [Google Authenticator](https://github.com/google/google-authenticator) to enable two-factor authentication with Android or iOS
+
+| FreeOTP       | Link                                                                                 |
+|:------------- |:------------------------------------------------------------------------------------:|
+| Android       | [Google Play](https://play.google.com/store/apps/details?id=org.fedorahosted.freeotp)|
+| iOS           | [iTunes](https://itunes.apple.com/us/app/freeotp/id872559395)                        |
+
+| Google Authenticator| Link                                                                                                                                                                                   |
+|:------------------- |:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| Android             | [Google Play](https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2)|
+| iOS                 | [iTunes](https://itunes.apple.com/us/app/google-authenticator/id38849760)                                                                                                              |
 
 To Run Bundled with Jetty
 ------
