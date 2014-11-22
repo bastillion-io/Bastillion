@@ -59,7 +59,7 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
             ResultSet rs = statement.executeQuery("select * from information_schema.tables where upper(table_name) = 'USERS' and table_schema='PUBLIC'");
             if (rs == null || !rs.next()) {
                 resetSSHKey = true;
-                statement.executeUpdate("create table if not exists users (id INTEGER PRIMARY KEY AUTO_INCREMENT, first_nm varchar, last_nm varchar, email varchar, username varchar not null, password varchar, auth_token varchar, enabled boolean not null default true, user_type varchar not null default '" + Auth.ADMINISTRATOR + "')");
+                statement.executeUpdate("create table if not exists users (id INTEGER PRIMARY KEY AUTO_INCREMENT, first_nm varchar, last_nm varchar, email varchar, username varchar not null, password varchar, auth_token varchar, enabled boolean not null default true, user_type varchar not null default '" + Auth.ADMINISTRATOR + "', salt varchar, otp_secret varchar)");
 
 
                 statement.executeUpdate("create table if not exists system (id INTEGER PRIMARY KEY AUTO_INCREMENT, display_nm varchar not null, user varchar not null, host varchar not null, port INTEGER not null, authorized_keys varchar not null, status_cd varchar not null default 'INITIAL')");
@@ -78,10 +78,12 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
                 statement.executeUpdate("create table if not exists terminal_log (session_id BIGINT, system_id INTEGER, output varchar not null, log_tm timestamp default CURRENT_TIMESTAMP, foreign key (session_id) references session_log(id) on delete cascade, foreign key (system_id) references system(id) on delete cascade)");
 
                 //insert default admin user
-                PreparedStatement pStmt = connection.prepareStatement("insert into users (username, password, user_type) values(?,?,?)");
+                String salt= EncryptionUtil.generateSalt();
+                PreparedStatement pStmt = connection.prepareStatement("insert into users (username, password, user_type, salt) values(?,?,?,?)");
                 pStmt.setString(1, "admin");
-                pStmt.setString(2, EncryptionUtil.hash("changeme"));
+                pStmt.setString(2, EncryptionUtil.hash("changeme" + salt));
                 pStmt.setString(3, Auth.MANAGER);
+                pStmt.setString(4, salt);
                 pStmt.execute();
                 DBUtils.closeStmt(pStmt);
 

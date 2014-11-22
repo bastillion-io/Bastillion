@@ -77,6 +77,7 @@ table td, table th {
 .errorMessage, .errorMessage a {
     font-size: smaller;
     color: #cc0000;
+    list-style-type: none;
 }
 
 .errorLabel {
@@ -221,16 +222,9 @@ div.termwrapper div h6 {
     clear: both;
 }
 
-.ui-dialog-titlebar-close {
-    display: none;
-    background: #cccccc url("jquery-ui/base/images/ui-icons_222222_256x240.png");
-    background-position: -96px -128px;
-}
-
 .errorsBg {
     background-color: #fdd;
-    color: red;
-    border: 1px solid;
+    border: 1px solid red;
 }
 
 .errorMessage {
@@ -273,7 +267,7 @@ div.termwrapper div h6 {
 
 .btn {
     padding: 5px;
-    margin: 5px;
+    margin: 5px 5px 0 5px;
 }
 
 .nav-img {
@@ -288,6 +282,14 @@ div.termwrapper div h6 {
 .align_right {
     padding-right :0px;
     margin-right :0px;
+}
+.modal-body .row {
+    padding-left:10px;
+}
+
+.modal-footer .btn {
+    margin-bottom: 0;
+    padding: 8px 12px;
 }
 
 

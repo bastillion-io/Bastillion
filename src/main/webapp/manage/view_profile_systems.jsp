@@ -36,9 +36,9 @@
             $("#assignSystemsToProfile_systemSelectAll").click(function() {
 
                 if ($(this).is(':checked')) {
-                    $(".systemSelect").attr('checked', true);
+                    $(".systemSelect").prop('checked', true);
                 } else {
-                    $(".systemSelect").attr('checked', false);
+                    $(".systemSelect").prop('checked', false);
                 }
             });
 
@@ -65,7 +65,7 @@
 
             <s:if test="profile.hostSystemList!= null && !profile.hostSystemList.isEmpty()">
             <s:iterator var="system" value="profile.hostSystemList" status="stat">
-            $(':checkbox[value=<s:property value="id"/>]').attr('checked', true);
+            $(':checkbox[value=<s:property value="id"/>]').prop('checked', true);
             </s:iterator>
             </s:if>
 

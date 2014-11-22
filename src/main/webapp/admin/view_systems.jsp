@@ -22,23 +22,9 @@
     <jsp:include page="../_res/inc/header.jsp"/>
     <script type="text/javascript">
         $(document).ready(function() {
-             $("#script_dia").dialog({
-                autoOpen: false,
-                height: 350,
-                width: 350,
-                modal: true,
-                open: function(event, ui) {
-                    $(".ui-dialog-titlebar-close").show();
-                }
-            });
-
             $("#view_btn").button().click(function () {
                 $("#viewSystemsFilter").submit();
             });
-
-            $("#script_btn").click(function() {
-                $("#script_dia").dialog("open");
-             });
 
             $(".select_frm_btn").button().click(function() {
                 $("#select_frm").submit();
@@ -46,9 +32,9 @@
             //select all check boxes
             $("#select_frm_systemSelectAll").click(function() {
                 if ($(this).is(':checked')) {
-                    $(".systemSelect").attr('checked', true);
+                    $(".systemSelect").prop('checked', true);
                 } else {
-                    $(".systemSelect").attr('checked', false);
+                    $(".systemSelect").prop('checked', false);
                 }
             });
             $(".sort,.sortAsc,.sortDesc").click(function() {
@@ -74,18 +60,7 @@
                 $(".scrollableTable tr:odd").css("background-color", "#e0e0e0");
     });
     </script>
-    <s:if test="fieldErrors.size > 0">
-        <script type="text/javascript">
-            $(document).ready(function() {
-                <s:if test="hostSystem.id>0">
-                $("#edit_dialog_<s:property value="hostSystem.id"/>").dialog("open");
-                </s:if>
-                <s:else>
-                $("#add_dialog").dialog("open");
-                </s:else>
-            });
-        </script>
-    </s:if>
+
 
     <title>KeyBox - Manage Systems</title>
 </head>
@@ -106,22 +81,35 @@
 
             <s:if test="script!=null">
                 <h3>Execute Script on Systems</h3>
-                Run <b>
-                <a id="script_btn" href="#"><s:property value="script.displayNm"/></a></b> on the selected systems below
+                <p>Run <b> <a data-toggle="modal" data-target="#script_dialog"><s:property value="script.displayNm"/></a></b> on the selected systems below</p>
 
-                <div id="script_dia" title="View Script">
-                    <pre><s:property value="script.script"/></pre>
+                <div id="script_dialog" class="modal fade">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                                <h4 class="modal-title">View Script: <s:property value="script.displayNm"/></h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <pre><s:property value="script.script"/></pre>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Close</button>
+
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </s:if>
             <s:else>
                 <h3>Composite SSH Terminals</h3>
-                Select the systems below to generate composite SSH sessions in multiple terminals
+                <p>Select the systems below to generate composite SSH sessions in multiple terminals</p>
             </s:else>
 
        <s:if test="profileList!= null && !profileList.isEmpty()">
-        <table style="min-width:0px">
-            <tr>
-                <td class="align_left">
+           <div>
                     <s:form id="viewSystemsFilter" action="viewSystems" theme="simple">
                         <s:hidden name="sortedSet.orderByDirection"/>
                         <s:hidden name="sortedSet.orderByField"/>
@@ -137,15 +125,14 @@
                                 headerKey=""
                                 headerValue="-Select Profile-"/>
                             </td>
-                            <td style="padding:5px 5px 0px 5px;">
+                            <td style="padding-left:0px;">
                                 <div id="view_btn" class="btn btn-default">Filter</div>
                             </td>
                         </tr>
                         </table>
                     </s:form>
-                </td>
-            </tr>
-       </table>
+
+           </div>
        </s:if>
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
 

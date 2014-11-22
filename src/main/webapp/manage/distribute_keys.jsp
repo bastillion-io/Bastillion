@@ -32,9 +32,9 @@
             $("#select_frm_systemSelectAll").click(function () {
 
                 if ($(this).is(':checked')) {
-                    $(".systemSelect").attr('checked', true);
+                    $(".systemSelect").prop('checked', true);
                 } else {
-                    $(".systemSelect").attr('checked', false);
+                    $(".systemSelect").prop('checked', false);
                 }
             });
 
@@ -148,7 +148,7 @@
                         </tbody>
                     </table>
                 </s:form>
-                <div class="btn btn-default submit_btn">Distribute Keys</div>
+                <button class="btn btn-default submit_btn">Distribute Keys</button>
             </s:else>
 
 
@@ -163,14 +163,11 @@
 
             <p>Select a profile below to distribute SSH public keys.<br/><span class="note">Assigning and distributing keys will overwrite the existing authorized keys file.</span></p>
 
-
-            <s:form action="selectProfileForAuthKeys">
+            <s:form action="selectProfileForAuthKeys" >
                 <s:select name="publicKey.profile.id" list="profileList" headerKey="" headerValue="All Systems"
                           listKey="id" listValue="%{nm}" label="Profile" value="%{profile.id}"/>
-
-
             </s:form>
-            <div class="btn btn-default submit_btn">Distribute Keys</div>
+            <button class="btn btn-default submit_btn" style="margin-left:65px">Distribute Keys</button>
 
         </s:else>
 

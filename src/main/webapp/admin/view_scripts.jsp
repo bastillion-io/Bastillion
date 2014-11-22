@@ -25,31 +25,7 @@
     <script type="text/javascript">
         $(document).ready(function() {
 
-            $("#add_dialog").dialog({
-                autoOpen: false,
-                height: 500,
-                width: 500,
-                modal: true
-            });
 
-            $(".edit_dialog").dialog({
-                autoOpen: false,
-                height: 500,
-                width: 500,
-                modal: true
-            });
-
-            //open add dialog
-            $("#add_btn").button().click(function() {
-                $("#add_dialog").dialog("open");
-            });
-            //open edit dialog
-            $(".edit_btn").button().click(function() {
-                //get dialog id to open
-                var id = $(this).attr('id').replace("edit_btn_", "");
-                $("#edit_dialog_" + id).dialog("open");
-
-            });
             //call delete action
             $(".del_btn").button().click(function() {
                 var id = $(this).attr('id').replace("del_btn_", "");
@@ -57,13 +33,9 @@
             });
             //submit add or edit form
             $(".submit_btn").button().click(function() {
-               $(this).parents('form:first').submit();
+                $(this).parents('.modal').find('form').submit();
             });
-            //close all forms
-            $(".cancel_btn").button().click(function() {
-                $("#add_dialog").dialog("close");
-                $(".edit_dialog").dialog("close");
-            });
+
             $(".sort,.sortAsc,.sortDesc").click(function() {
                 var id = $(this).attr('id')
 
@@ -92,10 +64,10 @@
         <script type="text/javascript">
             $(document).ready(function() {
                 <s:if test="script.id>0">
-                $("#edit_dialog_<s:property value="script.id"/>").dialog("open");
+                $("#edit_dialog_<s:property value="script.id"/>").modal();
                 </s:if>
                 <s:else>
-                $("#add_dialog").dialog("open");
+                $("#add_dialog").modal();
                 </s:else>
 
 
@@ -139,18 +111,13 @@
                         </td>
                             <td>
                                 <div style="width:240px">
-                                <a href="viewSystems.action?script.id=<s:property value="id"/>">
-                                <div id="exec_btn_<s:property value="id"/>" class="btn btn-default edit_btn" style="float:left">
-                                    Execute Script
-                                </div></a>
-                                <div id="edit_btn_<s:property value="id"/>" class="btn btn-default edit_btn" style="float:left">
-                                    Edit
+
+                                    <a href="viewSystems.action?script.id=<s:property value="id"/>"><button id="exec_btn_<s:property value="id"/>" class="btn btn-default edit_btn" style="float:left">Execute Script</button></a>
+                                    <button class="btn btn-default" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>" style="float:left">Edit</button>
+                                    <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn" style="float:left">Delete</button>
+                                    <div style="clear:both"></div>
+
                                 </div>
-                                <div id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn" style="float:left">
-                                    Delete
-                                </div>
-                                <div style="clear:both"></div>
-                                    </div>
                             </td>
 
                     </tr>
@@ -159,37 +126,57 @@
                 </table>
         </s:if>
 
-
-
-            <div id="add_btn" class="btn btn-default">Add Script</div>
-            <div id="add_dialog" title="Add Script">
-                <s:form action="saveScript" class="save_script_form_add">
-                    <s:textfield name="script.displayNm" label="Script Name" size="15"/>
-                    <s:textarea name="script.script" label="Script" rows="15" cols="35" wrap="off"/>
-                    <s:hidden name="sortedSet.orderByDirection"/>
-                    <s:hidden name="sortedSet.orderByField"/>
-                    <tr> <td>&nbsp;</td>
-                        <td align="left"><div class="btn btn-default submit_btn">Submit</div>
-                        <div class="btn btn-default cancel_btn">Cancel</div></td>
-                    </tr>
-                </s:form>
-
+        <button class="btn btn-default add_btn" data-toggle="modal" data-target="#add_dialog">Add Script</button>
+        <div id="add_dialog" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                        <h4 class="modal-title">Add Script</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <s:form action="saveScript" class="save_script_form_add">
+                                <s:textfield name="script.displayNm" label="Script Name" size="15"/>
+                                <s:textarea name="script.script" label="Script" rows="15" cols="35" wrap="off"/>
+                                <s:hidden name="sortedSet.orderByDirection"/>
+                                <s:hidden name="sortedSet.orderByField"/>
+                            </s:form>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-default submit_btn">Submit</button>
+                    </div>
+                </div>
             </div>
-
+        </div>
 
             <s:iterator var="script" value="sortedSet.itemList" status="stat">
-                <div id="edit_dialog_<s:property value="id"/>" title="Edit Script" class="edit_dialog">
-                    <s:form action="saveScript" id="save_script_form_edit_%{id}">
-                       <s:textfield name="script.displayNm" value="%{displayNm}"  label="Script Name" size="15"/>
-                       <s:textarea name="script.script" value="%{script}" label="Script" rows="15" cols="35" wrap="off"/>
-                       <s:hidden name="script.id" value="%{id}"/>
-                       <s:hidden name="sortedSet.orderByDirection"/>
-                       <s:hidden name="sortedSet.orderByField"/>
-                       <tr> <td>&nbsp;</td>
-                        <td align="left"><div class="btn btn-default submit_btn">Submit</div>
-                        <div class="btn btn-default cancel_btn">Cancel</div></td>
-                        </tr>
-                    </s:form>
+                <div id="edit_dialog_<s:property value="id"/>" class="modal fade">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                                <h4 class="modal-title">Edit Script</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <s:form action="saveScript" id="save_script_form_edit_%{id}">
+                                        <s:textfield name="script.displayNm" value="%{displayNm}"  label="Script Name" size="15"/>
+                                        <s:textarea name="script.script" value="%{script}" label="Script" rows="15" cols="35" wrap="off"/>
+                                        <s:hidden name="script.id" value="%{id}"/>
+                                        <s:hidden name="sortedSet.orderByDirection"/>
+                                        <s:hidden name="sortedSet.orderByField"/>
+                                    </s:form>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-default submit_btn">Submit</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </s:iterator>
 

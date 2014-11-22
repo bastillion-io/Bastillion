@@ -23,30 +23,6 @@
     <jsp:include page="../_res/inc/header.jsp"/>
     <script type="text/javascript">
         $(document).ready(function () {
-            $("#add_dialog").dialog({
-                autoOpen: false,
-                height: 300,
-                width: 425,
-                modal: true
-            });
-            $(".edit_dialog").dialog({
-                autoOpen: false,
-                height: 300,
-                width: 425,
-                modal: true
-            });
-
-            //open add dialog
-            $("#add_btn").button().click(function () {
-                $("#add_dialog").dialog("open");
-            });
-            //open edit dialog
-            $(".edit_btn").button().click(function () {
-                //get dialog id to open
-                var id = $(this).attr('id').replace("edit_btn_", "");
-                $("#edit_dialog_" + id).dialog("open");
-
-            });
 
             //call delete action
             $(".del_btn").button().click(function () {
@@ -55,12 +31,7 @@
             });
             //submit add or edit form
             $(".submit_btn").button().click(function () {
-                $(this).parents('form:first').submit();
-            });
-            //close all forms
-            $(".cancel_btn").button().click(function () {
-                $("#add_dialog").dialog("close");
-                $(".edit_dialog").dialog("close");
+                $(this).parents('.modal').find('form').submit();
             });
 
             $(".sort,.sortAsc,.sortDesc").click(function () {
@@ -89,10 +60,10 @@
         <script type="text/javascript">
             $(document).ready(function () {
                 <s:if test="profile.id>0">
-                $("#edit_dialog_<s:property value="profile.id"/>").dialog("open");
+                $("#edit_dialog_<s:property value="profile.id"/>").modal();
                 </s:if>
                 <s:else>
-                $("#add_dialog").dialog("open");
+                $("#add_dialog").modal();
                 </s:else>
             });
         </script>
@@ -151,9 +122,9 @@
                         <td>
                             <div style="width:240px">
                                 <a href="viewProfileSystems.action?profile.id=<s:property value="id"/>">
-                                <div id="assign_btn_<s:property value="id"/>" class="btn btn-default edit_btn" style="float:left">Assign Systems</div></a>
-                                <div id="edit_btn_<s:property value="id"/>" class="btn btn-default edit_btn" style="float:left">Edit</div>
-                                <div id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn" style="float:left">Delete</div>
+                                <button id="assign_btn_<s:property value="id"/>" class="btn btn-default edit_btn" style="float:left">Assign Systems</button></a>
+                                <button class="btn btn-default" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>" style="float:left">Edit</button>
+                                <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn" style="float:left">Delete</button>
                                 <div style="clear:both"/>
                             </div>
                         </td>
@@ -165,43 +136,58 @@
             </table>
         </s:if>
 
-
-        <div id="add_btn" class="btn btn-default">Add Profile</div>
-        <div id="add_dialog" title="Add Profile">
-            <s:form action="saveProfile" class="save_profile_form_add">
-                <s:textfield name="profile.nm" label="Name" size="15"/>
-                <s:textarea name="profile.desc" label="Profile Description" rows="5" cols="25"/>
-                <s:hidden name="sortedSet.orderByDirection"/>
-                <s:hidden name="sortedSet.orderByField"/>
-                <tr>
-                    <td>&nbsp;</td>
-                    <td align="left">
-                        <div class="btn btn-default submit_btn">Submit</div>
-                        <div class="btn btn-default cancel_btn">Cancel</div>
-                    </td>
-                </tr>
-            </s:form>
+        <button class="btn btn-default add_btn" data-toggle="modal" data-target="#add_dialog">Add Profile</button>
+        <div id="add_dialog" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                        <h4 class="modal-title">Add Profile</h4>
+                    </div>
+                    <div class="modal-body">
+                        <s:form action="saveProfile" class="save_profile_form_add">
+                            <s:textfield name="profile.nm" label="Name" size="15"/>
+                            <s:textarea name="profile.desc" label="Profile Description" rows="5" cols="25"/>
+                            <s:hidden name="sortedSet.orderByDirection"/>
+                            <s:hidden name="sortedSet.orderByField"/>
+                         </s:form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-default submit_btn">Submit</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
-
         <s:iterator var="profile" value="sortedSet.itemList" status="stat">
-            <div id="edit_dialog_<s:property value="id"/>" title="Edit Profile" class="edit_dialog">
-                <s:form action="saveProfile" id="save_profile_form_edit_%{id}">
-                    <s:textfield name="profile.nm" value="%{nm}" label="Name" size="15"/>
-                    <s:textarea name="profile.desc" value="%{desc}" label="Profile Description" rows="5"
-                                cols="25"/>
-                    <s:hidden name="profile.id" value="%{id}"/>
-                    <s:hidden name="sortedSet.orderByDirection"/>
-                    <s:hidden name="sortedSet.orderByField"/>
-                    <tr>
-                        <td>&nbsp;</td>
-                        <td align="left">
-                            <div class="btn btn-default submit_btn">Submit</div>
-                            <div class="btn btn-default cancel_btn">Cancel</div>
-                        </td>
-                    </tr>
-                </s:form>
+            <div id="edit_dialog_<s:property value="id"/>" class="modal fade">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                            <h4 class="modal-title">Edit Profile</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <s:form action="saveProfile" id="save_profile_form_edit_%{id}">
+                                    <s:textfield name="profile.nm" value="%{nm}" label="Name" size="15"/>
+                                    <s:textarea name="profile.desc" value="%{desc}" label="Profile Description" rows="5"
+                                                cols="25"/>
+                                    <s:hidden name="profile.id" value="%{id}"/>
+                                    <s:hidden name="sortedSet.orderByDirection"/>
+                                    <s:hidden name="sortedSet.orderByField"/>
+                                </s:form>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-default submit_btn">Submit</button>
+                        </div>
+                    </div>
+                </div>
             </div>
+
         </s:iterator>
     </div>
 

@@ -30,6 +30,8 @@ public class Auth {
     String passwordConfirm;
     String prevPassword;
     String authToken;
+    String otpSecret;
+    Long otpToken;
     String salt;
     String userType=ADMINISTRATOR;
 
@@ -63,6 +65,22 @@ public class Auth {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getOtpSecret() {
+        return otpSecret;
+    }
+
+    public void setOtpSecret(String otpSecret) {
+        this.otpSecret = otpSecret;
+    }
+
+    public Long getOtpToken() {
+        return otpToken;
+    }
+
+    public void setOtpToken(Long otpToken) {
+        this.otpToken = otpToken;
     }
 
     public String getPasswordConfirm() {

@@ -27,6 +27,17 @@ import java.util.Calendar;
  */
 public class AuthUtil {
 
+    /**
+     * query session for OTP shared secret
+     *
+     * @param session http session
+     * @return shared secret
+     */
+    public static String getOTPSecret( HttpSession session) {
+        String secret = (String) session.getAttribute("otp_secret");
+        secret = EncryptionUtil.decrypt(secret);
+        return secret;
+    }
 
     /**
      * set user type
@@ -115,6 +126,19 @@ public class AuthUtil {
         String timeout = (String) session.getAttribute("timeout");
         return timeout;
     }
+
+    /**
+     * set session OTP shared secret
+     *
+     * @param session http session
+     * @param secret shared secret
+     */
+    public static void setOTPSecret(HttpSession session, String secret) {
+        if (secret != null && !secret.trim().equals("")) {
+            session.setAttribute("otp_secret", EncryptionUtil.encrypt(secret));
+        }
+    }
+
 
     /**
      * set session user id

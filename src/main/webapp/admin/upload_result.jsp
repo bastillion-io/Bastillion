@@ -27,14 +27,7 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
-            $("#error_dialog").dialog({
-                autoOpen: false,
-                height: 175,
-                width: 400,
-                modal: true
-            });
 
-            //submit add or edit form
             $(".submit_btn").button().click(function() {
                 $('#push').submit();
             });
@@ -47,7 +40,7 @@
             container.scrollTop(scrollTo.offset().top - container.offset().top + container.scrollTop() - 55);
             </s:if>
             <s:if test="currentSystemStatus!=null && currentSystemStatus.statusCd=='GENERICFAIL'">
-            $("#error_dialog").dialog("open");
+            $("#error_dialog").modal();
             </s:if>
             <s:elseif test="pendingSystemStatus!=null">
             $('#push').submit();
@@ -72,7 +65,7 @@
 
 
 <s:if test="hostSystemList!= null && !hostSystemList.isEmpty()">
-    <table class="table-striped scrollableTable">
+    <table class="table-striped scrollableTable"  style="min-width: 95%">
         <thead>
 
         <tr>
@@ -131,15 +124,25 @@
     <s:hidden name="uploadFileName"/>
 </s:form>
 
-<div id="error_dialog" title="Error">
-    <p class="error">Error: <s:property value="currentSystemStatus.errorMsg"/></p>
-
-    <p>System: <s:property value="currentSystemStatus.displayLabel"/>
-
-    </p>
 
 
-    <div class="btn btn-default submit_btn">OK</div>
+<div id="error_dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                <h4 class="modal-title">System: <s:property value="currentSystemStatus.displayLabel"/></h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="error">Error: <s:property value="currentSystemStatus.errorMsg"/></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default submit_btn">OK</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 </body>

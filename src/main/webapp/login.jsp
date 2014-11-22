@@ -57,6 +57,9 @@
         <s:form action="loginSubmit"  autocomplete="off">
             <s:textfield name="auth.username" label="Username"/>
             <s:password name="auth.password" label="Password"/>
+            <s:if test="otpEnabled">
+                <s:textfield name="auth.otpToken" label="OTP Access Code"  autocomplete="off"/>
+            </s:if>
             <tr> <td>&nbsp;</td>
                 <td align="right">  <div id="login_btn" class="btn btn-default login" >Login</div></td>
             </tr>

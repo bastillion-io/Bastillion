@@ -15,14 +15,18 @@
  */
 package com.keybox.manage.action;
 
+import com.keybox.common.util.AppConfig;
 import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.db.AuthDB;
 import com.keybox.manage.model.Auth;
+import com.keybox.manage.util.OTPUtil;
 import com.opensymphony.xwork2.ActionSupport;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.apache.struts2.interceptor.ServletResponseAware;
+import sun.misc.SharedSecrets;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,6 +40,8 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
     HttpServletResponse servletResponse;
     HttpServletRequest servletRequest;
     Auth auth;
+    //check if otp is enabled
+    boolean otpEnabled="true".equals(AppConfig.getProperty("enableOTP"));
 
     @Action(value = "/login",
             results = {
@@ -62,6 +68,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
             results = {
                     @Result(name = "input", location = "/login.jsp"),
                     @Result(name = "change_password", location = "/admin/setPassword.action", type = "redirect"),
+                    @Result(name = "otp", location = "/admin/viewOTP.action", type = "redirect"),
                     @Result(name = "success", location = "/admin/menu.action", type = "redirect")
             }
     )
@@ -70,11 +77,26 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 
         String authToken = AuthDB.login(auth);
         if (authToken != null) {
+
+            Long userId = AuthDB.getUserIdByAuthToken(authToken);
+            String sharedSecret = null;
+            if (otpEnabled) {
+                sharedSecret = AuthDB.getSharedSecret(userId);
+                if (StringUtils.isNotEmpty(sharedSecret) && (auth.getOtpToken() == null || !OTPUtil.verifyToken(sharedSecret, auth.getOtpToken()))) {
+                    addFieldError("auth.otpToken", "Invalid");
+                    return INPUT;
+                }
+            }
+
             AuthUtil.setAuthToken(servletRequest.getSession(), authToken);
-            AuthUtil.setUserId(servletRequest.getSession(), AuthDB.getUserIdByAuthToken(authToken));
+            AuthUtil.setUserId(servletRequest.getSession(), userId);
             AuthUtil.setTimeout(servletRequest.getSession());
 
-            if ("changeme".equals(auth.getPassword())) {
+            //for first time login redirect to set OTP
+            if (otpEnabled && StringUtils.isEmpty(sharedSecret)) {
+                return "otp";
+            }
+            else if ("changeme".equals(auth.getPassword())) {
                 retVal = "change_password";
             }
 
@@ -172,6 +194,14 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 
     }
 
+    public boolean isOtpEnabled() {
+        return otpEnabled;
+    }
+
+    public void setOtpEnabled(boolean otpEnabled) {
+        this.otpEnabled = otpEnabled;
+    }
+
     public Auth getAuth() {
         return auth;
     }
@@ -179,7 +209,6 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
     public void setAuth(Auth auth) {
         this.auth = auth;
     }
-
 
     public HttpServletResponse getServletResponse() {
         return servletResponse;

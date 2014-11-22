@@ -25,31 +25,6 @@
     <script type="text/javascript">
         $(document).ready(function () {
 
-            $("#add_dialog").dialog({
-                autoOpen: false,
-                height: 450,
-                width: 800,
-                modal: true
-            });
-
-            $(".edit_dialog").dialog({
-                autoOpen: false,
-                height: 450,
-                width: 800,
-                modal: true
-            });
-
-            //open add dialog
-            $("#add_btn").button().click(function () {
-                $("#add_dialog").dialog("open");
-            });
-            //open edit dialog
-            $(".edit_btn").button().click(function () {
-                //get dialog id to open
-                var id = $(this).attr('id').replace("edit_btn_", "");
-                $("#edit_dialog_" + id).dialog("open");
-
-            });
             //call delete action
             $(".del_btn").button().click(function () {
                 var id = $(this).attr('id').replace("del_btn_", "");
@@ -57,13 +32,10 @@
             });
             //submit add or edit form
             $(".submit_btn").button().click(function () {
-                $(this).parents('form:first').submit();
+                $(this).parents('.modal').find('form').submit();
             });
-            //close all forms
-            $(".cancel_btn").button().click(function () {
-                $("#add_dialog").dialog("close");
-                $(".edit_dialog").dialog("close");
-            });  //regenerate auth keys btn
+
+            //regenerate auth keys btn
             $(".gen_auth_keys_btn").button().click(function () {
                 $("#gen_auth_keys").submit();
             });
@@ -96,10 +68,10 @@
         <script type="text/javascript">
             $(document).ready(function () {
                 <s:if test="publicKey.id>0">
-                $("#edit_dialog_<s:property value="publicKey.id"/>").dialog("open");
+                $("#edit_dialog_<s:property value="publicKey.id"/>").modal();
                 </s:if>
                 <s:else>
-                $("#add_dialog").dialog("open");
+                $("#add_dialog").modal();
                 </s:else>
             });
         </script>
@@ -157,12 +129,9 @@
                         </td>
                         <td>
                             <div style="width:150px">
-                                <div id="edit_btn_<s:property value="id"/>" class="btn btn-default edit_btn" style="float:left">
-                                    Edit
-                                </div>
-                                <div id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn" style="float:left">
-                                    Delete
-                                </div>
+                                <button class="btn btn-default" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>" style="float:left">Edit</button>
+
+                                <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn" style="float:left" >Delete</button>
                                 &nbsp;&nbsp;&nbsp;
                                 <div style="clear:both"></div>
                             </div>
@@ -173,46 +142,63 @@
             </table>
         </s:if>
 
-
-        <div id="add_btn" class="btn btn-default">Add Public Key</div>
-        <div id="add_dialog" title="Add Public Key">
-            <s:form action="savePublicKey" class="save_public_key_form_add" autocomplete="off">
-                <s:textfield name="publicKey.keyNm" label="Key Name" size="15"/>
-                <s:select name="publicKey.profile.id" list="profileList" headerKey="" headerValue="All Systems"
-                          listKey="id" listValue="%{nm}" label="Profile"/>
-                <s:textarea name="publicKey.publicKey" rows="10" cols="75"/>
-                <s:hidden name="sortedSet.orderByDirection"/>
-                <s:hidden name="sortedSet.orderByField"/>
-                <tr>
-                    <td>&nbsp;</td>
-                    <td align="left">
-                        <div class="btn btn-default submit_btn">Submit</div>
-                        <div class="btn btn-default cancel_btn">Cancel</div>
-                    </td>
-                </tr>
-            </s:form>
+        <button class="btn btn-default add_btn" data-toggle="modal" data-target="#add_dialog">Add Public Key</button>
+        <div id="add_dialog" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                        <h4 class="modal-title">Add Public Key</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <s:form action="savePublicKey" class="save_public_key_form_add" autocomplete="off">
+                                <s:textfield name="publicKey.keyNm" label="Key Name" size="15"/>
+                                <s:select name="publicKey.profile.id" list="profileList" headerKey="" headerValue="All Systems"
+                                          listKey="id" listValue="%{nm}" label="Profile"/>
+                                <s:textarea name="publicKey.publicKey" rows="15" cols="55"/>
+                                <s:hidden name="sortedSet.orderByDirection"/>
+                                <s:hidden name="sortedSet.orderByField"/>
+                            </s:form>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-default submit_btn">Submit</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
 
         <s:iterator var="publicKey" value="sortedSet.itemList" status="stat">
-            <div id="edit_dialog_<s:property value="id"/>" title="Edit Public Key" class="edit_dialog">
-                <s:form action="savePublicKey" id="save_public_key_form_edit_%{id}" autocomplete="off">
-                    <s:hidden name="publicKey.id" value="%{id}"/>
-                    <s:textfield name="publicKey.keyNm" value="%{keyNm}" label="Key Name" size="15"/>
-                    <s:select name="publicKey.profile.id" list="profileList" headerKey="" headerValue="All Systems"
-                              listKey="id" listValue="%{nm}" label="Profile" value="%{profile.id}"/>
+            <div id="edit_dialog_<s:property value="id"/>" class="modal fade">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                            <h4 class="modal-title">Edit Public Key</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <s:form action="savePublicKey" id="save_public_key_form_edit_%{id}" autocomplete="off">
+                                    <s:hidden name="publicKey.id" value="%{id}"/>
+                                    <s:textfield name="publicKey.keyNm" value="%{keyNm}" label="Key Name" size="15"/>
+                                    <s:select name="publicKey.profile.id" list="profileList" headerKey="" headerValue="All Systems"
+                                              listKey="id" listValue="%{nm}" label="Profile" value="%{profile.id}"/>
 
-                    <s:textarea name="publicKey.publicKey" value="%{publicKey}" label="Public Key" rows="10" cols="75"/>
-                    <s:hidden name="sortedSet.orderByDirection"/>
-                    <s:hidden name="sortedSet.orderByField"/>
-                    <tr>
-                        <td>&nbsp;</td>
-                        <td align="left">
-                            <div class="btn btn-default submit_btn">Submit</div>
-                            <div class="btn btn-default cancel_btn">Cancel</div>
-                        </td>
-                    </tr>
-                </s:form>
+                                    <s:textarea name="publicKey.publicKey" value="%{publicKey}" label="Public Key" rows="15" cols="55"/>
+                                    <s:hidden name="sortedSet.orderByDirection"/>
+                                    <s:hidden name="sortedSet.orderByField"/>
+                                </s:form>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-default submit_btn">Submit</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </s:iterator>
 

@@ -22,49 +22,13 @@
     <jsp:include page="../_res/inc/header.jsp"/>
     <script type="text/javascript">
         $(document).ready(function () {
-            $("#add_dialog").dialog({
-                autoOpen: false,
-                height: 325,
-                width: 450,
-                modal: true
-            });
-            $(".edit_dialog").dialog({
-                autoOpen: false,
-                height: 325,
-                width: 450,
-                modal: true
-            });
-            $("#script_dia").dialog({
-                autoOpen: false,
-                height: 350,
-                width: 350,
-                modal: true,
-                open: function (event, ui) {
-                    $(".ui-dialog-titlebar-close").show();
-                }
-            });
-            //open add dialog
-            $("#add_btn").button().click(function () {
-                $("#add_dialog").dialog("open");
-            });
-            //open edit dialog
-            $(".edit_btn").button().click(function () {
-                //get dialog id to open
-                var id = $(this).attr('id').replace("edit_btn_", "");
-                $("#edit_dialog_" + id).dialog("open");
 
-            });
-
-
-            //open edit dialog
             $(".refresh_btn").button().click(function () {
                 //get id to submit edit form
                 var id = $(this).attr('id').replace("refresh_btn_", "");
                 $("#save_sys_form_edit_" + id).submit();
 
             });
-
-
             //call delete action
             $(".del_btn").button().click(function () {
                 var id = $(this).attr('id').replace("del_btn_", "");
@@ -72,24 +36,19 @@
             });
             //submit add or edit form
             $(".submit_btn").button().click(function () {
-                $(this).parents('form:first').submit();
+                $(this).parents('.modal').find('form').submit();
             });
             //close all forms
             $(".cancel_btn").button().click(function () {
                 <s:if test="pendingSystem!=null">
-                window.location = 'getNextPendingSystem.action?pendingSystem.id=<s:property value="pendingSystem.id"/>';
+                    window.location = 'getNextPendingSystem.action?pendingSystem.id=<s:property value="pendingSystem.id"/>';
                 </s:if>
-                <s:else>
-                $(".dialog").dialog("close");
-                $(".edit_dialog").dialog("close");
-                </s:else>
             });
             $(".sort,.sortAsc,.sortDesc").click(function () {
-                var id = $(this).attr('id')
+                var id = $(this).attr('id');
 
                 if ($('#viewSystems_sortedSet_orderByDirection').attr('value') == 'asc') {
                     $('#viewSystems_sortedSet_orderByDirection').attr('value', 'desc');
-
                 } else {
                     $('#viewSystems_sortedSet_orderByDirection').attr('value', 'asc');
                 }
@@ -107,28 +66,11 @@
             $(".scrollableTable tr:odd").css("background-color", "#e0e0e0");
 
 
-            $("#error_dialog").dialog({
-                autoOpen: false,
-                height: 225,
-                width: 500,
-                modal: true
-            });
-            $("#set_password_dialog").dialog({
-                autoOpen: false,
-                height: 225,
-                width: 500,
-                modal: true
-            });
-            $("#set_passphrase_dialog").dialog({
-                autoOpen: false,
-                height: 225,
-                width: 500,
-                modal: true
-            });
+
 
 
             <s:if test="pendingSystem!=null">
-            //change all form actions to distrubte keys
+            //change all form actions to distribute keys
             $('form').attr('action', 'genAuthKeyForSystem.action');
             //disable all buttons
             $('.refresh_btn').button("disable");
@@ -141,13 +83,13 @@
             </s:if>
 
             <s:if test="hostSystem.statusCd=='GENERICFAIL'">
-            $("#error_dialog").dialog("open");
+            $("#error_dialog").modal();
             </s:if>
             <s:elseif test="hostSystem.statusCd=='AUTHFAIL'">
-            $("#set_password_dialog").dialog("open");
+            $("#set_password_dialog").modal();
             </s:elseif>
             <s:elseif test="hostSystem.statusCd=='KEYAUTHFAIL'">
-            $("#set_passphrase_dialog").dialog("open");
+            $("#set_passphrase_dialog").modal();
             </s:elseif>
             <s:elseif test="pendingSystem!=null">
             $("#gen_key_frm").submit();
@@ -159,10 +101,10 @@
         <script type="text/javascript">
             $(document).ready(function () {
                 <s:if test="hostSystem.id>0">
-                $("#edit_dialog_<s:property value="hostSystem.id"/>").dialog("open");
+                $("#edit_dialog_<s:property value="hostSystem.id"/>").modal();
                 </s:if>
                 <s:else>
-                $("#add_dialog").dialog("open");
+                $("#add_dialog").modal();
                 </s:else>
             });
         </script>
@@ -192,7 +134,7 @@
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
 
-            <table class="table-striped scrollableTable">
+            <table class="table-striped scrollableTable" style="min-width: 85%">
                 <thead>
 
 
@@ -240,13 +182,12 @@
 
                             <div style="width:160px">
 
-                                <img src="../../img/refresh.png" alt="Refresh" style="float:left;width:32px;height:32px;" class="btn btn-default refresh_btn"
-                                     id="refresh_btn_<s:property value="id"/>"/>
 
-                                <div id="edit_btn_<s:property value="id"/>" class="btn btn-default edit_btn" style="float:left">Edit
-                                </div>
-                                <div id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn" style="float:left">Delete
-                                </div>
+                                <button id="refresh_btn_<s:property value="id"/>" class="btn btn-default refresh_btn" style="float:left"><img src="../../img/refresh.png" alt="Refresh" style="float:left;width:20px;height:20px;"/></button>
+
+                                <button class="btn btn-default" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>" style="float:left">Edit</button>
+
+                                <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn" style="float:left" >Delete</button>
                                 <div style="clear:both"></div>
                             </div>
                         </td>
@@ -258,120 +199,158 @@
             </table>
 
         </s:if>
-        <div id="add_btn" class="btn btn-default add_btn">Add System</div>
-        <div id="add_dialog" class="dialog" title="Add System">
-            <s:form action="saveSystem" class="save_sys_form_add">
-                <s:textfield name="hostSystem.displayNm" label="Display Name" size="10"/>
-                <s:textfield name="hostSystem.user" label="System User" size="10"/>
-                <s:textfield name="hostSystem.host" label="Host" size="18"/>
-                <s:textfield name="hostSystem.port" label="Port" size="2"/>
-                <s:textfield name="hostSystem.authorizedKeys" label="Authorized Keys" size="30"/>
-                <s:hidden name="sortedSet.orderByDirection"/>
-                <s:hidden name="sortedSet.orderByField"/>
-                <tr>
-                    <td>&nbsp;</td>
-                    <td align="left">
-                        <div class="btn btn-default submit_btn">Submit</div>
-                        <div class="btn btn-default cancel_btn">Cancel</div>
-                    </td>
-                </tr>
-            </s:form>
 
+        <button class="btn btn-default add_btn" data-toggle="modal" data-target="#add_dialog">Add System</button>
+        <div id="add_dialog" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                        <h4 class="modal-title">Add System</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <s:form action="saveSystem" class="save_sys_form_add">
+                                <s:textfield name="hostSystem.displayNm" label="Display Name" size="10"/>
+                                <s:textfield name="hostSystem.user" label="System User" size="10"/>
+                                <s:textfield name="hostSystem.host" label="Host" size="18"/>
+                                <s:textfield name="hostSystem.port" label="Port" size="2"/>
+                                <s:textfield name="hostSystem.authorizedKeys" label="Authorized Keys" size="30"/>
+                                <s:hidden name="sortedSet.orderByDirection"/>
+                                <s:hidden name="sortedSet.orderByField"/>
+                            </s:form>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-default submit_btn">Submit</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <s:iterator var="system" value="sortedSet.itemList" status="stat">
-
-            <div id="edit_dialog_<s:property value="id"/>" title="Edit System" class="edit_dialog">
-                <s:form action="saveSystem" id="save_sys_form_edit_%{id}">
-                    <s:textfield name="hostSystem.displayNm" value="%{displayNm}" label="Display Name" size="10"/>
-                    <s:textfield name="hostSystem.user" value="%{user}" label="System User" size="10"/>
-                    <s:textfield name="hostSystem.host" value="%{host}" label="Host" size="18"/>
-                    <s:textfield name="hostSystem.port" value="%{port}" label="Port" size="2"/>
-                    <s:textfield name="hostSystem.authorizedKeys" value="%{authorizedKeys}"
-                                 label="Authorized Keys" size="30"/>
-                    <s:hidden name="hostSystem.id" value="%{id}"/>
-                    <s:hidden name="sortedSet.orderByDirection"/>
-                    <s:hidden name="sortedSet.orderByField"/>
-                    <tr>
-                        <td>&nbsp;</td>
-                        <td align="left">
-                            <div class="btn btn-default submit_btn">Submit</div>
-                            <div class="btn btn-default cancel_btn">Cancel</div>
-                        </td>
-                    </tr>
-                </s:form>
+            <div id="edit_dialog_<s:property value="id"/>" class="modal fade">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                            <h4 class="modal-title">Edit System</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <s:form action="saveSystem" id="save_sys_form_edit_%{id}">
+                                    <s:textfield name="hostSystem.displayNm" value="%{displayNm}" label="Display Name" size="10"/>
+                                    <s:textfield name="hostSystem.user" value="%{user}" label="System User" size="10"/>
+                                    <s:textfield name="hostSystem.host" value="%{host}" label="Host" size="18"/>
+                                    <s:textfield name="hostSystem.port" value="%{port}" label="Port" size="2"/>
+                                    <s:textfield name="hostSystem.authorizedKeys" value="%{authorizedKeys}"
+                                                 label="Authorized Keys" size="30"/>
+                                    <s:hidden name="hostSystem.id" value="%{id}"/>
+                                    <s:hidden name="sortedSet.orderByDirection"/>
+                                    <s:hidden name="sortedSet.orderByField"/>
+                                </s:form>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-default submit_btn">Submit</button>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </s:iterator>
+       </s:iterator>
 
-        <div id="set_password_dialog" class="dialog" title="Enter Password">
-            <p class="error"><s:property value="hostSystem.errorMsg"/></p>
 
-            <p>Enter password for <s:property value="hostSystem.displayLabel"/>
 
-            </p>
-            <s:form id="password_frm" action="saveSystem">
-                <s:hidden name="hostSystem.id"/>
-                <s:hidden name="hostSystem.displayNm"/>
-                <s:hidden name="hostSystem.user"/>
-                <s:hidden name="hostSystem.host"/>
-                <s:hidden name="hostSystem.port"/>
-                <s:hidden name="hostSystem.authorizedKeys"/>
-                <s:hidden name="sortedSet.orderByDirection"/>
-                <s:hidden name="sortedSet.orderByField"/>
-                <s:password name="password" label="Password" size="15" value="" autocomplete="off"/>
-                <s:hidden name="pendingSystem.id"/>
-                <tr>
-                    <td>&nbsp;</td>
-                    <td align="left">
-                        <div class="btn btn-default submit_btn">Submit</div>
-                        <div class="btn btn-default cancel_btn">Cancel</div>
-                    </td>
-                </tr>
-            </s:form>
+        <div id="set_password_dialog" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                        <h4 class="modal-title">Enter password for <s:property value="hostSystem.displayLabel"/></h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="error">Error: <s:property value="hostSystem.errorMsg"/></div>
+                            <s:form id="password_frm" action="saveSystem">
+                                <s:hidden name="hostSystem.id"/>
+                                <s:hidden name="hostSystem.displayNm"/>
+                                <s:hidden name="hostSystem.user"/>
+                                <s:hidden name="hostSystem.host"/>
+                                <s:hidden name="hostSystem.port"/>
+                                <s:hidden name="hostSystem.authorizedKeys"/>
+                                <s:hidden name="sortedSet.orderByDirection"/>
+                                <s:hidden name="sortedSet.orderByField"/>
+                                <s:password name="password" label="Password" size="15" value="" autocomplete="off"/>
+                                <s:hidden name="pendingSystem.id"/>
+                            </s:form>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-default submit_btn">Submit</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div id="set_passphrase_dialog" class="dialog" title="Enter Passphrase">
-            <p class="error"><s:property value="hostSystem.errorMsg"/></p>
-            <s:form id="passphrase_frm" action="saveSystem">
-                <s:hidden name="hostSystem.id"/>
-                <s:hidden name="hostSystem.displayNm"/>
-                <s:hidden name="hostSystem.user"/>
-                <s:hidden name="hostSystem.host"/>
-                <s:hidden name="hostSystem.port"/>
-                <s:hidden name="hostSystem.authorizedKeys"/>
-                <s:hidden name="sortedSet.orderByDirection"/>
-                <s:hidden name="sortedSet.orderByField"/>
-                <s:password name="passphrase" label="Passphrase" size="15" value="" autocomplete="off"/>
-                <s:hidden name="pendingSystem.id"/>
-                <tr>
-                    <td>&nbsp;</td>
-                    <td align="left">
-                        <div class="btn btn-default submit_btn">Submit</div>
-                        <div class="btn btn-default cancel_btn">Cancel</div>
-                    </td>
-                </tr>
-            </s:form>
+
+
+        <div id="set_passphrase_dialog" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                        <h4 class="modal-title">Enter passphrase for <s:property value="hostSystem.displayLabel"/></h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="error">Error: <s:property value="hostSystem.errorMsg"/></div>
+                            <s:form id="passphrase_frm" action="saveSystem">
+                                <s:hidden name="hostSystem.id"/>
+                                <s:hidden name="hostSystem.displayNm"/>
+                                <s:hidden name="hostSystem.user"/>
+                                <s:hidden name="hostSystem.host"/>
+                                <s:hidden name="hostSystem.port"/>
+                                <s:hidden name="hostSystem.authorizedKeys"/>
+                                <s:hidden name="sortedSet.orderByDirection"/>
+                                <s:hidden name="sortedSet.orderByField"/>
+                                <s:password name="passphrase" label="Passphrase" size="15" value="" autocomplete="off"/>
+                                <s:hidden name="pendingSystem.id"/>
+                            </s:form>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-default submit_btn">Submit</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div id="error_dialog" class="dialog" title="Error">
-            <p class="error">Error: <s:property value="hostSystem.errorMsg"/></p>
-
-            <p>System: <s:property value="hostSystem.displayLabel"/>
-
-            </p>
-
-            <s:form id="error_frm">
-                <s:hidden name="hostSystem.id"/>
-                <s:hidden name="pendingSystem.id"/>
-                <tr>
-                    <td>&nbsp;</td>
-                    <td align="left">
-                        <div class="btn btn-default cancel_btn">OK</div>
-                    </td>
-                </tr>
-            </s:form>
+        <div id="error_dialog" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                        <h4 class="modal-title">System: <s:property value="hostSystem.displayLabel"/></h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="error">Error: <s:property value="hostSystem.errorMsg"/></div>
+                            <s:form id="error_frm">
+                                <s:hidden name="hostSystem.id"/>
+                                <s:hidden name="pendingSystem.id"/>
+                            </s:form>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default submit_btn">OK</button>
+                    </div>
+                </div>
+            </div>
         </div>
-
 
     </div>
 
