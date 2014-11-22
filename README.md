@@ -17,10 +17,8 @@ Prerequisites
 http://www.oracle.com/technetwork/java/javase/overview/index.html
 
 * Browser with Web Socket support
-http://caniuse.com/websockets
-
-⋅⋅* Note: In Safari if using a self-signed certificate you must import the certificate into your Keychain.
-Select 'Show Certificate' -> 'Always Trust' when prompted in Safari
+http://caniuse.com/websockets *Note: In Safari if using a self-signed certificate you must import the certificate into your Keychain.
+Select 'Show Certificate' -> 'Always Trust' when prompted in Safari*
 
 * Maven 3 or greater  ( Only needed if building from source )
 http://maven.apache.org
