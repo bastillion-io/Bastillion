@@ -21,6 +21,7 @@
 <head>
 
 <jsp:include page="../_res/inc/header.jsp"/>
+<script src="<%= request.getContextPath() %>/_res/js/jquery-ui.js"></script>
 
 <script type="text/javascript">
 $(document).ready(function() {
