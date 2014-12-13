@@ -43,7 +43,7 @@
     </welcome-file-list>
 
     <error-page>
-        <location>/error.html</location>
+        <location>/error.jsp</location>
     </error-page>
 
 </web-app>

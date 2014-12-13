@@ -83,8 +83,6 @@
                     <th>Google Authenticator</th>
                     <th>Link</th>
                 </tr>
-                </thead>
-                <tbody>
                 <tr>
                     <td>Android</td>
                     <td><a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2" target="_blank">Google Play</a></td>

@@ -27,15 +27,17 @@ table tbody {
     padding: 10px 2px 2px 0px;
     float: right;
 }
-.wwFormTable {
+
+form table {
     background-color: #FFFFFF;
     min-width:10px;
 }
 
-.wwFormTable input {
+form table input {
     padding: 2px;
 }
-.wwFormTable td {
+
+form table td, form table th {
     padding: 5px;
 }
 
@@ -45,7 +47,6 @@ table td, table th {
     padding:10px;
 }
 
-
 .table-striped {
     border: 1px solid #CCCCCC;
 }
@@ -54,9 +55,8 @@ table td, table th {
     background-color: #e0e0e0;
 }
 
-.table-striped th, .tablescroll_head th {
+.table-striped th, .tablescroll_head th, .table-striped td, .tablescroll_head td {
     padding: 10px 15px 10px 10px;
-
 }
 .table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
     border: 1px solid #DDDDDD;
@@ -85,8 +85,8 @@ table td, table th {
 }
 
 
-.wwFormTable label,
-.wwFormTable  .label {
+form table label,
+form table .label {
     font-size: small;
     font-weight: bold;
     color: #666666;

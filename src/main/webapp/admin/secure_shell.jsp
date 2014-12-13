@@ -556,14 +556,14 @@
     </div>
 
     <div id="upload_push_dialog" class="modal fade">
-        <div class="modal-dialog">
+        <div class="modal-dialog" style="width:700px">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
                     <h4 class="modal-title">Upload &amp; Push</h4>
                 </div>
                 <div class="modal-body">
-                    <iframe id="upload_push_frame" width="575px" height="300px" style="border: none;">
+                    <iframe id="upload_push_frame" width="675px" height="300px" style="border: none;">
                     </iframe>
                 </div>
             </div>

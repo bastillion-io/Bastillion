@@ -101,7 +101,7 @@
             <s:form action="assignSystemsToProfile" theme="simple">
                 <s:hidden name="profile.id"/>
 
-                <table class="table-striped scrollableTable">
+                <table class="table-striped scrollableTable" style="min-width:50%">
                     <thead>
 
 

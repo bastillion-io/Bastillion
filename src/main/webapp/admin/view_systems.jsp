@@ -140,7 +140,7 @@
   	             <s:if test="script!=null">
                         <s:hidden name="script.id"/>
                  </s:if>
-                <table class="table-striped scrollableTable">
+                <table class="table-striped scrollableTable" style="min-width:50%">
                     <thead>
 
                     <tr>
