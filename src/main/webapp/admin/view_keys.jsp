@@ -84,23 +84,23 @@
 <body>
 
 
-    <jsp:include page="../_res/inc/navigation.jsp"/>
+<jsp:include page="../_res/inc/navigation.jsp"/>
 
-    <div class="container">
-        <s:form action="viewKeys">
-            <s:hidden name="sortedSet.orderByDirection"/>
-            <s:hidden name="sortedSet.orderByField"/>
-        </s:form>
+<div class="container">
+    <s:form action="viewKeys">
+        <s:hidden name="sortedSet.orderByDirection"/>
+        <s:hidden name="sortedSet.orderByField"/>
+    </s:form>
 
-        <h3>Manage Keys</h3>
+    <h3>Manage SSH Keys</h3>
 
-        <p>Add / Delete keys and assign to profile in order to be distributed (<a href="../manage/distributeKeysByProfile.action">Distribute Keys</a>).<br/><span class="note">Assigning and distributing keys will overwrite the existing authorized keys file.</span></p>
+    <p>Add / Delete keys and assign to profile in order to be set on systems.</p>
 
+    <s:if test="%{#session.userType==\"M\" || (profileList!= null && !profileList.isEmpty()) }">
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
             <table class="table-striped scrollableTable">
                 <thead>
-
 
 
                 <tr>
@@ -129,9 +129,13 @@
                         </td>
                         <td>
                             <div style="width:150px">
-                                <button class="btn btn-default" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>" style="float:left">Edit</button>
+                                <button class="btn btn-default" data-toggle="modal"
+                                        data-target="#edit_dialog_<s:property value="id"/>" style="float:left">Edit
+                                </button>
 
-                                <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn" style="float:left" >Delete</button>
+                                <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn"
+                                        style="float:left">Delete
+                                </button>
                                 &nbsp;&nbsp;&nbsp;
                                 <div style="clear:both"></div>
                             </div>
@@ -141,6 +145,7 @@
                 </tbody>
             </table>
         </s:if>
+
 
         <button class="btn btn-default add_btn" data-toggle="modal" data-target="#add_dialog">Add Public Key</button>
         <div id="add_dialog" class="modal fade">
@@ -154,8 +159,15 @@
                         <div class="row">
                             <s:form action="savePublicKey" class="save_public_key_form_add" autocomplete="off">
                                 <s:textfield name="publicKey.keyNm" label="Key Name" size="15"/>
-                                <s:select name="publicKey.profile.id" list="profileList" headerKey="" headerValue="All Systems"
-                                          listKey="id" listValue="%{nm}" label="Profile"/>
+                                <s:if test="%{#session.userType==\"M\"}">
+                                    <s:select name="publicKey.profile.id" list="profileList" headerKey=""
+                                              headerValue="All Systems"
+                                              listKey="id" listValue="%{nm}" label="Profile" value="%{profile.id}"/>
+                                </s:if>
+                                <s:else>
+                                    <s:select name="publicKey.profile.id" list="profileList"
+                                              listKey="id" listValue="%{nm}" label="Profile" value="%{profile.id}"/>
+                                </s:else>
                                 <s:textarea name="publicKey.publicKey" rows="15" cols="55"/>
                                 <s:hidden name="sortedSet.orderByDirection"/>
                                 <s:hidden name="sortedSet.orderByField"/>
@@ -184,17 +196,25 @@
                                 <s:form action="savePublicKey" id="save_public_key_form_edit_%{id}" autocomplete="off">
                                     <s:hidden name="publicKey.id" value="%{id}"/>
                                     <s:textfield name="publicKey.keyNm" value="%{keyNm}" label="Key Name" size="15"/>
-                                    <s:select name="publicKey.profile.id" list="profileList" headerKey="" headerValue="All Systems"
-                                              listKey="id" listValue="%{nm}" label="Profile" value="%{profile.id}"/>
-
-                                    <s:textarea name="publicKey.publicKey" value="%{publicKey}" label="Public Key" rows="15" cols="55"/>
+                                    <s:if test="%{#session.userType==\"M\"}">
+                                        <s:select name="publicKey.profile.id" list="profileList" headerKey=""
+                                                  headerValue="All Systems"
+                                                  listKey="id" listValue="%{nm}" label="Profile" value="%{profile.id}"/>
+                                    </s:if>
+                                    <s:else>
+                                        <s:select name="publicKey.profile.id" list="profileList"
+                                                  listKey="id" listValue="%{nm}" label="Profile" value="%{profile.id}"/>
+                                    </s:else>
+                                    <s:textarea name="publicKey.publicKey" value="%{publicKey}" label="Public Key"
+                                                rows="15" cols="55"/>
                                     <s:hidden name="sortedSet.orderByDirection"/>
                                     <s:hidden name="sortedSet.orderByField"/>
                                 </s:form>
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel
+                            </button>
                             <button type="button" class="btn btn-default submit_btn">Submit</button>
                         </div>
                     </div>
@@ -203,7 +223,13 @@
         </s:iterator>
 
 
-    </div>
+    </s:if>
+    <s:else>
+        <div class="actionMessage">
+            <p class="error">No profiles have been assigned</p>
+        </div>
+    </s:else>
+</div>
 
 </body>
 </html>

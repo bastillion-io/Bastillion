@@ -17,10 +17,12 @@ package com.keybox.manage.action;
 
 
 import com.keybox.manage.db.ProfileDB;
+import com.keybox.manage.db.PublicKeyDB;
 import com.keybox.manage.db.UserDB;
 import com.keybox.manage.db.UserProfileDB;
 import com.keybox.manage.model.Profile;
 import com.keybox.manage.model.User;
+import com.keybox.manage.util.RefreshAuthKeyUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
@@ -61,6 +63,7 @@ public class UserProfileAction extends ActionSupport {
 
         if (profileId != null) {
             UserProfileDB.addProfileToUser(profileId, user.getId());
+            RefreshAuthKeyUtil.refreshProfileSystems(profileId);
         }
 
         return SUCCESS;
@@ -74,6 +77,8 @@ public class UserProfileAction extends ActionSupport {
     public String deleteProfileFromUser() {
 
         UserProfileDB.deleteProfileFromUser(profileId, user.getId());
+        PublicKeyDB.deleteProfilePublicKeys(profileId);
+        RefreshAuthKeyUtil.refreshProfileSystems(profileId);
 
         return SUCCESS;
     }

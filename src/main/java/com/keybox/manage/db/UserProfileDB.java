@@ -206,4 +206,41 @@ public class UserProfileDB {
         return userList;
     }
 
+
+    /**
+     * checks to determine if user belongs to profile
+     *
+     * @param userId user id
+     * @param profileId profile id
+     * @return true if user belongs to profile
+     */
+    public static boolean checkIsUsersProfile(Long userId, Long profileId){
+        boolean isUsersProfile=false;
+
+        Connection con = null;
+
+        try {
+            con = DBUtils.getConn();
+            PreparedStatement stmt = con.prepareStatement("select * from user_map where profile_id=? and user_id=?");
+            stmt.setLong(1, profileId);
+            stmt.setLong(2, userId);
+
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+               isUsersProfile=true;
+            }
+            DBUtils.closeRs(rs);
+            DBUtils.closeStmt(stmt);
+            DBUtils.closeStmt(stmt);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+
+        return isUsersProfile;
+
+    }
+
 }

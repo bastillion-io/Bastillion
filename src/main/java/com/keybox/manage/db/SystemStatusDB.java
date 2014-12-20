@@ -16,11 +16,8 @@
 package com.keybox.manage.db;
 
 import com.keybox.manage.model.HostSystem;
-import com.keybox.manage.model.Profile;
 import com.keybox.manage.model.SortedSet;
-import com.keybox.manage.model.User;
 import com.keybox.manage.util.DBUtils;
-import com.keybox.manage.util.SSHUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
@@ -28,48 +25,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * DAO used to generate a list of public keys and systems associated
  * with them based on system profiles and users assigned to the profiles.
  */
 public class SystemStatusDB {
-
-
-
-    /**
-     * set the initial status for selected systems
-     *
-     * @param hostSystemList systems ids to set initial status
-     * @param userId user id
-     */
-    public static void setInitialSystemStatusByHostSystem(List<HostSystem> hostSystemList, Long userId) {
-        Connection con = null;
-        try {
-            con = DBUtils.getConn();
-
-            //deletes all old systems
-            deleteAllSystemStatus(con,userId);
-            for (HostSystem hostSystem : hostSystemList) {
-
-                hostSystem.setId(hostSystem.getId());
-                hostSystem.setStatusCd(HostSystem.INITIAL_STATUS);
-
-                //insert new status
-                insertSystemStatus(con, hostSystem, userId);
-
-
-
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        DBUtils.closeConn(con);
-    }
 
 
     /**
@@ -331,29 +293,7 @@ public class SystemStatusDB {
 
     }
 
-    //todo
-    public static List<Long> getHostSystemsIdsByKey(List<Long> keyIds){
-       List<Long> systemIdList= new ArrayList<Long>();
-        Connection con = null;
-        try {
-            con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("select unique system_id from system_map where profile_id in (select unique profile_id from public_keys where id in (?))");
-            stmt.setString(1, StringUtils.join(keyIds,","));
-            ResultSet rs = stmt.executeQuery();
 
-            if (rs.next()) {
-               systemIdList.add(rs.getLong("id"));
-            }
-            DBUtils.closeRs(rs);
-            DBUtils.closeStmt(stmt);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        DBUtils.closeConn(con);
-        return systemIdList;
-
-    }
 
 
 

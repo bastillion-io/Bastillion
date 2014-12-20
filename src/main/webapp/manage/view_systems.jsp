@@ -38,12 +38,6 @@
             $(".submit_btn").button().click(function () {
                 $(this).parents('.modal').find('form').submit();
             });
-            //close all forms
-            $(".cancel_btn").button().click(function () {
-                <s:if test="pendingSystem!=null">
-                    window.location = 'getNextPendingSystem.action?pendingSystem.id=<s:property value="pendingSystem.id"/>';
-                </s:if>
-            });
             $(".sort,.sortAsc,.sortDesc").click(function () {
                 var id = $(this).attr('id');
 
@@ -66,33 +60,14 @@
             $(".scrollableTable tr:odd").css("background-color", "#e0e0e0");
 
 
-
-
-
-            <s:if test="pendingSystem!=null">
-            //change all form actions to distribute keys
-            $('form').attr('action', 'genAuthKeyForSystem.action');
-            //disable all buttons
-            $('.refresh_btn').button("disable");
-            $('.edit_btn').button("disable");
-            $('.del_btn').button("disable");
-            $('.add_btn').button("disable");
-            //set scroll
-            var container = $('.tablescroll_wrapper'), scrollTo = $('#status_<s:property value="pendingSystem.id"/>');
-            container.scrollTop(scrollTo.offset().top - container.offset().top + container.scrollTop() - 55);
-            </s:if>
-
-            <s:if test="hostSystem.statusCd=='GENERICFAIL'">
-            $("#error_dialog").modal();
-            </s:if>
-            <s:elseif test="hostSystem.statusCd=='AUTHFAIL'">
+            <s:if test="hostSystem.statusCd=='AUTHFAIL'">
             $("#set_password_dialog").modal();
-            </s:elseif>
+            </s:if>
             <s:elseif test="hostSystem.statusCd=='KEYAUTHFAIL'">
             $("#set_passphrase_dialog").modal();
             </s:elseif>
             <s:elseif test="pendingSystem!=null">
-            $("#gen_key_frm").submit();
+            $("#error_dialog").modal();
             </s:elseif>
 
         });
@@ -119,16 +94,14 @@
 
     <div class="container">
 
-        <s:form id="gen_key_frm" action="genAuthKeyForSystem">
-            <s:hidden name="pendingSystem.id"/>
-        </s:form>
+
 
         <s:form action="viewSystems">
             <s:hidden name="sortedSet.orderByDirection"/>
             <s:hidden name="sortedSet.orderByField"/>
         </s:form>
 
-        <h3>Manage Systems / Distribute SSH Keys</h3>
+        <h3>Manage Systems</h3>
 
         <p>Add / Delete systems below or distribute SSH keys</p>
 

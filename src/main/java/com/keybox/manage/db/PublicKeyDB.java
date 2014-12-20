@@ -82,6 +82,52 @@ public class PublicKeyDB {
         return sortedSet;
     }
 
+    /**
+     * returns public keys based on sort order defined
+     *
+     * @param sortedSet object that defines sort order
+     * @param userId user id
+     * @return sorted script list
+     */
+    public static SortedSet getPublicKeySet(SortedSet sortedSet, Long userId) {
+
+        ArrayList<PublicKey> publicKeysList = new ArrayList<PublicKey>();
+
+
+        String orderBy = "";
+        if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
+            orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
+        }
+        String sql = "select * from public_keys where user_id = ?" + orderBy;
+
+        Connection con = null;
+        try {
+            con = DBUtils.getConn();
+            PreparedStatement stmt = con.prepareStatement(sql);
+            stmt.setLong(1, userId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                PublicKey publicKey = new PublicKey();
+                publicKey.setId(rs.getLong("id"));
+                publicKey.setKeyNm(rs.getString("key_nm"));
+                publicKey.setPublicKey(rs.getString("public_key"));
+                publicKey.setProfile(ProfileDB.getProfile(con, rs.getLong("profile_id")));
+                publicKeysList.add(publicKey);
+
+            }
+            DBUtils.closeRs(rs);
+            DBUtils.closeStmt(stmt);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+
+        sortedSet.setItemList(publicKeysList);
+        return sortedSet;
+    }
+
 
     /**
      * returns public key base on id
@@ -149,7 +195,7 @@ public class PublicKeyDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("insert into public_keys(key_nm, public_key, profile_id) values (?,?,?)");
+            PreparedStatement stmt = con.prepareStatement("insert into public_keys(key_nm, public_key, profile_id, user_id) values (?,?,?,?)");
             stmt.setString(1, publicKey.getKeyNm());
             stmt.setString(2, publicKey.getPublicKey());
             if (publicKey.getProfile() == null || publicKey.getProfile().getId() == null) {
@@ -157,6 +203,7 @@ public class PublicKeyDB {
             } else {
                 stmt.setLong(3, publicKey.getProfile().getId());
             }
+            stmt.setLong(4, publicKey.getUserId());
             stmt.execute();
 
             DBUtils.closeStmt(stmt);
@@ -167,6 +214,7 @@ public class PublicKeyDB {
         DBUtils.closeConn(con);
 
     }
+
 
     /**
      * updates existing public key
@@ -179,7 +227,7 @@ public class PublicKeyDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("update public_keys set key_nm=?, public_key=?, profile_id=? where id=?");
+            PreparedStatement stmt = con.prepareStatement("update public_keys set key_nm=?, public_key=?, profile_id=? where id=? and user_id=?");
             stmt.setString(1, publicKey.getKeyNm());
             stmt.setString(2, publicKey.getPublicKey());
             if (publicKey.getProfile() == null || publicKey.getProfile().getId() == null) {
@@ -188,6 +236,34 @@ public class PublicKeyDB {
                 stmt.setLong(3, publicKey.getProfile().getId());
             }
             stmt.setLong(4, publicKey.getId());
+            stmt.setLong(5, publicKey.getUserId());
+            stmt.execute();
+            DBUtils.closeStmt(stmt);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+
+    }
+
+
+
+    /**
+     * deletes public key
+     *
+     * @param publicKeyId key id
+     * @param userId  user id
+     */
+    public static void deletePublicKey(Long publicKeyId, Long userId) {
+
+
+        Connection con = null;
+        try {
+            con = DBUtils.getConn();
+            PreparedStatement stmt = con.prepareStatement("delete from public_keys where id=? and user_id=?");
+            stmt.setLong(1, publicKeyId);
+            stmt.setLong(2, userId);
             stmt.execute();
             DBUtils.closeStmt(stmt);
 
@@ -199,18 +275,41 @@ public class PublicKeyDB {
     }
 
     /**
-     * deletes public key
+     * deletes all public keys for user
      *
-     * @param publicKeyId key id
+     * @param userId  user id
      */
-    public static void deletePublicKey(Long publicKeyId) {
+    public static void deleteUserPublicKeys(Long userId) {
 
 
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("delete from public_keys where id=?");
-            stmt.setLong(1, publicKeyId);
+            PreparedStatement stmt = con.prepareStatement("delete from public_keys where user_id=?");
+            stmt.setLong(1, userId);
+            stmt.execute();
+            DBUtils.closeStmt(stmt);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+
+    }
+
+    /**
+     * deletes all public keys for a profile
+     *
+     * @param profileId profile id
+     */
+    public static void deleteProfilePublicKeys(Long profileId) {
+
+
+        Connection con = null;
+        try {
+            con = DBUtils.getConn();
+            PreparedStatement stmt = con.prepareStatement("delete from public_keys where profile_id=?");
+            stmt.setLong(1, profileId);
             stmt.execute();
             DBUtils.closeStmt(stmt);
 

@@ -83,9 +83,21 @@ In the directory that contains the pom.xml run
 
 **Note: Doing a mvn clean will delete the H2 DB and wipe out all the data.
 
+Managing SSH Keys
+------
+By default KeyBox will overwrite all values in the specified authorized_keys file for a system.  You can disable key management by editing KeyBoxConfig.properties file and use KeyBox only as a bastion host.  This file is located in the jetty/keybox/WEB-INF/classes directory. (or the src/main/resources directory if building from source)
+
+	#enable key management  --set to false to disable
+    keyManagementEnabled=false
+
+Also, the authorized_keys file is updated/refreshed periodically based on the relationships defined in the application.  If key management is enabled the refresh interval can be specified in the KeyBoxConfig.properties file.
+
+	#authorized_keys refresh interval in minutes (no refresh for <=0)
+    authKeysRefreshInterval=120
+
 Supplying a Custom SSH Key Pair
 ------
-KeyBox generates its own public/private SSH key upon initial startup for use when registering systems.  You can specify a custom SSH key pair in the KeyBoxConfig.properties file.  This file is located in the jetty/keybox/WEB-INF/classes directory. (or the src/main/resources directory if building from source)
+KeyBox generates its own public/private SSH key upon initial startup for use when registering systems.  You can specify a custom SSH key pair in the KeyBoxConfig.properties file.
 
 For example:
 
@@ -103,6 +115,13 @@ For example:
 	
 	#default passphrase  --leave blank if passphrase is empty
 	defaultSSHPassphrase=myPa$$w0rd
+
+Auditing
+------
+Auditing is disabled by default and is only a proof of concept.  Can be enabled in the KeyBoxConfig.properties.
+
+	#enable audit  --set to true to enable
+    enableAudit=true
 
 Using KeyBox
 ------

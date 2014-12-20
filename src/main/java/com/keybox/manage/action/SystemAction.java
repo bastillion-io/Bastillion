@@ -88,9 +88,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
     public String saveSystem() {
         String retVal=SUCCESS;
 
-
-
-        hostSystem = SSHUtil.authAndAddPubKey(hostSystem, passphrase, password, false);
+        hostSystem = SSHUtil.authAndAddPubKey(hostSystem, passphrase, password);
 
         if (hostSystem.getId() != null) {
             SystemDB.updateSystem(hostSystem);

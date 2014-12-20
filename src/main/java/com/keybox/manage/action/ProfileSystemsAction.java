@@ -21,6 +21,7 @@ import com.keybox.manage.db.ProfileSystemsDB;
 import com.keybox.manage.db.SystemDB;
 import com.keybox.manage.model.Profile;
 import com.keybox.manage.model.SortedSet;
+import com.keybox.manage.util.RefreshAuthKeyUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
@@ -63,6 +64,7 @@ public class ProfileSystemsAction extends ActionSupport {
                 ProfileSystemsDB.addSystemToProfile(profile.getId(), hostSystemId);
             }
         }
+        RefreshAuthKeyUtil.refreshProfileSystems(profile.getId());
         return SUCCESS;
     }
 

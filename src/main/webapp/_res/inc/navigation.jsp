@@ -38,10 +38,10 @@
                 <li><a href="../admin/menu.action">Home</a></li>
 
 
-                <s:if test="%{#session.userType==\"M\"}">
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Manage <b class="caret"></b></a>
                         <ul class="dropdown-menu">
+                            <s:if test="%{#session.userType==\"M\"}">
 
 
                             <li><a href="../manage/viewSystems.action">Systems</a></li>
@@ -52,18 +52,14 @@
 
                             <li><a href="../manage/viewUsers.action">Users</a></li>
 
-                            <li class="divider"></li>
-
-                            <li><a href="../manage/viewKeys.action">Public SSH Keys</a></li>
-
-                            <li><a href="../manage/distributeKeysByProfile.action">Distribute SSH Keys</a></li>
-
-
+                            </s:if>
+                            <s:if test="%{@com.keybox.manage.util.SSHUtil@keyManagementEnabled}">
+                                <li><a href="../admin/viewKeys.action">Manage SSH Keys</a></li>
+                            </s:if>
                         </ul>
                     </li>
 
 
-                </s:if>
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Secure Shell <b class="caret"></b></a>
                     <ul class="dropdown-menu">

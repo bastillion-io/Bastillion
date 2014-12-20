@@ -60,7 +60,10 @@
             });
             //submit
             $(".submit_btn").button().click(function () {
-                $(this).parents('.modal').find('form').submit();
+                <s:if test="pendingSystemStatus!=null">
+                    $(this).parents('.modal').find('form').submit();
+                </s:if>
+                $(this).parents('.modal').modal('hide');
             });
             //close all forms
             $(".cancel_btn").button().click(function () {
@@ -477,7 +480,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                    <button type="button" class="close cancel_btn" data-dismiss="modal" aria-hidden="true">x</button>
                     <h4 class="modal-title">Enter password for <s:property
                             value="pendingSystemStatus.displayLabel"/></h4>
                 </div>
@@ -506,7 +509,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                    <button type="button" class="close cancel_btn" data-dismiss="modal" aria-hidden="true">x</button>
                     <h4 class="modal-title">Enter passphrase for <s:property
                             value="pendingSystemStatus.displayLabel"/></h4>
                 </div>

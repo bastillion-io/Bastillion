@@ -20,6 +20,7 @@ package com.keybox.manage.model;
  */
 public class PublicKey {
     Long id;
+    Long userId;
     String keyNm;
     String publicKey;
     Profile profile;
@@ -55,5 +56,13 @@ public class PublicKey {
 
     public void setProfile(Profile profile) {
         this.profile = profile;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

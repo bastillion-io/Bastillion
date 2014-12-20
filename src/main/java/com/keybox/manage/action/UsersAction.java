@@ -17,11 +17,13 @@ package com.keybox.manage.action;
 
 
 import com.keybox.common.util.AuthUtil;
+import com.keybox.manage.db.PublicKeyDB;
 import com.keybox.manage.db.ScriptDB;
 import com.keybox.manage.db.UserDB;
 import com.keybox.manage.model.Script;
 import com.keybox.manage.model.SortedSet;
 import com.keybox.manage.model.User;
+import com.keybox.manage.util.RefreshAuthKeyUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
@@ -91,6 +93,8 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
 
         if (user.getId() != null) {
             UserDB.disableUser(user.getId());
+            PublicKeyDB.deleteUserPublicKeys(user.getId());
+            RefreshAuthKeyUtil.refreshAllSystems();
         }
         return SUCCESS;
     }

@@ -91,24 +91,6 @@
                     file is distributed to systems.
                 </td>
             </tr>
-            <tr>
-                <td>
-                    <a href="../manage/viewKeys.action">Public SSH Keys</a>
-                </td>
-                <td>
-                    Set additional public SSH keys for systems
-                </td>
-            </tr>
-
-                <tr>
-                    <td>
-                        <a href="../manage/distributeKeysByProfile.action">Distribute SSH Keys</a>
-                    </td>
-                    <td>
-                        Distribute public SSH keys for systems
-                    </td>
-                </tr>
-
             </s:if>
 
 
@@ -128,6 +110,16 @@
                     Create scripts to be executed on selected systems simultaneously through a web-terminal
                 </td>
              </tr>
+            <s:if test="%{@com.keybox.manage.util.SSHUtil@keyManagementEnabled}">
+            <tr>
+                <td>
+                    <a href="../admin/viewKeys.action">Manage SSH Keys</a>
+                </td>
+                <td>
+                    Set additional public SSH keys for systems
+                </td>
+            </tr>
+            </s:if>
              <s:if test="%{#session.userType==\"M\"}">
              <tr>
                 <td>
