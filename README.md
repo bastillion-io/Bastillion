@@ -88,12 +88,12 @@ Managing SSH Keys
 By default KeyBox will overwrite all values in the specified authorized_keys file for a system.  You can disable key management by editing KeyBoxConfig.properties file and use KeyBox only as a bastion host.  This file is located in the jetty/keybox/WEB-INF/classes directory. (or the src/main/resources directory if building from source)
 
 	#enable key management  --set to false to disable
-    keyManagementEnabled=false
+	keyManagementEnabled=false
 
 Also, the authorized_keys file is updated/refreshed periodically based on the relationships defined in the application.  If key management is enabled the refresh interval can be specified in the KeyBoxConfig.properties file.
 
 	#authorized_keys refresh interval in minutes (no refresh for <=0)
-    authKeysRefreshInterval=120
+	authKeysRefreshInterval=120
 
 Supplying a Custom SSH Key Pair
 ------
@@ -105,10 +105,10 @@ For example:
 	resetApplicationSSHKey=true
 
 	#SSH Key Type 'dsa' or 'rsa'
-    sshKeyType=rsa
+	sshKeyType=rsa
 
 	#private key  --set pvt key
-    privateKey=/Users/kavanagh/.ssh/id_rsa
+	privateKey=/Users/kavanagh/.ssh/id_rsa
 
 	#public key  --set pub key
 	publicKey=/Users/kavanagh/.ssh/id_rsa.pub
@@ -121,7 +121,7 @@ Auditing
 Auditing is disabled by default and is only a proof of concept.  Can be enabled in the KeyBoxConfig.properties.
 
 	#enable audit  --set to true to enable
-    enableAudit=true
+	enableAudit=true
 
 Using KeyBox
 ------
