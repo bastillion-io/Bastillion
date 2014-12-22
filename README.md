@@ -36,7 +36,7 @@ http://maven.apache.org
 
 To Run Bundled with Jetty
 ------
-If your not big on the idea of building from source...
+If you're not big on the idea of building from source...
 
 Download keybox-jetty-vXX.XX.tar.gz
 
