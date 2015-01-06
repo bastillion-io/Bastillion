@@ -15,6 +15,7 @@
  */
 package com.keybox.manage.action;
 
+import com.jcraft.jsch.ChannelShell;
 import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.db.*;
 import com.keybox.manage.model.*;
@@ -48,6 +49,8 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
     String passphrase;
     Long id;
     List<HostSystem> systemList = new ArrayList<HostSystem>();
+    Integer ptyWidth;
+    Integer ptyHeight;
 
     static Map<Long, UserSchSessions> userSchSessionMap = new ConcurrentHashMap<Long, UserSchSessions>();
 
@@ -205,6 +208,27 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         return null;
     }
 
+    @Action(value = "/admin/setPtyType")
+    public String setPtyType() {
+
+        Long sessionId = AuthUtil.getSessionId(servletRequest.getSession());
+        if (SecureShellAction.getUserSchSessionMap() != null) {
+            UserSchSessions userSchSessions = SecureShellAction.getUserSchSessionMap().get(sessionId);
+            if (userSchSessions != null && userSchSessions.getSchSessionMap() !=null) {
+
+                SchSession schSession = userSchSessions.getSchSessionMap().get(id);
+
+                ChannelShell channel = (ChannelShell) schSession.getChannel();
+                channel.setPtySize((int)Math.floor(ptyWidth / 7.2981), (int)Math.floor(ptyHeight / 14.4166), ptyWidth, ptyHeight);
+                schSession.setChannel(channel);
+
+            }
+
+
+        }
+
+        return null;
+    }
     /**
      * set system list once all connections have been attempted
      *
@@ -348,6 +372,21 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         SecureShellAction.userSchSessionMap = userSchSessionMap;
     }
 
+    public Integer getPtyWidth() {
+        return ptyWidth;
+    }
+
+    public void setPtyWidth(Integer ptyWidth) {
+        this.ptyWidth = ptyWidth;
+    }
+
+    public Integer getPtyHeight() {
+        return ptyHeight;
+    }
+
+    public void setPtyHeight(Integer ptyHeight) {
+        this.ptyHeight = ptyHeight;
+    }
 }
 
 

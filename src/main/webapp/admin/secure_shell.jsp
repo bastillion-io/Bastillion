@@ -22,6 +22,7 @@
 
     <jsp:include page="../_res/inc/header.jsp"/>
     <script src="<%= request.getContextPath() %>/_res/js/jquery-ui.js"></script>
+    <link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/_res/css/jquery-ui/jquery-ui.css"/>
 
     <script type="text/javascript">
         $(document).ready(function () {
@@ -244,16 +245,49 @@
 
             var termMap = {};
 
+
             $(".output").each(function (index) {
                 var id = $(this).attr("id").replace("output_", "");
                 termMap[id] = new Terminal({
-                    cols: 80, rows: 24,
+                    cols: Math.floor($('.output:first').innerWidth()/7.2981), rows: 24,
                     screenKeys: false,
                     useStyle: true,
                     cursorBlink: true,
                     convertEol: true
                 });
                 termMap[id].open($(this));
+            });
+
+            var y_offset=$('.run_cmd:first').innerHeight() - $('.run_cmd').find(".output:first").innerHeight();
+
+            $(".run_cmd").resizable( {
+                ghost:true,
+                stop: function(event, ui){
+                    resize($(this));
+                }
+            } );
+
+             $(".run_cmd").dblclick(function (event, uii) {
+                 var id = $(this).attr("id").replace("run_cmd_", "");
+                 $(this).width("48%");
+                 $(this).height(346+y_offset);
+                 resize($(this));
+             });
+
+
+            function resize(element) {
+                var id = element.attr("id").replace("run_cmd_", "");
+                var width = element.find(".output:first").innerWidth();
+                var height= element.innerHeight()-y_offset;
+
+                termMap[id].resize(Math.floor(width/7.2981), Math.floor(height/14.4166));
+
+                $.ajax({url: '../admin/setPtyType.action?id=' + id + '&ptyWidth=' + width + '&ptyHeight='+ height, cache: false});
+            }
+
+            //resize all elements
+            $(".run_cmd").each(function (index) {
+                resize($(this));
             });
 
 
@@ -452,14 +486,13 @@
 
         <s:iterator value="systemList">
             <div id="run_cmd_<s:property value="id"/>" class="run_cmd_active run_cmd">
+                <h6 class="term-header" style="white-space: nowrap"><s:property value="displayLabel"/></h6>
 
-                <h6 class="term-header"><s:property value="displayLabel"/></h6>
 
 
                 <div class="term">
                     <div id="output_<s:property value="id"/>" class="output"></div>
                 </div>
-
             </div>
         </s:iterator>
 
