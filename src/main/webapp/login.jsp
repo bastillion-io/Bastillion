@@ -33,6 +33,17 @@
                 $('#loginSubmit').submit();
             });
         });
+		
+		function callLogin(event) {
+			if (!event) {
+				return
+			}
+			
+			//Enter
+			if (event.keyCode == 13) {
+				$('#login_btn').click();
+			}
+		}
 
     </script>
     <title>KeyBox - Login </title>
@@ -56,9 +67,9 @@
         <s:actionerror/>
         <s:form action="loginSubmit"  autocomplete="off">
             <s:textfield name="auth.username" label="Username"/>
-            <s:password name="auth.password" label="Password" value=""/>
+            <s:password name="auth.password" label="Password" value="" onkeydown="callLogin(event)"/>
             <s:if test="otpEnabled">
-                <s:textfield name="auth.otpToken" label="OTP Access Code"  autocomplete="off" value=""/>
+                <s:textfield name="auth.otpToken" label="OTP Access Code"  autocomplete="off" value="" onkeydown="callLogin(event)"/>
             </s:if>
             <tr> <td>&nbsp;</td>
                 <td align="right">  <div id="login_btn" class="btn btn-default login" >Login</div></td>
