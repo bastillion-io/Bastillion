@@ -243,6 +243,7 @@ div.termwrapper div h6 {
 
 .terminal div {
     white-space: nowrap;
+    height: 14px;
 }
 
 .reverse-video {
