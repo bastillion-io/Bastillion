@@ -83,6 +83,14 @@ In the directory that contains the pom.xml run
 
 **Note: Doing a mvn clean will delete the H2 DB and wipe out all the data.
 
+If building from source fails with
+
+	[ERROR] Failed to execute goal org.eclipse.jetty:jetty-maven-plugin:[VERSIONNUMBER]:run (default-cli) 
+	on project keybox: Failure: Address already in use: bind -> [Help 1]
+	
+It means that you already have an instance of jetty running on that address on your machine.
+So make sure you close the running jetty tasks and restart the build process.
+
 Managing SSH Keys
 ------
 By default KeyBox will overwrite all values in the specified authorized_keys file for a system.  You can disable key management by editing KeyBoxConfig.properties file and use KeyBox only as a bastion host.  This file is located in the jetty/keybox/WEB-INF/classes directory. (or the src/main/resources directory if building from source)
