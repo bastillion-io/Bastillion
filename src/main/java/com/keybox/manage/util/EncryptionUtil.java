@@ -20,6 +20,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 
@@ -64,6 +66,44 @@ public class EncryptionUtil {
         }
         return hash;
     }
+	
+	/**
+	 * returns a readable fingerprint of a public ssh-key
+	 *
+	 * @param publicKey ssh-key to convert
+	 * @return fingerprint of ssh-key
+	 */
+	public static String generateFingerprint(String publicKey) throws IOException, NoSuchAlgorithmException {
+		//Public ssh-keys look like this:
+		//ssh-rsa [SOME_KEY_VALUE]== [COMMENT]
+		
+		String strGoodKey = "";
+		if (publicKey.contains(" ")) {
+			String[] strKeyItems = publicKey.split(" ");
+			strGoodKey = strKeyItems[1];
+		}
+		
+		//In case someone entered the plain key e.g.: [SOME_KEY_VALUE]
+		else {
+			strGoodKey = publicKey;
+		}
+		
+		byte[] bDecodedKey = Base64.decodeBase64(strGoodKey);
+		
+		//Generate md5 hash
+		MessageDigest md = MessageDigest.getInstance("MD5");
+        byte[] bMd5Fingerprint = md.digest(bDecodedKey);
+		
+		String strFingerprint = "";
+        for (int i = 0; i < bMd5Fingerprint.length; i++) {
+            strFingerprint += String.format("%02x", bMd5Fingerprint[i]);
+            
+            if (i+1 < bMd5Fingerprint.length)
+                strFingerprint += ":";
+        }
+		
+		return strFingerprint;		
+	}
 
     /**
      * return hash value of string

@@ -85,6 +85,7 @@
 
 
 <jsp:include page="../_res/inc/navigation.jsp"/>
+<%@page import = "com.keybox.manage.util.EncryptionUtil"%>
 
 <div class="container">
     <s:form action="viewKeys">
@@ -112,6 +113,9 @@
                     <th id="<s:property value="@com.keybox.manage.db.PublicKeyDB@SORT_BY_PROFILE"/>" class="sort">
                         Profile
                     </th>
+					<th>
+					SSH Fingerprint
+					</th>
                     <th>&nbsp;</th>
                 </tr>
                 </thead>
@@ -127,6 +131,14 @@
                                 <s:property value="profile.nm"/>
                             </s:else>
                         </td>
+						<td>
+							<%
+								String strPublicKey = (String) request.getAttribute("publicKey");
+								
+								String strFingerprint = EncryptionUtil.generateFingerprint(strPublicKey);
+								out.println(strFingerprint);
+							%>
+						</td>
                         <td>
                             <div style="width:150px">
                                 <button class="btn btn-default" data-toggle="modal"
