@@ -113,8 +113,11 @@
                     <th id="<s:property value="@com.keybox.manage.db.PublicKeyDB@SORT_BY_PROFILE"/>" class="sort">
                         Profile
                     </th>
+					<th id="th_SSH_Type" class="sort">
+						SSH Type
+					</th>
 					<th>
-					SSH Fingerprint
+						SSH Fingerprint
 					</th>
                     <th>&nbsp;</th>
                 </tr>
@@ -122,6 +125,7 @@
                 <tbody>
                 <s:iterator var="publicKey" value="sortedSet.itemList" status="stat">
                     <tr>
+						<% String strPublicKey = (String) request.getAttribute("publicKey"); %>
                         <td><s:property value="keyNm"/></td>
                         <td>
                             <s:if test="%{#publicKey.profile==null}">
@@ -133,9 +137,15 @@
                         </td>
 						<td>
 							<%
-								String strPublicKey = (String) request.getAttribute("publicKey");
+								String strPublicKeyType = EncryptionUtil.generateKeyType(strPublicKey);
 								
+								out.println(strPublicKeyType);
+							%>
+						</td>
+						<td>
+							<%
 								String strFingerprint = EncryptionUtil.generateFingerprint(strPublicKey);
+								
 								out.println(strFingerprint);
 							%>
 						</td>

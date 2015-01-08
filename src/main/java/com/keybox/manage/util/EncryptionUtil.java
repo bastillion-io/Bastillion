@@ -68,24 +68,100 @@ public class EncryptionUtil {
     }
 	
 	/**
+	 * returns the key type which is used in the public key
+	 *
+	 * @param publicKey ssh-key to parse
+	 * @return key type of ssh-key
+	 */
+	public static String generateKeyType(String publicKey) {
+		//Public ssh-keys look like this:
+		//SSH-1 RSA
+		//[BIT_LENGTH] 37 [SOME_KEY_VALUE] [COMMENT]
+		//SSH-2 RSA
+		//ssh-rsa [SOME_KEY_VALUE] [COMMENT]
+		//SSH-2 DSA
+		//ssh-dss [SOME_KEY_VALUE] [COMMENT] 
+		
+		publicKey = publicKey.toLowerCase();
+		
+		String strSshKeyType = "[]";
+		
+		//Check the starting chars to make sure the key is a correct key!
+		if (publicKey.startsWith("ssh-rsa")) {
+			strSshKeyType = "[SSH-2 RSA]";
+		}
+		
+		else if (publicKey.startsWith("ssh-dss")) {
+			strSshKeyType = "[SSH-2 DSA]";
+		}
+		
+		//SSH1 Check
+		else if (publicKey.contains("37")) {
+			String [] strSplitted = publicKey.split(" ");
+			
+			if (strSplitted.length > 0) {
+				if (strSplitted[1].equals("37")) {
+					strSshKeyType = "[SSH-1 RSA]";
+				}
+				
+				else {
+					strSshKeyType = "[None]";
+				}
+			}
+			
+		}
+		
+		else {
+			strSshKeyType = "[None]";
+		}
+		
+		return strSshKeyType;
+	}
+	
+	/**
 	 * returns a readable fingerprint of a public ssh-key
 	 *
 	 * @param publicKey ssh-key to convert
 	 * @return fingerprint of ssh-key
 	 */
 	public static String generateFingerprint(String publicKey) throws IOException, NoSuchAlgorithmException {
-		//Public ssh-keys look like this:
-		//ssh-rsa [SOME_KEY_VALUE]== [COMMENT]
+		String strSshKeyType = generateKeyType(publicKey);
 		
+		SSH_KEY_TYPE pKeyType = SSH_KEY_TYPE.NONE;
+		
+		//Check the starting chars to make sure the key is a correct key!
+		if (strSshKeyType.equals("[SSH-2 RSA]")) {
+			pKeyType = SSH_KEY_TYPE.SSH2_RSA;
+		}
+		
+		else if (strSshKeyType.equals("[SSH-2 DSA]")) {
+			pKeyType = SSH_KEY_TYPE.SSH2_DSA;
+		}
+		
+		else if (strSshKeyType.equals("[SSH-1 RSA]")) {
+			pKeyType = SSH_KEY_TYPE.SSH1_RSA;
+			return "Fingerprint for SSH-1 not supported!";
+		}
+		
+		//Grab the actual key
 		String strGoodKey = "";
 		if (publicKey.contains(" ")) {
 			String[] strKeyItems = publicKey.split(" ");
-			strGoodKey = strKeyItems[1];
+			
+			if (pKeyType == SSH_KEY_TYPE.SSH1_RSA) {
+				strGoodKey = strKeyItems[2];
+			}
+			
+			else {
+				strGoodKey = strKeyItems[1];
+			}
 		}
-		
-		//In case someone entered the plain key e.g.: [SOME_KEY_VALUE]
-		else {
-			strGoodKey = publicKey;
+			
+		//SSH-2 public keys are multiples of 4!
+		if (strGoodKey.length() % 4 != 0 &&
+			pKeyType != SSH_KEY_TYPE.SSH1_RSA &&
+			pKeyType != SSH_KEY_TYPE.NONE) {
+			return "Key invalid - length corrupted!";
 		}
 		
 		byte[] bDecodedKey = Base64.decodeBase64(strGoodKey);
@@ -101,7 +177,13 @@ public class EncryptionUtil {
             if (i+1 < bMd5Fingerprint.length)
                 strFingerprint += ":";
         }
+
+		//Change fingerprint because it's wrong anyway!
+		if (pKeyType == SSH_KEY_TYPE.NONE) {
+			strFingerprint = "Invalid key - SSH Type missing!";
+		}
 		
+
 		return strFingerprint;		
 	}
 
@@ -159,6 +241,15 @@ public class EncryptionUtil {
         }
         return retVal;
     }
+	
+	/**
+	 * returns a SSH_TYPE_STATE to distinguish between keys.
+	 *
+	 * @return the needed enum
+	 */
+	public static enum SSH_KEY_TYPE {
+		SSH1_RSA, SSH2_RSA, SSH2_DSA, NONE
+	}
 
 
 }
