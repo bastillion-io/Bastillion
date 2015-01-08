@@ -113,12 +113,12 @@
                     <th id="<s:property value="@com.keybox.manage.db.PublicKeyDB@SORT_BY_PROFILE"/>" class="sort">
                         Profile
                     </th>
-					<th id="th_SSH_Type" class="sort">
-						SSH Type
-					</th>
-					<th>
-						SSH Fingerprint
-					</th>
+                    <th>
+                        SSH Type
+                    </th>
+                    <th>
+                        SSH Fingerprint
+                    </th>
                     <th>&nbsp;</th>
                 </tr>
                 </thead>
@@ -135,20 +135,18 @@
                                 <s:property value="profile.nm"/>
                             </s:else>
                         </td>
-						<td>
-							<%
-								String strPublicKeyType = EncryptionUtil.generateKeyType(strPublicKey);
-								
-								out.println(strPublicKeyType);
-							%>
-						</td>
-						<td>
-							<%
-								String strFingerprint = EncryptionUtil.generateFingerprint(strPublicKey);
-								
-								out.println(strFingerprint);
-							%>
-						</td>
+                        <td>
+                            <%
+                                String strPublicKeyType = EncryptionUtil.generateKeyType(strPublicKey);
+                                out.println(strPublicKeyType);
+                            %>
+                        </td>
+                        <td>
+                            <%
+                                String strFingerprint = EncryptionUtil.generateFingerprint(strPublicKey);
+                                out.println(strFingerprint);
+                            %>
+                        </td>
                         <td>
                             <div style="width:150px">
                                 <button class="btn btn-default" data-toggle="modal"
