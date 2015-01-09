@@ -188,9 +188,9 @@
                     <div class="modal-body">
                         <div class="row">
                             <s:form action="saveSystem" class="save_sys_form_add">
-                                <s:textfield name="hostSystem.displayNm" label="Display Name" size="10"/>
+                                <s:textfield name="hostSystem.displayNm" label="Display Name" size="10" placeholder="Mandatory field"/>
                                 <s:textfield name="hostSystem.user" label="System User" size="10"/>
-                                <s:textfield name="hostSystem.host" label="Host" size="18"/>
+                                <s:textfield name="hostSystem.host" label="Host" size="18" placeholder="Mandatory field"/>
                                 <s:textfield name="hostSystem.port" label="Port" size="2"/>
                                 <s:textfield name="hostSystem.authorizedKeys" label="Authorized Keys" size="30"/>
                                 <s:hidden name="sortedSet.orderByDirection"/>

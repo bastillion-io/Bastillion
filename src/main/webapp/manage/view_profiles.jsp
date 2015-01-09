@@ -150,7 +150,7 @@
                     </div>
                     <div class="modal-body">
                         <s:form action="saveProfile" class="save_profile_form_add">
-                            <s:textfield name="profile.nm" label="Name" size="15"/>
+                            <s:textfield name="profile.nm" label="Name" size="15" placeholder="Mandatory field"/>
                             <s:textarea name="profile.desc" label="Profile Description" rows="5" cols="25"/>
                             <s:hidden name="sortedSet.orderByDirection"/>
                             <s:hidden name="sortedSet.orderByField"/>

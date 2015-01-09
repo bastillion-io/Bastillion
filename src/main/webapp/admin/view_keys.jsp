@@ -180,7 +180,7 @@
                     <div class="modal-body">
                         <div class="row">
                             <s:form action="savePublicKey" class="save_public_key_form_add" autocomplete="off">
-                                <s:textfield name="publicKey.keyNm" label="Key Name" size="15" />
+                                <s:textfield name="publicKey.keyNm" label="Key Name" size="15" placeholder="Mandatory field"/>
                                 <s:if test="%{#session.userType==\"M\"}">
                                     <s:select name="publicKey.profile.id" list="profileList" headerKey=""
                                               headerValue="All Systems"
@@ -190,7 +190,7 @@
                                     <s:select name="publicKey.profile.id" list="profileList"
                                               listKey="id" listValue="%{nm}" label="Profile" value="%{profile.id}"/>
                                 </s:else>
-                                <s:textarea name="publicKey.publicKey" rows="15" cols="55"/>
+                                <s:textarea name="publicKey.publicKey" rows="15" cols="55" placeholder="Mandatory field"/>
                                 <s:hidden name="sortedSet.orderByDirection"/>
                                 <s:hidden name="sortedSet.orderByField"/>
                             </s:form>
