@@ -22,8 +22,13 @@
 
     <jsp:include page="../_res/inc/header.jsp"/>
 
-    <script type="text/javascript">
+    <script type="text/javascript">   
         $(document).ready(function () {
+            //Select the first textbox in modal
+            $('.modal').on('shown.bs.modal', function () {
+                $('input:text:visible:first').focus();
+            });
+            
             //call delete action
             $(".del_btn").button().click(function () {
                 var id = $(this).attr('id').replace("del_btn_", "");
@@ -84,7 +89,6 @@
 
 
 <jsp:include page="../_res/inc/navigation.jsp"/>
-<%@page import = "com.keybox.manage.util.EncryptionUtil"%>
 
 <div class="container">
     <s:form action="viewKeys">
@@ -176,7 +180,7 @@
                     <div class="modal-body">
                         <div class="row">
                             <s:form action="savePublicKey" class="save_public_key_form_add" autocomplete="off">
-                                <s:textfield name="publicKey.keyNm" label="Key Name" size="15"/>
+                                <s:textfield name="publicKey.keyNm" label="Key Name" size="15" />
                                 <s:if test="%{#session.userType==\"M\"}">
                                     <s:select name="publicKey.profile.id" list="profileList" headerKey=""
                                               headerValue="All Systems"

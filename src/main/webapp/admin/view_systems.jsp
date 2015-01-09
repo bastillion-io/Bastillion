@@ -22,6 +22,11 @@
     <jsp:include page="../_res/inc/header.jsp"/>
     <script type="text/javascript">
         $(document).ready(function() {
+            //Select the first textbox in modal
+            $('.modal').on('shown.bs.modal', function () {
+                $('input:text:visible:first').focus();
+            });
+            
             $("#view_btn").button().click(function () {
                 $("#viewSystemsFilter").submit();
             });

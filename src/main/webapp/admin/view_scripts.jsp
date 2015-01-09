@@ -24,7 +24,10 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
-
+            //Select the first textbox in modal
+            $('.modal').on('shown.bs.modal', function () {
+                $('input:text:visible:first').focus();
+            });
 
             //call delete action
             $(".del_btn").button().click(function() {
