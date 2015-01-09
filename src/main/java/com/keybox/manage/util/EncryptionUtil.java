@@ -161,7 +161,7 @@ public class EncryptionUtil {
 		if (strGoodKey.length() % 4 != 0 &&
 			pKeyType != SSH_KEY_TYPE.SSH1_RSA &&
 			pKeyType != SSH_KEY_TYPE.NONE) {
-			return "Key invalid - length corrupted!";
+			return "Invalid key - length corrupted!";
 		}
 		
 		byte[] bDecodedKey = Base64.decodeBase64(strGoodKey);

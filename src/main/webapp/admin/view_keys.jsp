@@ -24,7 +24,6 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
-
             //call delete action
             $(".del_btn").button().click(function () {
                 var id = $(this).attr('id').replace("del_btn_", "");
@@ -41,7 +40,7 @@
             });
 
             $(".sort,.sortAsc,.sortDesc").click(function () {
-                var id = $(this).attr('id')
+                var id = $(this).attr('id');
 
                 if ($('#viewKeys_sortedSet_orderByDirection').attr('value') == 'asc') {
                     $('#viewKeys_sortedSet_orderByDirection').attr('value', 'desc');
@@ -102,21 +101,17 @@
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
             <table class="table-striped scrollableTable">
                 <thead>
-
-
                 <tr>
-
                     <th id="<s:property value="@com.keybox.manage.db.PublicKeyDB@SORT_BY_KEY_NM"/>" class="sort">Key
                         Name
                     </th>
-
                     <th id="<s:property value="@com.keybox.manage.db.PublicKeyDB@SORT_BY_PROFILE"/>" class="sort">
                         Profile
                     </th>
-                    <th>
-                        SSH Type
+                    <th id="<s:property value="@com.keybox.manage.db.PublicKeyDB@SORT_BY_KEY_TP"/>" class="">
+                        Key Type
                     </th>
-                    <th>
+                    <th id="<s:property value="@com.keybox.manage.db.PublicKeyDB@SORT_BY_KEY_FP"/>" class="">
                         SSH Fingerprint
                     </th>
                     <th>&nbsp;</th>
@@ -125,7 +120,6 @@
                 <tbody>
                 <s:iterator var="publicKey" value="sortedSet.itemList" status="stat">
                     <tr>
-						<% String strPublicKey = (String) request.getAttribute("publicKey"); %>
                         <td><s:property value="keyNm"/></td>
                         <td>
                             <s:if test="%{#publicKey.profile==null}">
@@ -136,16 +130,20 @@
                             </s:else>
                         </td>
                         <td>
-                            <%
-                                String strPublicKeyType = EncryptionUtil.generateKeyType(strPublicKey);
-                                out.println(strPublicKeyType);
-                            %>
+                            <s:if test="%{#publicKey.keyTp==null}">
+                                ---
+                            </s:if>
+                            <s:else>
+                                <s:property value="keyTp"/>
+                            </s:else>
                         </td>
                         <td>
-                            <%
-                                String strFingerprint = EncryptionUtil.generateFingerprint(strPublicKey);
-                                out.println(strFingerprint);
-                            %>
+                            <s:if test="%{#publicKey.keyFp==null}">
+                                ---
+                            </s:if>
+                            <s:else>
+                                <s:property value="keyFp"/>
+                            </s:else>
                         </td>
                         <td>
                             <div style="width:150px">
@@ -227,7 +225,8 @@
                                     </s:else>
                                     <s:textarea name="publicKey.publicKey" value="%{publicKey}" label="Public Key"
                                                 rows="15" cols="55"/>
-                                    <s:hidden name="sortedSet.orderByDirection"/>
+                                    <s:textfield name="publicKey.keyTp" value="%{keyTp}" label="Key Type" size="10" disabled="true"/>
+                                    <s:textfield name="publicKey.keyFp" value="%{keyFp}" label="Fingerprint" size="40" disabled="true"/>
                                     <s:hidden name="sortedSet.orderByField"/>
                                 </s:form>
                             </div>
