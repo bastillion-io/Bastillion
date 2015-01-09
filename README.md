@@ -191,9 +191,9 @@ Keybox - MIT License ( **Sean Kavanagh**) See the LICENSE file for license right
 
 ##3rd party software and licenses in use
 
-^Jquery - MIT License - https://jquery.org/license/^
-^term.js - Copyright (c) 2012-2013, Christopher Jeffrey (MIT License)^
-^JSch - http://www.jcraft.com/jsch/LICENSE.txt and SSH by SSH Communications Security Corp (TM)^
+Jquery - MIT License - https://jquery.org/license/
+term.js - Copyright (c) 2012-2013, Christopher Jeffrey (MIT License)
+JSch - http://www.jcraft.com/jsch/LICENSE.txt and SSH by SSH Communications Security Corp (TM)
 
 
 
