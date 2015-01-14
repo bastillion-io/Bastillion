@@ -18,8 +18,8 @@ package com.keybox.manage.action;
 import com.keybox.common.util.AppConfig;
 import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.db.AuthDB;
-import com.keybox.manage.db.UserDB;
 import com.keybox.manage.model.Auth;
+import com.keybox.manage.db.UserDB;
 import com.keybox.manage.util.OTPUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.commons.lang3.StringUtils;
@@ -40,6 +40,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 
     HttpServletResponse servletResponse;
     HttpServletRequest servletRequest;
+    Boolean showOtpPage;
     Auth auth;
     private final String AUTH_ERROR="Authentication Failed : Login credentials are invalid";
     //check if otp is enabled
@@ -51,7 +52,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
             }
     )
     public String login() {
-
+        
         return SUCCESS;
     }
 
@@ -139,6 +140,9 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
     )
     public String setPassword() {
 
+        Long userId= AuthUtil.getUserId(servletRequest.getSession());
+        showOtpPage = UserDB.getUser(userId).getUseOtp();
+
         return SUCCESS;
     }
 
@@ -204,6 +208,14 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
         }
 
 
+    }
+    
+    public boolean getShowOtpPage() {
+        return showOtpPage;
+    }
+    
+    public void setshowOtpPage(boolean showOtpPage) {
+        this.showOtpPage = showOtpPage;
     }
 
     public boolean isOtpEnabled() {

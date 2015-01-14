@@ -66,8 +66,12 @@
             
         <h3>Set OTP Authentication</h3>
         <p>Reset OTP page- settings per user</p>
-        <button onclick="window.location='otpEnable.action'" class="btn btn-default">Enable OTP Authentication</button>
-        <button onclick="window.location='otpDisable.action'" class="btn btn-danger">Disable OTP Authentication</button>
+        <s:if test="showOtpPage==true">
+            <button onclick="window.location='otpDisable.action'" class="btn btn-danger">Disable OTP Authentication</button>
+        </s:if>
+        <s:else>
+            <button onclick="window.location='otpEnable.action'" class="btn btn-default">Enable OTP Authentication</button>
+        </s:else>
     </div>
 </body>
 </html>
