@@ -24,12 +24,21 @@
 
        <script type="text/javascript">
         $(document).ready(function() {
-
-
             $("#change_pass_btn").button().click(function() {
                 $('#passwordSubmit').submit();
             });
         });
+        
+        function onKeyCaller(event) {
+                if (!event) {
+                    return;
+                }
+
+                //Enter
+                if (event.keyCode == 13) {
+                        $('#change_pass_btn').click();
+                }
+        }
 
     </script>
 
@@ -49,21 +58,16 @@
         <s:form action="passwordSubmit" autocomplete="off">
             <s:password name="auth.prevPassword" label="Current Password" placeholder="Mandatory field"/>
             <s:password name="auth.password" label="New Password" placeholder="Mandatory field"/>
-            <s:password name="auth.passwordConfirm" label="Confirm New Password" placeholder="Mandatory field"/>
+            <s:password name="auth.passwordConfirm" label="Confirm New Password" placeholder="Mandatory field" onkeydown="onKeyCaller(event)"/>
             <tr> <td>&nbsp;</td>
-                <td align="right">  <div id="change_pass_btn" class="btn btn-default" >Change Password</div></td>
+                <td align="right"><div id="change_pass_btn" class="btn btn-default">Change Password</div></td>
             </tr>
         </s:form>
             
-        <h3>Set OTP</h3>
-        <p>Reset OTP usage per user</p>
-        
-        <s:checkbox name="user.useOtp" value="%{useOtp}" label="Use OTP Authetication"/>
-
-
+        <h3>Set OTP Authentication</h3>
+        <p>Reset OTP page- settings per user</p>
+        <button onclick="window.location='otpEnable.action'" class="btn btn-default">Enable OTP Authentication</button>
+        <button onclick="window.location='otpDisable.action'" class="btn btn-danger">Disable OTP Authentication</button>
     </div>
-
-
-
 </body>
 </html>

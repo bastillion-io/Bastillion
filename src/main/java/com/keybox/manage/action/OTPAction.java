@@ -85,6 +85,23 @@ public class OTPAction extends ActionSupport implements ServletRequestAware, Ser
         
         return SUCCESS;
     }
+    
+    @Action(value = "/admin/otpEnable",
+            results = {
+                @Result(name = "success", location = "/admin/menu.action", type = "redirect")
+            }
+    )
+    public String otpEnable() {
+
+        Long UserId = AuthUtil.getUserId(servletRequest.getSession());
+        
+        User usr = UserDB.getUser(UserId);
+        usr.setUseOtp(true);
+
+        UserDB.updateUserNoCredentials(usr);
+        
+        return SUCCESS;
+    }
 
 
     @Action(value = "/admin/otpSubmit",
