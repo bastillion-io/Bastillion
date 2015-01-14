@@ -54,6 +54,12 @@
                 <td align="right">  <div id="change_pass_btn" class="btn btn-default" >Change Password</div></td>
             </tr>
         </s:form>
+            
+        <h3>Set OTP</h3>
+        <p>Reset OTP usage per user</p>
+        
+        <s:checkbox name="user.useOtp" value="%{useOtp}" label="Use OTP Authetication"/>
+
 
     </div>
 

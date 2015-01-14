@@ -18,6 +18,7 @@ package com.keybox.manage.action;
 import com.keybox.common.util.AppConfig;
 import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.db.AuthDB;
+import com.keybox.manage.db.UserDB;
 import com.keybox.manage.model.Auth;
 import com.keybox.manage.util.OTPUtil;
 import com.opensymphony.xwork2.ActionSupport;
@@ -92,11 +93,21 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
             AuthUtil.setAuthToken(servletRequest.getSession(), authToken);
             AuthUtil.setUserId(servletRequest.getSession(), userId);
             AuthUtil.setTimeout(servletRequest.getSession());
+            
+            boolean bUserUsesOTP = UserDB.getUser(userId).getUseOtp();
 
             //for first time login redirect to set OTP
-            if (otpEnabled && StringUtils.isEmpty(sharedSecret)) {
+            if (otpEnabled && 
+                StringUtils.isEmpty(sharedSecret) &&
+                bUserUsesOTP) {
                 return "otp";
             }
+            
+            else if (!bUserUsesOTP) {
+                retVal = "success";
+            }
+                
+            
             else if ("changeme".equals(auth.getPassword())) {
                 retVal = "change_password";
             }

@@ -67,6 +67,8 @@ public class UserDB {
                 user.setUsername(rs.getString("username"));
                 user.setPassword(rs.getString("password"));
                 user.setUserType(rs.getString("user_type"));
+                user.setUseOtp(Boolean.valueOf(rs.getString("use_otp")));
+                
                 userList.add(user);
 
             }
@@ -129,6 +131,7 @@ public class UserDB {
                 user.setPassword(rs.getString("password"));
                 user.setUserType(rs.getString("user_type"));
                 user.setSalt(rs.getString("salt"));
+                user.setUseOtp(Boolean.valueOf(rs.getString("use_otp")));
                 user.setProfileList(UserProfileDB.getProfilesByUser(con, userId));
             }
             DBUtils.closeRs(rs);
@@ -152,7 +155,7 @@ public class UserDB {
         try {
             con = DBUtils.getConn();
             String salt=EncryptionUtil.generateSalt();
-            PreparedStatement stmt = con.prepareStatement("insert into users (first_nm, last_nm, email, username, user_type, password, salt) values (?,?,?,?,?,?,?)");
+            PreparedStatement stmt = con.prepareStatement("insert into users (first_nm, last_nm, email, username, user_type, password, salt, use_otp) values (?,?,?,?,?,?,?,?)");
             stmt.setString(1, user.getFirstNm());
             stmt.setString(2, user.getLastNm());
             stmt.setString(3, user.getEmail());
@@ -160,6 +163,7 @@ public class UserDB {
             stmt.setString(5, user.getUserType());
             stmt.setString(6, EncryptionUtil.hash(user.getPassword()+salt));
             stmt.setString(7, salt);
+            stmt.setBoolean(8, user.getUseOtp());
             stmt.execute();
             DBUtils.closeStmt(stmt);
 
@@ -180,13 +184,14 @@ public class UserDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("update users set first_nm=?, last_nm=?, email=?, username=?, user_type=? where id=?");
+            PreparedStatement stmt = con.prepareStatement("update users set first_nm=?, last_nm=?, email=?, username=?, user_type=?, use_otp=? where id=?");
             stmt.setString(1, user.getFirstNm());
             stmt.setString(2, user.getLastNm());
             stmt.setString(3, user.getEmail());
             stmt.setString(4, user.getUsername());
             stmt.setString(5, user.getUserType());
-            stmt.setLong(6, user.getId());
+            stmt.setBoolean(6, user.getUseOtp());
+            stmt.setLong(7, user.getId());
             stmt.execute();
             DBUtils.closeStmt(stmt);
 
@@ -208,7 +213,7 @@ public class UserDB {
         try {
             con = DBUtils.getConn();
             String salt=EncryptionUtil.generateSalt();
-            PreparedStatement stmt = con.prepareStatement("update users set first_nm=?, last_nm=?, email=?, username=?, user_type=?, password=?, salt=? where id=?");
+            PreparedStatement stmt = con.prepareStatement("update users set first_nm=?, last_nm=?, email=?, username=?, user_type=?, password=?, salt=?, use_otp=? where id=?");
             stmt.setString(1, user.getFirstNm());
             stmt.setString(2, user.getLastNm());
             stmt.setString(3, user.getEmail());
@@ -216,7 +221,8 @@ public class UserDB {
             stmt.setString(5, user.getUserType());
             stmt.setString(6, EncryptionUtil.hash(user.getPassword()+salt));
             stmt.setString(7, salt);
-            stmt.setLong(8, user.getId());
+            stmt.setBoolean(8, user.getUseOtp());
+            stmt.setLong(9, user.getId());
             stmt.execute();
             DBUtils.closeStmt(stmt);
 

@@ -181,6 +181,7 @@
                                 <s:textfield name="user.firstNm" label="First Name" size="15" placeholder="Mandatory field"/>
                                 <s:textfield name="user.lastNm" label="Last Name" size="15" placeholder="Mandatory field"/>
                                 <s:textfield name="user.email" label="Email Address" size="25"/>
+                                <s:select name="user.useOtp" list="#{true:'true',false:'false'}" label="Show OTP page"/>
                                 <s:password name="user.password" value="" label="Password" size="15" placeholder="Mandatory field"/>
                                 <s:password name="user.passwordConfirm" value="" label="Confirm Password" size="15" placeholder="Mandatory field"/>
                                 <s:hidden name="resetSharedSecret"/>
@@ -215,6 +216,7 @@
                                         <s:textfield name="user.firstNm" value="%{firstNm}" label="First Name" size="15" placeholder="Mandatory field"/>
                                         <s:textfield name="user.lastNm" value="%{lastNm}" label="Last Name" size="15" placeholder="Mandatory field"/>
                                         <s:textfield name="user.email" value="%{email}" label="Email Address" size="25"/>
+                                        <s:select name="user.useOtp" value="%{useOtp}" list="#{'true':'true','false':'false'}" label="Show OTP page"/>
                                         <s:password name="user.password" value="" label="Password" size="15" placeholder="Password hidden"/>
                                         <s:password name="user.passwordConfirm" value="" label="Confirm Password" size="15" placeholder="Password hidden"/>
                                         <s:checkbox name="resetSharedSecret" label="Reset OTP Code"/>
