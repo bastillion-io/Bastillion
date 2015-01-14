@@ -94,7 +94,6 @@
 
                     <thead>
                     <tr>
-
                         <th id="<s:property value="@com.keybox.manage.db.UserDB@SORT_BY_USERNAME"/>" class="sort">Username
                         </th>
                          <th id="<s:property value="@com.keybox.manage.db.UserDB@SORT_BY_USER_TYPE"/>" class="sort">User Type
