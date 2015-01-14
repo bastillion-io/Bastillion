@@ -71,7 +71,7 @@ public class OTPAction extends ActionSupport implements ServletRequestAware, Ser
     
     @Action(value = "/admin/otpDisable",
             results = {
-                @Result(name = "success", location = "/admin/menu.action", type = "redirect")
+                @Result(name = "success", location = "/admin/userSettings.action", type = "redirect")
             }
     )
     public String otpDisable() {
@@ -88,7 +88,7 @@ public class OTPAction extends ActionSupport implements ServletRequestAware, Ser
     
     @Action(value = "/admin/otpEnable",
             results = {
-                @Result(name = "success", location = "/admin/menu.action", type = "redirect")
+                @Result(name = "success", location = "/admin/userSettings.action", type = "redirect")
             }
     )
     public String otpEnable() {

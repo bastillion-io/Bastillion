@@ -49,8 +49,14 @@
 
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
+    <div class="bs-example">
+        <div class="alert alert-info">
+            <a href="#" class="close" data-dismiss="alert">&times;</a>
+            <strong>Information!</strong> Your password was successfully changed!
+        </div>
+    </div>
     <div class="container">
-
+        
         <h3>Set Admin Password</h3>
         <p>Change your administrative password below</p>
 
