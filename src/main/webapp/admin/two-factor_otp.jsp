@@ -96,7 +96,7 @@
             </table>
 
             </p>
-            <button onclick="window.location='otpDisable.action'" class="btn btn-danger">Disable</button>
+            <button onclick="window.location='otpDisable.action?otp'" class="btn btn-danger">Disable</button>
             <button onclick="window.location='menu.action'" class="btn btn-warning">Skip for Now</button>
             <button onclick="window.location='otpSubmit.action'" class="btn btn-default">Got It!</button>
         </div>

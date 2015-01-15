@@ -66,22 +66,29 @@ public class OTPAction extends ActionSupport implements ServletRequestAware, Ser
 
         this.setQrImage(Long.toString(new Date().getTime()) + ".png");
         return SUCCESS;
-
     }
     
     @Action(value = "/admin/otpDisable",
             results = {
-                @Result(name = "success", location = "/admin/userSettings.action", type = "redirect")
+                @Result(name = "success", location = "/admin/userSettings.action", type = "redirect"),
+                @Result(name = "menu", location = "/admin/menu.action", type = "redirect")
             }
     )
     public String otpDisable() {
 
         Long UserId = AuthUtil.getUserId(servletRequest.getSession());
+
+        //Use to know where you are from
+        String strQueryString = servletRequest.getQueryString();
         
         User usr = UserDB.getUser(UserId);
         usr.setUseOtp(false);
 
         UserDB.updateUserNoCredentials(usr);
+        
+        if (strQueryString != null &&
+            strQueryString.equals("otp"))
+            return "menu";
         
         return SUCCESS;
     }

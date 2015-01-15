@@ -140,6 +140,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
     )
     public String setPassword() {
 
+        //Set the showOtpPage on page load so you can access it with JSP
         Long userId= AuthUtil.getUserId(servletRequest.getSession());
         showOtpPage = UserDB.getUser(userId).getUseOtp();
 
@@ -148,8 +149,11 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 
     @Action(value = "/admin/passwordSubmit",
             results = {
+                //Encode the URLs before you use them!
                     @Result(name = "input", location = "/admin/user_settings.jsp"),
-                    @Result(name = "success", location = "/admin/userSettings.action", type = "redirect")
+                    @Result(name = "success", location = "/admin/userSettings.action?showPasswordNotification%3Dsuccess%26%3Cb%3ESuccess!%3C%2Fb%3E%20-%20Password%20successfully%20changed", type = "redirect"),
+                    @Result(name = "danger", location = "/admin/userSettings.action?showPasswordNotification%3Ddanger%26%3Cb%3EDanger!%3C%2Fb%3E%20-%20Current%20password%20is%20invalid", type = "redirect"),
+                    @Result(name = "warning", location = "/admin/userSettings.action?showPasswordNotification%3Ddanger%26%3Cb%3EDanger!%3C%2Fb%3E%20-%20Passwords%20do%20not%20match", type = "redirect")
             }
     )
     public String passwordSubmit() {
@@ -160,14 +164,13 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 
             if (!AuthDB.updatePassword(auth)) {
                 addActionError("Current password is invalid");
-                retVal = INPUT;
+                retVal = "danger";
             }
 
         } else {
             addActionError("Passwords do not match");
-            retVal = INPUT;
+            retVal = "warning";
         }
-
 
         return retVal;
     }

@@ -26,7 +26,7 @@
         $(document).ready(function() {
             $("#change_pass_btn").button().click(function() {
                 $('#passwordSubmit').submit();
-            });
+            });      
         });
         
         function onKeyCaller(event) {
@@ -39,7 +39,6 @@
                         $('#change_pass_btn').click();
                 }
         }
-
     </script>
 
     <title>KeyBox - Set Admin Password</title>
@@ -49,13 +48,11 @@
 
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
-    <div class="bs-example">
-        <div class="alert alert-info">
-            <a href="#" class="close" data-dismiss="alert">&times;</a>
-            <strong>Information!</strong> Your password was successfully changed!
-        </div>
-    </div>
+    
     <div class="container">
+        
+        <jsp:include page="../_res/inc/notification.jsp"/>
+    
         
         <h3>Set Admin Password</h3>
         <p>Change your administrative password below</p>

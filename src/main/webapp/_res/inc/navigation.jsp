@@ -20,7 +20,6 @@
 
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container">
-
         <div class="navbar-header">
             <div class="navbar-brand">
                 <div class="nav-img"><img src="<%= request.getContextPath() %>/img/keybox_50x38.png"/></div>
@@ -86,4 +85,3 @@
         <!--/.nav-collapse -->
     </div>
 </div>
-
