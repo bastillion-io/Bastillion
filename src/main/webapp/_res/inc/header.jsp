@@ -50,6 +50,12 @@
                     $(this).click();
                 }
             });
+
+            $("form input, form select").keydown(function(event){
+                if (event.keyCode == 13) {
+                    $(this).closest("form").submit();
+                }
+            });
         });
 
     });
