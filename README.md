@@ -151,11 +151,17 @@ Steps:
 7. Add additional public keys to systems
 8. Audit session history
 
+Change Password/ set OTP Authentication
+------
+By default the admin password is "changeme". To change that go to "Setting" and change it.
+To disable the OTP Authentication notification after the login, go to "Settings" and disable it.
+You can also enable it again when you want to use OTP.
+
 Screenshots
 -----------
 ![Login](http://sshkeybox.com/img/screenshots/medium/login.png)
 
-![Two-Factor](http://sshkeybox.com/img/screenshots/medium/two-factor.png)
+![Two-Factor](http://i.imgur.com/NKhDQu8.png)
 
 ![More Terminals](http://sshkeybox.com/img/screenshots/medium/more_terms.png)
 
@@ -166,6 +172,8 @@ Screenshots
 ![Manage Users](http://sshkeybox.com/img/screenshots/medium/manage_users.png)
 
 ![Define SSH Keys](http://sshkeybox.com/img/screenshots/medium/manage_keys.png)
+
+![Settings] (http://i.imgur.com/ROiQGy8.png)
 
 Acknowledgments
 ------
