@@ -27,9 +27,9 @@ import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.apache.struts2.interceptor.ServletResponseAware;
-import sun.misc.SharedSecrets;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpServletResponse;
 
 
@@ -41,6 +41,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
     HttpServletResponse servletResponse;
     HttpServletRequest servletRequest;
     Boolean showOtpPage;
+    String showPasswordNotification;
     Auth auth;
     private final String AUTH_ERROR="Authentication Failed : Login credentials are invalid";
     //check if otp is enabled
@@ -139,25 +140,27 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
             }
     )
     public String setPassword() {
-
         //Set the showOtpPage on page load so you can access it with JSP
         Long userId= AuthUtil.getUserId(servletRequest.getSession());
         showOtpPage = UserDB.getUser(userId).getUseOtp();
-
+        
         return SUCCESS;
     }
 
     @Action(value = "/admin/passwordSubmit",
             results = {
-                //Encode the URLs before you use them!
                     @Result(name = "input", location = "/admin/user_settings.jsp"),
-                    @Result(name = "success", location = "/admin/userSettings.action?showPasswordNotification%3Dsuccess%26%3Cb%3ESuccess!%3C%2Fb%3E%20-%20Password%20successfully%20changed", type = "redirect"),
-                    @Result(name = "danger", location = "/admin/userSettings.action?showPasswordNotification%3Ddanger%26%3Cb%3EDanger!%3C%2Fb%3E%20-%20Current%20password%20is%20invalid", type = "redirect"),
-                    @Result(name = "warning", location = "/admin/userSettings.action?showPasswordNotification%3Ddanger%26%3Cb%3EDanger!%3C%2Fb%3E%20-%20Passwords%20do%20not%20match", type = "redirect")
+                    @Result(name = "success", location = "/admin/userSettings.action", type = "redirect"),
+                    @Result(name = "danger", location = "/admin/userSettings.action", type = "redirect"),
+                    @Result(name = "warning", location = "/admin/userSettings.action", type = "redirect")
             }
     )
     public String passwordSubmit() {
         String retVal = SUCCESS;
+        
+        //Get the session and set default value as success
+        HttpSession session = servletRequest.getSession();
+        session.setAttribute("showPasswordNotification", "success");
 
         if (auth.getPassword().equals(auth.getPasswordConfirm())) {
             auth.setAuthToken(AuthUtil.getAuthToken(servletRequest.getSession()));
@@ -165,13 +168,17 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
             if (!AuthDB.updatePassword(auth)) {
                 addActionError("Current password is invalid");
                 retVal = "danger";
+                //Set value as danger (aka. password was wrong)
+                session.setAttribute("showPasswordNotification", "danger");
             }
 
         } else {
             addActionError("Passwords do not match");
             retVal = "warning";
+            //Set value as warning (aka. passwords didn't match)
+            session.setAttribute("showPasswordNotification", "warning");
         }
-
+        
         return retVal;
     }
 
@@ -212,6 +219,15 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 
 
     }
+    
+    public String getShowPasswordNotification() {
+        return  (String)servletRequest.getSession().getAttribute("showPasswordNotification");
+    }
+    
+    public void setShowPasswordNotification(String showPasswordNotification) {
+        servletRequest.getSession().setAttribute("showPasswordNotification", showPasswordNotification);
+    }
+    
     
     public boolean getShowOtpPage() {
         return showOtpPage;

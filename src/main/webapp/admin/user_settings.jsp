@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
 /**
  * Copyright 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
@@ -26,7 +27,9 @@
         $(document).ready(function() {
             $("#change_pass_btn").button().click(function() {
                 $('#passwordSubmit').submit();
-            });      
+            });
+            
+            
         });
         
         function onKeyCaller(event) {
@@ -44,16 +47,42 @@
     <title>KeyBox - Set Admin Password</title>
 </head>
 <body>
-
-
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
-    
     <div class="container">
         
-        <jsp:include page="../_res/inc/notification.jsp"/>
-    
-        
+        <c:if test="${not empty showPasswordNotification}">
+            <div class="alertContainer">
+                
+                <%-- Alert if the password was changed successfully --%>
+                <s:if test="showPasswordNotification=='success'">
+                    <div class="alert alert-success">
+                        <a href="#" class="close" data-dismiss="alert">&times;</a>
+                        <span class="alertMessage">Password successfully changed!</span>
+                    </div>
+                </s:if>
+                
+                <%-- Alert if the passwords didn't match--%>
+                <s:elseif test="showPasswordNotification=='warning'">
+                    <div class="alert alert-danger">
+                        <a href="#" class="close" data-dismiss="alert">&times;</a>
+                        <span class="alertMessage">The passwords do not match!</span>
+                    </div>
+                </s:elseif>
+                
+                <%-- Alert if the password was wrong --%>
+                <s:else>
+                    <div class="alert alert-danger">
+                        <a href="#" class="close" data-dismiss="alert">&times;</a>
+                        <span class="alertMessage">The current password was wrong!</span>
+                    </div>
+                </s:else>
+            </div>
+            
+            <%-- Remove the session variable --%>
+            <c:remove var="showPasswordNotification" scope="session"/>
+        </c:if>
+
         <h3>Set Admin Password</h3>
         <p>Change your administrative password below</p>
 

@@ -295,3 +295,7 @@ div.termwrapper div h6 {
     margin: 0 5px;
     display: inline-block;
 }
+
+.alertContainer {
+    margin-top: 25px;
+}
