@@ -264,7 +264,7 @@ div.termwrapper div h6 {
 
 .btn {
     padding: 5px;
-    margin: 5px 5px 0 5px;
+    margin: 5px 0 0 0;
 }
 
 .nav-img {
@@ -290,4 +290,9 @@ div.termwrapper div h6 {
 .modal-footer .btn {
     margin-bottom: 0;
     padding: 8px 12px;
+}
+
+.spacer {
+    margin: 0 5px;
+    display: inline-block;
 }

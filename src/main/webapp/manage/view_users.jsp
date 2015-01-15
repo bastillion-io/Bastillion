@@ -138,14 +138,18 @@
                             <td>
                                 <div style="width:235px">
 
-
-                                <button class="btn btn-default" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>" style="float:left">Edit</button>
-
-                                <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn" style="float:left" >Delete</button>
-
+                                <div class="spacer">
+                                    <button class="btn btn-default" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>">Edit</button>
+                                </div>
+                                <div class="spacer">
+                                    <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn">Delete</button>
+                                </div>
+                                
                                 <s:if test="userType==\"A\"">
                                     <a href="viewUserProfiles.action?user.id=<s:property value="id"/>">
-                                        <button id="profile_btn_<s:property value="id"/>" class="btn btn-default edit_btn" style="float:left">Assign Profiles</button>
+                                        <div class="spacer">
+                                            <button id="profile_btn_<s:property value="id"/>" class="btn btn-default edit_btn">Assign Profiles</button>
+                                        </div>
                                     </a>
                                 </s:if>
                                 <div style="clear:both"></div>

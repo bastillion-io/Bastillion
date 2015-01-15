@@ -122,9 +122,15 @@
                         <td>
                             <div style="width:240px">
                                 <a href="viewProfileSystems.action?profile.id=<s:property value="id"/>">
-                                <button id="assign_btn_<s:property value="id"/>" class="btn btn-default edit_btn" style="float:left">Assign Systems</button></a>
-                                <button class="btn btn-default" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>" style="float:left">Edit</button>
-                                <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn" style="float:left">Delete</button>
+                                <div class="spacer">
+                                    <button id="assign_btn_<s:property value="id"/>" class="btn btn-default edit_btn">Assign Systems</button></a>
+                                </div>
+                                <div class="spacer">
+                                    <button class="btn btn-default" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>">Edit</button>
+                                </div>
+                                <div class="spacer">
+                                    <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn">Delete</button>
+                                </div>
                                 <div style="clear:both"/>
                             </div>
                         </td>
