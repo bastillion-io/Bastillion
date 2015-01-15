@@ -151,13 +151,16 @@
                         </td>
                         <td>
                             <div style="width:150px">
-                                <button class="btn btn-default" data-toggle="modal"
-                                        data-target="#edit_dialog_<s:property value="id"/>" style="float:left">Edit
-                                </button>
+                                <div class="spacer">
+                                    <button class="btn btn-default" data-toggle="modal"
+                                            data-target="#edit_dialog_<s:property value="id"/>">Edit
+                                    </button>
+                                </div>
 
-                                <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn"
-                                        style="float:left">Delete
-                                </button>
+                                <div class="spacer">
+                                    <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn">Delete
+                                    </button>
+                                </div>
                                 &nbsp;&nbsp;&nbsp;
                                 <div style="clear:both"></div>
                             </div>

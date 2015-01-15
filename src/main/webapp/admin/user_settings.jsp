@@ -62,10 +62,9 @@
             <s:password name="auth.prevPassword" label="Current Password" placeholder="Mandatory field"/>
             <s:password name="auth.password" label="New Password" placeholder="Mandatory field"/>
             <s:password name="auth.passwordConfirm" label="Confirm New Password" placeholder="Mandatory field" onkeydown="onKeyCaller(event)"/>
-            <tr> <td>&nbsp;</td>
-                <td align="right"><div id="change_pass_btn" class="btn btn-default">Change Password</div></td>
             </tr>
         </s:form>
+            <div id="change_pass_btn" class="btn btn-default">Change Password</div>
             
         <h3>Set OTP Authentication</h3>
         <p>Reset OTP page- settings per user</p>
