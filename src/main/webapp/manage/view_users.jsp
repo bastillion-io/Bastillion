@@ -156,18 +156,12 @@
                             <td>
                                 <div style="width:235px">
 
-                                <div class="spacer spacer-left">
-                                    <button class="btn btn-default" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>">Edit</button>
-                                </div>
-                                <div class="spacer spacer-middle">
-                                    <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn">Delete</button>
-                                </div>
+                                    <button class="btn btn-default spacer spacer-left" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>">Edit</button>
+                                    <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn spacer spacer-middle">Delete</button>
                                 
                                 <s:if test="userType==\"A\"">
                                     <a href="viewUserProfiles.action?user.id=<s:property value="id"/>">
-                                        <div class="spacer spacer-right">
-                                            <button id="profile_btn_<s:property value="id"/>" class="btn btn-default edit_btn">Assign Profiles</button>
-                                        </div>
+                                        <button id="profile_btn_<s:property value="id"/>" class="btn btn-default edit_btn spacer spacer-right">Assign Profiles</button>
                                     </a>
                                 </s:if>
                                 <div style="clear:both"></div>
@@ -182,7 +176,7 @@
 
 
 
-        <button class="btn btn-default add_btn" data-toggle="modal" data-target="#add_dialog">Add User</button>
+        <button class="btn btn-default add_btn spacer spacer-bottom" data-toggle="modal" data-target="#add_dialog">Add User</button>
         <div id="add_dialog" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">

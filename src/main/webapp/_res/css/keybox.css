@@ -263,7 +263,6 @@ div.termwrapper div h6 {
 
 .btn {
     padding: 5px;
-    margin: 5px 0 0 0;
 }
 
 .nav-img {
@@ -305,6 +304,14 @@ div.termwrapper div h6 {
 
 .spacer-right {
     margin: 0 0 0 5px;
+}
+
+.spacer-top {
+    margin: 0 0 5px 0;
+}
+
+.spacer-bottom {
+    margin: 5px 0 0 0;
 }
 
 .alertContainer {

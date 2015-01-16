@@ -158,15 +158,9 @@
                         <td>
 
                             <div style="width:160px">
-                                <div class="spacer spacer-left">
-                                    <button id="refresh_btn_<s:property value="id"/>" class="btn btn-default refresh_btn"><img src="../../img/refresh.png" alt="Refresh" style="float:left;width:20px;height:20px;"/></button>
-                                </div>
-                                <div class="spacer spacer-middle">
-                                    <button class="btn btn-default" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>">Edit</button>
-                                </div>
-                                <div class="spacer spacer-right">
-                                    <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn">Delete</button>
-                                </div>
+                                    <button id="refresh_btn_<s:property value="id"/>" class="btn btn-default refresh_btn spacer spacer-left"><img src="../../img/refresh.png" alt="Refresh" style="float:left;width:20px;height:20px;"/></button>
+                                    <button class="btn btn-default spacer spacer-middle" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>">Edit</button>
+                                    <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn spacer spacer-right">Delete</button>
                                 <div style="clear:both"></div>
                             </div>
                         </td>
@@ -179,7 +173,7 @@
 
         </s:if>
 
-        <button class="btn btn-default add_btn" data-toggle="modal" data-target="#add_dialog">Add System</button>
+        <button class="btn btn-default add_btn spacer spacer-bottom" data-toggle="modal" data-target="#add_dialog">Add System</button>
         <div id="add_dialog" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">

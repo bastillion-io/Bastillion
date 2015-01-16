@@ -98,17 +98,10 @@
                             </tr>
                         </tbody>
                     </table>
-
-                    <div class="spacer spacer-left">
-                        <button onclick="window.location = 'otpDisable.action?otp'" class="btn btn-danger">Disable</button>
-                    </div>
-                    <div class="spacer spacer-middle">
-                        <button onclick="window.location = 'menu.action'" class="btn btn-warning">Skip for Now</button>
-                    </div>
-                    <div class="spacer spacer-right">
-                        <button onclick="window.location = 'otpSubmit.action'" class="btn btn-default">Got It!</button>
-                    </div>
-
+                    
+                    <button onclick="window.location = 'otpDisable.action?otp'" class="btn btn-danger spacer spacer-left">Disable</button>
+                    <button onclick="window.location = 'menu.action'" class="btn btn-warning spacer spacer-middle">Skip for Now</button>
+                    <button onclick="window.location = 'otpSubmit.action'" class="btn btn-default spacer spacer-right">Got It!</button>
                 </div>
             </div>
         </div>

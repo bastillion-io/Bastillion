@@ -151,16 +151,11 @@
                         </td>
                         <td>
                             <div style="width:150px">
-                                <div class="spacer spacer-left">
-                                    <button class="btn btn-default" data-toggle="modal"
+                                    <button class="btn btn-default spacer spacer-left" data-toggle="modal"
                                             data-target="#edit_dialog_<s:property value="id"/>">Edit
                                     </button>
-                                </div>
-
-                                <div class="spacer spacer-right">
-                                    <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn">Delete
+                                    <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn spacer spacer-right">Delete
                                     </button>
-                                </div>
                                 &nbsp;&nbsp;&nbsp;
                                 <div style="clear:both"></div>
                             </div>
@@ -172,7 +167,7 @@
         </s:if>
 
 
-        <button class="btn btn-default add_btn" data-toggle="modal" data-target="#add_dialog">Add Public Key</button>
+        <button class="btn btn-default add_btn spacer spacer-bottom" data-toggle="modal" data-target="#add_dialog">Add Public Key</button>
         <div id="add_dialog" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">
