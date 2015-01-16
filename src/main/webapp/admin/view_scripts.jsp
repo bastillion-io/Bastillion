@@ -24,7 +24,10 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
-
+            //Select the first textbox in modal
+            $('.modal').on('shown.bs.modal', function () {
+                $('input:text:visible:first').focus();
+            });
 
             //call delete action
             $(".del_btn").button().click(function() {
@@ -112,10 +115,10 @@
                             <td>
                                 <div style="width:240px">
 
-                                    <a href="viewSystems.action?script.id=<s:property value="id"/>"><button id="exec_btn_<s:property value="id"/>" class="btn btn-default edit_btn" style="float:left">Execute Script</button></a>
-                                    <button class="btn btn-default" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>" style="float:left">Edit</button>
-                                    <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn" style="float:left">Delete</button>
-                                    <div style="clear:both"></div>
+                                    <a href="viewSystems.action?script.id=<s:property value="id"/>"><button id="exec_btn_<s:property value="id"/>" class="btn btn-default edit_btn spacer spacer-left">Execute Script</button></a>
+                                    <button class="btn btn-default spacer spacer-middle" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>">Edit</button>
+                                    <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn spacer spacer-right">Delete</button>
+                                <div style="clear:both"></div>
 
                                 </div>
                             </td>
@@ -126,7 +129,7 @@
                 </table>
         </s:if>
 
-        <button class="btn btn-default add_btn" data-toggle="modal" data-target="#add_dialog">Add Script</button>
+        <button class="btn btn-default add_btn spacer spacer-bottom" data-toggle="modal" data-target="#add_dialog">Add Script</button>
         <div id="add_dialog" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -137,8 +140,8 @@
                     <div class="modal-body">
                         <div class="row">
                             <s:form action="saveScript" class="save_script_form_add">
-                                <s:textfield name="script.displayNm" label="Script Name" size="15"/>
-                                <s:textarea name="script.script" label="Script" rows="15" cols="35" wrap="off"/>
+                                <s:textfield name="script.displayNm" label="Script Name" size="15" placeholder="Mandatory field"/>
+                                <s:textarea name="script.script" label="Script" rows="15" cols="35" wrap="off" placeholder="Mandatory field"/>
                                 <s:hidden name="sortedSet.orderByDirection"/>
                                 <s:hidden name="sortedSet.orderByField"/>
                             </s:form>

@@ -22,12 +22,15 @@ import com.google.zxing.qrcode.QRCodeWriter;
 import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.db.AuthDB;
 import com.keybox.manage.db.UserDB;
+import com.keybox.manage.model.Auth;
+import com.keybox.manage.model.User;
 import com.keybox.manage.util.OTPUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.apache.struts2.interceptor.ServletResponseAware;
+
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -36,7 +39,10 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.net.URLEncoder;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Set;
+
 
 public class OTPAction extends ActionSupport implements ServletRequestAware, ServletResponseAware {
 
@@ -48,6 +54,7 @@ public class OTPAction extends ActionSupport implements ServletRequestAware, Ser
     HttpServletRequest servletRequest;
     HttpServletResponse servletResponse;
     String qrImage;
+    
 
     @Action(value = "/admin/viewOTP",
             results = {
@@ -59,7 +66,48 @@ public class OTPAction extends ActionSupport implements ServletRequestAware, Ser
 
         this.setQrImage(Long.toString(new Date().getTime()) + ".png");
         return SUCCESS;
+    }
+    
+    @Action(value = "/admin/otpDisable",
+            results = {
+                @Result(name = "success", location = "/admin/userSettings.action", type = "redirect"),
+                @Result(name = "menu", location = "/admin/menu.action", type = "redirect")
+            }
+    )
+    public String otpDisable() {
 
+        Long UserId = AuthUtil.getUserId(servletRequest.getSession());
+
+        //Use to know where you are from
+        String strQueryString = servletRequest.getQueryString();
+        
+        User usr = UserDB.getUser(UserId);
+        usr.setUseOtp(false);
+
+        UserDB.updateUserNoCredentials(usr);
+        
+        if (strQueryString != null &&
+            strQueryString.equals("otp"))
+            return "menu";
+        
+        return SUCCESS;
+    }
+    
+    @Action(value = "/admin/otpEnable",
+            results = {
+                @Result(name = "success", location = "/admin/userSettings.action", type = "redirect")
+            }
+    )
+    public String otpEnable() {
+
+        Long UserId = AuthUtil.getUserId(servletRequest.getSession());
+        
+        User usr = UserDB.getUser(UserId);
+        usr.setUseOtp(true);
+
+        UserDB.updateUserNoCredentials(usr);
+        
+        return SUCCESS;
     }
 
 

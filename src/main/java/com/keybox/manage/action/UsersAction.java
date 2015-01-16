@@ -50,6 +50,7 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
     )
     public String viewUsers() {
         Long userId= AuthUtil.getUserId(servletRequest.getSession());
+        
         sortedSet = UserDB.getUserSet(sortedSet);
         if(script!=null && script.getId()!=null){
             script=ScriptDB.getScript(script.getId(),userId);

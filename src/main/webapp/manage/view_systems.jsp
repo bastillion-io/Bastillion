@@ -22,7 +22,11 @@
     <jsp:include page="../_res/inc/header.jsp"/>
     <script type="text/javascript">
         $(document).ready(function () {
-
+            //Select the first textbox in modal
+            $('.modal').on('shown.bs.modal', function () {
+                $('input:text:visible:first').focus();
+            });
+            
             $(".refresh_btn").button().click(function () {
                 //get id to submit edit form
                 var id = $(this).attr('id').replace("refresh_btn_", "");
@@ -154,13 +158,9 @@
                         <td>
 
                             <div style="width:160px">
-
-
-                                <button id="refresh_btn_<s:property value="id"/>" class="btn btn-default refresh_btn" style="float:left"><img src="../../img/refresh.png" alt="Refresh" style="float:left;width:20px;height:20px;"/></button>
-
-                                <button class="btn btn-default" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>" style="float:left">Edit</button>
-
-                                <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn" style="float:left" >Delete</button>
+                                    <button id="refresh_btn_<s:property value="id"/>" class="btn btn-default refresh_btn spacer spacer-left"><img src="../../img/refresh.png" alt="Refresh" style="float:left;width:20px;height:20px;"/></button>
+                                    <button class="btn btn-default spacer spacer-middle" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>">Edit</button>
+                                    <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn spacer spacer-right">Delete</button>
                                 <div style="clear:both"></div>
                             </div>
                         </td>
@@ -173,7 +173,7 @@
 
         </s:if>
 
-        <button class="btn btn-default add_btn" data-toggle="modal" data-target="#add_dialog">Add System</button>
+        <button class="btn btn-default add_btn spacer spacer-bottom" data-toggle="modal" data-target="#add_dialog">Add System</button>
         <div id="add_dialog" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -184,9 +184,9 @@
                     <div class="modal-body">
                         <div class="row">
                             <s:form action="saveSystem" class="save_sys_form_add">
-                                <s:textfield name="hostSystem.displayNm" label="Display Name" size="10"/>
+                                <s:textfield name="hostSystem.displayNm" label="Display Name" size="10" placeholder="Mandatory field"/>
                                 <s:textfield name="hostSystem.user" label="System User" size="10"/>
-                                <s:textfield name="hostSystem.host" label="Host" size="18"/>
+                                <s:textfield name="hostSystem.host" label="Host" size="18" placeholder="Mandatory field"/>
                                 <s:textfield name="hostSystem.port" label="Port" size="2"/>
                                 <s:textfield name="hostSystem.authorizedKeys" label="Authorized Keys" size="30"/>
                                 <s:hidden name="sortedSet.orderByDirection"/>

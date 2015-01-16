@@ -1,15 +1,14 @@
-
 body {
     padding-top: 50px;
 }
+
 a {
-    color: #666666;
+    color: #666;
 }
 table {
     border-collapse: collapse;
     font-size: small;
     min-width: 50%;
-
 }
 
 table tbody {
@@ -24,12 +23,12 @@ table tbody {
     text-decoration: none;
 }
 .navbar .note {
-    padding: 10px 2px 2px 0px;
+    padding: 10px 2px 2px 0;
     float: right;
 }
 
 form table {
-    background-color: #FFFFFF;
+    background-color: #FFF;
     min-width:10px;
 }
 
@@ -58,15 +57,16 @@ table td, table th {
 .table-striped th, .tablescroll_head th, .table-striped td, .tablescroll_head td {
     padding: 10px 15px 10px 10px;
 }
+
 .table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
-    border: 1px solid #DDDDDD;
+    border: 1px solid #DDD;
     line-height: 1.42857;
     padding: 10px;
     vertical-align: middle;
 }
 
 .table-striped td, .table-striped th, .tablescroll_head th {
-    border: 1px solid #CCCCCC;
+    border: 1px solid #CCC;
     white-space: nowrap;
 }
 
@@ -84,18 +84,17 @@ table td, table th {
     color: #cc0000;
 }
 
-
 form table label,
 form table .label {
     font-size: small;
     font-weight: bold;
-    color: #666666;
+    color: #666;
     padding: 2px 2px 2px 2px;
 }
 
 div.block {
     overflow: hidden;
-    border: 1px solid #CCCCCC;
+    border: 1px solid #CCC;
 }
 
 div.block label, div.block .inner_block {
@@ -172,29 +171,32 @@ div.termwrapper div h6 {
 
 .top_nav_item {
     float: left;
-    padding: 0 15px 0px 0;
+    padding: 0 15px 0 0;
 }
+
 .run_cmd {
-    background: #eeeeee;
+    background: #eee;
 }
+
 .run_cmd_active {
     background: #4d4d4d;
 }
 
 .run_cmd_active h6 {
-    color: #eeeeee;
+    color: #eee;
 }
 
 .run_cmd {
     border-radius: 4px;
     margin-top: 5px;
-    border: 1px solid #CCCCCC;
+    border: 1px solid #CCC;
     float: left;
     width: 50%;
 }
 .term {
-    background-color: #000000;
+    background-color: #000;
 }
+
 .term-header {
     cursor:move;
 }
@@ -205,7 +207,6 @@ div.termwrapper div h6 {
     font-weight: bold;
     text-decoration: underline;
     cursor: pointer;
-
 }
 
 .clear {
@@ -229,7 +230,7 @@ div.termwrapper div h6 {
     border: #f0f0f0 solid 5px;
     font-family: "DejaVu Sans Mono", "Liberation Mono", monospace;
     font-size: 12px;
-    color: #000000;
+    color: #000;
     background: #f0f0f0;
     line-height: 1.231;
 }
@@ -262,7 +263,6 @@ div.termwrapper div h6 {
 
 .btn {
     padding: 5px;
-    margin: 5px 5px 0 5px;
 }
 
 .nav-img {
@@ -270,14 +270,17 @@ div.termwrapper div h6 {
     margin-top: -8px;
     margin-left: -50px;
 }
+
 .align_left {
-    padding-left :0px;
-    margin-left :0px;
+    padding-left :0;
+    margin-left :0;
 }
+
 .align_right {
-    padding-right :0px;
-    margin-right :0px;
+    padding-right :0;
+    margin-right :0;
 }
+
 .modal-body .row {
     padding-left:10px;
 }
@@ -287,6 +290,30 @@ div.termwrapper div h6 {
     padding: 8px 12px;
 }
 
+.spacer {
+    display: inline-block;
+}
 
+.spacer-middle {
+    margin: 0 5px;
+}
 
+.spacer-left {
+    margin: 0 5px 0 0;
+}
 
+.spacer-right {
+    margin: 0 0 0 5px;
+}
+
+.spacer-top {
+    margin: 0 0 5px 0;
+}
+
+.spacer-bottom {
+    margin: 5px 0 0 0;
+}
+
+.alertContainer {
+    margin-top: 25px;
+}

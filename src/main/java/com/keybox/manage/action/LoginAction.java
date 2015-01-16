@@ -19,6 +19,7 @@ import com.keybox.common.util.AppConfig;
 import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.db.AuthDB;
 import com.keybox.manage.model.Auth;
+import com.keybox.manage.db.UserDB;
 import com.keybox.manage.util.OTPUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.commons.lang3.StringUtils;
@@ -26,9 +27,9 @@ import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.apache.struts2.interceptor.ServletResponseAware;
-import sun.misc.SharedSecrets;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpServletResponse;
 
 
@@ -39,6 +40,8 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 
     HttpServletResponse servletResponse;
     HttpServletRequest servletRequest;
+    Boolean showOtpPage;
+    String showPasswordNotification;
     Auth auth;
     private final String AUTH_ERROR="Authentication Failed : Login credentials are invalid";
     //check if otp is enabled
@@ -50,7 +53,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
             }
     )
     public String login() {
-
+        
         return SUCCESS;
     }
 
@@ -68,7 +71,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
     @Action(value = "/loginSubmit",
             results = {
                     @Result(name = "input", location = "/login.jsp"),
-                    @Result(name = "change_password", location = "/admin/setPassword.action", type = "redirect"),
+                    @Result(name = "change_password", location = "/admin/user_settings.action", type = "redirect"),
                     @Result(name = "otp", location = "/admin/viewOTP.action", type = "redirect"),
                     @Result(name = "success", location = "/admin/menu.action", type = "redirect")
             }
@@ -92,11 +95,21 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
             AuthUtil.setAuthToken(servletRequest.getSession(), authToken);
             AuthUtil.setUserId(servletRequest.getSession(), userId);
             AuthUtil.setTimeout(servletRequest.getSession());
+            
+            boolean bUserUsesOTP = UserDB.getUser(userId).getUseOtp();
 
             //for first time login redirect to set OTP
-            if (otpEnabled && StringUtils.isEmpty(sharedSecret)) {
+            if (otpEnabled && 
+                StringUtils.isEmpty(sharedSecret) &&
+                bUserUsesOTP) {
                 return "otp";
             }
+            
+            else if (!bUserUsesOTP) {
+                retVal = "success";
+            }
+                
+            
             else if ("changeme".equals(auth.getPassword())) {
                 retVal = "change_password";
             }
@@ -121,39 +134,51 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
         return SUCCESS;
     }
 
-    @Action(value = "/admin/setPassword",
+    @Action(value = "/admin/userSettings",
             results = {
-                    @Result(name = "success", location = "/admin/set_password.jsp")
+                    @Result(name = "success", location = "/admin/user_settings.jsp")
             }
     )
     public String setPassword() {
-
+        //Set the showOtpPage on page load so you can access it with JSP
+        Long userId= AuthUtil.getUserId(servletRequest.getSession());
+        showOtpPage = UserDB.getUser(userId).getUseOtp();
+        
         return SUCCESS;
     }
 
     @Action(value = "/admin/passwordSubmit",
             results = {
-                    @Result(name = "input", location = "/admin/set_password.jsp"),
-                    @Result(name = "success", location = "/admin/menu.action", type = "redirect")
+                    @Result(name = "input", location = "/admin/user_settings.jsp"),
+                    @Result(name = "success", location = "/admin/userSettings.action", type = "redirect"),
+                    @Result(name = "danger", location = "/admin/userSettings.action", type = "redirect"),
+                    @Result(name = "warning", location = "/admin/userSettings.action", type = "redirect")
             }
     )
     public String passwordSubmit() {
         String retVal = SUCCESS;
+        
+        //Get the session and set default value as success
+        HttpSession session = servletRequest.getSession();
+        session.setAttribute("showPasswordNotification", "success");
 
         if (auth.getPassword().equals(auth.getPasswordConfirm())) {
             auth.setAuthToken(AuthUtil.getAuthToken(servletRequest.getSession()));
 
             if (!AuthDB.updatePassword(auth)) {
                 addActionError("Current password is invalid");
-                retVal = INPUT;
+                retVal = "danger";
+                //Set value as danger (aka. password was wrong)
+                session.setAttribute("showPasswordNotification", "danger");
             }
 
         } else {
             addActionError("Passwords do not match");
-            retVal = INPUT;
+            retVal = "warning";
+            //Set value as warning (aka. passwords didn't match)
+            session.setAttribute("showPasswordNotification", "warning");
         }
-
-
+        
         return retVal;
     }
 
@@ -193,6 +218,23 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
         }
 
 
+    }
+    
+    public String getShowPasswordNotification() {
+        return  (String)servletRequest.getSession().getAttribute("showPasswordNotification");
+    }
+    
+    public void setShowPasswordNotification(String showPasswordNotification) {
+        servletRequest.getSession().setAttribute("showPasswordNotification", showPasswordNotification);
+    }
+    
+    
+    public boolean getShowOtpPage() {
+        return showOtpPage;
+    }
+    
+    public void setshowOtpPage(boolean showOtpPage) {
+        this.showOtpPage = showOtpPage;
     }
 
     public boolean isOtpEnabled() {

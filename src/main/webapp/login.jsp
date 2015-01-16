@@ -33,6 +33,17 @@
             });
         });
 		
+		function callLogin(event) {
+			if (!event) {
+				return
+			}
+			
+			//Enter
+			if (event.keyCode == 13) {
+				$('#login_btn').click();
+			}
+		}
+
     </script>
     <title>KeyBox - Login </title>
 </head>
@@ -43,7 +54,7 @@
 
             <div class="navbar-header">
                 <div class="navbar-brand" >
-                    <div class="nav-img"><img src="<%= request.getContextPath() %>/img/keybox_50x38.png"/></div>
+                    <div class="nav-img"><img src="<%= request.getContextPath() %>/img/keybox_50x38.png" alt="keybox"/></div>
                  KeyBox</div>
             </div>
             <!--/.nav-collapse -->

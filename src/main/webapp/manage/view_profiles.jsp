@@ -23,7 +23,11 @@
     <jsp:include page="../_res/inc/header.jsp"/>
     <script type="text/javascript">
         $(document).ready(function () {
-
+            //Select the first textbox in modal
+            $('.modal').on('shown.bs.modal', function () {
+                $('input:text:visible:first').focus();
+            });
+            
             //call delete action
             $(".del_btn").button().click(function () {
                 var id = $(this).attr('id').replace("del_btn_", "");
@@ -122,9 +126,9 @@
                         <td>
                             <div style="width:240px">
                                 <a href="viewProfileSystems.action?profile.id=<s:property value="id"/>">
-                                <button id="assign_btn_<s:property value="id"/>" class="btn btn-default edit_btn" style="float:left">Assign Systems</button></a>
-                                <button class="btn btn-default" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>" style="float:left">Edit</button>
-                                <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn" style="float:left">Delete</button>
+                                    <button id="assign_btn_<s:property value="id"/>" class="btn btn-default edit_btn spacer spacer-left">Assign Systems</button></a>
+                                    <button class="btn btn-default spacer spacer-middle" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>">Edit</button>
+                                    <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn spacer spacer-right">Delete</button>
                                 <div style="clear:both"/>
                             </div>
                         </td>
@@ -136,7 +140,7 @@
             </table>
         </s:if>
 
-        <button class="btn btn-default add_btn" data-toggle="modal" data-target="#add_dialog">Add Profile</button>
+        <button class="btn btn-default add_btn spacer spacer-bottom" data-toggle="modal" data-target="#add_dialog">Add Profile</button>
         <div id="add_dialog" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -146,7 +150,7 @@
                     </div>
                     <div class="modal-body">
                         <s:form action="saveProfile" class="save_profile_form_add">
-                            <s:textfield name="profile.nm" label="Name" size="15"/>
+                            <s:textfield name="profile.nm" label="Name" size="15" placeholder="Mandatory field"/>
                             <s:textarea name="profile.desc" label="Profile Description" rows="5" cols="25"/>
                             <s:hidden name="sortedSet.orderByDirection"/>
                             <s:hidden name="sortedSet.orderByField"/>

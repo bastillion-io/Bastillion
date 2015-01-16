@@ -20,10 +20,9 @@
 
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container">
-
         <div class="navbar-header">
             <div class="navbar-brand">
-                <div class="nav-img"><img src="<%= request.getContextPath() %>/img/keybox_50x38.png"/></div>
+                <div class="nav-img"><img src="<%= request.getContextPath() %>/img/keybox_50x38.png" alt="keybox"/></div>
                 KeyBox
             </div>
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -78,7 +77,7 @@
 
                 </s:if>
 
-                <li><a href="../admin/setPassword.action">Change Password</a></li>
+                <li><a href="../admin/userSettings.action">Settings</a></li>
 
                 <li><a href="../logout.action">Logout</a></li>
             </ul>
@@ -86,4 +85,3 @@
         <!--/.nav-collapse -->
     </div>
 </div>
-

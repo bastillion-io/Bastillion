@@ -20,6 +20,7 @@ import com.keybox.manage.model.HostSystem;
 import com.keybox.manage.model.PublicKey;
 import com.keybox.manage.model.SortedSet;
 import com.keybox.manage.util.DBUtils;
+import com.keybox.manage.util.EncryptionUtil;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -36,6 +37,8 @@ public class PublicKeyDB {
 
     public static final String SORT_BY_KEY_NM = "key_nm";
     public static final String SORT_BY_PROFILE = "profile_id";
+    public static final String SORT_BY_KEY_TP = "key_tp";
+    public static final String SORT_BY_KEY_FP = "key_fp";
 
 
     /**
@@ -62,10 +65,14 @@ public class PublicKeyDB {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
+                String strTempPublicKey = rs.getString("public_key");
                 PublicKey publicKey = new PublicKey();
                 publicKey.setId(rs.getLong("id"));
                 publicKey.setKeyNm(rs.getString("key_nm"));
-                publicKey.setPublicKey(rs.getString("public_key"));
+                publicKey.setPublicKey(strTempPublicKey);
+                publicKey.setKeyTp(EncryptionUtil.generateKeyType(strTempPublicKey));
+                publicKey.setKeyFp(EncryptionUtil.generateFingerprint(strTempPublicKey));
+                
                 publicKey.setProfile(ProfileDB.getProfile(con, rs.getLong("profile_id")));
                 publicKeysList.add(publicKey);
 
@@ -108,10 +115,13 @@ public class PublicKeyDB {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
+                String strTempPublicKey = rs.getString("public_key");
                 PublicKey publicKey = new PublicKey();
                 publicKey.setId(rs.getLong("id"));
                 publicKey.setKeyNm(rs.getString("key_nm"));
-                publicKey.setPublicKey(rs.getString("public_key"));
+                publicKey.setPublicKey(strTempPublicKey);
+                publicKey.setKeyTp(EncryptionUtil.generateKeyType(strTempPublicKey));
+                publicKey.setKeyFp(EncryptionUtil.generateFingerprint(strTempPublicKey));
                 publicKey.setProfile(ProfileDB.getProfile(con, rs.getLong("profile_id")));
                 publicKeysList.add(publicKey);
 
@@ -168,10 +178,13 @@ public class PublicKeyDB {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
+                String strTempPublicKey = rs.getString("public_key");
                 publicKey = new PublicKey();
                 publicKey.setId(rs.getLong("id"));
                 publicKey.setKeyNm(rs.getString("key_nm"));
-                publicKey.setPublicKey(rs.getString("public_key"));
+                publicKey.setPublicKey(rs.getString(strTempPublicKey));
+                publicKey.setKeyTp(EncryptionUtil.generateKeyType(strTempPublicKey));
+                publicKey.setKeyFp(EncryptionUtil.generateFingerprint(strTempPublicKey));
                 publicKey.setProfile(ProfileDB.getProfile(con, rs.getLong("profile_id")));
             }
             DBUtils.closeRs(rs);
@@ -195,15 +208,17 @@ public class PublicKeyDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("insert into public_keys(key_nm, public_key, profile_id, user_id) values (?,?,?,?)");
+            PreparedStatement stmt = con.prepareStatement("insert into public_keys(key_nm, public_key, key_tp, key_fp, profile_id, user_id) values (?,?,?,?,?,?)");
             stmt.setString(1, publicKey.getKeyNm());
             stmt.setString(2, publicKey.getPublicKey());
+            stmt.setString(3, publicKey.getKeyTp());
+            stmt.setString(4, publicKey.getKeyFp());
             if (publicKey.getProfile() == null || publicKey.getProfile().getId() == null) {
-                stmt.setNull(3, Types.NULL);
+                stmt.setNull(5, Types.NULL);
             } else {
-                stmt.setLong(3, publicKey.getProfile().getId());
+                stmt.setLong(5, publicKey.getProfile().getId());
             }
-            stmt.setLong(4, publicKey.getUserId());
+            stmt.setLong(6, publicKey.getUserId());
             stmt.execute();
 
             DBUtils.closeStmt(stmt);
@@ -227,16 +242,18 @@ public class PublicKeyDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("update public_keys set key_nm=?, public_key=?, profile_id=? where id=? and user_id=?");
+            PreparedStatement stmt = con.prepareStatement("update public_keys set key_nm=?, public_key=?, key_tp=?, key_fp=?, profile_id=? where id=? and user_id=?");
             stmt.setString(1, publicKey.getKeyNm());
             stmt.setString(2, publicKey.getPublicKey());
+            stmt.setString(3, publicKey.getKeyTp());
+            stmt.setString(4, publicKey.getKeyFp());
             if (publicKey.getProfile() == null || publicKey.getProfile().getId() == null) {
-                stmt.setNull(3, Types.NULL);
+                stmt.setNull(5, Types.NULL);
             } else {
-                stmt.setLong(3, publicKey.getProfile().getId());
+                stmt.setLong(5, publicKey.getProfile().getId());
             }
-            stmt.setLong(4, publicKey.getId());
-            stmt.setLong(5, publicKey.getUserId());
+            stmt.setLong(6, publicKey.getId());
+            stmt.setLong(7, publicKey.getUserId());
             stmt.execute();
             DBUtils.closeStmt(stmt);
 

@@ -22,6 +22,11 @@
     <jsp:include page="../_res/inc/header.jsp"/>
     <script type="text/javascript">
         $(document).ready(function() {
+            //Select the first textbox in modal
+            $('.modal').on('shown.bs.modal', function () {
+                $('input:text:visible:first').focus();
+            });
+            
             $("#view_btn").button().click(function () {
                 $("#viewSystemsFilter").submit();
             });
@@ -177,10 +182,10 @@
 	    </s:form>
         </s:if>
         <s:if test="script!=null && sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
-            <div class="btn btn-default select_frm_btn">Execute Script</div>
+            <div class="btn btn-default select_frm_btn spacer spacer-bottom">Execute Script</div>
         </s:if>
         <s:elseif test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
-            <div class="btn btn-default select_frm_btn">Create SSH Terminals</div>
+            <div class="btn btn-default select_frm_btn spacer spacer-bottom">Create SSH Terminals</div>
         </s:elseif>
         <s:else>
             <div class="actionMessage">
