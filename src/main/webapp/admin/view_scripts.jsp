@@ -112,16 +112,10 @@
                             <td>
                                 <div style="width:240px">
 
-                                    <div class="spacer spacer-left">
-                                        <a href="viewSystems.action?script.id=<s:property value="id"/>"><button id="exec_btn_<s:property value="id"/>" class="btn btn-default edit_btn">Execute Script</button></a>
-                                    </div>
-                                    <div class="spacer spacer-middle">
-                                        <button class="btn btn-default" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>">Edit</button>
-                                    </div>
-                                    <div class="spacer spacer-right">
-                                        <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn">Delete</button>
-                                    </div>
-                                    <div style="clear:both"></div>
+                                    <a href="viewSystems.action?script.id=<s:property value="id"/>"><button id="exec_btn_<s:property value="id"/>" class="btn btn-default edit_btn spacer spacer-left">Execute Script</button></a>
+                                    <button class="btn btn-default spacer spacer-middle" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>">Edit</button>
+                                    <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn spacer spacer-right">Delete</button>
+                                <div style="clear:both"></div>
 
                                 </div>
                             </td>
@@ -132,7 +126,7 @@
                 </table>
         </s:if>
 
-        <button class="btn btn-default add_btn" data-toggle="modal" data-target="#add_dialog">Add Script</button>
+        <button class="btn btn-default add_btn spacer spacer-bottom" data-toggle="modal" data-target="#add_dialog">Add Script</button>
         <div id="add_dialog" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">
