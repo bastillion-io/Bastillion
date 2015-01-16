@@ -293,6 +293,21 @@ div.termwrapper div h6 {
 }
 
 .spacer {
-    margin: 0 5px;
     display: inline-block;
+}
+
+.spacer-middle {
+    margin: 0 5px;
+}
+
+.spacer-left {
+    margin: 0 5px 0 0;
+}
+
+.spacer-right {
+    margin: 0 0 0 5px;
+}
+
+.alertContainer {
+    margin-top: 25px;
 }

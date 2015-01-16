@@ -138,16 +138,16 @@
                             <td>
                                 <div style="width:235px">
 
-                                <div class="spacer">
+                                <div class="spacer spacer-left">
                                     <button class="btn btn-default" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>">Edit</button>
                                 </div>
-                                <div class="spacer">
+                                <div class="spacer spacer-middle">
                                     <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn">Delete</button>
                                 </div>
                                 
                                 <s:if test="userType==\"A\"">
                                     <a href="viewUserProfiles.action?user.id=<s:property value="id"/>">
-                                        <div class="spacer">
+                                        <div class="spacer spacer-right">
                                             <button id="profile_btn_<s:property value="id"/>" class="btn btn-default edit_btn">Assign Profiles</button>
                                         </div>
                                     </a>
