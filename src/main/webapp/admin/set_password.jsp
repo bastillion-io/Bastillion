@@ -50,10 +50,11 @@
             <s:password name="auth.prevPassword" label="Current Password" />
             <s:password name="auth.password" label="New Password" />
             <s:password name="auth.passwordConfirm" label="Confirm New Password" />
+            <tr> <td>&nbsp;</td>
+                <td align="right">  <div id="change_pass_btn" class="btn btn-default" >Change Password</div></td>
+            </tr>
         </s:form>
 
-        <div id="change_pass_btn" class="btn btn-default">Change Password</div>
-            
     </div>
 
 
