@@ -99,7 +99,7 @@
                         </tbody>
                     </table>
 
-                    <button onclick="window.location = 'menu.action'" class="btn btn-danger spacer spacer-middle">Skip for Now</button>
+                    <button onclick="window.location = 'menu.action'" class="btn btn-danger spacer spacer-left">Skip for Now</button>
                     <button onclick="window.location = 'otpSubmit.action'" class="btn btn-default spacer spacer-right">Got It!</button>
                 </div>
             </div>
