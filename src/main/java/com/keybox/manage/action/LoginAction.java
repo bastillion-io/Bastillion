@@ -30,6 +30,7 @@ import sun.misc.SharedSecrets;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 
 /**
@@ -37,6 +38,8 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class LoginAction extends ActionSupport implements ServletRequestAware, ServletResponseAware {
 
+    String notificationClass;
+    String notificationText;
     HttpServletResponse servletResponse;
     HttpServletRequest servletRequest;
     Auth auth;
@@ -139,6 +142,11 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
     )
     public String passwordSubmit() {
         String retVal = SUCCESS;
+        
+        //Get the session and set default value as success
+        HttpSession session = servletRequest.getSession();
+        session.setAttribute("notificationClass", "alert alert-success");
+        session.setAttribute("notificationText", "Password changed successfully!");
 
         if (auth.getPassword().equals(auth.getPasswordConfirm())) {
             auth.setAuthToken(AuthUtil.getAuthToken(servletRequest.getSession()));
@@ -146,11 +154,15 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
             if (!AuthDB.updatePassword(auth)) {
                 addActionError("Current password is invalid");
                 retVal = INPUT;
+                session.setAttribute("notificationClass", "alert alert-danger");
+                session.setAttribute("notificationText", "Current password is invalid!");
             }
 
         } else {
             addActionError("Passwords do not match");
             retVal = INPUT;
+            session.setAttribute("notificationClass", "alert alert-danger");
+            session.setAttribute("notificationText", "Entered passwords do not match!");
         }
 
 
@@ -209,6 +221,22 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 
     public void setAuth(Auth auth) {
         this.auth = auth;
+    }
+    
+    public void setNotificationClass(String notificationClass) {
+        servletRequest.getSession().setAttribute("notificationClass", notificationClass);
+    }
+    
+    public String getNotificationClass() {
+        return  (String)servletRequest.getSession().getAttribute("notificationClass");
+    }
+    
+    public void setNotificationText(String notificationText) {
+        servletRequest.getSession().setAttribute("notificationText", notificationText);
+    }
+    
+    public String getNotificationText() {
+        return  (String)servletRequest.getSession().getAttribute("notificationText");
     }
 
     public HttpServletResponse getServletResponse() {

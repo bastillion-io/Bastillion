@@ -41,6 +41,7 @@
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
     <div class="container">
+        <jsp:include page="../notification.jsp"/>
 
         <h3>Set Admin Password</h3>
         <p>Change your administrative password below</p>
