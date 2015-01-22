@@ -156,7 +156,7 @@
                     <div class="modal-body">
                         <div class="row">
                             <s:form action="savePublicKey" class="save_public_key_form_add" autocomplete="off">
-                                <s:textfield name="publicKey.keyNm" label="Key Name" size="15"/>
+                                <s:textfield name="publicKey.keyNm" label="Key Name" size="15" Placeholder="Mandatory field"/>
                                 <s:if test="%{#session.userType==\"M\"}">
                                     <s:select name="publicKey.profile.id" list="profileList" headerKey=""
                                               headerValue="All Systems"
@@ -166,7 +166,7 @@
                                     <s:select name="publicKey.profile.id" list="profileList"
                                               listKey="id" listValue="%{nm}" label="Profile" value="%{profile.id}"/>
                                 </s:else>
-                                <s:textarea name="publicKey.publicKey" rows="15" cols="55"/>
+                                <s:textarea name="publicKey.publicKey" rows="15" cols="55" Placeholder="Mandatory field"/>
                                 <s:hidden name="sortedSet.orderByDirection"/>
                                 <s:hidden name="sortedSet.orderByField"/>
                             </s:form>
@@ -193,7 +193,7 @@
                             <div class="row">
                                 <s:form action="savePublicKey" id="save_public_key_form_edit_%{id}" autocomplete="off">
                                     <s:hidden name="publicKey.id" value="%{id}"/>
-                                    <s:textfield name="publicKey.keyNm" value="%{keyNm}" label="Key Name" size="15"/>
+                                    <s:textfield name="publicKey.keyNm" value="%{keyNm}" label="Key Name" size="15" Placeholder="Mandatory field"/>
                                     <s:if test="%{#session.userType==\"M\"}">
                                         <s:select name="publicKey.profile.id" list="profileList" headerKey=""
                                                   headerValue="All Systems"
@@ -204,7 +204,7 @@
                                                   listKey="id" listValue="%{nm}" label="Profile" value="%{profile.id}"/>
                                     </s:else>
                                     <s:textarea name="publicKey.publicKey" value="%{publicKey}" label="Public Key"
-                                                rows="15" cols="55"/>
+                                                rows="15" cols="55" Placeholder="Mandatory field"/>
                                     <s:hidden name="sortedSet.orderByDirection"/>
                                     <s:hidden name="sortedSet.orderByField"/>
                                 </s:form>

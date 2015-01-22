@@ -180,11 +180,11 @@
                     <div class="modal-body">
                         <div class="row">
                             <s:form action="saveSystem" class="save_sys_form_add">
-                                <s:textfield name="hostSystem.displayNm" label="Display Name" size="10"/>
-                                <s:textfield name="hostSystem.user" label="System User" size="10"/>
-                                <s:textfield name="hostSystem.host" label="Host" size="18"/>
-                                <s:textfield name="hostSystem.port" label="Port" size="2"/>
-                                <s:textfield name="hostSystem.authorizedKeys" label="Authorized Keys" size="30"/>
+                                <s:textfield name="hostSystem.displayNm" label="Display Name" size="10" Placeholder="Mandatory field"/>
+                                <s:textfield name="hostSystem.user" label="System User" size="10" Placeholder="Mandatory field"/>
+                                <s:textfield name="hostSystem.host" label="Host" size="18" Placeholder="Mandatory field"/>
+                                <s:textfield name="hostSystem.port" label="Port" size="2" Placeholder="Mandatory field"/>
+                                <s:textfield name="hostSystem.authorizedKeys" label="Authorized Keys" size="30" Placeholder="Mandatory field"/>
                                 <s:hidden name="sortedSet.orderByDirection"/>
                                 <s:hidden name="sortedSet.orderByField"/>
                             </s:form>
@@ -209,12 +209,12 @@
                         <div class="modal-body">
                             <div class="row">
                                 <s:form action="saveSystem" id="save_sys_form_edit_%{id}">
-                                    <s:textfield name="hostSystem.displayNm" value="%{displayNm}" label="Display Name" size="10"/>
-                                    <s:textfield name="hostSystem.user" value="%{user}" label="System User" size="10"/>
-                                    <s:textfield name="hostSystem.host" value="%{host}" label="Host" size="18"/>
-                                    <s:textfield name="hostSystem.port" value="%{port}" label="Port" size="2"/>
+                                    <s:textfield name="hostSystem.displayNm" value="%{displayNm}" label="Display Name" size="10" Placeholder="Mandatory field"/>
+                                    <s:textfield name="hostSystem.user" value="%{user}" label="System User" size="10" Placeholder="Mandatory field"/>
+                                    <s:textfield name="hostSystem.host" value="%{host}" label="Host" size="18" Placeholder="Mandatory field"/>
+                                    <s:textfield name="hostSystem.port" value="%{port}" label="Port" size="2" Placeholder="Mandatory field"/>
                                     <s:textfield name="hostSystem.authorizedKeys" value="%{authorizedKeys}"
-                                                 label="Authorized Keys" size="30"/>
+                                                 label="Authorized Keys" size="30" Placeholder="Mandatory field"/>
                                     <s:hidden name="hostSystem.id" value="%{id}"/>
                                     <s:hidden name="sortedSet.orderByDirection"/>
                                     <s:hidden name="sortedSet.orderByField"/>

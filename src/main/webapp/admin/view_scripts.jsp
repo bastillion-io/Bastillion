@@ -137,8 +137,8 @@
                     <div class="modal-body">
                         <div class="row">
                             <s:form action="saveScript" class="save_script_form_add">
-                                <s:textfield name="script.displayNm" label="Script Name" size="15"/>
-                                <s:textarea name="script.script" label="Script" rows="15" cols="35" wrap="off"/>
+                                <s:textfield name="script.displayNm" label="Script Name" size="15" Placeholder="Mandatory field"/>
+                                <s:textarea name="script.script" label="Script" rows="15" cols="35" wrap="off" Placeholder="Mandatory field"/>
                                 <s:hidden name="sortedSet.orderByDirection"/>
                                 <s:hidden name="sortedSet.orderByField"/>
                             </s:form>
@@ -163,8 +163,8 @@
                             <div class="modal-body">
                                 <div class="row">
                                     <s:form action="saveScript" id="save_script_form_edit_%{id}">
-                                        <s:textfield name="script.displayNm" value="%{displayNm}"  label="Script Name" size="15"/>
-                                        <s:textarea name="script.script" value="%{script}" label="Script" rows="15" cols="35" wrap="off"/>
+                                        <s:textfield name="script.displayNm" value="%{displayNm}"  label="Script Name" size="15" Placeholder="Mandatory field"/>
+                                        <s:textarea name="script.script" value="%{script}" label="Script" rows="15" cols="35" wrap="off" Placeholder="Mandatory field"/>
                                         <s:hidden name="script.id" value="%{id}"/>
                                         <s:hidden name="sortedSet.orderByDirection"/>
                                         <s:hidden name="sortedSet.orderByField"/>
