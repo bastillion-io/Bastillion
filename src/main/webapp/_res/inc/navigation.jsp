@@ -78,7 +78,7 @@
 
                 </s:if>
 
-                <li><a href="../admin/setPassword.action">Change Password</a></li>
+                <li><a href="../admin/userSettings.action">Settings</a></li>
 
                 <li><a href="../logout.action">Logout</a></li>
             </ul>
