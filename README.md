@@ -166,7 +166,7 @@ Special thanks goes to these amazing projects which makes this (and other great 
 + [JSch](http://www.jcraft.com/jsch) Java Secure Channel - by [ymnk](https://github.com/ymnk)
 + [term.js](https://github.com/chjj/term.js) A terminal written in javascript - by [chjj](https://github.com/chjj)
 
-The other great projects are mentioned in the _3rdPartyLicenses.md_!
+The other great projects are mentioned in the [_3rdPartyLicenses.md_](3rdPartyLicenses.md)!
 
 Author
 ------
