@@ -57,9 +57,6 @@
             $('#<s:property value="sortedSet.orderByField"/>').attr('class', '<s:property value="sortedSet.orderByDirection"/>');
             </s:if>
 
-
-            $('.scrollableTable').tableScroll({height:500});
-            $(".scrollableTable tr:odd").css("background-color", "#e0e0e0");
         });
     </script>
 

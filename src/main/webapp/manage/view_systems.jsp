@@ -60,10 +60,6 @@
             </s:if>
 
 
-            $('.scrollableTable').tableScroll({height: 500});
-            $(".scrollableTable tr:odd").css("background-color", "#e0e0e0");
-
-
             <s:if test="hostSystem.statusCd=='AUTHFAIL'">
             $("#set_password_dialog").modal();
             </s:if>

@@ -56,8 +56,6 @@
             $('#<s:property value="sortedSet.orderByField"/>').attr('class', '<s:property value="sortedSet.orderByDirection"/>');
             </s:if>
 
-            $('.scrollableTable').tableScroll({height: 500});
-            $(".scrollableTable tr:odd").css("background-color", "#e0e0e0");
         });
     </script>
     <s:if test="fieldErrors.size > 0">
@@ -97,10 +95,8 @@
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
 
-            <table class="table-striped scrollableTable">
+            <table class="table-striped scrollableTable" >
                 <thead>
-
-
 
                 <tr>
                     <th id="<s:property value="@com.keybox.manage.db.ProfileDB@SORT_BY_PROFILE_NM"/>" class="sort">
@@ -110,9 +106,6 @@
                 </tr>
                 </thead>
                 <tbody>
-
-
-
 
                 <s:iterator var="profile" value="sortedSet.itemList" status="stat">
                     <tr>
@@ -124,7 +117,7 @@
                         </td>
 
                         <td>
-                            <div style="width:240px">
+                            <div>
                                 <a href="viewProfileSystems.action?profile.id=<s:property value="id"/>">
                                     <button id="assign_btn_<s:property value="id"/>" class="btn btn-default edit_btn spacer spacer-left">Assign Systems</button></a>
                                     <button class="btn btn-default spacer spacer-middle" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>">Edit</button>

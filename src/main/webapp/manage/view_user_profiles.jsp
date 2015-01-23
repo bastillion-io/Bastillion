@@ -34,8 +34,6 @@
                 $(this).parents('.modal').find('form').submit();
             });
 
-            $('.scrollableTable').tableScroll({height: 400});
-            $(".scrollableTable tr:odd").css("background-color", "#e0e0e0");
         });
     </script>
 

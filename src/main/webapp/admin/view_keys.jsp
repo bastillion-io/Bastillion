@@ -22,13 +22,9 @@
 
     <jsp:include page="../_res/inc/header.jsp"/>
 
-    <script type="text/javascript">   
+    <script type="text/javascript">
         $(document).ready(function () {
-            //Select the first textbox in modal
-            $('.modal').on('shown.bs.modal', function () {
-                $('input:text:visible:first').focus();
-            });
-            
+
             //call delete action
             $(".del_btn").button().click(function () {
                 var id = $(this).attr('id').replace("del_btn_", "");
@@ -44,8 +40,9 @@
                 $("#gen_auth_keys").submit();
             });
 
+
             $(".sort,.sortAsc,.sortDesc").click(function () {
-                var id = $(this).attr('id');
+                var id = $(this).attr('id')
 
                 if ($('#viewKeys_sortedSet_orderByDirection').attr('value') == 'asc') {
                     $('#viewKeys_sortedSet_orderByDirection').attr('value', 'desc');
@@ -63,8 +60,7 @@
             </s:if>
 
 
-            $('.scrollableTable').tableScroll({height: 500});
-            $(".scrollableTable tr:odd").css("background-color", "#e0e0e0");
+           
         });
     </script>
 
@@ -101,22 +97,38 @@
     <p>Add / Delete keys and assign to profile in order to be set on systems.</p>
 
     <s:if test="%{#session.userType==\"M\" || (profileList!= null && !profileList.isEmpty()) }">
+        
+        <s:if test="%{#session.userType==\"M\"}">
+            <table>
+                <tr>
+                    <td class="align_left">
+                        <a href="../manage/viewKeys.action" class="btn btn-danger" >View / Disable SSH Keys</a>
+                    </td>
+                </tr>
+            </table>
+        </s:if>
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
-            <table class="table-striped scrollableTable">
+            <table class="table-striped scrollableTable" style="min-width:80%">
                 <thead>
+
                 <tr>
+
                     <th id="<s:property value="@com.keybox.manage.db.PublicKeyDB@SORT_BY_KEY_NM"/>" class="sort">Key
                         Name
                     </th>
+
                     <th id="<s:property value="@com.keybox.manage.db.PublicKeyDB@SORT_BY_PROFILE"/>" class="sort">
                         Profile
                     </th>
-                    <th id="<s:property value="@com.keybox.manage.db.PublicKeyDB@SORT_BY_KEY_TP"/>" class="">
-                        Key Type
+                    <th id="<s:property value="@com.keybox.manage.db.PublicKeyDB@SORT_BY_TYPE"/>" class="sort">
+                        Type
                     </th>
-                    <th id="<s:property value="@com.keybox.manage.db.PublicKeyDB@SORT_BY_KEY_FP"/>" class="">
-                        SSH Fingerprint
+                    <th id="<s:property value="@com.keybox.manage.db.PublicKeyDB@SORT_BY_FINGERPRINT"/>" class="sort">
+                        Fingerprint
+                    </th>
+                    <th id="<s:property value="@com.keybox.manage.db.PublicKeyDB@SORT_BY_CREATE_DT"/>" class="sort">
+                        Created
                     </th>
                     <th>&nbsp;</th>
                 </tr>
@@ -133,24 +145,11 @@
                                 <s:property value="profile.nm"/>
                             </s:else>
                         </td>
+                        <td>[ <s:property value="type"/> ]</td>
+                        <td><s:property value="fingerprint"/></td>
+                        <td><s:date name="createDt" nice="true"/></td>
                         <td>
-                            <s:if test="%{#publicKey.keyTp==null}">
-                                ---
-                            </s:if>
-                            <s:else>
-                                <s:property value="keyTp"/>
-                            </s:else>
-                        </td>
-                        <td>
-                            <s:if test="%{#publicKey.keyFp==null}">
-                                ---
-                            </s:if>
-                            <s:else>
-                                <s:property value="keyFp"/>
-                            </s:else>
-                        </td>
-                        <td>
-                            <div style="width:150px">
+                            <div>
                                     <button class="btn btn-default spacer spacer-left" data-toggle="modal"
                                             data-target="#edit_dialog_<s:property value="id"/>">Edit
                                     </button>
@@ -177,8 +176,9 @@
                     </div>
                     <div class="modal-body">
                         <div class="row">
+                            <s:actionerror/>
                             <s:form action="savePublicKey" class="save_public_key_form_add" autocomplete="off">
-                                <s:textfield name="publicKey.keyNm" label="Key Name" size="15" placeholder="Mandatory field"/>
+                                <s:textfield name="publicKey.keyNm" label="Key Name" size="15"/>
                                 <s:if test="%{#session.userType==\"M\"}">
                                     <s:select name="publicKey.profile.id" list="profileList" headerKey=""
                                               headerValue="All Systems"
@@ -188,7 +188,7 @@
                                     <s:select name="publicKey.profile.id" list="profileList"
                                               listKey="id" listValue="%{nm}" label="Profile" value="%{profile.id}"/>
                                 </s:else>
-                                <s:textarea name="publicKey.publicKey" rows="15" cols="55" placeholder="Mandatory field"/>
+                                <s:textarea name="publicKey.publicKey" rows="15" cols="55"/>
                                 <s:hidden name="sortedSet.orderByDirection"/>
                                 <s:hidden name="sortedSet.orderByField"/>
                             </s:form>
@@ -213,6 +213,7 @@
                         </div>
                         <div class="modal-body">
                             <div class="row">
+                                <s:actionerror/>
                                 <s:form action="savePublicKey" id="save_public_key_form_edit_%{id}" autocomplete="off">
                                     <s:hidden name="publicKey.id" value="%{id}"/>
                                     <s:textfield name="publicKey.keyNm" value="%{keyNm}" label="Key Name" size="15"/>
@@ -227,8 +228,7 @@
                                     </s:else>
                                     <s:textarea name="publicKey.publicKey" value="%{publicKey}" label="Public Key"
                                                 rows="15" cols="55"/>
-                                    <s:textfield name="publicKey.keyTp" value="%{keyTp}" label="Key Type" size="10" disabled="true"/>
-                                    <s:textfield name="publicKey.keyFp" value="%{keyFp}" label="Fingerprint" size="40" disabled="true"/>
+                                    <s:hidden name="sortedSet.orderByDirection"/>
                                     <s:hidden name="sortedSet.orderByField"/>
                                 </s:form>
                             </div>

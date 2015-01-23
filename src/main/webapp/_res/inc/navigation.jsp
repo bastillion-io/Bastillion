@@ -53,7 +53,7 @@
 
                             </s:if>
                             <s:if test="%{@com.keybox.manage.util.SSHUtil@keyManagementEnabled}">
-                                <li><a href="../admin/viewKeys.action">Manage SSH Keys</a></li>
+                                    <li><a href="../admin/viewKeys.action">Manage SSH Keys</a></li>
                             </s:if>
                         </ul>
                     </li>
