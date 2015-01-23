@@ -22,11 +22,7 @@
     <jsp:include page="../_res/inc/header.jsp"/>
     <script type="text/javascript">
         $(document).ready(function () {
-            //Select the first textbox in modal
-            $('.modal').on('shown.bs.modal', function () {
-                $('input:text:visible:first').focus();
-            });
-            
+
             $(".refresh_btn").button().click(function () {
                 //get id to submit edit form
                 var id = $(this).attr('id').replace("refresh_btn_", "");
@@ -180,9 +176,9 @@
                     <div class="modal-body">
                         <div class="row">
                             <s:form action="saveSystem" class="save_sys_form_add">
-                                <s:textfield name="hostSystem.displayNm" label="Display Name" size="10" placeholder="Mandatory field"/>
+                                <s:textfield name="hostSystem.displayNm" label="Display Name" size="10"/>
                                 <s:textfield name="hostSystem.user" label="System User" size="10"/>
-                                <s:textfield name="hostSystem.host" label="Host" size="18" placeholder="Mandatory field"/>
+                                <s:textfield name="hostSystem.host" label="Host" size="18"/>
                                 <s:textfield name="hostSystem.port" label="Port" size="2"/>
                                 <s:textfield name="hostSystem.authorizedKeys" label="Authorized Keys" size="30"/>
                                 <s:hidden name="sortedSet.orderByDirection"/>

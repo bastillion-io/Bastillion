@@ -23,26 +23,8 @@
     <jsp:include page="../_res/inc/header.jsp"/>
 
     <script type="text/javascript">
-        //Call when you manually toggle the list (Enable/Disable OTP)
-        function toggleOtpReset() {
-            var element = document.querySelectorAll("[id$=resetSharedSecret]");
-            
-            for (var i = 0; i < element.length; i++) {
-                if (element[i].disabled.length > 0 ||
-                    element[i].disabled === true) {
-                    element[i].disabled="";
-                } else {
-                    element[i].disabled="disabled";
-                }
-            }
-        }
-        
         $(document).ready(function() {
-            //Select the first textbox in modal
-            $('.modal').on('shown.bs.modal', function () {
-                $('input:text:visible:first').focus();
-            });
-            
+
             //call delete action
             $(".del_btn").button().click(function() {
                 var id = $(this).attr('id').replace("del_btn_", "");
@@ -186,14 +168,13 @@
                         <div class="row">
                             <s:actionerror/>
                             <s:form action="saveUser" class="save_user_form_add" autocomplete="off">
-                                <s:textfield name="user.username" label="Username" size="15" placeholder="Mandatory field"/>
+                                <s:textfield name="user.username" label="Username" size="15"/>
                                 <s:select name="user.userType" list="#{'A':'Administrative Only','M':'Full Access'}" label="UserType"/>
-                                <s:textfield name="user.firstNm" label="First Name" size="15" placeholder="Mandatory field"/>
-                                <s:textfield name="user.lastNm" label="Last Name" size="15" placeholder="Mandatory field"/>
+                                <s:textfield name="user.firstNm" label="First Name" size="15"/>
+                                <s:textfield name="user.lastNm" label="Last Name" size="15"/>
                                 <s:textfield name="user.email" label="Email Address" size="25"/>
-                                <s:password name="user.password" value="" label="Password" size="15" placeholder="Mandatory field"/>
-                                <s:password name="user.passwordConfirm" value="" label="Confirm Password" size="15" placeholder="Mandatory field"/>
-                                <s:select name="user.useOtp" list="#{true:'true',false:'false'}" label="Show OTP page"/>
+                                <s:password name="user.password" value="" label="Password" size="15"/>
+                                <s:password name="user.passwordConfirm" value="" label="Confirm Password" size="15"/>
                                 <s:hidden name="resetSharedSecret"/>
                                 <s:hidden name="sortedSet.orderByDirection"/>
                                 <s:hidden name="sortedSet.orderByField"/>
@@ -221,20 +202,14 @@
                                 <div class="row">
                                     <s:actionerror/>
                                     <s:form action="saveUser" id="save_user_form_edit_%{id}" autocomplete="off">
-                                        <s:textfield name="user.username" value="%{username}" label="Username" size="15" placeholder="Mandatory field"/>
+                                        <s:textfield name="user.username" value="%{username}" label="Username" size="15"/>
                                         <s:select name="user.userType" value="%{userType}" list="#{'A':'Administrative Only','M':'Full Access'}" label="UserType"/>
-                                        <s:textfield name="user.firstNm" value="%{firstNm}" label="First Name" size="15" placeholder="Mandatory field"/>
-                                        <s:textfield name="user.lastNm" value="%{lastNm}" label="Last Name" size="15" placeholder="Mandatory field"/>
+                                        <s:textfield name="user.firstNm" value="%{firstNm}" label="First Name" size="15"/>
+                                        <s:textfield name="user.lastNm" value="%{lastNm}" label="Last Name" size="15"/>
                                         <s:textfield name="user.email" value="%{email}" label="Email Address" size="25"/>
-                                        <s:password name="user.password" value="" label="Password" size="15" placeholder="Password hidden"/>
-                                        <s:password name="user.passwordConfirm" value="" label="Confirm Password" size="15" placeholder="Password hidden"/>
-                                        <s:select name="user.useOtp" value="%{useOtp}" list="#{'true':'true','false':'false'}" label="Show OTP page" onchange="toggleOtpReset()"/>
-                                        <s:if test="useOtp==true">
-                                            <s:checkbox name="resetSharedSecret" label="Reset OTP Code"/>
-                                        </s:if>
-                                        <s:else>
-                                            <s:checkbox name="resetSharedSecret" label="Reset OTP Code" disabled="true"/>
-                                        </s:else>
+                                        <s:password name="user.password" value="" label="Password" size="15"/>
+                                        <s:password name="user.passwordConfirm" value="" label="Confirm Password" size="15"/>
+                                        <s:checkbox name="resetSharedSecret" label="Reset OTP Code"/>
                                         <s:hidden name="user.id" value="%{id}"/>
                                         <s:hidden name="sortedSet.orderByDirection"/>
                                         <s:hidden name="sortedSet.orderByField"/>
@@ -249,6 +224,8 @@
                     </div>
                 </div>
             </s:iterator>
+
+
     </div>
 
 </body>

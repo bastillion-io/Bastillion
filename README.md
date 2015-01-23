@@ -83,14 +83,6 @@ In the directory that contains the pom.xml run
 
 **Note: Doing a mvn clean will delete the H2 DB and wipe out all the data.
 
-If building from source fails with
-
-	[ERROR] Failed to execute goal org.eclipse.jetty:jetty-maven-plugin:[VERSIONNUMBER]:run (default-cli) 
-	on project keybox: Failure: Address already in use: bind -> [Help 1]
-	
-It means that you already have an instance of jetty running on that address on your machine.
-So make sure you close the running jetty tasks and restart the build process.
-
 Managing SSH Keys
 ------
 By default KeyBox will overwrite all values in the specified authorized_keys file for a system.  You can disable key management by editing KeyBoxConfig.properties file and use KeyBox only as a bastion host.  This file is located in the jetty/keybox/WEB-INF/classes directory. (or the src/main/resources directory if building from source)
@@ -151,17 +143,11 @@ Steps:
 7. Add additional public keys to systems
 8. Audit session history
 
-Change Password/ set OTP Authentication
-------
-By default the admin password is "changeme". To change that go to "Setting" and change it.
-To disable the OTP Authentication notification after the login, go to "Settings" and disable it.
-You can also enable it again when you want to use OTP.
-
 Screenshots
 -----------
 ![Login](http://sshkeybox.com/img/screenshots/medium/login.png)
 
-![Two-Factor](http://i.imgur.com/NKhDQu8.png)
+![Two-Factor](http://sshkeybox.com/img/screenshots/medium/two-factor.png)
 
 ![More Terminals](http://sshkeybox.com/img/screenshots/medium/more_terms.png)
 
@@ -172,8 +158,6 @@ Screenshots
 ![Manage Users](http://sshkeybox.com/img/screenshots/medium/manage_users.png)
 
 ![Define SSH Keys](http://sshkeybox.com/img/screenshots/medium/manage_keys.png)
-
-![Settings] (http://i.imgur.com/ROiQGy8.png)
 
 Acknowledgments
 ------
@@ -190,18 +174,5 @@ Author
 + https://twitter.com/spkavanagh6
 
 (Follow me on twitter for release updates, but mostly nonsense)
-
-
----
-License
---------
-Keybox - MIT License ( **Sean Kavanagh**) See the LICENSE file for license rights and limitations (MIT).
-
-##3rd party software and licenses in use
-
-Jquery - MIT License - https://jquery.org/license/
-term.js - Copyright (c) 2012-2013, Christopher Jeffrey (MIT License)
-JSch - http://www.jcraft.com/jsch/LICENSE.txt and SSH by SSH Communications Security Corp (TM)
-
 
 

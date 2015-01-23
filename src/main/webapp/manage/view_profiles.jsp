@@ -23,11 +23,7 @@
     <jsp:include page="../_res/inc/header.jsp"/>
     <script type="text/javascript">
         $(document).ready(function () {
-            //Select the first textbox in modal
-            $('.modal').on('shown.bs.modal', function () {
-                $('input:text:visible:first').focus();
-            });
-            
+
             //call delete action
             $(".del_btn").button().click(function () {
                 var id = $(this).attr('id').replace("del_btn_", "");
@@ -143,7 +139,7 @@
                     </div>
                     <div class="modal-body">
                         <s:form action="saveProfile" class="save_profile_form_add">
-                            <s:textfield name="profile.nm" label="Name" size="15" placeholder="Mandatory field"/>
+                            <s:textfield name="profile.nm" label="Name" size="15"/>
                             <s:textarea name="profile.desc" label="Profile Description" rows="5" cols="25"/>
                             <s:hidden name="sortedSet.orderByDirection"/>
                             <s:hidden name="sortedSet.orderByField"/>
