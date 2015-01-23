@@ -58,6 +58,10 @@ table td, table th {
     padding: 10px 15px 10px 10px;
 }
 
+.tablescroll_body td {
+    padding: 10px 15px 10px 10px;
+}
+
 .table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
     border: 1px solid #DDD;
     line-height: 1.42857;
@@ -69,6 +73,7 @@ table td, table th {
     border: 1px solid #CCC;
     white-space: nowrap;
 }
+
 
 .table-striped td a, .table-striped th a, .tablescroll_head th a {
     white-space: nowrap;
@@ -317,4 +322,8 @@ div.termwrapper div h6 {
 
 .alertContainer {
     margin-top: 25px;
+}
+
+a.btn {
+    text-decoration: none;
 }

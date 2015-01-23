@@ -175,7 +175,7 @@ public class SSHUtil {
 				System.out.println("Finger print: " + keyPair.getFingerPrint());
 				keyPair.dispose();
 			} catch (Exception e) {
-				System.out.println(e);
+				e.printStackTrace();
 			}
 		}
 
@@ -546,6 +546,63 @@ public class SSHUtil {
 		}
 	}
 
+
+	/**
+	 * returns public key fingerprint
+	 *
+	 * @param publicKey public key 
+	 * @return fingerprint of public key                     
+	 */
+	public static String getFingerprint(String publicKey){
+		String fingerprint=null;
+		if(StringUtils.isNotEmpty(publicKey)){
+			try {
+ 				KeyPair keyPair = KeyPair.load(new JSch(), null, publicKey.getBytes());
+				if(keyPair != null){
+					fingerprint=keyPair.getFingerPrint();
+				}
+			} catch (JSchException ex){
+				ex.printStackTrace();
+			}
+			
+		}
+		return fingerprint;
+
+	}
+
+	/**
+	 * returns public key type 
+	 *
+	 * @param publicKey public key 
+	 * @return fingerprint of public key                     
+	 */
+	public static String getKeyType(String publicKey){
+		String keyType=null;
+		if(StringUtils.isNotEmpty(publicKey)){
+			try {
+				KeyPair keyPair = KeyPair.load(new JSch(), null, publicKey.getBytes());
+				if(keyPair != null) {
+					int type =keyPair.getKeyType();
+					if(KeyPair.DSA == type){
+						keyType="DSA";
+					} else if (KeyPair.RSA == type){
+						keyType="RSA";
+					} else if(KeyPair.UNKNOWN ==type){
+						keyType="UNKNOWN";
+					} else if(KeyPair.ERROR == type){
+						keyType="ERROR";
+					}
+				}
+
+			} catch (JSchException ex){
+				ex.printStackTrace();
+			}
+		}
+		return keyType;
+
+	}
+
+	
 
 
 
