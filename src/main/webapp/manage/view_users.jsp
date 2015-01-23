@@ -53,8 +53,6 @@
             </s:if>
 
 
-            $('.scrollableTable').tableScroll({height:500});
-            $(".scrollableTable tr:odd").css("background-color", "#e0e0e0");
         });
     </script>
 

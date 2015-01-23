@@ -30,7 +30,7 @@
             });
 
             $("#view_btn").button().click(function () {
-                $("#viewSessionsFilter").submit();
+                $("#viewSessions").submit();
             });
 
             //submit add or edit form
@@ -57,8 +57,7 @@
             </s:if>
 
 
-            $('.scrollableTable').tableScroll({height: 500});
-            $(".scrollableTable tr:odd").css("background-color", "#e0e0e0");
+
         });
     </script>
 
@@ -73,13 +72,6 @@
 <div class="container">
 
 
-    <s:form action="viewSessions" theme="simple">
-        <s:hidden name="sortedSet.orderByDirection"/>
-        <s:hidden name="sortedSet.orderByField"/>
-        <s:hidden name="userId"/>
-        <s:hidden name="systemId"/>
-    </s:form>
-
     <h3>Audit Sessions</h3>
 
     <s:if test="enableAudit=='true'">
@@ -87,7 +79,7 @@
                 <table style="min-width:0px">
                     <tr>
                         <td class="align_left">
-                            <s:form id="viewSessionsFilter" action="viewSessions" theme="simple">
+                            <s:form id="viewSessions" action="viewSessions" theme="simple">
                                 <s:hidden name="sortedSet.orderByDirection"/>
                                 <s:hidden name="sortedSet.orderByField"/>
                                 <table style="min-width:0px">
