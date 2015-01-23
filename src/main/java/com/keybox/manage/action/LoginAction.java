@@ -26,11 +26,9 @@ import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.apache.struts2.interceptor.ServletResponseAware;
-import sun.misc.SharedSecrets;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 
 /**
@@ -137,16 +135,14 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
     @Action(value = "/admin/passwordSubmit",
             results = {
                     @Result(name = "input", location = "/admin/set_password.jsp"),
-                    @Result(name = "success", location = "/admin/menu.action", type = "redirect")
+                    @Result(name = "success", location = "/admin/setPassword.action", type = "redirect")
             }
     )
     public String passwordSubmit() {
-        String retVal = SUCCESS;
         
-        //Get the session and set default value as success
-        HttpSession session = servletRequest.getSession();
-        session.setAttribute("notificationClass", "alert alert-success");
-        session.setAttribute("notificationText", "Password changed successfully!");
+        String retVal = SUCCESS;
+        String strClass = "alert alert-success";
+        String strText ="Password changed successfully!";
 
         if (auth.getPassword().equals(auth.getPasswordConfirm())) {
             auth.setAuthToken(AuthUtil.getAuthToken(servletRequest.getSession()));
@@ -154,17 +150,19 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
             if (!AuthDB.updatePassword(auth)) {
                 addActionError("Current password is invalid");
                 retVal = INPUT;
-                session.setAttribute("notificationClass", "alert alert-danger");
-                session.setAttribute("notificationText", "Current password is invalid!");
+                strClass = "alert alert-danger";
+                strText = "Current password is invalid!";
             }
 
         } else {
             addActionError("Passwords do not match");
             retVal = INPUT;
-            session.setAttribute("notificationClass", "alert alert-danger");
-            session.setAttribute("notificationText", "Entered passwords do not match!");
+            strClass = "alert alert-danger";
+            strText = "Entered passwords do not match!";
         }
 
+        setNotificationClass(strClass);
+        setNotificationText(strText);
 
         return retVal;
     }

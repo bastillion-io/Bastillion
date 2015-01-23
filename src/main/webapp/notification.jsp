@@ -4,14 +4,15 @@
     Author     : ptusch
 --%>
 
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="s" uri="/struts-tags" %>
 <!DOCTYPE html>
 <html>
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     </head>
     <body>
+        <%-- Only render if there is any content to show --%>
         <c:if test="${not empty notificationClass}">
             <div class="alertContainer">               
                 <%-- Alert if the password was changed successfully --%>
@@ -21,9 +22,9 @@
                 </div>
             </div>
             
-            <%-- Remove the session variable --%>
-            <c:remove var="notificationClass" scope="session"/>
-            <c:remove var="notificationText" scope="session"/>
+            <%-- Set the session- variables to something less dangerous... --%>
+            <c:set var="notificationClass" scope="session" value=""/>
+            <c:set var="notificationText" scope="session" value=""/>
         </c:if>
     </body>
 </html>
