@@ -135,7 +135,7 @@
             </s:if>
             <tr>
                 <td>
-                  <a href="../admin/userSettings.action">Settings</a>
+                  <a href="../admin/setPassword.action">Change Password</a>
                 </td>
                 <td>
                     Change administrative login to application.

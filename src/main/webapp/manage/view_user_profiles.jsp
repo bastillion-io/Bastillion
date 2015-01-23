@@ -24,6 +24,7 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
+
             //call delete action
             $(".del_btn").button().click(function () {
                 var id = $(this).attr('id').replace("del_btn_", "");

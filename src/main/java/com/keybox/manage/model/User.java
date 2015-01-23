@@ -24,7 +24,6 @@ public class User extends Auth {
     String firstNm;
     String lastNm;
     String email;
-    boolean useOtp;
     boolean checked=false;
     List<Profile> profileList;
 
@@ -47,10 +46,6 @@ public class User extends Auth {
     public String getLastNm() {
         return lastNm;
     }
-    
-    public boolean getUseOtp() {
-        return useOtp;
-    }
 
     public void setLastNm(String lastNm) {
         this.lastNm = lastNm;
@@ -70,10 +65,6 @@ public class User extends Auth {
 
     public void setProfileList(List<Profile> profileList) {
         this.profileList = profileList;
-    }
-    
-    public void setUseOtp (boolean useOtp) {
-        this.useOtp = useOtp;
     }
 
 }

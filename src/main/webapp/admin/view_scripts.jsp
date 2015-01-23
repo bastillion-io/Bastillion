@@ -24,10 +24,7 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
-            //Select the first textbox in modal
-            $('.modal').on('shown.bs.modal', function () {
-                $('input:text:visible:first').focus();
-            });
+
 
             //call delete action
             $(".del_btn").button().click(function() {
@@ -137,8 +134,8 @@
                     <div class="modal-body">
                         <div class="row">
                             <s:form action="saveScript" class="save_script_form_add">
-                                <s:textfield name="script.displayNm" label="Script Name" size="15" placeholder="Mandatory field"/>
-                                <s:textarea name="script.script" label="Script" rows="15" cols="35" wrap="off" placeholder="Mandatory field"/>
+                                <s:textfield name="script.displayNm" label="Script Name" size="15"/>
+                                <s:textarea name="script.script" label="Script" rows="15" cols="35" wrap="off"/>
                                 <s:hidden name="sortedSet.orderByDirection"/>
                                 <s:hidden name="sortedSet.orderByField"/>
                             </s:form>

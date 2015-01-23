@@ -33,17 +33,6 @@
             });
         });
 		
-		function callLogin(event) {
-			if (!event) {
-				return
-			}
-			
-			//Enter
-			if (event.keyCode == 13) {
-				$('#login_btn').click();
-			}
-		}
-
     </script>
     <title>KeyBox - Login </title>
 </head>

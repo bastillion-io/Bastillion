@@ -198,6 +198,7 @@ div.termwrapper div h6 {
     float: left;
     width: 50%;
 }
+
 .term {
     background-color: #000;
 }
@@ -224,7 +225,7 @@ div.termwrapper div h6 {
 }
 
 .errorMessage {
-    padding: 0px 8px;
+    padding: 0 8px;
 }
 
 .output {
