@@ -114,7 +114,6 @@ $(document).ready(function() {
     .terminal {
         background-color: rgb(240, 240, 240);
         color: rgb(77, 77, 77);
-        width:595px;
         height:300px;
         overflow-y:scroll;
 
@@ -169,10 +168,10 @@ $(document).ready(function() {
                 <div class="align-right">
                     <s:form id="filter_frm" theme="simple">
                         <s:label value=""/>
-                        <s:textfield name="filter" type="text"/><div class="btn btn-default submit_btn">Filter</div><div class="btn btn-default clear_btn">Clear</div>
+                        <s:textfield name="filter" type="text" class="spacer spacer-left"/><div class="btn btn-default submit_btn spacer spacer-middle">Filter</div><div class="btn btn-default clear_btn spacer spacer-right">Clear</div>
                     </s:form>
                 </div>
-                <div class="align-right" style="padding-top: 20px">
+                <div class="align-right" style="padding-top: 15px">
                     <b>Audit  ( <s:property value="sessionAudit.user.username"/>
                     <s:if test="sessionAudit.user!=null && sessionAudit.user.lastNm!=null">
                         - <s:property value="sessionAudit.user.lastNm"/>, <s:property value="sessionAudit.user.firstNm"/>

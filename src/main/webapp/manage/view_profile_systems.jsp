@@ -59,9 +59,6 @@
             <s:if test="sortedSet.orderByField!= null">
             $('#<s:property value="sortedSet.orderByField"/>').attr('class', '<s:property value="sortedSet.orderByDirection"/>');
             </s:if>
-            $('.scrollableTable').tableScroll({height:400});
-            $(".scrollableTable tr:odd").css("background-color", "#e0e0e0");
-
 
             <s:if test="profile.hostSystemList!= null && !profile.hostSystemList.isEmpty()">
             <s:iterator var="system" value="profile.hostSystemList" status="stat">
