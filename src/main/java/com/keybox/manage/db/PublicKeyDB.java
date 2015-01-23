@@ -15,11 +15,11 @@
  */
 package com.keybox.manage.db;
 
-
-import com.keybox.manage.model.HostSystem;
 import com.keybox.manage.model.PublicKey;
 import com.keybox.manage.model.SortedSet;
 import com.keybox.manage.util.DBUtils;
+import com.keybox.manage.util.SSHUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -33,9 +33,94 @@ import java.util.List;
  */
 public class PublicKeyDB {
 
+    public static final String FILTER_BY_USER_ID = "user_id";
+    public static final String FILTER_BY_PROFILE_ID = "profile_id";
+    public static final String FILTER_BY_ENABLED= "enabled";
 
     public static final String SORT_BY_KEY_NM = "key_nm";
     public static final String SORT_BY_PROFILE = "profile_id";
+    public static final String SORT_BY_TYPE= "type";
+    public static final String SORT_BY_FINGERPRINT= "fingerprint";
+    public static final String SORT_BY_CREATE_DT= "create_dt";
+    public static final String SORT_BY_USERNAME= "username";
+
+
+    /**
+     * disables SSH key
+     *
+     * @param id key id
+     */
+    public static void disableKey(Long id){
+
+        Connection con = null;
+        try {
+            con = DBUtils.getConn();
+            PreparedStatement stmt = con.prepareStatement("update public_keys set enabled=false where id=?");
+            stmt.setLong(1, id);
+            stmt.execute();
+            DBUtils.closeStmt(stmt);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+        
+         
+    }
+
+    /**
+      * re-enables SSH key
+      * 
+      * @param id key id
+     */
+    public static void enableKey(Long id){
+
+        Connection con = null;
+        try {
+            con = DBUtils.getConn();
+            PreparedStatement stmt = con.prepareStatement("update public_keys set enabled=true where id=?");
+            stmt.setLong(1, id);
+            stmt.execute();
+            DBUtils.closeStmt(stmt);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+
+    }
+
+    /**
+     * checks fingerprint to determine if key is disabled
+     * 
+     * @param fingerprint public key fingerprint
+     * @return true if disabled
+     */
+    public static boolean isKeyDisabled(String fingerprint) {
+        boolean isDisabled=false;
+
+        Connection con = null;
+        try {
+            con = DBUtils.getConn();
+            PreparedStatement stmt = con.prepareStatement("select * from  public_keys where fingerprint like ? and enabled=false");
+            stmt.setString(1, fingerprint);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                isDisabled=true;
+            }
+            
+            DBUtils.closeRs(rs);
+            DBUtils.closeStmt(stmt);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+        
+        return isDisabled;
+        
+        
+    }
 
 
     /**
@@ -51,14 +136,30 @@ public class PublicKeyDB {
 
         String orderBy = "";
         if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
-            orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
+            orderBy = " order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
         }
-        String sql = "select * from public_keys " + orderBy;
+        String sql = "select p.*, u.username from public_keys p, users u where u.id=p.user_id  ";
+
+        sql+= StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_USER_ID)) ? " and p.user_id=? " : "";
+        sql+= StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID)) ? " and p.profile_id=? " : "";
+        sql+= StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_ENABLED)) ? " and p.enabled=? " : " and p.enabled=true";
+        sql=sql+orderBy;
 
         Connection con = null;
         try {
             con = DBUtils.getConn();
             PreparedStatement stmt = con.prepareStatement(sql);
+            int i=1;
+            //set filters in prepared statement
+            if(StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_USER_ID))){
+                stmt.setLong(i++, Long.valueOf(sortedSet.getFilterMap().get(FILTER_BY_USER_ID)));
+            }
+            if(StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID))){
+                stmt.setLong(i++, Long.valueOf(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID)));
+            }
+            if(StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_ENABLED))){
+                stmt.setBoolean(i++, Boolean.valueOf(sortedSet.getFilterMap().get(FILTER_BY_ENABLED)));
+            }
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
@@ -67,6 +168,12 @@ public class PublicKeyDB {
                 publicKey.setKeyNm(rs.getString("key_nm"));
                 publicKey.setPublicKey(rs.getString("public_key"));
                 publicKey.setProfile(ProfileDB.getProfile(con, rs.getLong("profile_id")));
+                publicKey.setType(SSHUtil.getKeyType(publicKey.getPublicKey()));
+                publicKey.setFingerprint(SSHUtil.getFingerprint(publicKey.getPublicKey()));
+                publicKey.setCreateDt(rs.getTimestamp("create_dt"));
+                publicKey.setUsername(rs.getString("username"));
+                publicKey.setUserId(rs.getLong("user_id"));
+                publicKey.setEnabled(rs.getBoolean("enabled"));
                 publicKeysList.add(publicKey);
 
             }
@@ -98,7 +205,7 @@ public class PublicKeyDB {
         if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
             orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
         }
-        String sql = "select * from public_keys where user_id = ?" + orderBy;
+        String sql = "select * from public_keys where user_id = ? and enabled=true " + orderBy;
 
         Connection con = null;
         try {
@@ -113,6 +220,9 @@ public class PublicKeyDB {
                 publicKey.setKeyNm(rs.getString("key_nm"));
                 publicKey.setPublicKey(rs.getString("public_key"));
                 publicKey.setProfile(ProfileDB.getProfile(con, rs.getLong("profile_id")));
+                publicKey.setType(SSHUtil.getKeyType(publicKey.getPublicKey()));
+                publicKey.setFingerprint(SSHUtil.getFingerprint(publicKey.getPublicKey()));
+                publicKey.setCreateDt(rs.getTimestamp("create_dt"));
                 publicKeysList.add(publicKey);
 
             }
@@ -173,6 +283,9 @@ public class PublicKeyDB {
                 publicKey.setKeyNm(rs.getString("key_nm"));
                 publicKey.setPublicKey(rs.getString("public_key"));
                 publicKey.setProfile(ProfileDB.getProfile(con, rs.getLong("profile_id")));
+                publicKey.setType(rs.getString("type"));
+                publicKey.setFingerprint(rs.getString("fingerprint"));
+                publicKey.setCreateDt(rs.getTimestamp("create_dt"));
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
@@ -195,15 +308,17 @@ public class PublicKeyDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("insert into public_keys(key_nm, public_key, profile_id, user_id) values (?,?,?,?)");
+            PreparedStatement stmt = con.prepareStatement("insert into public_keys(key_nm, type, fingerprint, public_key, profile_id, user_id) values (?,?,?,?,?,?)");
             stmt.setString(1, publicKey.getKeyNm());
-            stmt.setString(2, publicKey.getPublicKey());
+            stmt.setString(2, SSHUtil.getKeyType(publicKey.getPublicKey()));
+            stmt.setString(3, SSHUtil.getFingerprint(publicKey.getPublicKey()));
+            stmt.setString(4, publicKey.getPublicKey().trim());
             if (publicKey.getProfile() == null || publicKey.getProfile().getId() == null) {
-                stmt.setNull(3, Types.NULL);
+                stmt.setNull(5, Types.NULL);
             } else {
-                stmt.setLong(3, publicKey.getProfile().getId());
+                stmt.setLong(5, publicKey.getProfile().getId());
             }
-            stmt.setLong(4, publicKey.getUserId());
+            stmt.setLong(6, publicKey.getUserId());
             stmt.execute();
 
             DBUtils.closeStmt(stmt);
@@ -227,16 +342,18 @@ public class PublicKeyDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("update public_keys set key_nm=?, public_key=?, profile_id=? where id=? and user_id=?");
+            PreparedStatement stmt = con.prepareStatement("update public_keys set key_nm=?, type=?, fingerprint=?, public_key=?, profile_id=? where id=? and user_id=? and enabled=true");
             stmt.setString(1, publicKey.getKeyNm());
-            stmt.setString(2, publicKey.getPublicKey());
+            stmt.setString(2, SSHUtil.getKeyType(publicKey.getPublicKey()));
+            stmt.setString(3, SSHUtil.getFingerprint(publicKey.getPublicKey()));
+            stmt.setString(4, publicKey.getPublicKey().trim());
             if (publicKey.getProfile() == null || publicKey.getProfile().getId() == null) {
-                stmt.setNull(3, Types.NULL);
+                stmt.setNull(5, Types.NULL);
             } else {
-                stmt.setLong(3, publicKey.getProfile().getId());
+                stmt.setLong(5, publicKey.getProfile().getId());
             }
-            stmt.setLong(4, publicKey.getId());
-            stmt.setLong(5, publicKey.getUserId());
+            stmt.setLong(6, publicKey.getId());
+            stmt.setLong(7, publicKey.getUserId());
             stmt.execute();
             DBUtils.closeStmt(stmt);
 
@@ -261,7 +378,7 @@ public class PublicKeyDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("delete from public_keys where id=? and user_id=?");
+            PreparedStatement stmt = con.prepareStatement("delete from public_keys where id=? and user_id=? and enabled=true");
             stmt.setLong(1, publicKeyId);
             stmt.setLong(2, userId);
             stmt.execute();
@@ -285,7 +402,7 @@ public class PublicKeyDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("delete from public_keys where user_id=?");
+            PreparedStatement stmt = con.prepareStatement("delete from public_keys where user_id=? and enabled=true");
             stmt.setLong(1, userId);
             stmt.execute();
             DBUtils.closeStmt(stmt);
@@ -308,7 +425,7 @@ public class PublicKeyDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("delete from public_keys where profile_id=?");
+            PreparedStatement stmt = con.prepareStatement("delete from public_keys where profile_id=? and enabled=true");
             stmt.setLong(1, profileId);
             stmt.execute();
             DBUtils.closeStmt(stmt);
@@ -319,65 +436,6 @@ public class PublicKeyDB {
         DBUtils.closeConn(con);
 
     }
-
-    public static List<Long> getSystemsByPublicKey(List<Long> publicKeyIdList) {
-
-        List<Long> systemIdList = new ArrayList<Long>();
-
-        Connection con = null;
-        try {
-            con = DBUtils.getConn();
-
-            systemIdList = getSystemsByPublicKey(con, publicKeyIdList);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        DBUtils.closeConn(con);
-
-        return systemIdList;
-
-
-    }
-
-
-    public static List<Long> getSystemsByPublicKey(Connection con, List<Long> publicKeyIdList) {
-
-        List<Long> systemIdList = new ArrayList<Long>();
-
-        try {
-
-            for (Long publicKeyId : publicKeyIdList) {
-
-                PreparedStatement stmt = con.prepareStatement("select * from public_keys where id=?");
-                stmt.setLong(1, publicKeyId);
-                ResultSet rs = stmt.executeQuery();
-                while (rs.next()) {
-                    Long profileId = rs.getLong("profile_id");
-                    if (profileId != null) {
-                        systemIdList.addAll(ProfileSystemsDB.getSystemIdsByProfile(con, publicKeyId));
-                    }
-                    else {
-                        systemIdList.addAll(SystemDB.getAllSystemIds(con));
-                        break;
-                    }
-                }
-                DBUtils.closeStmt(stmt);
-
-            }
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        DBUtils.closeConn(con);
-
-        return systemIdList;
-
-
-    }
-
-
 
 
     public static List<String> getPublicKeysForSystem(Long systemId) {
@@ -406,7 +464,7 @@ public class PublicKeyDB {
             systemId=-99L;
         }
         try {
-            PreparedStatement stmt = con.prepareStatement("select * from public_keys where profile_id is null or profile_id in (select profile_id from system_map where system_id=?)");
+            PreparedStatement stmt = con.prepareStatement("select * from public_keys where (profile_id is null or profile_id in (select profile_id from system_map where system_id=?)) and enabled=true");
             stmt.setLong(1, systemId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {

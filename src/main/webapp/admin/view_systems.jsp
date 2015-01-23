@@ -23,7 +23,7 @@
     <script type="text/javascript">
         $(document).ready(function() {
             $("#view_btn").button().click(function () {
-                $("#viewSystemsFilter").submit();
+                $("#viewSystems").submit();
             });
 
             $(".select_frm_btn").button().click(function() {
@@ -37,6 +37,7 @@
                     $(".systemSelect").prop('checked', false);
                 }
             });
+
             $(".sort,.sortAsc,.sortDesc").click(function() {
                 var id = $(this).attr('id')
 
@@ -55,9 +56,6 @@
             $('#<s:property value="sortedSet.orderByField"/>').attr('class', '<s:property value="sortedSet.orderByDirection"/>');
             </s:if>
 
-
-                $('.scrollableTable').tableScroll({height:500});
-                $(".scrollableTable tr:odd").css("background-color", "#e0e0e0");
     });
     </script>
 
@@ -70,14 +68,6 @@
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
     <div class="container">
-        <s:form action="viewSystems" theme="simple">
-            <s:hidden name="sortedSet.orderByDirection"/>
-            <s:hidden name="sortedSet.orderByField"/>
-            <s:hidden name="profileId"/>
-            <s:if test="script!=null">
-              <s:hidden name="script.id"/>
-            </s:if>
-        </s:form>
 
             <s:if test="script!=null">
                 <h3>Execute Script on Systems</h3>
@@ -108,14 +98,14 @@
                 <p>Select the systems below to generate composite SSH sessions in multiple terminals</p>
             </s:else>
 
-       <s:if test="profileList!= null && !profileList.isEmpty()">
+        <s:form id="viewSystems" action="viewSystems" theme="simple">
+        <s:hidden name="sortedSet.orderByDirection"/>
+        <s:hidden name="sortedSet.orderByField"/>
+        <s:if test="script!=null">
+            <s:hidden name="script.id"/>
+        </s:if>
+        <s:if test="profileList!= null && !profileList.isEmpty()">
            <div>
-                    <s:form id="viewSystemsFilter" action="viewSystems" theme="simple">
-                        <s:hidden name="sortedSet.orderByDirection"/>
-                        <s:hidden name="sortedSet.orderByField"/>
-                        <s:if test="script!=null">
-                            <s:hidden name="script.id"/>
-                        </s:if>
                         <table style="min-width:0px">
                         <tr>
                             <td style="padding-left:0px;">
@@ -130,10 +120,9 @@
                             </td>
                         </tr>
                         </table>
-                    </s:form>
-
            </div>
-       </s:if>
+        </s:if>
+        </s:form>
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
 
   	        <s:form action="selectSystemsForCompositeTerms" id="select_frm" theme="simple">

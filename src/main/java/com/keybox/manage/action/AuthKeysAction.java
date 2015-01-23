@@ -19,13 +19,13 @@ import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.db.*;
 import com.keybox.manage.model.*;
 import com.keybox.manage.util.RefreshAuthKeyUtil;
+import com.keybox.manage.util.SSHUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
-import java.sql.Ref;
 import java.util.List;
 
 /**
@@ -37,6 +37,7 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 
 	HttpServletRequest servletRequest;
 	List<Profile> profileList;
+	List<User> userList;
 	PublicKey publicKey;
 	SortedSet sortedSet = new SortedSet();
 	List<Long> systemSelectId;
@@ -44,15 +45,73 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 	HostSystem pendingSystem = null;
 	HostSystem hostSystem = new HostSystem();
 
-	String password;
-	String passphrase;
+
+	
+	@Action(value = "/manage/enablePublicKey",
+			results = {
+					@Result(name = "success", location = "/manage/view_keys.jsp")
+			}
+	)
+	public String enablePublicKey() {
+
+		publicKey= PublicKeyDB.getPublicKey(publicKey.getId());
+
+		PublicKeyDB.enableKey(publicKey.getId());
+
+		profileList = ProfileDB.getAllProfiles();
+		userList= UserDB.getUserSet(new SortedSet(SessionAuditDB.SORT_BY_USERNAME)).getItemList();
+
+		sortedSet = PublicKeyDB.getPublicKeySet(sortedSet);
+
+		distributePublicKeys(publicKey);
+		
+		return SUCCESS;
+	}
+
+	@Action(value = "/manage/disablePublicKey",
+			results = {
+					@Result(name = "success", location = "/manage/view_keys.jsp")
+			}
+	)
+	public String disablePublicKey() {
+		
+		publicKey= PublicKeyDB.getPublicKey(publicKey.getId());
+
+		PublicKeyDB.disableKey(publicKey.getId());
+
+		profileList = ProfileDB.getAllProfiles();
+		userList= UserDB.getUserSet(new SortedSet(SessionAuditDB.SORT_BY_USERNAME)).getItemList();
+
+		sortedSet = PublicKeyDB.getPublicKeySet(sortedSet);
+
+		distributePublicKeys(publicKey);
+		
+		return SUCCESS;
+	}
+
+	@Action(value = "/manage/viewKeys",
+			results = {
+					@Result(name = "success", location = "/manage/view_keys.jsp")
+			}
+	)
+	public String manageViewKeys() {
+
+		profileList = ProfileDB.getAllProfiles();
+		userList= UserDB.getUserSet(new SortedSet(SessionAuditDB.SORT_BY_USERNAME)).getItemList();
+
+		sortedSet = PublicKeyDB.getPublicKeySet(sortedSet);
+
+		return SUCCESS;
+	}
+
+	
 
 	@Action(value = "/admin/viewKeys",
 			results = {
 					@Result(name = "success", location = "/admin/view_keys.jsp")
 			}
 	)
-	public String viewKeys() {
+	public String adminViewKeys() {
 
 		Long userId = AuthUtil.getUserId(servletRequest.getSession());
 		String userType = AuthUtil.getUserType(servletRequest.getSession());
@@ -66,7 +125,7 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 
 		return SUCCESS;
 	}
-
+	
 	@Action(value = "/admin/savePublicKey",
 			results = {
 					@Result(name = "input", location = "/admin/view_keys.jsp"),
@@ -87,13 +146,8 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 			} else {
 				PublicKeyDB.insertPublicKey(publicKey);
 			}
-
-			//distribute public keys
-			if (publicKey.getProfile() != null && publicKey.getProfile().getId() != null) {
-				RefreshAuthKeyUtil.refreshProfileSystems(publicKey.getProfile().getId());
-			} else {
-				RefreshAuthKeyUtil.refreshAllSystems();
-			}
+			
+			distributePublicKeys(publicKey);
 		}
 
 		return SUCCESS;
@@ -114,12 +168,7 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 			PublicKeyDB.deletePublicKey(publicKey.getId(), AuthUtil.getUserId(servletRequest.getSession()));
 		}
 
-		//distribute public keys
-		if (publicKey.getProfile() != null && publicKey.getProfile().getId() != null) {
-			RefreshAuthKeyUtil.refreshProfileSystems(publicKey.getProfile().getId());
-		} else {
-			RefreshAuthKeyUtil.refreshAllSystems();
-		}
+		distributePublicKeys(publicKey);
 
 		return SUCCESS;
 	}
@@ -138,13 +187,39 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 				|| publicKey.getPublicKey().trim().equals("")) {
 			addFieldError("publicKey.publicKey", "Required");
 		}
-
+		else if(SSHUtil.getFingerprint(publicKey.getPublicKey()) == null
+				|| SSHUtil.getKeyType(publicKey.getPublicKey()) == null) {
+			addFieldError("publicKey.publicKey", "Invalid");
+		} else if(PublicKeyDB.isKeyDisabled(SSHUtil.getFingerprint(publicKey.getPublicKey()))){
+			addActionError("This key has been disabled. Please generate and set a new public key.");
+			addFieldError("publicKey.publicKey", "Invalid");
+		}
+		
 		if (!this.getFieldErrors().isEmpty()) {
 
-			profileList = ProfileDB.getAllProfiles();
-			sortedSet = PublicKeyDB.getPublicKeySet(sortedSet);
+			Long userId = AuthUtil.getUserId(servletRequest.getSession());
+			
+			profileList = UserProfileDB.getProfilesByUser(userId);
+			sortedSet = PublicKeyDB.getPublicKeySet(sortedSet, userId);
 		}
 
+	}
+
+
+
+	/**
+	 * distribute public keys to all systems or to profile
+	 *
+	 * @param publicKey public key to distribute
+	 */
+	private void distributePublicKeys(PublicKey publicKey){
+		
+		if (publicKey.getProfile() != null && publicKey.getProfile().getId() != null) {
+			RefreshAuthKeyUtil.refreshProfileSystems(publicKey.getProfile().getId());
+		} else {
+			RefreshAuthKeyUtil.refreshAllSystems();
+		}
+		
 	}
 
 
@@ -196,20 +271,12 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 		this.pendingSystem = pendingSystem;
 	}
 
-	public String getPassword() {
-		return password;
+	public List<User> getUserList() {
+		return userList;
 	}
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public String getPassphrase() {
-		return passphrase;
-	}
-
-	public void setPassphrase(String passphrase) {
-		this.passphrase = passphrase;
+	public void setUserList(List<User> userList) {
+		this.userList = userList;
 	}
 
 	public HostSystem getHostSystem() {

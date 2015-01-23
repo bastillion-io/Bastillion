@@ -57,6 +57,15 @@
                 }
             });
         });
+        
+        $('.scrollableTable').tableScroll({height: 450});
+        $(".scrollableTable tr:odd").css("background-color", "#e0e0e0");
+
+        $(':input:enabled:visible:first').focus();
+        
+        $('.modal').on('shown.bs.modal', function () {
+            $('input:enabled:visible:first').focus();
+        });
 
     });
 </script>
