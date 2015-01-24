@@ -5,7 +5,7 @@ simultaneously. KeyBox allows you to share terminal commands and upload files to
 all your systems. Once the sessions have been opened you can select a single
 system or any combination to run your commands.  Additional system
 administrators can be added and their terminal sessions and history can be
-audited. Also, KeyBox can manage and distribute public keys that have been setup
+audited. Also, KeyBox can manage, distribute, and disable public keys that have been setup
 and defined.
 
 ![Terminals](http://sshkeybox.com/img/screenshots/medium/terms.png)
@@ -141,7 +141,8 @@ Steps:
 5. Users can login to create sessions on assigned systems
 6. Start a composite SSH session or create and execute a script across multiple sessions
 7. Add additional public keys to systems
-8. Audit session history
+8. Disable any adminstrative public key forcing key rotation.
+9. Audit session history
 
 Screenshots
 -----------
@@ -158,6 +159,8 @@ Screenshots
 ![Manage Users](http://sshkeybox.com/img/screenshots/medium/manage_users.png)
 
 ![Define SSH Keys](http://sshkeybox.com/img/screenshots/medium/manage_keys.png)
+
+![Disable SSH Keys](http://sshkeybox.com/img/screenshots/medium/disable_keys.png)
 
 Acknowledgments
 ------
