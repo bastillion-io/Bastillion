@@ -152,8 +152,6 @@ Screenshots
 
 ![More Terminals](http://sshkeybox.com/img/screenshots/medium/more_terms.png)
 
-![Upload Files](http://sshkeybox.com/img/screenshots/medium/upload_files.png)
-
 ![Manage Systems](http://sshkeybox.com/img/screenshots/medium/manage_systems.png)
 
 ![Manage Users](http://sshkeybox.com/img/screenshots/medium/manage_users.png)
