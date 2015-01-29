@@ -111,16 +111,22 @@
              </tr>
             <s:if test="%{@com.keybox.manage.util.SSHUtil@keyManagementEnabled}">
             <tr>
+                <s:if test="%{#session.userType==\"M\"}">
                 <td>
-                    <a href="../admin/viewKeys.action">Manage SSH Keys</a>
+                    <a href="../manage/viewKeys.action">Manage SSH Keys</a>
                 </td>
                  <td>
-                     Set additional public SSH keys for current users.
-                     <s:if test="%{#session.userType==\"M\"}">
-                         Disable any user key to force rotation.
-                     </s:if>
-                     
+                     Disable any administrative key forcing rotation. Set additional public SSH keys for current user. 
                  </td>
+                </s:if>
+                <s:else>
+                    <td>
+                        <a href="../admin/viewKeys.action">Manage SSH Keys</a>
+                    </td>
+                    <td>
+                        Set additional public SSH keys for current user.
+                    </td>
+                </s:else>
             </tr>
             </s:if>
              <s:if test="%{#session.userType==\"M\"}">
