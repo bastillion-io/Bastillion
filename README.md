@@ -5,7 +5,7 @@ simultaneously. KeyBox allows you to share terminal commands and upload files to
 all your systems. Once the sessions have been opened you can select a single
 system or any combination to run your commands.  Additional system
 administrators can be added and their terminal sessions and history can be
-audited. Also, KeyBox can manage, distribute, and disable public keys that have been setup
+audited. Also, KeyBox can manage and distribute public keys that have been setup
 and defined.
 
 ![Terminals](http://sshkeybox.com/img/screenshots/medium/terms.png)
@@ -141,8 +141,7 @@ Steps:
 5. Users can login to create sessions on assigned systems
 6. Start a composite SSH session or create and execute a script across multiple sessions
 7. Add additional public keys to systems
-8. Disable any adminstrative public key forcing key rotation.
-9. Audit session history
+8. Audit session history
 
 Screenshots
 -----------
@@ -152,13 +151,13 @@ Screenshots
 
 ![More Terminals](http://sshkeybox.com/img/screenshots/medium/more_terms.png)
 
+![Upload Files](http://sshkeybox.com/img/screenshots/medium/upload_files.png)
+
 ![Manage Systems](http://sshkeybox.com/img/screenshots/medium/manage_systems.png)
 
 ![Manage Users](http://sshkeybox.com/img/screenshots/medium/manage_users.png)
 
 ![Define SSH Keys](http://sshkeybox.com/img/screenshots/medium/manage_keys.png)
-
-![Disable SSH Keys](http://sshkeybox.com/img/screenshots/medium/disable_keys.png)
 
 Acknowledgments
 ------
@@ -166,6 +165,8 @@ Special thanks goes to these amazing projects which makes this (and other great 
 
 + [JSch](http://www.jcraft.com/jsch) Java Secure Channel - by [ymnk](https://github.com/ymnk)
 + [term.js](https://github.com/chjj/term.js) A terminal written in javascript - by [chjj](https://github.com/chjj)
+
+The other great projects are mentioned in the [_3rdPartyLicenses.md_](3rdPartyLicenses.md)!
 
 Author
 ------
