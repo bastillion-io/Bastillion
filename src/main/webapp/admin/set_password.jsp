@@ -47,9 +47,9 @@
 
         <s:actionerror/>
         <s:form action="passwordSubmit" autocomplete="off">
-            <s:password name="auth.prevPassword" label="Current Password" />
-            <s:password name="auth.password" label="New Password" />
-            <s:password name="auth.passwordConfirm" label="Confirm New Password" />
+            <s:password name="auth.prevPassword" label="Current Password" Placeholder="Mandatory field"/>
+            <s:password name="auth.password" label="New Password" Placeholder="Mandatory field"/>
+            <s:password name="auth.passwordConfirm" label="Confirm New Password" Placeholder="Mandatory field"/>
             <tr> <td>&nbsp;</td>
                 <td align="right">  <div id="change_pass_btn" class="btn btn-default" >Change Password</div></td>
             </tr>
