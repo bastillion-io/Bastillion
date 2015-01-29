@@ -51,11 +51,11 @@
 
     <p>Add / Delete profiles to be assigned to the current user.</p>
 
-    <h5><s:property value="user.username"/>&nbsp;:&nbsp;<s:property value="user.lastNm"/>,&nbsp;<s:property
+    <h4><s:property value="user.username"/>&nbsp;:&nbsp;<s:property value="user.lastNm"/>,&nbsp;<s:property
             value="user.firstNm"/>
         &nbsp;(<s:property value="user.email"/>)
 
-    </h5>
+    </h4>
 
 
     <s:if test="user.profileList!= null && !user.profileList.isEmpty()">

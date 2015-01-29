@@ -54,8 +54,8 @@
         <p>
         <s:actionerror/>
         <s:form action="loginSubmit"  autocomplete="off">
-            <s:textfield name="auth.username" label="Username"/>
-            <s:password name="auth.password" label="Password" value="" />
+            <s:textfield name="auth.username" label="Username" Placeholder="Mandatory field"/>
+            <s:password name="auth.password" label="Password" value="" Placeholder="Mandatory field"/>
             <s:if test="otpEnabled">
                 <s:textfield name="auth.otpToken" label="OTP Access Code"  autocomplete="off" value=""/>
             </s:if>
