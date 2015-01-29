@@ -185,21 +185,40 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
             SortedSet sortedTempSet = PublicKeyDB.getPublicKeySet(sortedSet, userId);
             
             User usr = UserDB.getUser(userId);
-            List<Profile> lst = usr.getProfileList();
+            
             
 
             try {
 
-                List<PublicKey> items = sortedTempSet.getItemList();
+                List<PublicKey> items = sortedTempSet.getItemList();    //Public keys by user
+                List<Profile> lst = usr.getProfileList();               //Profile list by user
                 
 
                 //Iterate through the keys untill you find the mathcing key, then break and flag.
                 for (PublicKey k : items) {
                     
+                    //Find duplicate fingerprints within the users public key list
                     if (k.getFingerprint().equals(SSHUtil.getFingerprint(publicKey.getPublicKey()))) {
-                        if (k.getFingerprint().equals(SSHUtil.getFingerprint(publicKey.getPublicKey()))) {
-                            bKeyIsDuplicate = true;
-                            break;
+
+                        //Iterate again to find the profiles
+                        for (PublicKey k2 : items) {      
+                            
+                            //If you are admin with the infamous "All Systems"- profile, zje .getProfile will return null
+                            //If both return null, it's a duplicate
+                            if (k2.getProfile() == null &&
+                                publicKey.getProfile().getId() == null) {
+                                bKeyIsDuplicate = true;
+                                break;
+                            }
+                           
+                            //Check for normal users.
+                            if (k2.getProfile() != null &&
+                                publicKey.getProfile() != null) {
+                                if (k2.getProfile().getId().equals(publicKey.getProfile().getId())) {
+                                    bKeyIsDuplicate = true;
+                                    break;
+                                }
+                            }
                         }
                     }
                 }
