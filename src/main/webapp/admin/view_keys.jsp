@@ -94,7 +94,7 @@
 
     <h3>Manage SSH Keys</h3>
 
-    <p>Add / Delete keys and assign to profile in order to be set on systems.</p>
+    <p>Add / Delete public SSH keys for current user.</p>
 
     <s:if test="%{#session.userType==\"M\" || (profileList!= null && !profileList.isEmpty()) }">
         

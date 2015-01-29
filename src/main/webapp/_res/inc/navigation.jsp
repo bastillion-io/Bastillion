@@ -54,7 +54,12 @@
 
                             </s:if>
                             <s:if test="%{@com.keybox.manage.util.SSHUtil@keyManagementEnabled}">
+                                <s:if test="%{#session.userType==\"M\"}">
+                                    <li><a href="../manage/viewKeys.action">Manage SSH Keys</a></li>
+                                </s:if>
+                                <s:else>
                                     <li><a href="../admin/viewKeys.action">Manage SSH Keys</a></li>
+                                </s:else>
                             </s:if>
                         </ul>
                     </li>

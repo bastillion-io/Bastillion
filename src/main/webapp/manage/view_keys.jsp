@@ -86,7 +86,7 @@
 
     <h3>View / Disable SSH Keys</h3>
 
-    <p>Disabling will remove the public key from all host systems. Additional SSH keys with the same fingerprint can no longer be set, forcing users to rotate keys.</p>
+    <p>Disabling will remove the public key from all host systems. Additional SSH keys with the same fingerprint can no longer be set forcing users to rotate keys.</p>
     <table>
         <tr>
             <td class="align_left">
