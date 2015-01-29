@@ -27,6 +27,7 @@ import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Action to generate and distribute auth keys for systems or users
@@ -177,6 +178,36 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 	 * Validates all fields for adding a public key
 	 */
 	public void validateSavePublicKeys() {
+            
+            
+            boolean bKeyIsDuplicate = false;
+            Long userId = AuthUtil.getUserId(servletRequest.getSession());
+            SortedSet sortedTempSet = PublicKeyDB.getPublicKeySet(sortedSet, userId);
+            
+            User usr = UserDB.getUser(userId);
+            List<Profile> lst = usr.getProfileList();
+            
+
+            try {
+
+                List<PublicKey> items = sortedTempSet.getItemList();
+                
+
+                //Iterate through the keys untill you find the mathcing key, then break and flag.
+                for (PublicKey k : items) {
+                    
+                    if (k.getFingerprint().equals(SSHUtil.getFingerprint(publicKey.getPublicKey()))) {
+                        if (k.getFingerprint().equals(SSHUtil.getFingerprint(publicKey.getPublicKey()))) {
+                            bKeyIsDuplicate = true;
+                            break;
+                        }
+                    }
+                }
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            
 		if (publicKey == null
 				|| publicKey.getKeyNm() == null
 				|| publicKey.getKeyNm().trim().equals("")) {
@@ -186,19 +217,19 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 				|| publicKey.getPublicKey() == null
 				|| publicKey.getPublicKey().trim().equals("")) {
 			addFieldError("publicKey.publicKey", "Required");
-		}
-		else if(SSHUtil.getFingerprint(publicKey.getPublicKey()) == null
+		} else if(SSHUtil.getFingerprint(publicKey.getPublicKey()) == null
 				|| SSHUtil.getKeyType(publicKey.getPublicKey()) == null) {
 			addFieldError("publicKey.publicKey", "Invalid");
 		} else if(PublicKeyDB.isKeyDisabled(SSHUtil.getFingerprint(publicKey.getPublicKey()))){
 			addActionError("This key has been disabled. Please generate and set a new public key.");
 			addFieldError("publicKey.publicKey", "Invalid");
-		}
+		} else if (bKeyIsDuplicate) {
+                        addActionError("This key already exists in the key database. Please check this key and avoid duplicates!");
+			addFieldError("publicKey.publicKey", "Invalid");
+                }
 		
 		if (!this.getFieldErrors().isEmpty()) {
 
-			Long userId = AuthUtil.getUserId(servletRequest.getSession());
-			
 			profileList = UserProfileDB.getProfilesByUser(userId);
 			sortedSet = PublicKeyDB.getPublicKeySet(sortedSet, userId);
 		}
