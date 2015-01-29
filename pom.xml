@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.keybox</groupId>
     <artifactId>keybox</artifactId>
-    <version>2.73.00</version>
+    <version>2.73.01</version>
     <packaging>war</packaging>
     <name>KeyBox</name>
     <properties>
@@ -24,7 +24,7 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.4.184</version>
+            <version>1.4.185</version>
         </dependency>
         <dependency>
             <groupId>com.jcraft</groupId>
