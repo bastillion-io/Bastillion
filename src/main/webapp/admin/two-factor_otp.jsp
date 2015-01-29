@@ -1,18 +1,18 @@
 <%
     /**
-     * Copyright 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
+     * Copyright 2014 Sean Kavanagh - sean.p.kavanagh6@gmail.com
      *
-     * Licensed under the Apache License, Version 2.0 (the "License");
-     * you may not use this file except in compliance with the License.
-     * You may obtain a copy of the License at
+     * Licensed under the Apache License, Version 2.0 (the "License"); you may
+     * not use this file except in compliance with the License. You may obtain a
+     * copy of the License at
      *
      * http://www.apache.org/licenses/LICENSE-2.0
      *
      * Unless required by applicable law or agreed to in writing, software
-     * distributed under the License is distributed on an "AS IS" BASIS,
-     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-     * See the License for the specific language governing permissions and
-     * limitations under the License.
+     * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+     * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+     * License for the specific language governing permissions and limitations
+     * under the License.
      */
 %>
 <%@ taglib prefix="s" uri="/struts-tags" %>
@@ -32,7 +32,6 @@
                     $(this).parents('.container').find('form').submit();
                 });
             });
-
         </script>
         <title>KeyBox - One-Time Password Setup</title>
     </head>
@@ -99,10 +98,65 @@
                         </tbody>
                     </table>
 
-                    <button onclick="window.location = 'menu.action'" class="btn btn-danger spacer spacer-left">Skip for Now</button>
-                    <button onclick="window.location = 'otpSubmit.action'" class="btn btn-default spacer spacer-right">Got It!</button>
+                    <div class="spacer spacer-left">
+                        <button class="btn btn-danger" data-toggle="modal" data-target="#confirmOtpDisable">Disable</button>
+                    </div>
+                    <div class="spacer spacer-middle">
+                        <button onclick="window.location = 'menu.action'" class="btn btn-warning">Skip for Now</button>
+                    </div>
+                    <div class="spacer spacer-right">
+                        <button class="btn btn-default" data-toggle="modal" data-target="#confirmOtpSetup">Got It!</button>
+                    </div>
+                    
+                    <!-- Confirm that you scanned the QR code -->
+                    <div id="confirmOtpSetup" class="modal fade">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                                    <h4 class="modal-title">Confirm</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        Did you scan the QR Code?<br>
+                                        <br>
+                                        You will be logged off!
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
+                                    <button onclick="window.location='otpSubmit.action'" type="button" class="btn btn-default">Submit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Confirm that you don't want to see this page again -->
+                    <div id="confirmOtpDisable" class="modal fade">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                                    <h4 class="modal-title">Confirm</h4>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        Are you sure that you want to disable OTP Authentication?<br>
+                                        <br>
+                                        You can enable it in the settings!
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
+                                    <button onclick="window.location='otpDisable.action?otp'" type="button" class="btn btn-default">Submit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
+
     </body>
 </html>

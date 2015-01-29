@@ -26,7 +26,6 @@ import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.apache.struts2.interceptor.ServletResponseAware;
-import sun.misc.SharedSecrets;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -37,6 +36,8 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class LoginAction extends ActionSupport implements ServletRequestAware, ServletResponseAware {
 
+    String notificationClass;
+    String notificationText;
     HttpServletResponse servletResponse;
     HttpServletRequest servletRequest;
     Auth auth;
@@ -134,11 +135,14 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
     @Action(value = "/admin/passwordSubmit",
             results = {
                     @Result(name = "input", location = "/admin/set_password.jsp"),
-                    @Result(name = "success", location = "/admin/menu.action", type = "redirect")
+                    @Result(name = "success", location = "/admin/setPassword.action", type = "redirect")
             }
     )
     public String passwordSubmit() {
+        
         String retVal = SUCCESS;
+        String strClass = "alert alert-success";
+        String strText ="Password changed successfully!";
 
         if (auth.getPassword().equals(auth.getPasswordConfirm())) {
             auth.setAuthToken(AuthUtil.getAuthToken(servletRequest.getSession()));
@@ -146,13 +150,19 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
             if (!AuthDB.updatePassword(auth)) {
                 addActionError("Current password is invalid");
                 retVal = INPUT;
+                strClass = "alert alert-danger";
+                strText = "Current password is invalid!";
             }
 
         } else {
             addActionError("Passwords do not match");
             retVal = INPUT;
+            strClass = "alert alert-danger";
+            strText = "Entered passwords do not match!";
         }
 
+        setNotificationClass(strClass);
+        setNotificationText(strText);
 
         return retVal;
     }
@@ -209,6 +219,22 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 
     public void setAuth(Auth auth) {
         this.auth = auth;
+    }
+    
+    public void setNotificationClass(String notificationClass) {
+        servletRequest.getSession().setAttribute("notificationClass", notificationClass);
+    }
+    
+    public String getNotificationClass() {
+        return  (String)servletRequest.getSession().getAttribute("notificationClass");
+    }
+    
+    public void setNotificationText(String notificationText) {
+        servletRequest.getSession().setAttribute("notificationText", notificationText);
+    }
+    
+    public String getNotificationText() {
+        return  (String)servletRequest.getSession().getAttribute("notificationText");
     }
 
     public HttpServletResponse getServletResponse() {
