@@ -1,4 +1,4 @@
-Third party liceses by different vendors:
+Third party licenses by different vendors:
 =========================================
 
 Apache Struts : Apache License, Version 2.0 -  The Apache Software Foundation
