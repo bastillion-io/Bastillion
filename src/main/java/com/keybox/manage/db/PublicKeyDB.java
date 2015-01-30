@@ -303,8 +303,7 @@ public class PublicKeyDB {
      * @param publicKey key object
      */
     public static void insertPublicKey(PublicKey publicKey) {
-
-
+        
         Connection con = null;
         try {
             con = DBUtils.getConn();
@@ -479,5 +478,49 @@ public class PublicKeyDB {
         return publicKeyList;
 
 
+    }
+    
+    /**
+     * Gets all the fingerprints for a specific user with a specific profile for a fingerprint
+     * @param userId The user to look at
+     * @param profileId The profile to look at
+     * @param fingerprint The fingerprint to gather
+     * @return A list of fingerprints
+     */
+    public static int getFingerprintCountForUseeAndProfile(Long userId, Long profileId, String fingerprint) {
+        int iFingerprintCounter = 0;
+        PreparedStatement stmt;
+
+        try {
+            Connection con = DBUtils.getConn();
+            
+            if (profileId != null) {
+                stmt = con.prepareStatement("select * from public_keys where user_id=? and profile_id=? and fingerprint=?");
+                stmt.setLong(1, userId);
+                stmt.setLong(2, profileId);
+                stmt.setString(3, fingerprint);
+                
+            } else {
+                    
+                stmt = con.prepareStatement("select * from public_keys where user_id=? and fingerprint=? and profile_id IS NULL");
+                stmt.setLong(1, userId);
+                stmt.setString(2, fingerprint);
+            }
+            
+            
+            ResultSet rs = stmt.executeQuery();
+            
+            //Legacy DBs surely have more than one entry..
+            while (rs.next()) {
+                iFingerprintCounter += 1;
+            }
+            
+            DBUtils.closeStmt(stmt);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return iFingerprintCounter;
     }
 }

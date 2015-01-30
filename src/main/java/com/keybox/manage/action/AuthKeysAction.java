@@ -177,31 +177,49 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 	 * Validates all fields for adding a public key
 	 */
 	public void validateSavePublicKeys() {
-		if (publicKey == null
-				|| publicKey.getKeyNm() == null
-				|| publicKey.getKeyNm().trim().equals("")) {
-			addFieldError("publicKey.keyNm", "Required");
-		}
-		if (publicKey == null
-				|| publicKey.getPublicKey() == null
-				|| publicKey.getPublicKey().trim().equals("")) {
-			addFieldError("publicKey.publicKey", "Required");
-		}
-		else if(SSHUtil.getFingerprint(publicKey.getPublicKey()) == null
-				|| SSHUtil.getKeyType(publicKey.getPublicKey()) == null) {
-			addFieldError("publicKey.publicKey", "Invalid");
-		} else if(PublicKeyDB.isKeyDisabled(SSHUtil.getFingerprint(publicKey.getPublicKey()))){
-			addActionError("This key has been disabled. Please generate and set a new public key.");
-			addFieldError("publicKey.publicKey", "Invalid");
-		}
-		
-		if (!this.getFieldErrors().isEmpty()) {
 
-			Long userId = AuthUtil.getUserId(servletRequest.getSession());
-			
-			profileList = UserProfileDB.getProfilesByUser(userId);
-			sortedSet = PublicKeyDB.getPublicKeySet(sortedSet, userId);
-		}
+            Long userId = AuthUtil.getUserId(servletRequest.getSession());
+            Long profileId = null;
+            String fingerprint = "";
+            
+
+            if (publicKey.getProfile() != null &&
+                publicKey.getProfile().getId() != null) {
+                profileId = publicKey.getProfile().getId();
+            }
+            
+            if (publicKey.getPublicKey() != null) {
+                fingerprint = SSHUtil.getFingerprint(publicKey.getPublicKey());
+            }
+            
+            int iFingerprintCounter = PublicKeyDB.getFingerprintCountForUseeAndProfile(userId, profileId, fingerprint);
+            
+            if (publicKey == null
+                            || publicKey.getKeyNm() == null
+                            || publicKey.getKeyNm().trim().equals("")) {
+                    addFieldError("publicKey.keyNm", "Required");
+            }
+            if (publicKey == null
+                            || publicKey.getPublicKey() == null
+                            || publicKey.getPublicKey().trim().equals("")) {
+                    addFieldError("publicKey.publicKey", "Required");
+            }
+            else if(SSHUtil.getFingerprint(publicKey.getPublicKey()) == null
+                            || SSHUtil.getKeyType(publicKey.getPublicKey()) == null) {
+                    addFieldError("publicKey.publicKey", "Invalid");
+            } else if(PublicKeyDB.isKeyDisabled(SSHUtil.getFingerprint(publicKey.getPublicKey()))){
+                    addActionError("This key has been disabled. Please generate and set a new public key.");
+                    addFieldError("publicKey.publicKey", "Invalid");
+            } else if (iFingerprintCounter > 0) {
+                addActionError("It looks like this profile already has this key. Please submit another key.");
+                addFieldError("publicKey.publicKey", "Invalid");
+            }
+
+            if (!this.getFieldErrors().isEmpty()) {
+
+                    profileList = UserProfileDB.getProfilesByUser(userId);
+                    sortedSet = PublicKeyDB.getPublicKeySet(sortedSet, userId);
+            }
 
 	}
 
