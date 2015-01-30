@@ -27,6 +27,7 @@ import org.apache.struts2.interceptor.ServletRequestAware;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Action to generate and distribute auth keys for systems or users
@@ -177,6 +178,55 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 	 * Validates all fields for adding a public key
 	 */
 	public void validateSavePublicKeys() {
+            
+            
+            boolean bKeyIsDuplicate = false;
+            Long userId = AuthUtil.getUserId(servletRequest.getSession());
+            SortedSet sortedTempSet = PublicKeyDB.getPublicKeySet(sortedSet, userId);
+            
+            User usr = UserDB.getUser(userId);
+            
+            
+
+            try {
+
+                List<PublicKey> items = sortedTempSet.getItemList();    //Public keys by user
+                List<Profile> lst = usr.getProfileList();               //Profile list by user
+                
+
+                //Iterate through the keys untill you find the mathcing key, then break and flag.
+                for (PublicKey k : items) {
+                    
+                    //Find duplicate fingerprints within the users public key list
+                    if (k.getFingerprint().equals(SSHUtil.getFingerprint(publicKey.getPublicKey()))) {
+
+                        //Iterate again to find the profiles
+                        for (PublicKey k2 : items) {      
+                            
+                            //If you are admin with the infamous "All Systems"- profile, zje .getProfile will return null
+                            //If both return null, it's a duplicate
+                            if (k2.getProfile() == null &&
+                                publicKey.getProfile().getId() == null) {
+                                bKeyIsDuplicate = true;
+                                break;
+                            }
+                           
+                            //Check for normal users.
+                            if (k2.getProfile() != null &&
+                                publicKey.getProfile() != null) {
+                                if (k2.getProfile().getId().equals(publicKey.getProfile().getId())) {
+                                    bKeyIsDuplicate = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+            
 		if (publicKey == null
 				|| publicKey.getKeyNm() == null
 				|| publicKey.getKeyNm().trim().equals("")) {
@@ -186,19 +236,19 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 				|| publicKey.getPublicKey() == null
 				|| publicKey.getPublicKey().trim().equals("")) {
 			addFieldError("publicKey.publicKey", "Required");
-		}
-		else if(SSHUtil.getFingerprint(publicKey.getPublicKey()) == null
+		} else if(SSHUtil.getFingerprint(publicKey.getPublicKey()) == null
 				|| SSHUtil.getKeyType(publicKey.getPublicKey()) == null) {
 			addFieldError("publicKey.publicKey", "Invalid");
 		} else if(PublicKeyDB.isKeyDisabled(SSHUtil.getFingerprint(publicKey.getPublicKey()))){
 			addActionError("This key has been disabled. Please generate and set a new public key.");
 			addFieldError("publicKey.publicKey", "Invalid");
-		}
+		} else if (bKeyIsDuplicate) {
+                        addActionError("This key already exists in the key database. Please check this key and avoid duplicates!");
+			addFieldError("publicKey.publicKey", "Invalid");
+                }
 		
 		if (!this.getFieldErrors().isEmpty()) {
 
-			Long userId = AuthUtil.getUserId(servletRequest.getSession());
-			
 			profileList = UserProfileDB.getProfilesByUser(userId);
 			sortedSet = PublicKeyDB.getPublicKeySet(sortedSet, userId);
 		}
