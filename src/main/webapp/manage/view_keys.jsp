@@ -94,39 +94,31 @@
                     <s:hidden name="sortedSet.orderByDirection"/>
                     <s:hidden name="sortedSet.orderByField"/>
                     
-                    <table>
-                        <tr>
-                            <td class="align_left"><a href="../admin/viewKeys.action" class="btn btn-success">Add / Remove Keys</a></td>
-                            <td>|</td>
-                            <s:if test="userList!= null && !userList.isEmpty()">
-                                <td style="padding-left:0px;">
-                                    <s:select name="sortedSet.filterMap['%{@com.keybox.manage.db.PublicKeyDB@FILTER_BY_USER_ID}']" listKey="id" listValue="username"
-                                              class="view_frm_select"
-                                              list="userList"
-                                              headerKey=""
-                                              headerValue="-Select User-"/>
-                                </td>
-                            </s:if>
-                            <s:if test="profileList!= null && !profileList.isEmpty()">
-                                <td style="padding-left:0px;">
-                                    <s:select name="sortedSet.filterMap['%{@com.keybox.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID}']" listKey="id" listValue="nm"
-                                              class="view_frm_select"
-                                              list="profileList"
-                                              headerKey=""
-                                              headerValue="-Select Profile-"/>
-                                </td>
-                            </s:if>
-                            <td>
-                            <s:select name="sortedSet.filterMap['%{@com.keybox.manage.db.PublicKeyDB@FILTER_BY_ENABLED}']"
+                    <div>
+                        <a href="../admin/viewKeys.action" class="btn btn-success">Add / Remove Keys</a>
+                        |
+                        <s:if test="userList!= null && !userList.isEmpty()">
+                                <s:select name="sortedSet.filterMap['%{@com.keybox.manage.db.PublicKeyDB@FILTER_BY_USER_ID}']" listKey="id" listValue="username"
+                                          class="view_frm_select"
+                                          list="userList"
+                                          headerKey=""
+                                          headerValue="-Select User-"/>
+                        </s:if>
+                        |
+                         <s:if test="profileList!= null && !profileList.isEmpty()">
+                                <s:select name="sortedSet.filterMap['%{@com.keybox.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID}']" listKey="id" listValue="nm"
+                                          class="view_frm_select"
+                                          list="profileList"
+                                          headerKey=""
+                                          headerValue="-Select Profile-"/>
+                        </s:if>
+                        |
+                        <s:select name="sortedSet.filterMap['%{@com.keybox.manage.db.PublicKeyDB@FILTER_BY_ENABLED}']"
                                       class="view_frm_select"
                                       list="#{true:'Enabled', false:'Disabled'}"
                                       headerValue="true"/>
-                            </td>
-                            <td>
-                                <div id="view_btn" class="btn btn-default">Filter</div>
-                            </td>
-                        </tr>
-                    </table>
+                        <div id="view_btn" class="btn btn-default">Filter</div>
+                    </div>
                 </s:form>
             </td>
         </tr>
