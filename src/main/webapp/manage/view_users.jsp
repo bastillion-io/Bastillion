@@ -84,7 +84,7 @@
         </s:form>
 
         <h3>Manage Users</h3>
-
+        
         <p>Add / Delete users or select a user below to assign profile</p>
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
@@ -137,7 +137,14 @@
                                 <div style="width:235px">
 
                                     <button class="btn btn-default spacer spacer-left" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>">Edit</button>
-                                    <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn spacer spacer-middle">Delete</button>
+                                    
+                                    <s:if test="loginUser.id==id">
+                                        <button class="btn btn-default spacer spacer-middle" disabled="true">Delete</button>
+                                    </s:if>
+                                    <s:else>
+                                        <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn spacer spacer-middle">Delete</button>
+                                    </s:else>
+                                    
                                 
                                 <s:if test="userType==\"A\"">
                                     <a href="viewUserProfiles.action?user.id=<s:property value="id"/>">
@@ -224,8 +231,6 @@
                     </div>
                 </div>
             </s:iterator>
-
-
     </div>
 
 </body>
