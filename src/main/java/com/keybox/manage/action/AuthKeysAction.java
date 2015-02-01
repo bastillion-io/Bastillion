@@ -198,17 +198,15 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 		if (!this.getFieldErrors().isEmpty()) {
 
 			Long userId = AuthUtil.getUserId(servletRequest.getSession());
+
+			String userType = AuthUtil.getUserType(servletRequest.getSession());
+
+			if (Auth.MANAGER.equals(userType)) {
+				profileList = ProfileDB.getAllProfiles();
+			} else {
+				profileList = UserProfileDB.getProfilesByUser(userId);
+			}
 			
-                        //Check if user is Full Access or not
-                        User user = UserDB.getUser(userId);
-                        if (user.getUserType().equals("M")) {
-                            profileList = ProfileDB.getAllProfiles();
-                            
-                        } else {
-                            profileList = UserProfileDB.getProfilesByUser(userId);
-                            
-                        }
-                        
 			sortedSet = PublicKeyDB.getPublicKeySet(sortedSet, userId);
 		}
 
