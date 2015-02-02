@@ -153,7 +153,7 @@
                                     <button class="btn btn-default spacer spacer-left" data-toggle="modal"
                                             data-target="#edit_dialog_<s:property value="id"/>">Edit
                                     </button>
-                                    <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn spacer spacer-right">Delete
+                                    <button id="del_btn_<s:property value="id"/>" class="btn btn-danger del_btn spacer spacer-right">Delete
                                     </button>
                                 &nbsp;&nbsp;&nbsp;
                                 <div style="clear:both"></div>

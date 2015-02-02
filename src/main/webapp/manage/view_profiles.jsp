@@ -117,7 +117,7 @@
                                 <a href="viewProfileSystems.action?profile.id=<s:property value="id"/>">
                                     <button id="assign_btn_<s:property value="id"/>" class="btn btn-default edit_btn spacer spacer-left">Assign Systems</button></a>
                                     <button class="btn btn-default spacer spacer-middle" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>">Edit</button>
-                                    <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn spacer spacer-right">Delete</button>
+                                    <button id="del_btn_<s:property value="id"/>" class="btn btn-danger del_btn spacer spacer-right">Delete</button>
                                 <div style="clear:both"/>
                             </div>
                         </td>

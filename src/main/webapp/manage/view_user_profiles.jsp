@@ -90,7 +90,7 @@
                             </div>
                         </a>
 
-                        <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn spacer spacer-right">Delete</button>
+                        <button id="del_btn_<s:property value="id"/>" class="btn btn-danger del_btn spacer spacer-right">Delete</button>
 
                     </td>
 

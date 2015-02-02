@@ -137,7 +137,7 @@
                                 <div style="width:235px">
 
                                     <button class="btn btn-default spacer spacer-left" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>">Edit</button>
-                                    <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn spacer spacer-middle">Delete</button>
+                                    <button id="del_btn_<s:property value="id"/>" class="btn btn-danger del_btn spacer spacer-middle">Delete</button>
                                 
                                 <s:if test="userType==\"A\"">
                                     <a href="viewUserProfiles.action?user.id=<s:property value="id"/>">
