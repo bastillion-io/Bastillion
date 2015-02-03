@@ -122,6 +122,11 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 				publicKey = null;
 				privateKey = null;
 
+				//set config to default
+				AppConfig.updateProperty("publicKey", "");
+				AppConfig.updateProperty("privateKey", "");
+				AppConfig.updateProperty("defaultSSHPassphrase", "${randomPassphrase}");
+				
 				//set to false
 				AppConfig.updateProperty("resetApplicationSSHKey", "false");
 

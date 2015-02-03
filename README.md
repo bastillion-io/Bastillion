@@ -115,6 +115,8 @@ For example:
 	
 	#default passphrase  --leave blank if passphrase is empty
 	defaultSSHPassphrase=myPa$$w0rd
+	
+After startup and once the key has been registered it can then be removed from the system. The passphrase and the key paths will be removed from the configuration file.
 
 Auditing
 ------
@@ -167,7 +169,7 @@ Special thanks goes to these amazing projects which makes this (and other great 
 + [JSch](http://www.jcraft.com/jsch) Java Secure Channel - by [ymnk](https://github.com/ymnk)
 + [term.js](https://github.com/chjj/term.js) A terminal written in javascript - by [chjj](https://github.com/chjj)
 
-The other great projects are mentioned in the [_3rdPartyLicenses.md_](3rdPartyLicenses.md)!
+Third-party dependencies are mentioned in the [_3rdPartyLicenses.md_](3rdPartyLicenses.md)!
 
 Author
 ------
