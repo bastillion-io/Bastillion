@@ -303,8 +303,7 @@ public class PublicKeyDB {
      * @param publicKey key object
      */
     public static void insertPublicKey(PublicKey publicKey) {
-
-
+        
         Connection con = null;
         try {
             con = DBUtils.getConn();
@@ -479,5 +478,49 @@ public class PublicKeyDB {
         return publicKeyList;
 
 
+    }
+    
+    /**
+     * checks if key has already been registered under user's profile
+     *
+     * @param userId user id
+     * @param publicKey public key 
+     * @return true if duplicate
+     */
+    public static boolean isKeyRegistered(Long userId, PublicKey publicKey) {
+        boolean isDuplicate=false;
+        PreparedStatement stmt;
+        Connection con = null;
+        try {
+          con = DBUtils.getConn();
+
+          stmt = con.prepareStatement("select * from public_keys where user_id=? and fingerprint like ? and profile_id is ? and id is not ?");
+          stmt.setLong(1, userId);
+          stmt.setString(2, SSHUtil.getFingerprint(publicKey.getPublicKey()));
+          if(publicKey.getProfile()!=null && publicKey.getProfile().getId()!=null){
+            stmt.setLong(3, publicKey.getProfile().getId());
+          } else {
+            stmt.setNull(3,Types.NULL);
+          }
+          if(publicKey.getId()!=null ){
+            stmt.setLong(4, publicKey.getId());
+          } else {
+            stmt.setNull(4,Types.NULL);
+          }
+
+          ResultSet rs = stmt.executeQuery();
+          if (rs.next()) {
+              isDuplicate=true;
+          }
+          DBUtils.closeRs(rs);
+          DBUtils.closeStmt(stmt);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        
+        DBUtils.closeConn(con);
+
+        return isDuplicate;
     }
 }
