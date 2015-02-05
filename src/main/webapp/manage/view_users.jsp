@@ -137,13 +137,13 @@
                                 <div style="width:235px">
 
                                     <button class="btn btn-default spacer spacer-left" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>">Edit</button>
-                                    <s:if test="loginUser.id==id">
+                                    <s:if test="%{user.id == id}">
                                         <button class="btn btn-default spacer spacer-middle" disabled="true">Delete</button>
                                     </s:if>
                                     <s:else>
                                         <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn spacer spacer-middle">Delete</button>
                                     </s:else>
-                                
+
                                 <s:if test="userType==\"A\"">
                                     <a href="viewUserProfiles.action?user.id=<s:property value="id"/>">
                                         <button id="profile_btn_<s:property value="id"/>" class="btn btn-default edit_btn spacer spacer-right">Assign Profiles</button>

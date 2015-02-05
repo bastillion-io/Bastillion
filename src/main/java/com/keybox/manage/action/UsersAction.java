@@ -38,7 +38,6 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
 
     SortedSet sortedSet=new SortedSet();
     User user = new User();
-    User loginUser;
     Script script=null;
     HttpServletRequest servletRequest;
     boolean resetSharedSecret=false;
@@ -51,11 +50,11 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
     )
     public String viewUsers() {
         Long userId= AuthUtil.getUserId(servletRequest.getSession());
-        loginUser = UserDB.getUser(userId);
         sortedSet = UserDB.getUserSet(sortedSet);
         if(script!=null && script.getId()!=null){
             script=ScriptDB.getScript(script.getId(),userId);
         }
+        user.setId(userId);
         return SUCCESS;
     }
 
@@ -93,7 +92,7 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
     )
     public String deleteUser() {
 
-        if (user.getId() != null) {
+        if (user.getId() != null && user.getId()!=AuthUtil.getUserId(servletRequest.getSession())) {
             UserDB.disableUser(user.getId());
             PublicKeyDB.deleteUserPublicKeys(user.getId());
             RefreshAuthKeyUtil.refreshAllSystems();
@@ -158,13 +157,6 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
         this.user = user;
     }
     
-    public User getLoginUser() {
-        return loginUser;
-    }
-    public void setLoginUser(User user) {
-        this.loginUser = user;
-    }
-
     public Script getScript() {
         return script;
     }
