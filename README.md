@@ -1,12 +1,10 @@
 KeyBox
 ======
-A web-based ssh console to execute commands and manage multiple systems
-simultaneously. KeyBox allows you to share terminal commands and upload files to
-all your systems. Once the sessions have been opened you can select a single
-system or any combination to run your commands.  Additional system
-administrators can be added and their terminal sessions and history can be
-audited. Also, KeyBox can manage, distribute, and disable public keys that have been setup
-and defined.
+KeyBox is a web-based SSH console that centrally manages administrative access to systems. KeyBox combines key management and administration through profiles assigned to defined users.
+
+Administrators can login using two-factor authentication with [FreeOTP](https://fedorahosted.org/freeotp) or [Google Authenticatior](https://github.com/google/google-authenticator). From there they can manage their public SSH keys or connect to their systems through a web-shell. Commands can be shared across shells to make patching easier and eliminate redundant command execution.
+
+KeyBox layers TLS/SSL on top of SSH and can act as a bastion host for administration. Layering protocols for security is described in detail in [The Security Implications of SSH](http://www.sans.org/reading-room/whitepapers/vpns/security-implications-ssh-1180) whitepaper. SSH key management is enabled by default to prevent unmanaged public keys and enforce best practices.
 
 ![Terminals](http://sshkeybox.com/img/screenshots/medium/terms.png)
 
