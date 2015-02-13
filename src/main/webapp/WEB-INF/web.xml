@@ -14,17 +14,11 @@
     <filter-mapping>
         <filter-name>AuthFilter</filter-name>
         <url-pattern>/manage/*</url-pattern>
-        <dispatcher>FORWARD</dispatcher>
-        <dispatcher>INCLUDE</dispatcher>
-        <dispatcher>REQUEST</dispatcher>
     </filter-mapping>
 
     <filter-mapping>
         <filter-name>AuthFilter</filter-name>
         <url-pattern>/admin/*</url-pattern>
-        <dispatcher>FORWARD</dispatcher>
-        <dispatcher>INCLUDE</dispatcher>
-        <dispatcher>REQUEST</dispatcher>
     </filter-mapping>
 
     <filter-mapping>

@@ -75,9 +75,6 @@
                 //hide new key input
                 $('.new_key').closest('tr').hide();
                 $('.new_key_label').hide();
-                //reset new key values
-                $('textarea.new_key').val('');
-                $('input.new_key').val('');
                 //show existing key inputs
                 $('.existing_key_label').show();
                 $('.existing_key').closest('tr').show();

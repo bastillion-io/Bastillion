@@ -21,6 +21,7 @@ import com.keybox.common.util.AppConfig;
 import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.db.*;
 import com.keybox.manage.model.*;
+import com.keybox.manage.util.EncryptionUtil;
 import com.keybox.manage.util.PasswordUtil;
 import com.keybox.manage.util.RefreshAuthKeyUtil;
 import com.keybox.manage.util.SSHUtil;
@@ -193,7 +194,7 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 	@Action(value = "/admin/downloadPvtKey")
 	public String downloadPvtKey() {
 		
-		String privateKey=(String)servletRequest.getSession().getAttribute(PVT_KEY);
+		String privateKey=EncryptionUtil.decrypt((String)servletRequest.getSession().getAttribute(PVT_KEY));
 
 		if(StringUtils.isNotEmpty(publicKey.getKeyNm()) && StringUtils.isNotEmpty(privateKey)) {
 			try {
@@ -234,7 +235,7 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 			OutputStream os = new ByteArrayOutputStream();
 			keyPair.writePrivateKey(os, publicKey.getPassphrase().getBytes());
 			//set private key
-			servletRequest.getSession().setAttribute(PVT_KEY, os.toString());
+			servletRequest.getSession().setAttribute(PVT_KEY, EncryptionUtil.encrypt(os.toString()));
 			
 			os = new ByteArrayOutputStream();
 			keyPair.writePublicKey(os, null);

@@ -93,6 +93,12 @@ Also, the authorized_keys file is updated/refreshed periodically based on the re
 	#authorized_keys refresh interval in minutes (no refresh for <=0)
 	authKeysRefreshInterval=120
 
+By default KeyBox will generated and distribute the SSH keys managed by administrators while having them download the generated private. This forces admins to use strong passphrases for keys that are set on systems.  The private key is only available for download once and is not stored on the application side.  To disable and allow administrators to set any public key edit the KeyBoxConfig.properties.
+
+	#set to true to generate keys when added/managed by users and enforce strong passphrases set to false to allow users to set their own public key
+	forceUserKeyGeneration=false
+
+
 Supplying a Custom SSH Key Pair
 ------
 KeyBox generates its own public/private SSH key upon initial startup for use when registering systems.  You can specify a custom SSH key pair in the KeyBoxConfig.properties file.
@@ -167,7 +173,7 @@ Special thanks goes to these amazing projects which makes this (and other great 
 + [JSch](http://www.jcraft.com/jsch) Java Secure Channel - by [ymnk](https://github.com/ymnk)
 + [term.js](https://github.com/chjj/term.js) A terminal written in javascript - by [chjj](https://github.com/chjj)
 
-Third-party dependencies are mentioned in the [_3rdPartyLicenses.md_](3rdPartyLicenses.md)!
+Third-party dependencies are mentioned in the [_3rdPartyLicenses.md_](3rdPartyLicenses.md)
 
 Author
 ------

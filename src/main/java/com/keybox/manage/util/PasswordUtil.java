@@ -1,19 +1,34 @@
+/**
+ * Copyright 2015 Sean Kavanagh - sean.p.kavanagh6@gmail.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.keybox.manage.util;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * utility to validate password strength 
+ * Utility to validate password strength
  */
 public class PasswordUtil {
 
 
 
-        public static final String PASSWORD_REGEX="((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()]).{8,20})";
+        public static final String PASSWORD_REGEX="((?=.*\\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*()+=]).{8,20})";
         public static final String PASSWORD_REQ_ERROR_MSG="Passwords must be 8 to 20 characters, contain one digit, one lowercase, one uppercase, and one special character";
 
-
+        private static Pattern pattern = Pattern.compile(PASSWORD_REGEX);
 
         /**
          * Validation to ensure strong password
@@ -22,7 +37,6 @@ public class PasswordUtil {
          * @return true if strong password
          */
         public static boolean isValid(final String password){
-            Pattern pattern = Pattern.compile(PASSWORD_REGEX);
 
             Matcher matcher = pattern.matcher(password);
             
