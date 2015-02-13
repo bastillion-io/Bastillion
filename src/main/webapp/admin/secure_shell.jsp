@@ -40,7 +40,6 @@
             });
 
 
-            $.ajaxSetup({cache: false});
             $('.droppable').droppable({
                 zIndex: 10000,
                 tolerance: "touch",

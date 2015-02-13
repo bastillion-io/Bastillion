@@ -31,6 +31,8 @@ public class PublicKey {
     boolean enabled;
     Date createDt;
     Profile profile;
+    String passphrase;
+    String passphraseConfirm;
 
 
     public String getKeyNm() {
@@ -111,5 +113,21 @@ public class PublicKey {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public String getPassphraseConfirm() {
+        return passphraseConfirm;
+    }
+
+    public void setPassphraseConfirm(String passphraseConfirm) {
+        this.passphraseConfirm = passphraseConfirm;
+    }
+
+    public String getPassphrase() {
+        return passphrase;
+    }
+
+    public void setPassphrase(String passphrase) {
+        this.passphrase = passphrase;
     }
 }

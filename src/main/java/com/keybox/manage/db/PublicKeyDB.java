@@ -26,7 +26,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * DAO to manage public keys
@@ -522,5 +524,46 @@ public class PublicKeyDB {
         DBUtils.closeConn(con);
 
         return isDuplicate;
+    }
+
+    /**
+     * select all unique public keys for user
+     *
+     * @param userId user id
+     * @return public  key list for user
+     */
+    public static List<PublicKey> getUniquePublicKeysForUser(Long userId) {
+
+
+        Connection con = null;
+        Map<String, PublicKey> keyMap = new LinkedHashMap();
+        try {
+            con = DBUtils.getConn();
+            PreparedStatement stmt = con.prepareStatement("select * from public_keys where user_id=? and enabled=true order by key_nm asc");
+            stmt.setLong(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next()){
+
+                PublicKey publicKey = new PublicKey();
+                publicKey.setId(rs.getLong("id"));
+                publicKey.setKeyNm(rs.getString("key_nm"));
+                publicKey.setPublicKey(rs.getString("public_key"));
+                publicKey.setProfile(ProfileDB.getProfile(con, rs.getLong("profile_id")));
+                publicKey.setType(SSHUtil.getKeyType(publicKey.getPublicKey()));
+                publicKey.setFingerprint(SSHUtil.getFingerprint(publicKey.getPublicKey()));
+                publicKey.setCreateDt(rs.getTimestamp("create_dt"));
+                keyMap.put(publicKey.getKeyNm() + " (" + publicKey.getFingerprint() + ")", publicKey);
+                
+            }
+            DBUtils.closeRs(rs);
+            DBUtils.closeStmt(stmt);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+        
+        return new ArrayList(keyMap.values());
+
     }
 }

@@ -23,6 +23,7 @@ import com.keybox.manage.db.UserDB;
 import com.keybox.manage.model.Script;
 import com.keybox.manage.model.SortedSet;
 import com.keybox.manage.model.User;
+import com.keybox.manage.util.PasswordUtil;
 import com.keybox.manage.util.RefreshAuthKeyUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
@@ -121,11 +122,14 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
                 || user.getFirstNm().trim().equals("")) {
             addFieldError("user.firstNm", "Required");
         }
-        if (user != null
-                && user.getPassword() != null
-                && !user.getPassword().trim().equals("")
-                && !user.getPassword().equals(user.getPasswordConfirm())) {
-            addActionError("Passwords do not match");
+        
+        if (user != null && user.getPassword() != null && !user.getPassword().trim().equals("")){
+            
+            if(!user.getPassword().equals(user.getPasswordConfirm())) {
+                    addActionError("Passwords do not match");
+            } else if(!PasswordUtil.isValid(user.getPassword())) {
+                    addActionError(PasswordUtil.PASSWORD_REQ_ERROR_MSG);
+            }
         }
 
         if(user!=null && user.getId()==null && (user.getPassword()==null || user.getPassword().trim().equals(""))){

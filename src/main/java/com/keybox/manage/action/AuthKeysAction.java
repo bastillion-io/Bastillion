@@ -15,38 +15,51 @@
  */
 package com.keybox.manage.action;
 
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.KeyPair;
+import com.keybox.common.util.AppConfig;
 import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.db.*;
 import com.keybox.manage.model.*;
+import com.keybox.manage.util.PasswordUtil;
 import com.keybox.manage.util.RefreshAuthKeyUtil;
 import com.keybox.manage.util.SSHUtil;
 import com.opensymphony.xwork2.ActionSupport;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
+import org.apache.struts2.interceptor.ServletResponseAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 /**
  * Action to generate and distribute auth keys for systems or users
  */
 @SuppressWarnings("unchecked")
-public class AuthKeysAction extends ActionSupport implements ServletRequestAware {
+public class AuthKeysAction extends ActionSupport implements ServletRequestAware, ServletResponseAware {
 
 
 	HttpServletRequest servletRequest;
+	HttpServletResponse servletResponse;
 	List<Profile> profileList;
 	List<User> userList;
 	PublicKey publicKey;
 	SortedSet sortedSet = new SortedSet();
 	List<Long> systemSelectId;
+	boolean forceUserKeyGenEnabled="true".equals(AppConfig.getProperty("forceUserKeyGeneration"));
 
 	HostSystem pendingSystem = null;
 	HostSystem hostSystem = new HostSystem();
+	List<PublicKey> userPublicKeyList;
+	Long existingKeyId;	
 
 
-	
+
 	@Action(value = "/manage/enablePublicKey",
 			results = {
 					@Result(name = "success", location = "/manage/view_keys.jsp")
@@ -122,6 +135,8 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 			profileList = UserProfileDB.getProfilesByUser(userId);
 		}
 		sortedSet = PublicKeyDB.getPublicKeySet(sortedSet, userId);
+		
+		userPublicKeyList = PublicKeyDB.getUniquePublicKeysForUser(userId);
 
 		return SUCCESS;
 	}
@@ -129,7 +144,7 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 	@Action(value = "/admin/savePublicKey",
 			results = {
 					@Result(name = "input", location = "/admin/view_keys.jsp"),
-					@Result(name = "success", location = "/admin/viewKeys.action?sortedSet.orderByDirection=${sortedSet.orderByDirection}&sortedSet.orderByField=${sortedSet.orderByField}", type = "redirect")
+					@Result(name = "success", location = "/admin/viewKeys.action?sortedSet.orderByDirection=${sortedSet.orderByDirection}&sortedSet.orderByField=${sortedSet.orderByField}&keyNm=${publicKey.keyNm}", type = "redirect")
 			}
 	)
 	public String savePublicKeys() {
@@ -173,6 +188,69 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 		return SUCCESS;
 	}
 
+	public static final String PVT_KEY="privateKey";
+	
+	@Action(value = "/admin/downloadPvtKey")
+	public String downloadPvtKey() {
+		
+		String privateKey=(String)servletRequest.getSession().getAttribute(PVT_KEY);
+
+		if(StringUtils.isNotEmpty(publicKey.getKeyNm()) && StringUtils.isNotEmpty(privateKey)) {
+			try {
+
+				servletResponse.setContentType("application/octet-stream");
+				servletResponse.setHeader("Content-Disposition", "attachment;filename=" + publicKey.getKeyNm() + ".key");
+				servletResponse.getOutputStream().write(privateKey.getBytes());
+				servletResponse.getOutputStream().flush();
+				servletResponse.getOutputStream().close();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+		//remove pvt key
+		servletRequest.getSession().setAttribute(PVT_KEY, null);
+		servletRequest.getSession().removeAttribute(PVT_KEY);
+
+		return null;
+	}
+
+	/**
+	 * generates public private key from passphrase
+	 *  
+	 * @return public key
+	 */
+	public String generateUserKey() {
+
+		//set key type
+		int type = SSHUtil.KEY_TYPE.equals("rsa") ? KeyPair.RSA : KeyPair.DSA;
+
+		JSch jsch = new JSch();
+				
+		String pubKey=null;
+		try {
+
+			KeyPair keyPair = KeyPair.genKeyPair(jsch, type);
+
+			OutputStream os = new ByteArrayOutputStream();
+			keyPair.writePrivateKey(os, publicKey.getPassphrase().getBytes());
+			//set private key
+			servletRequest.getSession().setAttribute(PVT_KEY, os.toString());
+			
+			os = new ByteArrayOutputStream();
+			keyPair.writePublicKey(os, null);
+			pubKey = os.toString();
+
+
+			
+			
+			keyPair.dispose();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return pubKey;
+	}
+
 	/**
 	 * Validates all fields for adding a public key
 	 */
@@ -185,28 +263,53 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 				|| publicKey.getKeyNm().trim().equals("")) {
 			addFieldError("publicKey.keyNm", "Required");
 			
-		}
-		if (publicKey == null
-				|| publicKey.getPublicKey() == null
-				|| publicKey.getPublicKey().trim().equals("")) {
-			addFieldError("publicKey.publicKey", "Required"); 
-		}
-		else if(SSHUtil.getFingerprint(publicKey.getPublicKey()) == null
-				|| SSHUtil.getKeyType(publicKey.getPublicKey()) == null) {
-			addFieldError("publicKey.publicKey", "Invalid");
+		} 
+		
+		if(publicKey!=null) {
 			
-		} else if(PublicKeyDB.isKeyDisabled(SSHUtil.getFingerprint(publicKey.getPublicKey()))){
-			addActionError("This key has been disabled. Please generate and set a new public key.");
-			addFieldError("publicKey.publicKey", "Invalid");
-		
-		} else if(PublicKeyDB.isKeyRegistered(userId, publicKey)) {
-			addActionError("This key has already been registered under selected profile.");
-			addFieldError("publicKey.publicKey", "Invalid");
-		
+			if(existingKeyId!=null){
+				
+				publicKey.setPublicKey(PublicKeyDB.getPublicKey(existingKeyId).getPublicKey());
+				
+			} else if("true".equals(AppConfig.getProperty("forceUserKeyGeneration"))){
+				
+				if (publicKey.getPassphrase() == null ||
+						publicKey.getPassphrase().trim().equals("")) {
+					addFieldError("publicKey.passphrase", "Required");
+				}
+				else if (publicKey.getPassphraseConfirm() == null ||
+						publicKey.getPassphraseConfirm().trim().equals("")) {
+					addFieldError("publicKey.passphraseConfirm", "Required");
+				}
+				else if(!publicKey.getPassphrase().equals(publicKey.getPassphraseConfirm())) {
+					addActionError("Passphrases do not match");
+				}
+				else if(!PasswordUtil.isValid(publicKey.getPassphrase())){
+					addActionError(PasswordUtil.PASSWORD_REQ_ERROR_MSG);
+				}
+				else {
+					publicKey.setPublicKey(generateUserKey());
+				}
+			}
+			
+			if( publicKey.getPublicKey() == null || publicKey.getPublicKey().trim().equals("")) {
+				addFieldError("publicKey.publicKey", "Required");
+			
+			} else if (SSHUtil.getFingerprint(publicKey.getPublicKey()) == null || SSHUtil.getKeyType(publicKey.getPublicKey()) == null) {
+				addFieldError("publicKey.publicKey", "Invalid");
+
+			} else if (PublicKeyDB.isKeyDisabled(SSHUtil.getFingerprint(publicKey.getPublicKey()))) {
+				addActionError("This key has been disabled. Please generate and set a new public key.");
+				addFieldError("publicKey.publicKey", "Invalid");
+
+			} else if (PublicKeyDB.isKeyRegistered(userId, publicKey)) {
+				addActionError("This key has already been registered under selected profile.");
+				addFieldError("publicKey.publicKey", "Invalid");
+
+			}
 		}
 
 		if (!this.getFieldErrors().isEmpty()) {
-
 
 			String userType = AuthUtil.getUserType(servletRequest.getSession());
 
@@ -215,8 +318,9 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 			} else {
 				profileList = UserProfileDB.getProfilesByUser(userId);
 			}
-			
+
 			sortedSet = PublicKeyDB.getPublicKeySet(sortedSet, userId);
+			userPublicKeyList = PublicKeyDB.getUniquePublicKeysForUser(userId);
 		}
 
 	}
@@ -301,5 +405,37 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 
 	public void setHostSystem(HostSystem hostSystem) {
 		this.hostSystem = hostSystem;
+	}
+
+	public HttpServletResponse getServletResponse() {
+		return servletResponse;
+	}
+
+	public void setServletResponse(HttpServletResponse servletResponse) {
+		this.servletResponse = servletResponse;
+	}
+
+	public boolean getForceUserKeyGenEnabled() {
+		return forceUserKeyGenEnabled;
+	}
+
+	public void setForceUserKeyGenEnabled(boolean forceUserKeyGenEnabled) {
+		this.forceUserKeyGenEnabled = forceUserKeyGenEnabled;
+	}
+
+	public List<PublicKey> getUserPublicKeyList() {
+		return userPublicKeyList;
+	}
+
+	public void setUserPublicKeyList(List<PublicKey> userPublicKeyList) {
+		this.userPublicKeyList = userPublicKeyList;
+	}
+
+	public Long getExistingKeyId() {
+		return existingKeyId;
+	}
+
+	public void setExistingKeyId(Long existingKeyId) {
+		this.existingKeyId = existingKeyId;
 	}
 }

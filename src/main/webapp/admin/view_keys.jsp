@@ -59,8 +59,49 @@
             $('#<s:property value="sortedSet.orderByField"/>').attr('class', '<s:property value="sortedSet.orderByDirection"/>');
             </s:if>
 
+            <s:if test="#session['privateKey']!=null">
+                window.location='../admin/downloadPvtKey.action?publicKey.keyNm=<s:property value="%{#parameters.keyNm}" escapeJavaScript="true"/>';
+            </s:if>
+            
+            $('.new_key_label a').click(function() {
+                hideNewKeyInputs();
+            });
 
-           
+            $('.existing_key_label a').click(function() {
+                hideExistingKeyInputs();
+            });
+            
+            function hideNewKeyInputs() {
+                //hide new key input
+                $('.new_key').closest('tr').hide();
+                $('.new_key_label').hide();
+                //reset new key values
+                $('textarea.new_key').val('');
+                $('input.new_key').val('');
+                //show existing key inputs
+                $('.existing_key_label').show();
+                $('.existing_key').closest('tr').show();
+            }
+            
+            function hideExistingKeyInputs() {
+                //hide existing key inputs
+                $('.existing_key').closest('tr').hide();
+                $('.existing_key_label').hide();
+                //reset existing key values
+                $('select.existing_key').val('');
+                //show new key inputs
+                $('.new_key_label').show();
+                $('.new_key').closest('tr').show();
+            }
+            
+            <s:if test="existingKeyId!=null">
+                hideNewKeyInputs();
+            </s:if>
+            <s:else>
+                hideExistingKeyInputs();
+            </s:else>
+            
+
         });
     </script>
 
@@ -94,7 +135,7 @@
 
     <h3>Manage SSH Keys</h3>
 
-    <p>Add / Delete public SSH keys for current user.</p>
+    <p>Add / Delete SSH keys for current user.</p>
 
     <s:if test="%{#session.userType==\"M\" || (profileList!= null && !profileList.isEmpty()) }">
         
@@ -150,9 +191,11 @@
                         <td><s:date name="createDt" nice="true"/></td>
                         <td>
                             <div>
+                                <s:if test="!forceUserKeyGenEnabled">
                                     <button class="btn btn-default spacer spacer-left" data-toggle="modal"
                                             data-target="#edit_dialog_<s:property value="id"/>">Edit
                                     </button>
+                                </s:if>
                                     <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn spacer spacer-right">Delete
                                     </button>
                                 &nbsp;&nbsp;&nbsp;
@@ -166,13 +209,30 @@
         </s:if>
 
 
-        <button class="btn btn-default add_btn spacer spacer-bottom" data-toggle="modal" data-target="#add_dialog">Add Public Key</button>
+        <button class="btn btn-default add_btn spacer spacer-bottom" data-toggle="modal" data-target="#add_dialog">Add SSH Key</button>
         <div id="add_dialog" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                        <h4 class="modal-title">Add Public Key</h4>
+                            <div class="new_key_label">
+                                <div class="alert alert-success">
+                                    .. or <strong>select an <a href="#" class="alert-link">existing key</a></strong>
+                                </div>
+                                <s:if test="forceUserKeyGenEnabled">
+                                    <h4 class="modal-title">Generate &amp; Download an SSH Key</h4>
+                                </s:if>
+                                <s:else>
+                                    <h4 class="modal-title">Add Public SSH Key</h4>
+                                </s:else>
+                            </div>
+
+                            <div class="existing_key_label">
+                                <div class="alert alert-success">
+                                    .. or <strong>create a <a href="#" class="alert-link">new key</a></strong>
+                                </div>
+                                <h4 class="modal-title">Select &amp; Assign an SSH Key</h4>
+                            </div>
                     </div>
                     <div class="modal-body">
                         <div class="row">
@@ -188,13 +248,22 @@
                                     <s:select name="publicKey.profile.id" list="profileList"
                                               listKey="id" listValue="%{nm}" label="Profile" value="%{profile.id}"/>
                                 </s:else>
-                                <s:textarea name="publicKey.publicKey" rows="15" cols="55"/>
+                                <s:if test="forceUserKeyGenEnabled">
+                                    <s:password class="new_key" name="publicKey.passphrase" label="Passphrase"/>
+                                    <s:password class="new_key" name="publicKey.passphraseConfirm" label="Confirm Passphrase"/>
+                                </s:if>
+                                <s:else>
+                                    <s:textarea class="new_key" name="publicKey.publicKey" label="Public Key" rows="8" cols="55"/>
+                                </s:else>
+                                <s:select class="existing_key" name="existingKeyId" list="userPublicKeyList" listKey="id" listValue="%{keyNm + ' ('+fingerprint+')'}" label="Existing Key" value="%{existingKeyId}" headerKey=""
+                                headerValue="-Select Key-"/>
                                 <s:hidden name="sortedSet.orderByDirection"/>
                                 <s:hidden name="sortedSet.orderByField"/>
                             </s:form>
                         </div>
                     </div>
                     <div class="modal-footer">
+                       
                         <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
                         <button type="button" class="btn btn-default submit_btn">Submit</button>
                     </div>
@@ -203,13 +272,26 @@
         </div>
 
 
+    <s:if test="!forceUserKeyGenEnabled">
         <s:iterator var="publicKey" value="sortedSet.itemList" status="stat">
             <div id="edit_dialog_<s:property value="id"/>" class="modal fade">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                            <h4 class="modal-title">Edit Public Key</h4>
+                            <div class="new_key_label">
+                                <div class="alert alert-success">
+                                    .. or <strong>select an <a href="#" class="alert-link">existing key</a></strong>
+                                </div>
+                                <h4 class="modal-title">Edit Public SSH Key</h4>
+                            </div>
+
+                            <div class="existing_key_label">
+                                <div class="alert alert-success">
+                                    .. or <strong>create a <a href="#" class="alert-link">new key</a></strong>
+                                </div>
+                                <h4 class="modal-title">Select &amp; Assign an SSH Key</h4>
+                            </div>
                         </div>
                         <div class="modal-body">
                             <div class="row">
@@ -226,8 +308,10 @@
                                         <s:select name="publicKey.profile.id" list="profileList"
                                                   listKey="id" listValue="%{nm}" label="Profile" value="%{profile.id}"/>
                                     </s:else>
-                                    <s:textarea name="publicKey.publicKey" value="%{publicKey}" label="Public Key"
-                                                rows="15" cols="55"/>
+                                    <s:textarea class="new_key" name="publicKey.publicKey" value="%{publicKey}" label="Public Key"
+                                                rows="8" cols="55"/>
+                                    <s:select class="existing_key" name="existingKeyId" list="userPublicKeyList" listKey="id" listValue="%{keyNm + ' ('+fingerprint+')'}" label="Existing Key" value="%{existingKeyId}"   headerKey=""
+                                              headerValue="-Select Key-"/>
                                     <s:hidden name="sortedSet.orderByDirection"/>
                                     <s:hidden name="sortedSet.orderByField"/>
                                 </s:form>
@@ -242,6 +326,7 @@
                 </div>
             </div>
         </s:iterator>
+    </s:if>
 
 
     </s:if>

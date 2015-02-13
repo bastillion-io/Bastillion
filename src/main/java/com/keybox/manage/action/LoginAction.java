@@ -20,6 +20,7 @@ import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.db.AuthDB;
 import com.keybox.manage.model.Auth;
 import com.keybox.manage.util.OTPUtil;
+import com.keybox.manage.util.PasswordUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.convention.annotation.Action;
@@ -138,19 +139,22 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
             }
     )
     public String passwordSubmit() {
-        String retVal = SUCCESS;
+        String retVal = INPUT;
+        
+        if (!auth.getPassword().equals(auth.getPasswordConfirm())) {
+            addActionError("Passwords do not match");
 
-        if (auth.getPassword().equals(auth.getPasswordConfirm())) {
+        } else if(!PasswordUtil.isValid(auth.getPassword())){
+            addActionError(PasswordUtil.PASSWORD_REQ_ERROR_MSG);
+            
+        } else {
             auth.setAuthToken(AuthUtil.getAuthToken(servletRequest.getSession()));
 
-            if (!AuthDB.updatePassword(auth)) {
+            if (AuthDB.updatePassword(auth)) {
+                retVal=SUCCESS;
+            }else{
                 addActionError("Current password is invalid");
-                retVal = INPUT;
             }
-
-        } else {
-            addActionError("Passwords do not match");
-            retVal = INPUT;
         }
 
 

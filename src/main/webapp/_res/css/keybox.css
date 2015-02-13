@@ -327,3 +327,8 @@ div.termwrapper div h6 {
 a.btn {
     text-decoration: none;
 }
+.existing_key_label .alert, .new_key_label  .alert{
+    float:right;
+    margin-right:30px;
+    padding:6px 18px;
+}
