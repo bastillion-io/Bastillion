@@ -2,7 +2,7 @@ KeyBox
 ======
 KeyBox is a web-based SSH console that centrally manages administrative access to systems. KeyBox combines key management and administration through profiles assigned to defined users.
 
-Administrators can login using two-factor authentication with [FreeOTP](https://fedorahosted.org/freeotp) or [Google Authenticatior](https://github.com/google/google-authenticator). From there they can manage their public SSH keys or connect to their systems through a web-shell. Commands can be shared across shells to make patching easier and eliminate redundant command execution.
+Administrators can login using two-factor authentication with [FreeOTP](https://fedorahosted.org/freeotp) or [Google Authenticator](https://github.com/google/google-authenticator). From there they can manage their public SSH keys or connect to their systems through a web-shell. Commands can be shared across shells to make patching easier and eliminate redundant command execution.
 
 KeyBox layers TLS/SSL on top of SSH and can act as a bastion host for administration. Layering protocols for security is described in detail in [The Security Implications of SSH](http://www.sans.org/reading-room/whitepapers/vpns/security-implications-ssh-1180) whitepaper. SSH key management is enabled by default to prevent unmanaged public keys and enforce best practices.
 
@@ -22,15 +22,11 @@ http://maven.apache.org
 
 * Install [FreeOTP](https://fedorahosted.org/freeotp) or [Google Authenticator](https://github.com/google/google-authenticator) to enable two-factor authentication with Android or iOS
 
-| FreeOTP       | Link                                                                                 |
-|:------------- |:------------------------------------------------------------------------------------:|
-| Android       | [Google Play](https://play.google.com/store/apps/details?id=org.fedorahosted.freeotp)|
-| iOS           | [iTunes](https://itunes.apple.com/us/app/freeotp/id872559395)                        |
+    | Application          | Android                                                                                             | iOS                                                                        |             
+    |----------------------|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
+    | FreeOTP              | [Google Play](https://play.google.com/store/apps/details?id=org.fedorahosted.freeotp)               | [iTunes](https://itunes.apple.com/us/app/freeotp/id872559395)              |
+    | Google Authenticator | [Google Play](https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2) | [iTunes](https://itunes.apple.com/us/app/google-authenticator/id388497605) |
 
-| Google Authenticator| Link                                                                                                                                                                                   |
-|:------------------- |:--------------------------------------------------------------------------------------------------:|
-| Android             | [Google Play](https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2)|
-| iOS                 | [iTunes](https://itunes.apple.com/us/app/google-authenticator/id388497605)                         |
 
 To Run Bundled with Jetty
 ------
