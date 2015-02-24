@@ -105,6 +105,9 @@
                    <s:elseif test="statusCd=='HOSTFAIL'">
                     <div class="error">DNS Lookup Failed</div>
                    </s:elseif>
+                   <s:elseif test="statusCd=='HOSTFAIL'">
+                    <div class="error">DNS lookup Failed</div>
+                   </s:elseif>
                    <s:elseif test="statusCd=='KEYAUTHFAIL'">
                     <div class="warning">Passphrase Authentication Failed</div>
                    </s:elseif>
