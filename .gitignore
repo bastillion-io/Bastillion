@@ -8,3 +8,10 @@ target/*
 .idea/*
 *.iml
 *.DS_Store
+/target/
+/bin/
+
+# Eclipse Project Setting #
+.classpath
+.project
+.settings/*

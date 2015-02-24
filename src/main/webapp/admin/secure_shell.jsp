@@ -116,6 +116,9 @@
             <s:if test="currentSystemStatus!=null && currentSystemStatus.statusCd=='GENERICFAIL'">
             $("#error_dialog").modal();
             </s:if>
+            <s:if test="currentSystemStatus!=null && currentSystemStatus.statusCd=='HOSTFAIL'">
+            $("#error_dialog").modal();
+            </s:if>
             <s:elseif test="pendingSystemStatus!=null">
             <s:if test="pendingSystemStatus.statusCd=='AUTHFAIL'">
             $("#set_password_dialog").modal();
