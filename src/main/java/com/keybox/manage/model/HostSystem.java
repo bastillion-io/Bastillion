@@ -38,6 +38,7 @@ public class HostSystem {
     public static final String PUBLIC_KEY_FAIL_STATUS="KEYAUTHFAIL";
     public static final String GENERIC_FAIL_STATUS="GENERICFAIL";
     public static final String SUCCESS_STATUS="SUCCESS";
+    public static final String HOST_FAIL_STATUS="HOSTFAIL";
 
 
 
@@ -70,7 +71,7 @@ public class HostSystem {
         return host;
     }
 
-    public void setHost(String host) {
+    public void setHost(String host){
         this.host = host;
     }
 
