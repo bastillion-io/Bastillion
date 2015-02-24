@@ -233,6 +233,9 @@ public class SSHUtil {
 				hostSystem.setStatusCd(HostSystem.PUBLIC_KEY_FAIL_STATUS);
 			} else if (e.getMessage().toLowerCase().contains("auth fail") || e.getMessage().toLowerCase().contains("auth cancel")) {
 				hostSystem.setStatusCd(HostSystem.AUTH_FAIL_STATUS);
+			} else if (e.getMessage().toLowerCase().contains("unknownhostexception")){
+				hostSystem.setErrorMsg("DNS lookup Failed");
+				hostSystem.setStatusCd(HostSystem.HOST_FAIL_STATUS);
 			} else {
 				hostSystem.setStatusCd(HostSystem.GENERIC_FAIL_STATUS);
 			}
@@ -466,6 +469,9 @@ public class SSHUtil {
 				hostSystem.setStatusCd(HostSystem.PUBLIC_KEY_FAIL_STATUS);
 			} else if (e.getMessage().toLowerCase().contains("auth fail") || e.getMessage().toLowerCase().contains("auth cancel")) {
 				hostSystem.setStatusCd(HostSystem.AUTH_FAIL_STATUS);
+			} else if (e.getMessage().toLowerCase().contains("unknownhostexception")){
+				hostSystem.setErrorMsg("DNS lookup Failed");
+				hostSystem.setStatusCd(HostSystem.HOST_FAIL_STATUS);	
 			} else {
 				hostSystem.setStatusCd(HostSystem.GENERIC_FAIL_STATUS);
 			}
