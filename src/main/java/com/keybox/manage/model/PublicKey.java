@@ -27,14 +27,21 @@ public class PublicKey {
     String keyNm;
     String publicKey;
     String type;
-    String fingerprint;
+    PublicKeyFingerprint pkfingerprint = new PublicKeyFingerprint();
     boolean enabled;
     Date createDt;
     Profile profile;
     String passphrase;
     String passphraseConfirm;
 
+    public PublicKeyFingerprint getPkfingerprint() {
+		return pkfingerprint;
+	}
 
+	public void setPkfingerprint(PublicKeyFingerprint pkfingerprint) {
+		this.pkfingerprint = pkfingerprint;
+	}
+    
     public String getKeyNm() {
         return keyNm;
     }
@@ -84,11 +91,11 @@ public class PublicKey {
     }
 
     public String getFingerprint() {
-        return fingerprint;
+        return pkfingerprint.getFingerprint();
     }
 
     public void setFingerprint(String fingerprint) {
-        this.fingerprint = fingerprint;
+        this.pkfingerprint.setFingerprint(fingerprint);
     }
 
     public Date getCreateDt() {
