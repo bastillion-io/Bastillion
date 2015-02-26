@@ -45,6 +45,7 @@ public class PublicKeyDB {
     public static final String SORT_BY_FINGERPRINT= "fingerprint";
     public static final String SORT_BY_CREATE_DT= "create_dt";
     public static final String SORT_BY_USERNAME= "username";
+    public static final String SORT_BY_ENABLED="enabled";
 
 
     /**

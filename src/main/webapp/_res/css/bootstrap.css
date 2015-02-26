@@ -3049,6 +3049,9 @@ fieldset[disabled] .btn-warning.active {
   color: #d47500;
   background-color: #ffffff;
 }
+.btn-disable_enable {
+  width: 60px;
+}
 .btn-danger {
   color: #ffffff;
   background-color: #cd0200;
