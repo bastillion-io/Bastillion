@@ -119,8 +119,9 @@
                             <td>
                             <s:select name="sortedSet.filterMap['%{@com.keybox.manage.db.PublicKeyDB@FILTER_BY_ENABLED}']"
                                       class="view_frm_select"
-                                      list="#{true:'Enabled', false:'Disabled'}"
-                                      headerValue="true"/>
+                                      list="#{'true':'Enabled', 'false':'Disabled' }"
+                                      headerKey=""
+                                      headerValue="-Select Status-" />
                             </td>
                             <td>
                                 <div id="view_btn" class="btn btn-default">Filter</div>
@@ -156,7 +157,9 @@
                     <th id="<s:property value="@com.keybox.manage.db.PublicKeyDB@SORT_BY_CREATE_DT"/>" class="sort">
                         Created
                     </th>
-                    <th>&nbsp;</th>
+                    <th id="<s:property value="@com.keybox.manage.db.PublicKeyDB@SORT_BY_ENABLED"/>" class="sort" >
+                    	Action
+                    </th>
                 </tr>
                 </thead>
                 <tbody>
@@ -178,12 +181,12 @@
                         <td>
                             <div>
                                 <s:if test="%{enabled}">
-                                    <button class="btn btn-default btn-danger spacer spacer-left disable_btn" data-toggle="modal"
+                                    <button class="btn btn-default btn-danger btn-disable_enable spacer spacer-left disable_btn" data-toggle="modal"
                                             id="disable_btn_<s:property value="id"/>">Disable
                                     </button>
                                 </s:if>
                                 <s:else>
-                                    <button class="btn btn-default btn-success spacer spacer-left enable_btn" data-toggle="modal"
+                                    <button class="btn btn-default btn-success btn-disable_enable spacer spacer-left enable_btn" data-toggle="modal"
                                             id="enable_btn_<s:property value="id"/>">Enable
                                     </button>
                                 </s:else>

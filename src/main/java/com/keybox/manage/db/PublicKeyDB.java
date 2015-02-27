@@ -45,6 +45,7 @@ public class PublicKeyDB {
     public static final String SORT_BY_FINGERPRINT= "fingerprint";
     public static final String SORT_BY_CREATE_DT= "create_dt";
     public static final String SORT_BY_USERNAME= "username";
+    public static final String SORT_BY_ENABLED="enabled";
 
 
     /**
@@ -144,7 +145,7 @@ public class PublicKeyDB {
 
         sql+= StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_USER_ID)) ? " and p.user_id=? " : "";
         sql+= StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID)) ? " and p.profile_id=? " : "";
-        sql+= StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_ENABLED)) ? " and p.enabled=? " : " and p.enabled=true";
+        sql+= StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_ENABLED)) ? " and p.enabled=? " : "";
         sql=sql+orderBy;
 
         Connection con = null;

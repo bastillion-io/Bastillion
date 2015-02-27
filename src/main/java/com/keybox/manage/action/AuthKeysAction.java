@@ -113,6 +113,11 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 		profileList = ProfileDB.getAllProfiles();
 		userList= UserDB.getUserSet(new SortedSet(SessionAuditDB.SORT_BY_USERNAME)).getItemList();
 
+		//if null default to true
+		if(sortedSet.getFilterMap().get(PublicKeyDB.FILTER_BY_ENABLED)==null){
+			sortedSet.getFilterMap().put(PublicKeyDB.FILTER_BY_ENABLED, "true");
+		}
+		
 		sortedSet = PublicKeyDB.getPublicKeySet(sortedSet);
 
 		return SUCCESS;
