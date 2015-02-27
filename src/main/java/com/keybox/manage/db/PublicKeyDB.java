@@ -19,11 +19,14 @@ import com.keybox.manage.model.PublicKey;
 import com.keybox.manage.model.SortedSet;
 import com.keybox.manage.util.DBUtils;
 import com.keybox.manage.util.SSHUtil;
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
+import java.sql.ParameterMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -105,7 +108,7 @@ public class PublicKeyDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("select pk.*, pkf.fingerprint from  public_keys pk FULL JOIN public_keys_fingerprint pkf where fingerprint like ? and enabled=false");
+            PreparedStatement stmt = con.prepareStatement("select pk.*, pkf.fingerprint from public_keys pk JOIN public_keys_fingerprint pkf on pk.fingerprint_id = pkf.id where pkf.fingerprint like ? and pk.enabled=false");
             stmt.setString(1, fingerprint);
             ResultSet rs = stmt.executeQuery();
             
@@ -310,10 +313,20 @@ public class PublicKeyDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("insert into public_keys(key_nm, type, fingerprint, public_key, profile_id, user_id) values (?,?,?,?,?,?)");
+            PreparedStatement stmt_pkf = con.prepareStatement("insert into public_keys_fingerprint(fingerprint) values (?)");
+            stmt_pkf.setString(1, SSHUtil.getFingerprint(publicKey.getPublicKey()));
+            stmt_pkf.execute();
+            ParameterMetaData test = stmt_pkf.getParameterMetaData();
+            DBUtils.closeStmt(stmt_pkf);
+            
+            System.out.println(stmt_pkf.getUpdateCount());
+            //TODO:Hier fehlt noch was fingerprint_id
+            
+            
+            PreparedStatement stmt = con.prepareStatement("insert into public_keys(key_nm, type, fingerprint_id, public_key, profile_id, user_id) values (?,?,?,?,?,?)");
             stmt.setString(1, publicKey.getKeyNm());
             stmt.setString(2, SSHUtil.getKeyType(publicKey.getPublicKey()));
-            stmt.setString(3, SSHUtil.getFingerprint(publicKey.getPublicKey()));
+            stmt.setLong(3, stmt_pkf.getUpdateCount());
             stmt.setString(4, publicKey.getPublicKey().trim());
             if (publicKey.getProfile() == null || publicKey.getProfile().getId() == null) {
                 stmt.setNull(5, Types.NULL);
@@ -497,7 +510,8 @@ public class PublicKeyDB {
         try {
           con = DBUtils.getConn();
 
-          stmt = con.prepareStatement("select * from public_keys where user_id=? and fingerprint like ? and profile_id is ? and id is not ?");
+          stmt = con.prepareStatement("select pk.*, pkf.fingerprint from public_keys pk JOIN public_keys_fingerprint pkf on pk.fingerprint_id = pkf.id where pk.user_id=? and pkf.fingerprint like ? and pk.profile_id is ? and pk.id is not ?");
+           
           stmt.setLong(1, userId);
           stmt.setString(2, SSHUtil.getFingerprint(publicKey.getPublicKey()));
           if(publicKey.getProfile()!=null && publicKey.getProfile().getId()!=null){
