@@ -104,7 +104,7 @@ public class PublicKeyDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("select * from  public_keys where fingerprint like ? and enabled=false");
+            PreparedStatement stmt = con.prepareStatement("select pk.*, pkf.fingerprint from  public_keys pk FULL JOIN public_keys_fingerprint pkf where fingerprint like ? and enabled=false");
             stmt.setString(1, fingerprint);
             ResultSet rs = stmt.executeQuery();
             
