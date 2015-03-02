@@ -26,6 +26,8 @@ import java.sql.Connection;
 import java.sql.ParameterMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Savepoint;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -279,7 +281,7 @@ public class PublicKeyDB {
 
         PublicKey publicKey = null;
         try {
-            PreparedStatement stmt = con.prepareStatement("select * from  public_keys where id=?");
+            PreparedStatement stmt = con.prepareStatement("select pk.*, pkf.fingerprint from public_keys pk JOIN public_keys_fingerprint pkf on pk.fingerprint_id = pkf.id where pk.id=?");
             stmt.setLong(1, publicKeyId);
             ResultSet rs = stmt.executeQuery();
 
@@ -311,22 +313,24 @@ public class PublicKeyDB {
     public static void insertPublicKey(PublicKey publicKey) {
         
         Connection con = null;
+        Savepoint spt = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt_pkf = con.prepareStatement("insert into public_keys_fingerprint(fingerprint) values (?)");
+            
+            PreparedStatement stmt_pkf = con.prepareStatement("insert into public_keys_fingerprint(fingerprint) values (?)", Statement.RETURN_GENERATED_KEYS);
+            con.setAutoCommit(false);
+            spt = con.setSavepoint("sp_Fingerprint");
             stmt_pkf.setString(1, SSHUtil.getFingerprint(publicKey.getPublicKey()));
             stmt_pkf.execute();
-            ParameterMetaData test = stmt_pkf.getParameterMetaData();
-            DBUtils.closeStmt(stmt_pkf);
             
-            System.out.println(stmt_pkf.getUpdateCount());
-            //TODO:Hier fehlt noch was fingerprint_id
-            
-            
+            ResultSet tableKeys = stmt_pkf.getGeneratedKeys();
+            tableKeys.next();
+            int fingerprint_ID = tableKeys.getInt(1);
+                        
             PreparedStatement stmt = con.prepareStatement("insert into public_keys(key_nm, type, fingerprint_id, public_key, profile_id, user_id) values (?,?,?,?,?,?)");
             stmt.setString(1, publicKey.getKeyNm());
             stmt.setString(2, SSHUtil.getKeyType(publicKey.getPublicKey()));
-            stmt.setLong(3, stmt_pkf.getUpdateCount());
+            stmt.setLong(3, fingerprint_ID);
             stmt.setString(4, publicKey.getPublicKey().trim());
             if (publicKey.getProfile() == null || publicKey.getProfile().getId() == null) {
                 stmt.setNull(5, Types.NULL);
@@ -336,9 +340,20 @@ public class PublicKeyDB {
             stmt.setLong(6, publicKey.getUserId());
             stmt.execute();
 
+            con.commit();
+            DBUtils.closeStmt(stmt_pkf);
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
+        	if(spt != null)
+        	{
+        		try {
+					con.rollback(spt);
+					con.commit();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+        	}
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
@@ -581,4 +596,36 @@ public class PublicKeyDB {
         return new ArrayList(keyMap.values());
 
     }
+
+    /**
+     * checks if key has already been registered
+     * 
+     * @param publicKey public key
+     * @return true if exists
+     */
+	public static boolean isKeyExists(PublicKey publicKey) {
+		boolean isexisted = false;
+		PreparedStatement stmt;
+        Connection con = null;
+        try {
+            con = DBUtils.getConn();
+            stmt = con.prepareStatement("select pkf.fingerprint from public_keys_fingerprint pkf where pkf.fingerprint like ?");
+            stmt.setString(1, SSHUtil.getFingerprint(publicKey.getPublicKey()));
+            
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+            	isexisted=true;
+            }
+            DBUtils.closeRs(rs);
+            DBUtils.closeStmt(stmt);
+            
+        
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        
+        DBUtils.closeConn(con);
+		
+		return isexisted;
+	}
 }
