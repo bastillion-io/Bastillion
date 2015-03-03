@@ -315,17 +315,27 @@ public class PublicKeyDB {
         Connection con = null;
         Savepoint spt = null;
         try {
-            con = DBUtils.getConn();
-            
-            PreparedStatement stmt_pkf = con.prepareStatement("insert into public_keys_fingerprint(fingerprint) values (?)", Statement.RETURN_GENERATED_KEYS);
-            con.setAutoCommit(false);
-            spt = con.setSavepoint("sp_Fingerprint");
-            stmt_pkf.setString(1, SSHUtil.getFingerprint(publicKey.getPublicKey()));
-            stmt_pkf.execute();
-            
-            ResultSet tableKeys = stmt_pkf.getGeneratedKeys();
-            tableKeys.next();
-            int fingerprint_ID = tableKeys.getInt(1);
+        	con = DBUtils.getConn();
+        	PreparedStatement stmt_pkf;
+        	ResultSet rs_pkf;
+        	long fingerprint_ID;
+        	if(isKeyExists(publicKey.getUserId(), publicKey)) { //fingerprint exists
+        		stmt_pkf = con.prepareStatement("select * from public_keys_fingerprint where fingerprint");
+        		stmt_pkf.setString(1, SSHUtil.getFingerprint(publicKey.getPublicKey()));
+                rs_pkf = stmt_pkf.executeQuery();
+                rs_pkf.next();
+                fingerprint_ID = rs_pkf.getLong("id");
+        	} else { //fingerprint not exists
+        		stmt_pkf = con.prepareStatement("insert into public_keys_fingerprint(fingerprint) values (?)", Statement.RETURN_GENERATED_KEYS);
+                con.setAutoCommit(false);
+                spt = con.setSavepoint("sp_Fingerprint");
+                stmt_pkf.setString(1, SSHUtil.getFingerprint(publicKey.getPublicKey()));
+                stmt_pkf.execute();
+                
+                ResultSet tableKeys = stmt_pkf.getGeneratedKeys();
+                tableKeys.next();
+                fingerprint_ID = tableKeys.getLong(1);
+        	}
                         
             PreparedStatement stmt = con.prepareStatement("insert into public_keys(key_nm, type, fingerprint_id, public_key, profile_id, user_id) values (?,?,?,?,?,?)");
             stmt.setString(1, publicKey.getKeyNm());
@@ -390,7 +400,7 @@ public class PublicKeyDB {
                 stmt.execute();
                 DBUtils.closeStmt(stmt);
             } else { // SSH-key has changed (and possibly Name and/or Profile)
-            	if (isKeyExists(publicKey) == false){
+            	if (isKeyExists(publicKey.getUserId(), publicKey) == false){
             		deletePublicKey(publicKey.getId(), publicKey.getUserId());
             		insertPublicKey(publicKey);
             	} else {
@@ -612,12 +622,13 @@ public class PublicKeyDB {
     }
 
     /**
-     * checks if SSH-key has already been registered on other PublicKey
+     * checks if SSH-key has already been registered on other User
      * 
+     * @param userId user ID
      * @param publicKey public key
-     * @return true if exists on other PublicKey
+     * @return true if exists under a other User or Delete
      */
-	public static boolean isKeyExists(PublicKey publicKey) {
+	public static boolean isKeyExists(Long userId, PublicKey publicKey) {
 		boolean isexisted = false;
 		PreparedStatement stmt;
         Connection con = null;
@@ -628,17 +639,14 @@ public class PublicKeyDB {
             
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-            	isexisted=true;
-            	
-            	// Test whether it is registered for the same key
-            	PreparedStatement stmt_pk_pkf_test = con.prepareStatement("select pk.*, pkf.fingerprint from public_keys pk JOIN public_keys_fingerprint pkf on pk.fingerprint_id = pkf.id where pk.id=? and pkf.fingerprint like ?"); 
-                stmt_pk_pkf_test.setLong(1, publicKey.getId());
+            	// Test whether it is registered under other User
+            	PreparedStatement stmt_pk_pkf_test = con.prepareStatement("select pk.*, pkf.fingerprint from public_keys pk JOIN public_keys_fingerprint pkf on pk.fingerprint_id = pkf.id where pk.user_id!=? and pkf.fingerprint like ?");
+            	stmt_pk_pkf_test.setLong(1, userId);
                 stmt_pk_pkf_test.setString(2, SSHUtil.getFingerprint(publicKey.getPublicKey()));
                 ResultSet rs_pk_pkf_test = stmt_pk_pkf_test.executeQuery();
                 if (rs_pk_pkf_test.next()){
-                	isexisted = false;
+                	isexisted = true;
                 }
-            	
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);

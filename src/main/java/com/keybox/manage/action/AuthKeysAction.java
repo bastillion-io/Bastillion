@@ -308,12 +308,12 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 				addActionError("This key has been disabled. Please generate and set a new public key.");
 				addFieldError("publicKey.publicKey", "Invalid");
 
-			/*} else if (PublicKeyDB.isKeyRegistered(userId, publicKey)) {
+			} else if (PublicKeyDB.isKeyRegistered(userId, publicKey)) {
 				addActionError("This key has already been registered under selected profile.");
-				addFieldError("publicKey.publicKey", "Invalid");*/
+				addFieldError("publicKey.publicKey", "Invalid");
 				
-			} else if (PublicKeyDB.isKeyExists(publicKey)) {
-				addActionError("This key has already been registered (and may be deleted).");
+			} else if (PublicKeyDB.isKeyExists(userId, publicKey)) {
+				addActionError("This key has already been registered unter a other User or key deleted.");
 				addFieldError("publicKey.publicKey", "Invalid");
 			}
 				
