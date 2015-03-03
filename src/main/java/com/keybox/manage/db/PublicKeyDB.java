@@ -368,24 +368,38 @@ public class PublicKeyDB {
      */
     public static void updatePublicKey(PublicKey publicKey) {
 
-
-        Connection con = null;
+    	Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("update public_keys set key_nm=?, type=?, fingerprint=?, public_key=?, profile_id=? where id=? and user_id=? and enabled=true");
-            stmt.setString(1, publicKey.getKeyNm());
-            stmt.setString(2, SSHUtil.getKeyType(publicKey.getPublicKey()));
-            stmt.setString(3, SSHUtil.getFingerprint(publicKey.getPublicKey()));
-            stmt.setString(4, publicKey.getPublicKey().trim());
-            if (publicKey.getProfile() == null || publicKey.getProfile().getId() == null) {
-                stmt.setNull(5, Types.NULL);
-            } else {
-                stmt.setLong(5, publicKey.getProfile().getId());
+            
+            // Test whether the SSH-key has changed
+            PreparedStatement stmt_pk_pkf_test = con.prepareStatement("select pk.*, pkf.fingerprint from public_keys pk JOIN public_keys_fingerprint pkf on pk.fingerprint_id = pkf.id where pk.id=? AND pkf.fingerprint like ?"); 
+            stmt_pk_pkf_test.setLong(1, publicKey.getId());
+            stmt_pk_pkf_test.setString(2, SSHUtil.getFingerprint(publicKey.getPublicKey()));
+            ResultSet rs = stmt_pk_pkf_test.executeQuery();
+            if (rs.next()) { //SSH-key has not changed (update of Name and/or Profile)
+            	PreparedStatement stmt = con.prepareStatement("update public_keys set key_nm=?, profile_id=? where id=? and user_id=? and enabled=true");
+            	stmt.setString(1, publicKey.getKeyNm());
+            	if (publicKey.getProfile() == null || publicKey.getProfile().getId() == null) {
+                    stmt.setNull(2, Types.NULL);
+                } else {
+                    stmt.setLong(2, publicKey.getProfile().getId());
+                }
+                stmt.setLong(3, publicKey.getId());
+                stmt.setLong(4, publicKey.getUserId());
+                stmt.execute();
+                DBUtils.closeStmt(stmt);
+            } else { // SSH-key has changed (and possibly Name and/or Profile)
+            	if (isKeyExists(publicKey) == false){
+            		deletePublicKey(publicKey.getId(), publicKey.getUserId());
+            		insertPublicKey(publicKey);
+            	} else {
+					throw new Exception("Key already used for other purposes");
+				}
+            		
+            	
             }
-            stmt.setLong(6, publicKey.getId());
-            stmt.setLong(7, publicKey.getUserId());
-            stmt.execute();
-            DBUtils.closeStmt(stmt);
+            DBUtils.closeStmt(stmt_pk_pkf_test);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -598,10 +612,10 @@ public class PublicKeyDB {
     }
 
     /**
-     * checks if key has already been registered
+     * checks if SSH-key has already been registered on other PublicKey
      * 
      * @param publicKey public key
-     * @return true if exists
+     * @return true if exists on other PublicKey
      */
 	public static boolean isKeyExists(PublicKey publicKey) {
 		boolean isexisted = false;
@@ -615,6 +629,16 @@ public class PublicKeyDB {
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
             	isexisted=true;
+            	
+            	// Test whether it is registered for the same key
+            	PreparedStatement stmt_pk_pkf_test = con.prepareStatement("select pk.*, pkf.fingerprint from public_keys pk JOIN public_keys_fingerprint pkf on pk.fingerprint_id = pkf.id where pk.id=? and pkf.fingerprint like ?"); 
+                stmt_pk_pkf_test.setLong(1, publicKey.getId());
+                stmt_pk_pkf_test.setString(2, SSHUtil.getFingerprint(publicKey.getPublicKey()));
+                ResultSet rs_pk_pkf_test = stmt_pk_pkf_test.executeQuery();
+                if (rs_pk_pkf_test.next()){
+                	isexisted = false;
+                }
+            	
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
