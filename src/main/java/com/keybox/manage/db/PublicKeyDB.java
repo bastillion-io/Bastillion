@@ -622,11 +622,11 @@ public class PublicKeyDB {
     }
 
     /**
-     * checks if SSH-key has already been registered on other User
+     * checks if SSH-key has already been registered on another User
      * 
      * @param userId user ID
      * @param publicKey public key
-     * @return true if exists under a other User or Delete
+     * @return true if exists under another user or was deleted
      */
 	public static boolean isKeyExists(Long userId, PublicKey publicKey) {
 		boolean isexisted = false;
@@ -639,7 +639,7 @@ public class PublicKeyDB {
             
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-            	// Test whether it is registered under other User
+            	// Test whether it is registered under another user
             	PreparedStatement stmt_pk_pkf_test = con.prepareStatement("select pk.*, pkf.fingerprint from public_keys pk JOIN public_keys_fingerprint pkf on pk.fingerprint_id = pkf.id where pk.user_id!=? and pkf.fingerprint like ?");
             	stmt_pk_pkf_test.setLong(1, userId);
                 stmt_pk_pkf_test.setString(2, SSHUtil.getFingerprint(publicKey.getPublicKey()));
