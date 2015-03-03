@@ -284,7 +284,7 @@ public class SSHUtil {
 			//get file input stream
 			FileInputStream file = new FileInputStream(source);
 			c.put(file, destination);
-
+			file.close();
 
 		} catch (Exception e) {
 			hostSystem.setErrorMsg(e.getMessage());

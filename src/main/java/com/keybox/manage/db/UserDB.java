@@ -19,10 +19,12 @@ import com.keybox.manage.model.SortedSet;
 import com.keybox.manage.model.User;
 import com.keybox.manage.util.DBUtils;
 import com.keybox.manage.util.EncryptionUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 
 
@@ -36,6 +38,7 @@ public class UserDB {
     public static final String SORT_BY_EMAIL="email";
     public static final String SORT_BY_USERNAME="username";
     public static final String SORT_BY_USER_TYPE="user_type";
+    public static final String SORT_BY_AUTH_TYPE="auth_type";
 
     /**
      * returns users based on sort order defined
@@ -66,6 +69,7 @@ public class UserDB {
                 user.setEmail(rs.getString("email"));
                 user.setUsername(rs.getString("username"));
                 user.setPassword(rs.getString("password"));
+                user.setAuthType(rs.getString("auth_type"));
                 user.setUserType(rs.getString("user_type"));
                 userList.add(user);
 
@@ -127,6 +131,7 @@ public class UserDB {
                 user.setEmail(rs.getString("email"));
                 user.setUsername(rs.getString("username"));
                 user.setPassword(rs.getString("password"));
+                user.setAuthType(rs.getString("auth_type"));
                 user.setUserType(rs.getString("user_type"));
                 user.setSalt(rs.getString("salt"));
                 user.setProfileList(UserProfileDB.getProfilesByUser(con, userId));
@@ -143,30 +148,63 @@ public class UserDB {
 
     /**
      * inserts new user
+     *
      * @param user user object
      */
-    public static void insertUser(User user) {
+    public static Long insertUser(User user) {
 
-
+        Long userId = null;
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            String salt=EncryptionUtil.generateSalt();
-            PreparedStatement stmt = con.prepareStatement("insert into users (first_nm, last_nm, email, username, user_type, password, salt) values (?,?,?,?,?,?,?)");
+            userId = insertUser(con, user);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+
+        return userId;
+
+    }
+
+    /**
+     * inserts new user
+     * 
+     * @param con DB connection 
+     * @param user user object
+     */
+    public static Long insertUser(Connection con, User user) {
+
+        Long userId=null;
+        
+        try {
+            PreparedStatement stmt = con.prepareStatement("insert into users (first_nm, last_nm, email, username, auth_type, user_type, password, salt) values (?,?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
             stmt.setString(1, user.getFirstNm());
             stmt.setString(2, user.getLastNm());
             stmt.setString(3, user.getEmail());
             stmt.setString(4, user.getUsername());
-            stmt.setString(5, user.getUserType());
-            stmt.setString(6, EncryptionUtil.hash(user.getPassword()+salt));
-            stmt.setString(7, salt);
+            stmt.setString(5, user.getAuthType());
+            stmt.setString(6, user.getUserType());
+            if(StringUtils.isNotEmpty(user.getPassword())) {
+                String salt=EncryptionUtil.generateSalt();
+                stmt.setString(7, EncryptionUtil.hash(user.getPassword() + salt));
+                stmt.setString(8, salt);
+            }else {
+                stmt.setString(7, null);
+                stmt.setString(8, null);
+            }
             stmt.execute();
+            ResultSet rs = stmt.getGeneratedKeys();
+            if (rs != null && rs.next()) {
+                userId = rs.getLong(1);
+            }
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-        DBUtils.closeConn(con);
+        
+        return userId;
 
     }
 

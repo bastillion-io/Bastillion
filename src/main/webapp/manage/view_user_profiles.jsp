@@ -51,9 +51,12 @@
 
     <p>Add / Delete profiles to be assigned to the current user.</p>
 
-    <h5><s:property value="user.username"/>&nbsp;:&nbsp;<s:property value="user.lastNm"/>,&nbsp;<s:property
-            value="user.firstNm"/>
+    <h5><s:property value="user.username"/>
+    <s:if test="%{user.lastNm!=null && user.firstNm!=null}">
+        &nbsp;:&nbsp;<s:property value="user.lastNm"/>,&nbsp;<s:property value="user.firstNm"/>
+    </s:if> <s:if test="%{user.email!=null}">
         &nbsp;(<s:property value="user.email"/>)
+    </s:if>
 
     </h5>
 

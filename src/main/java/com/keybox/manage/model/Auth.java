@@ -23,6 +23,9 @@ public class Auth {
 
     public static final String ADMINISTRATOR="A";
     public static final String MANAGER="M";
+    
+    public static final String AUTH_BASIC="BASIC";
+    public static final String AUTH_EXTERNAL="EXTERNAL";
 
     Long id;
     String username;
@@ -34,6 +37,7 @@ public class Auth {
     Long otpToken;
     String salt;
     String userType=ADMINISTRATOR;
+    String authType=AUTH_BASIC;
 
     public String getUsername() {
         return username;
@@ -113,5 +117,13 @@ public class Auth {
 
     public void setSalt(String salt) {
         this.salt = salt;
+    }
+
+    public String getAuthType() {
+        return authType;
+    }
+
+    public void setAuthType(String authType) {
+        this.authType = authType;
     }
 }

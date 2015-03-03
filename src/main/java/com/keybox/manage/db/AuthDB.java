@@ -16,8 +16,11 @@
 package com.keybox.manage.db;
 
 import com.keybox.manage.model.Auth;
+import com.keybox.manage.model.User;
 import com.keybox.manage.util.DBUtils;
 import com.keybox.manage.util.EncryptionUtil;
+import com.keybox.manage.util.ExternalAuthUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -36,40 +39,44 @@ public class AuthDB {
      * @return auth token if success
      */
     public static String login(Auth auth) {
-        String authToken = null;
+        //check ldap first
+        String authToken = ExternalAuthUtil.login(auth);
+        
+        if (StringUtils.isEmpty(authToken)) {
+
+            Connection con = null;
+
+            try {
+                con = DBUtils.getConn();
 
 
-        Connection con = null;
-        try {
-            con = DBUtils.getConn();
-            //get salt for user
-            String salt = getSaltByUsername(con, auth.getUsername());
-            //login
-            PreparedStatement stmt = con.prepareStatement("select * from users where enabled=true and username=? and password=?");
-            stmt.setString(1, auth.getUsername());
-            stmt.setString(2, EncryptionUtil.hash(auth.getPassword() + salt));
-            ResultSet rs = stmt.executeQuery();
+                //get salt for user
+                String salt = getSaltByUsername(con, auth.getUsername());
+                //login
+                PreparedStatement stmt = con.prepareStatement("select * from users where enabled=true and username=? and password=?");
+                stmt.setString(1, auth.getUsername());
+                stmt.setString(2, EncryptionUtil.hash(auth.getPassword() + salt));
+                ResultSet rs = stmt.executeQuery();
 
-            if (rs.next()) {
+                if (rs.next()) {
 
-                auth.setId(rs.getLong("id"));
+                    auth.setId(rs.getLong("id"));
+                    authToken = UUID.randomUUID().toString();
+                    auth.setAuthToken(authToken);
+                    auth.setAuthType(Auth.AUTH_BASIC);
+                    updateLogin(con, auth);
 
-                authToken = UUID.randomUUID().toString();
-                auth.setAuthToken(authToken);
-
-                //set auth token
-                updateLogin(con, auth);
+                }
+                DBUtils.closeRs(rs);
+                DBUtils.closeStmt(stmt);
 
 
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            DBUtils.closeRs(rs);
-            DBUtils.closeStmt(stmt);
 
-        } catch (Exception e) {
-            e.printStackTrace();
+            DBUtils.closeConn(con);
         }
-        DBUtils.closeConn(con);
-
 
         return authToken;
 
@@ -79,10 +86,11 @@ public class AuthDB {
     /**
      * checks to see if user is an admin based on auth token
      *
+     * @param userId    user id
      * @param authToken auth token string
      * @return user type if authorized, null if not authorized
      */
-    public static String isAuthorized(String authToken) {
+    public static String isAuthorized(Long userId, String authToken) {
 
         String authorized = null;
 
@@ -91,8 +99,9 @@ public class AuthDB {
 
             try {
                 con = DBUtils.getConn();
-                PreparedStatement stmt = con.prepareStatement("select * from users where enabled=true and auth_token=?");
-                stmt.setString(1, authToken);
+                PreparedStatement stmt = con.prepareStatement("select * from users where enabled=true and id=? and auth_token=?");
+                stmt.setLong(1, userId);
+                stmt.setString(2, authToken);
                 ResultSet rs = stmt.executeQuery();
 
                 if (rs.next()) {
@@ -119,17 +128,23 @@ public class AuthDB {
      * @param con  DB connection
      * @param auth username and password object
      */
-    private static void updateLogin(Connection con, Auth auth) {
+    public static void updateLogin(Connection con, Auth auth) {
 
 
         try {
-            String salt = EncryptionUtil.generateSalt();
-            PreparedStatement stmt = con.prepareStatement("update users set username=?, password=?, auth_token=?, salt=? where id=?");
+            PreparedStatement stmt = con.prepareStatement("update users set username=?, auth_type=?, auth_token=?, password=?, salt=? where id=?");
             stmt.setString(1, auth.getUsername());
-            stmt.setString(2, EncryptionUtil.hash(auth.getPassword() + salt));
+            stmt.setString(2, auth.getAuthType());
             stmt.setString(3, auth.getAuthToken());
-            stmt.setString(4, salt);
-            stmt.setLong(5, auth.getId());
+            if (StringUtils.isNotEmpty(auth.getPassword())) {
+                String salt = EncryptionUtil.generateSalt();
+                stmt.setString(4, EncryptionUtil.hash(auth.getPassword() + salt));
+                stmt.setString(5, salt);
+            } else {
+                stmt.setString(4, null);
+                stmt.setString(5, null);
+            }
+            stmt.setLong(6, auth.getId());
             stmt.execute();
 
             DBUtils.closeStmt(stmt);
@@ -152,16 +167,16 @@ public class AuthDB {
             con = DBUtils.getConn();
 
 
-            String prevSalt=getSaltByAuthToken(con, auth.getAuthToken());
+            String prevSalt = getSaltByAuthToken(con, auth.getAuthToken());
             PreparedStatement stmt = con.prepareStatement("select * from users where auth_token like ? and password like ?");
             stmt.setString(1, auth.getAuthToken());
-            stmt.setString(2, EncryptionUtil.hash(auth.getPrevPassword()+prevSalt));
+            stmt.setString(2, EncryptionUtil.hash(auth.getPrevPassword() + prevSalt));
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
 
                 String salt = EncryptionUtil.generateSalt();
                 stmt = con.prepareStatement("update users set password=?, salt=? where auth_token like ?");
-                stmt.setString(1, EncryptionUtil.hash(auth.getPassword()+salt));
+                stmt.setString(1, EncryptionUtil.hash(auth.getPassword() + salt));
                 stmt.setString(2, salt);
                 stmt.setString(3, auth.getAuthToken());
                 stmt.execute();
@@ -183,18 +198,20 @@ public class AuthDB {
      *
      * @param authToken auth token
      * @param con       DB connection
-     * @return user id
+     * @return user
      */
-    public static Long getUserIdByAuthToken(Connection con, String authToken) {
+    public static User getUserByAuthToken(Connection con, String authToken) {
 
 
-        Long userId = null;
+        User user = null;
         try {
             PreparedStatement stmt = con.prepareStatement("select * from users where enabled=true and auth_token like ?");
             stmt.setString(1, authToken);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                userId = rs.getLong("id");
+                Long userId = rs.getLong("id");
+                
+                user=UserDB.getUser(con, userId);
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
@@ -204,29 +221,29 @@ public class AuthDB {
         }
 
 
-        return userId;
+        return user;
 
     }
 
     /**
-     * returns user id based on auth token
+     * returns user based on auth token
      *
      * @param authToken auth token
-     * @return user id
+     * @return user
      */
-    public static Long getUserIdByAuthToken(String authToken) {
+    public static User getUserByAuthToken(String authToken) {
 
-        Long userId = null;
+        User user = null;
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            userId = getUserIdByAuthToken(con, authToken);
+            user = getUserByAuthToken(con, authToken);
         } catch (Exception e) {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
 
-        return userId;
+        return user;
 
     }
 
@@ -288,7 +305,7 @@ public class AuthDB {
     /**
      * get salt by user name
      *
-     * @param con DB connection
+     * @param con      DB connection
      * @param username username
      * @return salt
      */
@@ -312,11 +329,10 @@ public class AuthDB {
     }
 
 
-
     /**
      * get salt by authentication token
      *
-     * @param con DB connection
+     * @param con       DB connection
      * @param authToken auth token
      * @return salt
      */
@@ -340,4 +356,38 @@ public class AuthDB {
     }
 
 
+    /**
+     * returns user base on username
+     *
+     * @param con DB connection
+     * @param uid username id
+     * @return user object
+     */
+    public static User getUserByUID(Connection con, String uid) {
+
+        User user = null;
+        try {
+            PreparedStatement stmt = con.prepareStatement("select * from  users where lower(username) like lower(?) and enabled=true");
+            stmt.setString(1, uid);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                user = new User();
+                user.setId(rs.getLong("id"));
+                user.setFirstNm(rs.getString("first_nm"));
+                user.setLastNm(rs.getString("last_nm"));
+                user.setEmail(rs.getString("email"));
+                user.setUsername(rs.getString("username"));
+                user.setUserType(rs.getString("user_type"));
+                user.setProfileList(UserProfileDB.getProfilesByUser(con, user.getId()));
+            }
+            DBUtils.closeRs(rs);
+            DBUtils.closeStmt(stmt);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return user;
+    }
 }
