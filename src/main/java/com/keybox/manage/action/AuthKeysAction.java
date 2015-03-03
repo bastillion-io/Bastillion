@@ -311,8 +311,12 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 			} else if (PublicKeyDB.isKeyRegistered(userId, publicKey)) {
 				addActionError("This key has already been registered under selected profile.");
 				addFieldError("publicKey.publicKey", "Invalid");
-
+				
+			} else if (PublicKeyDB.isKeyExists(userId, publicKey)) {
+				addActionError("This key has already been registered unter a other User or key deleted.");
+				addFieldError("publicKey.publicKey", "Invalid");
 			}
+				
 		}
 
 		if (!this.getFieldErrors().isEmpty()) {
