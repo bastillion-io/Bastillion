@@ -129,7 +129,7 @@
                 </s:else>
             </tr>
             </s:if>
-             <s:if test="%{#session.userType==\"M\"}">
+            <s:if test="%{@com.keybox.manage.util.SessionOutputUtil@enableAudit && #session.userType==\"M\"}">
              <tr>
                 <td>
                     <a href="../manage/viewSessions.action">Audit Sessions</a>
@@ -139,6 +139,7 @@
                 </td>
             </tr>
             </s:if>
+            <s:if test="%{!@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled || #session.authType==\"BASIC\"}">
             <tr>
                 <td>
                   <a href="../admin/setPassword.action">Change Password</a>
@@ -147,6 +148,7 @@
                     Change administrative login to application.
                 </td>
             </tr>
+            </s:if>
             </tbody>
         </table>
     </div>

@@ -19,6 +19,7 @@ import com.keybox.common.util.AppConfig;
 import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.db.AuthDB;
 import com.keybox.manage.model.Auth;
+import com.keybox.manage.model.User;
 import com.keybox.manage.util.OTPUtil;
 import com.keybox.manage.util.PasswordUtil;
 import com.opensymphony.xwork2.ActionSupport;
@@ -80,26 +81,33 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
         String authToken = AuthDB.login(auth);
         if (authToken != null) {
 
-            Long userId = AuthDB.getUserIdByAuthToken(authToken);
-            String sharedSecret = null;
-            if (otpEnabled) {
-                sharedSecret = AuthDB.getSharedSecret(userId);
-                if (StringUtils.isNotEmpty(sharedSecret) && (auth.getOtpToken() == null || !OTPUtil.verifyToken(sharedSecret, auth.getOtpToken()))) {
-                    addActionError(AUTH_ERROR);
+            User user = AuthDB.getUserByAuthToken(authToken);
+            if(user!=null) {
+                String sharedSecret = null;
+                if (otpEnabled) {
+                    sharedSecret = AuthDB.getSharedSecret(user.getId());
+                    if (StringUtils.isNotEmpty(sharedSecret) && (auth.getOtpToken() == null || !OTPUtil.verifyToken(sharedSecret, auth.getOtpToken()))) {
+                        addActionError(AUTH_ERROR);
+                        return INPUT;
+                    }
+                }
+                //check to see if admin has any assigned profiles
+                if(!User.MANAGER.equals(user.getUserType()) && (user.getProfileList()==null || user.getProfileList().size()<=0)){
+                    addActionError("Authentication Failed : There are no profiles assigned to this account");
                     return INPUT;
                 }
-            }
 
-            AuthUtil.setAuthToken(servletRequest.getSession(), authToken);
-            AuthUtil.setUserId(servletRequest.getSession(), userId);
-            AuthUtil.setTimeout(servletRequest.getSession());
+                AuthUtil.setAuthToken(servletRequest.getSession(), authToken);
+                AuthUtil.setUserId(servletRequest.getSession(), user.getId());
+                AuthUtil.setAuthType(servletRequest.getSession(), user.getAuthType());
+                AuthUtil.setTimeout(servletRequest.getSession());
 
-            //for first time login redirect to set OTP
-            if (otpEnabled && StringUtils.isEmpty(sharedSecret)) {
-                return "otp";
-            }
-            else if ("changeme".equals(auth.getPassword())) {
-                retVal = "change_password";
+                //for first time login redirect to set OTP
+                if (otpEnabled && StringUtils.isEmpty(sharedSecret)) {
+                    return "otp";
+                } else if ("changeme".equals(auth.getPassword())  && Auth.AUTH_BASIC.equals(user.getAuthType())) {
+                    retVal = "change_password";
+                }
             }
 
         } else {

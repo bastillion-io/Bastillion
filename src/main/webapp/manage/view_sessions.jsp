@@ -74,7 +74,6 @@
 
     <h3>Audit Sessions</h3>
 
-    <s:if test="enableAudit=='true'">
            Audit sessions below
                 <table style="min-width:0px">
                     <tr>
@@ -159,10 +158,6 @@
         <s:else>
             <p class="error">No session audits available</p>
         </s:else>
-    </s:if>
-    <s:else>
-        <p class="error">Session audits are disabled.<br/>Edit the KeyBox configuration properties to enable.</p>
-    </s:else>
 
 
 </div>
