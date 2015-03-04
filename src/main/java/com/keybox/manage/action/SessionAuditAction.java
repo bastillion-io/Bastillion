@@ -15,7 +15,6 @@
  */
 package com.keybox.manage.action;
 
-import com.keybox.common.util.AppConfig;
 import com.keybox.manage.db.SessionAuditDB;
 import com.keybox.manage.db.SystemDB;
 import com.keybox.manage.db.UserDB;
@@ -42,7 +41,6 @@ public class SessionAuditAction extends ActionSupport implements ServletResponse
     Long hostSystemId;
     SessionAudit sessionAudit;
     HttpServletResponse servletResponse;
-    String enableAudit = AppConfig.getProperty("enableAudit");
     List<HostSystem> systemList= SystemDB.getSystemSet(new SortedSet(SystemDB.SORT_BY_NAME)).getItemList();
     List<User> userList= UserDB.getUserSet(new SortedSet(SessionAuditDB.SORT_BY_USERNAME)).getItemList();
 
@@ -149,12 +147,5 @@ public class SessionAuditAction extends ActionSupport implements ServletResponse
         this.hostSystemId = hostSystemId;
     }
 
-    public String getEnableAudit() {
-        return enableAudit;
-    }
-
-    public void setEnableAudit(String enableAudit) {
-        this.enableAudit = enableAudit;
-    }
 
 }

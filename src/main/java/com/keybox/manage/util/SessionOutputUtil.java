@@ -32,7 +32,7 @@ public class SessionOutputUtil {
 
 
     private static Map<Long, UserSessionsOutput> userSessionsOutputMap = new ConcurrentHashMap<Long, UserSessionsOutput>();
-    private static String enableAudit = AppConfig.getProperty("enableAudit");
+    public static boolean enableAudit = "true".equals(AppConfig.getProperty("enableAudit"));
 
 
     /**
@@ -131,7 +131,7 @@ public class SessionOutputUtil {
                         if (StringUtils.isNotEmpty(sessionOutput.getOutput())) {
                             outputList.add(sessionOutput);
 
-                            if ("true".equals(enableAudit)) {
+                            if (enableAudit) {
                                 SessionAuditDB.insertTerminalLog(con, sessionOutput);
                             }
 
