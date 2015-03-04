@@ -139,6 +139,7 @@
                 </td>
             </tr>
             </s:if>
+            <s:if test="%{!@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled || #session.authType==\"BASIC\"}">
             <tr>
                 <td>
                   <a href="../admin/setPassword.action">Change Password</a>
@@ -147,6 +148,7 @@
                     Change administrative login to application.
                 </td>
             </tr>
+            </s:if>
             </tbody>
         </table>
     </div>
