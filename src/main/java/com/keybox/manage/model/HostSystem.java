@@ -32,6 +32,7 @@ public class HostSystem {
     String statusCd=INITIAL_STATUS;
     String errorMsg;
     List<String> publicKeyList;
+    boolean enable = true;
 
     public static final String INITIAL_STATUS="INITIAL";
     public static final String AUTH_FAIL_STATUS="AUTHFAIL";
