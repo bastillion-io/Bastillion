@@ -119,7 +119,9 @@
                             <td>
                             <s:select name="sortedSet.filterMap['%{@com.keybox.manage.db.PublicKeyDB@FILTER_BY_ENABLED}']"
                                       class="view_frm_select"
-                                      list="#{true:'Enabled', false:'Disabled'}"/>
+                                      list="#{'true':'Enabled', 'false':'Disabled' }"
+                                      headerKey=""
+                                      headerValue="-Select Status-" />
                             </td>
                             <td>
                                 <div id="view_btn" class="btn btn-default">Filter</div>
