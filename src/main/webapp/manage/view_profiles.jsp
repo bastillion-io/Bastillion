@@ -91,6 +91,7 @@
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
 
+            <div class="scrollWrapper">
             <table class="table-striped scrollableTable" >
                 <thead>
 
@@ -127,6 +128,7 @@
                 </s:iterator>
                 </tbody>
             </table>
+            </div>
         </s:if>
 
         <button class="btn btn-default add_btn spacer spacer-bottom" data-toggle="modal" data-target="#add_dialog">Add Profile</button>

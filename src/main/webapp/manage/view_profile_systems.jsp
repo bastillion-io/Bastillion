@@ -98,11 +98,9 @@
             <s:form action="assignSystemsToProfile" theme="simple">
                 <s:hidden name="profile.id"/>
 
+           <div class="scrollWrapper">
                 <table class="table-striped scrollableTable" style="min-width:50%">
                     <thead>
-
-
-
 
                     <tr>
                         <th><s:checkbox name="systemSelectAll" cssClass="systemSelect" theme="simple"/></th>
@@ -133,6 +131,7 @@
                     </s:iterator>
                     </tbody>
                 </table>
+               </div>
             </s:form>
             <div id="assign_sys" class="btn btn-default assign_sys_btn spacer spacer-bottom">Assign</div>
         </s:if>

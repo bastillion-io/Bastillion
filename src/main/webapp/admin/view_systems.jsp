@@ -129,6 +129,7 @@
   	             <s:if test="script!=null">
                         <s:hidden name="script.id"/>
                  </s:if>
+                <div class="scrollWrapper">
                 <table class="table-striped scrollableTable" style="min-width:50%">
                     <thead>
 
@@ -163,6 +164,7 @@
                     </s:iterator>
                     </tbody>
                 </table>
+                </div>
 	    </s:form>
         </s:if>
         <s:if test="script!=null && sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">

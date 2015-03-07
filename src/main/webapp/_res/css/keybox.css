@@ -332,3 +332,20 @@ a.btn {
     margin-right:30px;
     padding:6px 18px;
 }
+
+.scrollWrapperActive {
+    overflow-y: scroll;
+    height:450px;
+    display: inline-block;
+}
+.scrollableTable {
+    min-width: 700px;
+}
+.scrollableTable th {
+    background-color: #e0e0e0;
+}
+table.floatThead-table {
+    border-top: none;
+    border-bottom: none;
+    background-color: #FFF;
+}

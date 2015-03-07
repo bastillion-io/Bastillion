@@ -103,7 +103,8 @@
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
 
-            <table class="table-striped scrollableTable" style="min-width: 85%">
+            <div class="scrollWrapper">
+            <table class="table-striped scrollableTable">
                 <thead>
 
 
@@ -165,6 +166,7 @@
                 </tbody>
 
             </table>
+            </div>
 
         </s:if>
 
