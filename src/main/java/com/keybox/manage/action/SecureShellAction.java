@@ -149,8 +149,7 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
 
 
         Long userId = AuthUtil.getUserId(servletRequest.getSession());
-        //exit any previous terms
-        exitTerms();
+
         if (systemSelectId != null && !systemSelectId.isEmpty()) {
             //check to see if user has perms to access selected systems
             if (!Auth.MANAGER.equals(AuthUtil.getUserType(servletRequest.getSession()))) {
@@ -209,12 +208,21 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
     }
 
 
-    @Action(value = "/admin/clone")
-    public String clone() {
+    @Action(value = "/admin/duplicateSession")
+    public String duplicateSession() {
+        //todo need to clean this up!!!!
+        Long userId = AuthUtil.getUserId(servletRequest.getSession());
+        if (systemSelectId != null && !systemSelectId.isEmpty()) {
+            //check to see if user has perms to access selected systems
+            if (!Auth.MANAGER.equals(AuthUtil.getUserType(servletRequest.getSession()))) {
+                systemSelectId = SystemDB.checkSystemPerms(systemSelectId, userId);
+            }
 
+            SystemStatusDB.setInitialSystemStatus(systemSelectId, userId);
+            pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
 
-        System.out.println(selectSystemsForCompositeTerms());
-        System.out.println(createTerms());
+        }
+        createTerms();
         return null;
 
 

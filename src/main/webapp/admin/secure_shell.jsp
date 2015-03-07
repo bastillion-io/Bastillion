@@ -399,10 +399,33 @@
 
             }
 
+            var termCount=<s:property value="systemList.size"/>;
             $('.clone').click(function() {
                 var id = $(this).attr("id").replace("clone_", "");
-                alert(id);
-                $.ajax({url: '../admin/clone.action?systemSelectId=' + id});
+                
+                var instanceId=$(this).closest(".run_cmd").attr("id").replace("run_cmd_", "");
+                
+                
+                $.ajax({url: '../admin/duplicateSession.action?systemSelectId=' + id});
+                
+                termCount++;
+                var clone = $("#run_cmd_"+id).clone(true, true);
+                clone.attr("id", "run_cmd_"+ termCount);
+                clone.find(".output").remove();
+
+                $("<div id='output_"+termCount+"' class='output' />").appendTo(clone.find(".term"));
+                        
+                clone.insertAfter($("#run_cmd_"+instanceId));
+
+                termMap[termCount] = new Terminal({
+                    cols: Math.floor($('.output:first').innerWidth()/7.2981), rows: 24,
+                    screenKeys: false,
+                    useStyle: true,
+                    cursorBlink: true,
+                    convertEol: true
+                });
+                termMap[termCount].open($('#output_'+termCount));
+
             });
 
 
@@ -503,7 +526,7 @@
 
             <div id="run_cmd_<s:property value="instanceId"/>" class="run_cmd_active run_cmd">
                 <h6 class="term-header" style="white-space: nowrap"><s:property value="displayLabel"/>
-                    <span id="clone_<s:property value="id"/>" class="clone" style="float:right" >clone</span>
+                    <a id="clone_<s:property value="id"/>" class="clone" >Duplicate Session</a>
                 </h6>
 
 
