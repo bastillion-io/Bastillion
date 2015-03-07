@@ -1,3 +1,4 @@
+<%@page import="com.keybox.common.util.AppConfig"%>
 <%
     /**
      * Copyright 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
@@ -269,12 +270,18 @@
                 }
             } );
 
+<% // By default double clicking a window resets it to its default position.
+   // Provide an option to disable this behavior, as double clicking is a very
+   // common action to select words in a shell.
+   String doubleClickResize = AppConfig.getProperty("doubleClickResize");
+   if (doubleClickResize == null || doubleClickResize.length() == 0 || Boolean.valueOf(doubleClickResize)) { %>
              $(".run_cmd").dblclick(function (event, uii) {
                  var id = $(this).attr("id").replace("run_cmd_", "");
                  $(this).width("48%");
                  $(this).height(346+y_offset);
                  resize($(this));
              });
+<% } %>
 
 
             function resize(element) {
