@@ -5,14 +5,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class UserSessionsOutput {
 
-    Map<Long, StringBuilder> sessionOutputMap = new ConcurrentHashMap<Long,StringBuilder>();
+    Map<Integer, StringBuilder> sessionOutputMap = new ConcurrentHashMap<Integer,StringBuilder>();
 
 
-    public Map<Long, StringBuilder> getSessionOutputMap() {
+    public Map<Integer, StringBuilder> getSessionOutputMap() {
         return sessionOutputMap;
     }
 
-    public void setSessionOutputMap(Map<Long, StringBuilder> sessionOutputMap) {
+    public void setSessionOutputMap(Map<Integer, StringBuilder> sessionOutputMap) {
         this.sessionOutputMap = sessionOutputMap;
     }
 }

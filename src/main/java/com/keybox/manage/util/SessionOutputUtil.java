@@ -16,6 +16,7 @@
 package com.keybox.manage.util;
 
 import com.keybox.common.util.AppConfig;
+import com.keybox.manage.action.SecureShellAction;
 import com.keybox.manage.db.SessionAuditDB;
 import com.keybox.manage.model.SessionOutput;
 import com.keybox.manage.model.UserSessionsOutput;
@@ -53,13 +54,13 @@ public class SessionOutputUtil {
      * removes session output for host system
      *
      * @param sessionId    session id
-     * @param hostSystemId host system id
+     * @param instanceId id of host system instance
      */
-    public static void removeOutput(Long sessionId, Long hostSystemId) {
+    public static void removeOutput(Long sessionId, Integer instanceId) {
 
         UserSessionsOutput userSessionsOutput = userSessionsOutputMap.get(sessionId);
         if (userSessionsOutput != null) {
-            userSessionsOutput.getSessionOutputMap().remove(hostSystemId);
+            userSessionsOutput.getSessionOutputMap().remove(instanceId);
         }
     }
 
@@ -76,7 +77,7 @@ public class SessionOutputUtil {
             userSessionsOutputMap.put(sessionId, new UserSessionsOutput());
             userSessionsOutput = userSessionsOutputMap.get(sessionId);
         }
-        userSessionsOutput.getSessionOutputMap().put(sessionOutput.getHostSystemId(), new StringBuilder());
+        userSessionsOutput.getSessionOutputMap().put(sessionOutput.getInstanceId(), new StringBuilder());
 
 
     }
@@ -86,17 +87,17 @@ public class SessionOutputUtil {
      * adds a new output
      *
      * @param sessionId    session id
-     * @param hostSystemId host system id
+     * @param instanceId id of host system instance
      * @param value        Array that is the source of characters
      * @param offset       The initial offset
      * @param count        The length
      */
-    public static void addToOutput(Long sessionId, Long hostSystemId, char value[], int offset, int count) {
+    public static void addToOutput(Long sessionId, Integer instanceId, char value[], int offset, int count) {
 
 
         UserSessionsOutput userSessionsOutput = userSessionsOutputMap.get(sessionId);
         if (userSessionsOutput != null) {
-            userSessionsOutput.getSessionOutputMap().get(hostSystemId).append(value, offset, count);
+            userSessionsOutput.getSessionOutputMap().get(instanceId).append(value, offset, count);
         }
 
     }
@@ -116,7 +117,8 @@ public class SessionOutputUtil {
         if (userSessionsOutput != null) {
 
 
-            for (Long key : userSessionsOutput.getSessionOutputMap().keySet()) {
+
+            for (Integer key : userSessionsOutput.getSessionOutputMap().keySet()) {
 
                 //get output chars and set to output
                 try {
@@ -124,7 +126,7 @@ public class SessionOutputUtil {
                     if (sb != null) {
                         SessionOutput sessionOutput = new SessionOutput();
                         sessionOutput.setSessionId(sessionId);
-                        sessionOutput.setHostSystemId(key);
+                        sessionOutput.setInstanceId(key);
 
                         sessionOutput.setOutput(sb.toString());
 
@@ -132,6 +134,9 @@ public class SessionOutputUtil {
                             outputList.add(sessionOutput);
 
                             if (enableAudit) {
+
+                                //todo figure a way to do this better!!
+                                sessionOutput.setHostSystemId(SecureShellAction.getUserSchSessionMap().get(sessionId).getSchSessionMap().get(key).getHostSystem().getId());
                                 SessionAuditDB.insertTerminalLog(con, sessionOutput);
                             }
 

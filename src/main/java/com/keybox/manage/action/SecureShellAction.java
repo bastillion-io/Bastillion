@@ -208,6 +208,18 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         return null;
     }
 
+
+    @Action(value = "/admin/clone")
+    public String clone() {
+
+
+        System.out.println(selectSystemsForCompositeTerms());
+        System.out.println(createTerms());
+        return null;
+
+
+    }
+
     @Action(value = "/admin/setPtyType")
     public String setPtyType() {
 
@@ -242,7 +254,7 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         if (userSchSessionMap != null && !userSchSessionMap.isEmpty() && userSchSessionMap.get(sessionId)!=null) {
 
             //get user sessions
-            Map<Long, SchSession> schSessionMap = userSchSessionMap.get(sessionId).getSchSessionMap();
+            Map<Integer, SchSession> schSessionMap = userSchSessionMap.get(sessionId).getSchSessionMap();
 
 
             for (SchSession schSession : schSessionMap.values()) {

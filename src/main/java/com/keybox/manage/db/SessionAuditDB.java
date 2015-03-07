@@ -233,11 +233,12 @@ public class SessionAuditDB {
 
         try {
 
-            if (sessionOutput != null && sessionOutput.getSessionId() != null && sessionOutput.getHostSystemId() != null && sessionOutput.getOutput() != null && !sessionOutput.getOutput().equals("")) {
+            if (sessionOutput != null && sessionOutput.getSessionId() != null && sessionOutput.getInstanceId() != null && sessionOutput.getOutput() != null && !sessionOutput.getOutput().equals("")) {
                 //insert
                 PreparedStatement stmt = con.prepareStatement("insert into terminal_log (session_id, system_id, output) values(?,?,?)");
                 stmt.setLong(1, sessionOutput.getSessionId());
-                stmt.setLong(2, sessionOutput.getHostSystemId());
+                stmt.setLong(2, sessionOutput.getInstanceId());
+                //todo host system id`
                 stmt.setString(3, sessionOutput.getOutput());
                 stmt.execute();
                 DBUtils.closeStmt(stmt);

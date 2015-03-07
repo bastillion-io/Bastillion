@@ -398,7 +398,10 @@ public class SSHUtil {
 
 		JSch jsch = new JSch();
 
+		int instanceId = userSessionMap.get(sessionId)!=null ? userSessionMap.get(sessionId).getSchSessionMap().size()+1 : 1;
 		hostSystem.setStatusCd(HostSystem.SUCCESS_STATUS);
+		hostSystem.setInstanceId(instanceId);
+
 
 		SchSession schSession = null;
 
@@ -436,6 +439,7 @@ public class SSHUtil {
 			//new session output
 			SessionOutput sessionOutput = new SessionOutput();
 			sessionOutput.setHostSystemId(hostSystem.getId());
+			sessionOutput.setInstanceId(instanceId);
 			sessionOutput.setSessionId(sessionId);
 
 
@@ -464,6 +468,7 @@ public class SSHUtil {
 
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			hostSystem.setErrorMsg(e.getMessage());
 			if (e.getMessage().toLowerCase().contains("userauth fail")) {
 				hostSystem.setStatusCd(HostSystem.PUBLIC_KEY_FAIL_STATUS);
@@ -487,10 +492,10 @@ public class SSHUtil {
 			if (userSchSessions == null) {
 				userSchSessions = new UserSchSessions();
 			}
-			Map<Long, SchSession> schSessionMap = userSchSessions.getSchSessionMap();
+			Map<Integer, SchSession> schSessionMap = userSchSessions.getSchSessionMap();
 
 			//add server information
-			schSessionMap.put(hostSystem.getId(), schSession);
+			schSessionMap.put(instanceId, schSession);
 			userSchSessions.setSchSessionMap(schSessionMap);
 			//add back to map
 			userSessionMap.put(sessionId, userSchSessions);

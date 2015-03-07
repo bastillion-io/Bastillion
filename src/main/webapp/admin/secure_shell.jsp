@@ -321,7 +321,7 @@
                 var json = jQuery.parseJSON(e.data);
                 $.each(json, function (key, val) {
                     if (val.output != '') {
-                        termMap[val.hostSystemId].write(val.output);
+                        termMap[val.instanceId].write(val.output);
                     }
                 });
 
@@ -398,6 +398,12 @@
                 }
 
             }
+
+            $('.clone').click(function() {
+                var id = $(this).attr("id").replace("clone_", "");
+                alert(id);
+                $.ajax({url: '../admin/clone.action?systemSelectId=' + id});
+            });
 
 
             </s:if>
@@ -494,13 +500,15 @@
 
 
         <s:iterator value="systemList">
-            <div id="run_cmd_<s:property value="id"/>" class="run_cmd_active run_cmd">
-                <h6 class="term-header" style="white-space: nowrap"><s:property value="displayLabel"/></h6>
 
+            <div id="run_cmd_<s:property value="instanceId"/>" class="run_cmd_active run_cmd">
+                <h6 class="term-header" style="white-space: nowrap"><s:property value="displayLabel"/>
+                    <span id="clone_<s:property value="id"/>" class="clone" style="float:right" >clone</span>
+                </h6>
 
 
                 <div class="term">
-                    <div id="output_<s:property value="id"/>" class="output"></div>
+                    <div id="output_<s:property value="instanceId"/>" class="output"></div>
                 </div>
             </div>
         </s:iterator>
