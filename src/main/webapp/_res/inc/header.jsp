@@ -29,7 +29,7 @@
 <script type="text/javascript">
     $(document).ready(function () {
 
-        $.ajaxSetup({cache: false});
+        $.ajaxSetup({cache: false,async: false});
 
         $(function () {
             $("a").tooltip({
@@ -61,7 +61,7 @@
             });
         });
 
-        if ($('.scrollWrapper').height() > 450) {
+        if ($('.scrollWrapper').height() >= 450) {
             
             $('.scrollWrapper').addClass('scrollWrapperActive');
             $('.scrollableTable').floatThead({

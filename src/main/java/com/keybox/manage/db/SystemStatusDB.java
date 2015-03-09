@@ -46,7 +46,7 @@ public class SystemStatusDB {
             con = DBUtils.getConn();
 
             //deletes all old systems
-            deleteAllSystemStatus(con,userId);
+            deleteAllSystemStatus(con, userId);
             for (Long hostSystemId : systemSelectIds) {
 
                 HostSystem hostSystem= new HostSystem();
@@ -55,9 +55,6 @@ public class SystemStatusDB {
 
                 //insert new status
                 insertSystemStatus(con, hostSystem, userId);
-
-
-
             }
 
         } catch (Exception e) {

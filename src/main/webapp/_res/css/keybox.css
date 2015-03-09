@@ -338,6 +338,15 @@ a.btn {
     height:450px;
     display: inline-block;
 }
+.uploadScrollWrapperActive{
+    overflow-y: scroll;
+    height:200px;
+    display: inline-block;
+}
+
+.uploadScrollableTable {
+    min-width: 600px;
+}
 .scrollableTable {
     min-width: 700px;
 }

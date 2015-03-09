@@ -15,6 +15,7 @@
  */
 package com.keybox.manage.action;
 
+import com.google.gson.Gson;
 import com.jcraft.jsch.ChannelShell;
 import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.db.*;
@@ -47,7 +48,7 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
     HostSystem pendingSystemStatus;
     String password;
     String passphrase;
-    Long id;
+    Integer id;
     List<HostSystem> systemList = new ArrayList<HostSystem>();
     Integer ptyWidth;
     Integer ptyHeight;
@@ -185,19 +186,27 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         if (SecureShellAction.getUserSchSessionMap() != null) {
             UserSchSessions userSchSessions = SecureShellAction.getUserSchSessionMap().get(sessionId);
             if (userSchSessions != null) {
-                SchSession schSession = userSchSessions.getSchSessionMap().get(id);
+                try {
+                    SchSession schSession = userSchSessions.getSchSessionMap().get(id);
 
-                //disconnect ssh session
-                schSession.getChannel().disconnect();
-                schSession.getSession().disconnect();
-                schSession.setChannel(null);
-                schSession.setSession(null);
-                schSession.setInputToChannel(null);
-                schSession.setCommander(null);
-                schSession.setOutFromChannel(null);
-                schSession = null;
-                //remove from map
-                userSchSessions.getSchSessionMap().remove(id);
+                    //disconnect ssh session
+                    if(schSession!=null) {
+                        if (schSession.getChannel() != null)
+                            schSession.getChannel().disconnect();
+                        if (schSession.getSession() != null)
+                            schSession.getSession().disconnect();
+                        schSession.setChannel(null);
+                        schSession.setSession(null);
+                        schSession.setInputToChannel(null);
+                        schSession.setCommander(null);
+                        schSession.setOutFromChannel(null);
+                        schSession = null;
+                    }
+                    //remove from map
+                    userSchSessions.getSchSessionMap().remove(id);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
 
 
@@ -212,6 +221,7 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
     public String duplicateSession() {
         //todo need to clean this up!!!!
         Long userId = AuthUtil.getUserId(servletRequest.getSession());
+
         if (systemSelectId != null && !systemSelectId.isEmpty()) {
             //check to see if user has perms to access selected systems
             if (!Auth.MANAGER.equals(AuthUtil.getUserType(servletRequest.getSession()))) {
@@ -222,7 +232,18 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
             pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
 
         }
-        createTerms();
+        //if success return instance id
+        if (SUCCESS.equals(createTerms())) {
+
+            String json = new Gson().toJson(getSystemList().size());
+            try {
+                servletResponse.getOutputStream().write(json.getBytes());
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+
+
         return null;
 
 
@@ -234,12 +255,12 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         Long sessionId = AuthUtil.getSessionId(servletRequest.getSession());
         if (SecureShellAction.getUserSchSessionMap() != null) {
             UserSchSessions userSchSessions = SecureShellAction.getUserSchSessionMap().get(sessionId);
-            if (userSchSessions != null && userSchSessions.getSchSessionMap() !=null) {
+            if (userSchSessions != null && userSchSessions.getSchSessionMap() != null) {
 
                 SchSession schSession = userSchSessions.getSchSessionMap().get(id);
 
                 ChannelShell channel = (ChannelShell) schSession.getChannel();
-                channel.setPtySize((int)Math.floor(ptyWidth / 7.2981), (int)Math.floor(ptyHeight / 14.4166), ptyWidth, ptyHeight);
+                channel.setPtySize((int) Math.floor(ptyWidth / 7.2981), (int) Math.floor(ptyHeight / 14.4166), ptyWidth, ptyHeight);
                 schSession.setChannel(channel);
 
             }
@@ -249,6 +270,7 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
 
         return null;
     }
+
     /**
      * set system list once all connections have been attempted
      *
@@ -259,7 +281,7 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
 
 
         //check user map
-        if (userSchSessionMap != null && !userSchSessionMap.isEmpty() && userSchSessionMap.get(sessionId)!=null) {
+        if (userSchSessionMap != null && !userSchSessionMap.isEmpty() && userSchSessionMap.get(sessionId) != null) {
 
             //get user sessions
             Map<Integer, SchSession> schSessionMap = userSchSessionMap.get(sessionId).getSchSessionMap();
@@ -320,11 +342,11 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         this.systemSelectId = systemSelectId;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

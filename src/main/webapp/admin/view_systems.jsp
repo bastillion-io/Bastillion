@@ -130,7 +130,7 @@
                         <s:hidden name="script.id"/>
                  </s:if>
                 <div class="scrollWrapper">
-                <table class="table-striped scrollableTable" style="min-width:50%">
+                <table class="table-striped scrollableTable">
                     <thead>
 
                     <tr>

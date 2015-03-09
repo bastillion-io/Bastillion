@@ -1,4 +1,3 @@
-<%@page import="com.keybox.common.util.AppConfig"%>
 <%
     /**
      * Copyright 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
@@ -28,6 +27,16 @@
     <script type="text/javascript">
         $(document).ready(function () {
 
+            //get instance id list from selected terminals
+            function getActiveTermsInstanceIds() {
+                var ids = [];
+                $(".run_cmd_active").each(function (index) {
+                    var id = $(this).attr("id").replace("run_cmd_", "");
+                    ids.push(id);
+                });
+                return ids;
+            }
+
 
             $('#upload_push_dialog').on('hidden.bs.modal', function () {
                 $("#upload_push_frame").attr("src", "");
@@ -40,38 +49,33 @@
                 helper: 'clone'
             });
 
-
-            $('.droppable').droppable({
-                zIndex: 10000,
-                tolerance: "touch",
-                over: function (event, ui) {
-                    $('.ui-sortable-helper').addClass('dragdropHover');
-
-                },
-                out: function (event, ui) {
-                    $('.ui-sortable-helper').removeClass('dragdropHover');
-                },
-
-                drop: function (event, ui) {
-                    var id = ui.draggable.attr("id").replace("run_cmd_", "");
-                    $.ajax({url: '../admin/disconnectTerm.action?id=' + id, cache: false});
-                    ui.draggable.remove();
-
-                }
-            });
             //submit
             $(".submit_btn").button().click(function () {
                 <s:if test="pendingSystemStatus!=null">
-                    $(this).parents('.modal').find('form').submit();
+                $(this).parents('.modal').find('form').submit();
                 </s:if>
                 $(this).parents('.modal').modal('hide');
             });
+            
             //close all forms
             $(".cancel_btn").button().click(function () {
                 window.location = 'getNextPendingSystemForTerms.action?pendingSystemStatus.id=<s:property value="pendingSystemStatus.id"/>&script.id=<s:if test="script!=null"><s:property value="script.id"/></s:if>';
             });
 
-
+            //disconnect terminals and remove from view
+            $('#disconnect').click(function(){
+                var ids = getActiveTermsInstanceIds();
+                for(var i=0;i<ids.length;i++) {
+                    var id=ids[i];
+                    $.ajax({url: '../admin/disconnectTerm.action?id=' + id, cache: false});
+                    $('#run_cmd_'+id).remove();
+                    termMap[id].destroy();
+                    termMap[id]==null;
+                    delete termMap[id];
+                }
+                
+            });
+            
             //if terminal window toggle active for commands
             $(".run_cmd").click(function () {
 
@@ -88,20 +92,24 @@
 
             });
 
+            //select all
             $('#select_all').click(function () {
                 $(".run_cmd").addClass('run_cmd_active');
             });
 
 
+            //upload frame dialog
             $('#upload_push').click(function () {
 
 
-                //get id list from selected terminals
-                var ids = [];
+                var ids=[];
                 $(".run_cmd_active").each(function (index) {
-                    var id = $(this).attr("id").replace("run_cmd_", "");
-                    ids.push(id);
+                    var id = $(this).find(".host").attr("data-hostId");
+                    if (ids.indexOf(id)==-1) {
+                        ids.push(id);
+                    }
                 });
+                
                 var idListStr = '?action=upload';
                 ids.forEach(function (entry) {
                     idListStr = idListStr + '&idList=' + entry;
@@ -153,7 +161,7 @@
                 termFocus = true;
             });
 
-            $(".output").mouseover().mousedown(function () {
+            $(".output").click().mouseover().mousedown(function () {
                 termFocus = false;
             });
 
@@ -162,18 +170,12 @@
                 if (termFocus) {
                     var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
 
-                    var idList = [];
-                    $(".run_cmd_active").each(function (index) {
-                        var id = $(this).attr("id").replace("run_cmd_", "");
-                        idList.push(id);
-                    });
-
                     if (String.fromCharCode(keyCode) && String.fromCharCode(keyCode) != ''
                             && !keys[91] && !keys[93] && !keys[224] && !keys[27]
                             && !keys[37] && !keys[38] && !keys[39] && !keys[40]
                             && !keys[13] && !keys[8] && !keys[9] && !keys[17] && !keys[46]) {
                         var cmdStr = String.fromCharCode(keyCode);
-                        connection.send(JSON.stringify({id: idList, command: cmdStr}));
+                        connection.send(JSON.stringify({id: getActiveTermsInstanceIds(), command: cmdStr}));
                     }
 
                 }
@@ -199,13 +201,7 @@
                     //17 - CTRL
                     //46 - DEL
                     if (keys[27] || keys[37] || keys[38] || keys[39] || keys[40] || keys[13] || keys[8] || keys[9] || keys[17] || keys[46]) {
-                        var idList = [];
-                        $(".run_cmd_active").each(function (index) {
-                            var id = $(this).attr("id").replace("run_cmd_", "");
-                            idList.push(id);
-                        });
-
-                        connection.send(JSON.stringify({id: idList, keyCode: keyCode}));
+                        connection.send(JSON.stringify({id: getActiveTermsInstanceIds(), keyCode: keyCode}));
                     }
                 }
 
@@ -235,69 +231,53 @@
                 $('#dummy').focus();
                 $('#dummy').val('');
                 setTimeout(function () {
-                    var idList = [];
-                    $(".run_cmd_active").each(function (index) {
-                        var id = $(this).attr("id").replace("run_cmd_", "");
-                        idList.push(id);
-                    });
                     var cmdStr = $('#dummy').val();
-                    connection.send(JSON.stringify({id: idList, command: cmdStr}));
+                    connection.send(JSON.stringify({id: getActiveTermsInstanceIds(), command: cmdStr}));
                 }, 100);
             });
 
 
             var termMap = {};
 
+            var y_offset = $('.run_cmd:first').innerHeight() - $('.run_cmd').find(".output:first").innerHeight();
 
-            $(".output").each(function (index) {
-                var id = $(this).attr("id").replace("output_", "");
-                termMap[id] = new Terminal({
-                    cols: Math.floor($('.output:first').innerWidth()/7.2981), rows: 24,
-                    screenKeys: false,
-                    useStyle: true,
-                    cursorBlink: true,
-                    convertEol: true
-                });
-                termMap[id].open($(this));
-            });
-
-            var y_offset=$('.run_cmd:first').innerHeight() - $('.run_cmd').find(".output:first").innerHeight();
-
-            $(".run_cmd").resizable( {
-                ghost:true,
-                stop: function(event, ui){
+            $(".run_cmd").resizable({
+                ghost: true,
+                stop: function (event, ui) {
                     resize($(this));
                 }
-            } );
+            });
 
-<% // By default double clicking a window resets it to its default position.
-   // Provide an option to disable this behavior, as double clicking is a very
-   // common action to select words in a shell.
-   String doubleClickResize = AppConfig.getProperty("doubleClickResize");
-   if (doubleClickResize == null || doubleClickResize.length() == 0 || Boolean.valueOf(doubleClickResize)) { %>
-             $(".run_cmd").dblclick(function (event, uii) {
-                 var id = $(this).attr("id").replace("run_cmd_", "");
-                 $(this).width("48%");
-                 $(this).height(346+y_offset);
-                 resize($(this));
-             });
-<% } %>
+            $("#reset_size").click(function () {
+                var ids = getActiveTermsInstanceIds();
+                for(var i=0;i<ids.length;i++) {
+                    $("#run_cmd_"+ids[i]).width("48%");
+                    $("#run_cmd_"+ids[i]).height(346 + y_offset);
+                    resize($("#run_cmd_"+ids[i]));
+                }
+                
+            });
 
 
             function resize(element) {
                 var id = element.attr("id").replace("run_cmd_", "");
-                var width = element.find(".output:first").innerWidth();
-                var height= element.innerHeight()-y_offset;
 
-                termMap[id].resize(Math.floor(width/7.2981), Math.floor(height/14.4166));
+                if (termMap[id]) {
+                    var width = $('#run_cmd_'+id).find(".output:first").innerWidth();
+                    var height = $('#run_cmd_'+id).innerHeight() - y_offset;
 
-                $.ajax({url: '../admin/setPtyType.action?id=' + id + '&ptyWidth=' + width + '&ptyHeight='+ height, cache: false});
+                    termMap[id].resize(Math.floor(width / 7.2981), Math.floor(height / 14.4166));
+
+                    $.ajax({
+                        url: '../admin/setPtyType.action?id=' + id + '&ptyWidth=' + width + '&ptyHeight=' + height,
+                        cache: false
+                    });
+                }
             }
 
-            //resize all elements
-            $(".run_cmd").each(function (index) {
-                resize($(this));
-            });
+            
+            
+               
 
 
             var loc = window.location, ws_uri;
@@ -321,11 +301,40 @@
                 var json = jQuery.parseJSON(e.data);
                 $.each(json, function (key, val) {
                     if (val.output != '') {
-                        termMap[val.instanceId].write(val.output);
+                        if(!termMap[val.instanceId]) {
+                            createTermMap(val.instanceId, val.output);
+                        }else {
+                            termMap[val.instanceId].write(val.output);
+                        }
                     }
+                        
                 });
 
+                
             };
+            
+            function  createTermMap(id, output){
+
+                if($("#run_cmd_" + id).find('.output').length == 0) {
+                    setTimeout(createTermMap(id,output), 1000)
+                }else {
+                    termMap[id] = new Terminal({
+                        cols: Math.floor($('.output:first').innerWidth() / 7.2981), rows: 24,
+                        screenKeys: false,
+                        useStyle: true,
+                        cursorBlink: true,
+                        convertEol: true
+                    });
+                    termMap[id].open($("#run_cmd_" + id).find('.output'));
+                    
+                    resize($("#run_cmd_" + id));
+                    
+                    termMap[id].write(output);
+
+                }
+                
+            }
+          
 
             $('#match_btn').unbind().click(function () {
                 $('#match_frm').submit();
@@ -342,7 +351,6 @@
             function runRegExMatch() {
 
                 if ($('#match_btn').hasClass('btn-success')) {
-
                     $('#match_btn').addClass('btn-danger');
                     $('#match_btn').removeClass('btn-success');
                     $('#match_btn').text("Stop");
@@ -388,45 +396,58 @@
 
 
                     }, 5000);
-
-
                 } else {
                     $('#match_btn').addClass('btn-success');
                     $('#match_btn').removeClass('btn-danger');
                     $('#match_btn').text("Start");
                     clearInterval(matchFunction)
                 }
-
             }
 
-            var termCount=<s:property value="systemList.size"/>;
-            $('.clone').click(function() {
-                var id = $(this).attr("id").replace("clone_", "");
-                
-                var instanceId=$(this).closest(".run_cmd").attr("id").replace("run_cmd_", "");
-                
-                
-                $.ajax({url: '../admin/duplicateSession.action?systemSelectId=' + id});
-                
-                termCount++;
-                var clone = $("#run_cmd_"+id).clone(true, true);
-                clone.attr("id", "run_cmd_"+ termCount);
-                clone.find(".output").remove();
+            //function clones terminals based on active
+            var newInstanceId=-1;
+            $('#dup_session').click(function () {
+                var instanceIds = getActiveTermsInstanceIds();
+                for (var i = 0; i < instanceIds.length; i++) {
 
-                $("<div id='output_"+termCount+"' class='output' />").appendTo(clone.find(".term"));
+                    var instanceId = instanceIds[i];
+                    var hostId=$('#run_cmd_'+instanceId).find(".host").attr("data-hostId");
+
+                    //call server to create instances - returned the new cloned instance id
+                    $.getJSON('../admin/duplicateSession.action?systemSelectId=' + hostId, function (data) {
+                        newInstanceId= parseInt(data);
+                    });
+
+
+                    if (newInstanceId!=null && newInstanceId >= 1) {
+
+                        $("#run_cmd_" + instanceId).resizable('destroy');
+
+                        var clone = $("#run_cmd_" + instanceId).clone(true, true);
+                        clone.attr("id", "run_cmd_" + newInstanceId);
+                        clone.find(".output").remove();
+
+                        $("<div id='output_" + newInstanceId + "' class='output' />").appendTo(clone.find(".term"));
+
+                        clone.insertAfter($("#run_cmd_" + instanceId));
                         
-                clone.insertAfter($("#run_cmd_"+instanceId));
 
-                termMap[termCount] = new Terminal({
-                    cols: Math.floor($('.output:first').innerWidth()/7.2981), rows: 24,
-                    screenKeys: false,
-                    useStyle: true,
-                    cursorBlink: true,
-                    convertEol: true
-                });
-                termMap[termCount].open($('#output_'+termCount));
+                        $("#run_cmd_" + newInstanceId+",#run_cmd_" + instanceId ).resizable({
+                            ghost: true,
+                            stop: function (event, ui) {
+                                resize($(this));
+                            }
+                        });
+
+                    
+
+
+                    }
+                }
 
             });
+           //default to active
+           $(".run_cmd").addClass('run_cmd_active');
 
 
             </s:if>
@@ -438,9 +459,6 @@
     </script>
 
     <style>
-        .dragdropHover {
-            background-color: red;
-        }
 
         .align-right {
             padding: 10px 2px 10px 10px;
@@ -466,7 +484,8 @@
 
         <div class="navbar-header">
             <div class="navbar-brand">
-                <div class="nav-img"><img src="<%= request.getContextPath() %>/img/keybox_50x38.png" alt="keybox"/></div>
+                <div class="nav-img"><img src="<%= request.getContextPath() %>/img/keybox_50x38.png" alt="keybox"/>
+                </div>
                 KeyBox
             </div>
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -484,7 +503,16 @@
                     <li><a id="select_all" href="#"
                            title="Use CMD-Click or CTRL-Click to select multiple individual terminals">Select
                         All</a></li>
-                    <li><a id="upload_push" href="#">Upload &amp; Push</a></li>
+
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Terminal Actions<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a id="upload_push" href="#">Upload &amp; Push</a></li>
+                            <li><a id="dup_session" href="#">Duplicate Session</a></li>
+                            <li><a id="reset_size" href="#">Reset Size</a></li>
+                            <li><a id="disconnect" href="#">Disconnect</a></li>
+                        </ul>
+                    </li>
                     <li><a href="exitTerms.action">Exit Terminals</a></li>
                 </ul>
                 <div style="float:right;width:1px;">
@@ -492,10 +520,6 @@
                               style="border:none;color:#FFFFFF;width:1px;height:1px"></textarea>
                     <input type="text" name="dummy2" id="dummy2" size="1"
                            style="border:none;color:#FFFFFF;width:1px;height:1px"/>
-                </div>
-                <div class="droppable align-right">
-                    <a href="#" title="Drag terminal window here to disconnect">
-                        <img src="<%= request.getContextPath() %>/img/disconnect.png"/></a>
                 </div>
                 <div class="align-right">
                     <s:form id="match_frm" theme="simple">
@@ -525,14 +549,11 @@
         <s:iterator value="systemList">
 
             <div id="run_cmd_<s:property value="instanceId"/>" class="run_cmd_active run_cmd">
-                <h6 class="term-header" style="white-space: nowrap"><s:property value="displayLabel"/>
-                    <a id="clone_<s:property value="id"/>" class="clone" >Duplicate Session</a>
-                </h6>
-
-
+                <h6 class="term-header" style="white-space: nowrap"><s:property value="displayLabel"/></h6>
                 <div class="term">
                     <div id="output_<s:property value="instanceId"/>" class="output"></div>
                 </div>
+                <div data-hostId="<s:property value="id"/>" class="host"></div>
             </div>
         </s:iterator>
 

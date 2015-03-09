@@ -32,11 +32,20 @@
                 $('#push').submit();
             });
 
-            $('.uploadTable').tableScroll({height:150, width:435});
-            
+            if ($('.uploadScrollWrapper').height() >= 200) {
+
+                $('.uploadScrollWrapper').addClass('uploadScrollWrapperActive');
+                $('.uploadScrollableTable').floatThead({
+                    scrollContainer: function ($table) {
+                        return $table.closest(".uploadScrollWrapper");
+                    }
+                });
+            }
+            $(".uploadScrollableTable tr:even").css("background-color", "#e0e0e0");
+
             <s:if test="pendingSystemStatus!=null">
             //set scroll
-            var container = $('.tablescroll_wrapper'), scrollTo = $('#status_<s:property value="pendingSystemStatus.id"/>');
+            var container = $('.uploadScrollWrapper'), scrollTo = $('#status_<s:property value="pendingSystemStatus.id"/>');
             container.scrollTop(scrollTo.offset().top - container.offset().top + container.scrollTop() - 55);
             </s:if>
             <s:if test="currentSystemStatus!=null && currentSystemStatus.statusCd=='GENERICFAIL'">
@@ -65,18 +74,17 @@
 
 
 <s:if test="hostSystemList!= null && !hostSystemList.isEmpty()">
-    <table class="table-striped uploadTable"  style="min-width: 95%">
+    <div class="uploadScrollWrapper">
+
+    <table class="table-striped uploadScrollableTable" >
         <thead>
 
         <tr>
 
-
             <th>Display Name</th>
             <th>User</th>
             <th>Host</th>
-
             <th>Status</th>
-
         </tr>
         </thead>
         <tbody>
@@ -117,6 +125,7 @@
         </s:iterator>
         </tbody>
     </table>
+    </div>
 </s:if>
 <s:else>
     <p class="error">No systems associated with upload</p>

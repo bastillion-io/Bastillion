@@ -81,7 +81,7 @@
                             <s:form id="viewSessions" action="viewSessions" theme="simple">
                                 <s:hidden name="sortedSet.orderByDirection"/>
                                 <s:hidden name="sortedSet.orderByField"/>
-                                <table style="min-width:0px">
+                                <table>
                                 <tr>
                                     <s:if test="userList!= null && !userList.isEmpty()">
                                         <td style="padding-left:0px;">
