@@ -32,6 +32,11 @@
         });
 
     </script>
+    <style>
+        form table {
+            width:350px;
+        }
+    </style>
 
     <title>KeyBox - Set Admin Password</title>
 </head>
@@ -52,6 +57,30 @@
             <s:password name="auth.passwordConfirm" label="Confirm New Password" />
             <tr> <td>&nbsp;</td>
                 <td align="right">  <div id="change_pass_btn" class="btn btn-default" >Change Password</div></td>
+            </tr>
+        </s:form>
+
+
+
+        <h3>Set Terminal Theme</h3>
+
+        <p>Change the theme for your terminals below</p>
+        <s:form action="themeSubmit">
+
+            <s:select name="theme.theme"
+                      list="#{'#2e3436,#cc0000,#4e9a06,#c4a000,#3465a4,#75507b,#06989a,#d3d7cf,#555753,#ef2929,#8ae234,#fce94f,#729fcf,#ad7fa8,#34e2e2,#eeeeec':'Tango',
+                              '#000000,#cd0000,#00cd00,#cdcd00,#0000ee,#cd00cd,#00cdcd,#e5e5e5,#7f7f7f,#ff0000,#00ff00,#ffff00,#5c5cff,#ff00ff,#00ffff,#ffffff':'XTerm'}" 
+                      label="Terminal Theme" headerKey="" headerValue="- Select Theme -"/>
+            
+            <s:select name="theme.plane"
+                      list="#{'#f0f0f0,#555753':'Light / Dark', '#000000,#f0f0f0':'Dark / Light'}" label="Background / Foreground" headerKey=""
+                      headerValue="- Select BG / FG -"/>
+
+
+            
+
+            <tr> <td>&nbsp;</td>
+                <td align="right">  <div id="theme_btn" class="btn btn-default" >Update Theme</div></td>
             </tr>
         </s:form>
 
