@@ -169,6 +169,10 @@ div.termwrapper div h6 {
     margin: 8px 0 0 8px;
 }
 
+.term-header {
+    white-space: nowrap;
+}
+
 .top_nav {
     padding: 0;
     list-style: none;

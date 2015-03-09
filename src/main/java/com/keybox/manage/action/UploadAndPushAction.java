@@ -60,11 +60,7 @@ public class UploadAndPushAction extends ActionSupport implements ServletRequest
     public String setUpload() throws Exception {
         Long userId= AuthUtil.getUserId(servletRequest.getSession());
 
-        if (!Auth.MANAGER.equals(AuthUtil.getUserType(servletRequest.getSession()))) {
-            idList = SystemDB.checkSystemPerms(idList, userId);
-        }
-
-        SystemStatusDB.setInitialSystemStatus(idList, userId);
+        SystemStatusDB.setInitialSystemStatus(idList, userId, AuthUtil.getUserType(servletRequest.getSession()));
         return SUCCESS;
 
     }

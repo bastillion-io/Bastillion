@@ -20,6 +20,7 @@ import com.jcraft.jsch.ChannelShell;
 import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.db.*;
 import com.keybox.manage.model.*;
+import com.keybox.manage.model.SortedSet;
 import com.keybox.manage.util.SSHUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
@@ -50,6 +51,7 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
     String passphrase;
     Integer id;
     List<HostSystem> systemList = new ArrayList<HostSystem>();
+    List<HostSystem> allocatedSystemList = new ArrayList<HostSystem>();
     Integer ptyWidth;
     Integer ptyHeight;
 
@@ -109,6 +111,18 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         //set system list if no pending systems
         if (SystemStatusDB.getNextPendingSystem(userId) == null) {
             setSystemList(userId, sessionId);
+            
+            //set allocated systems for connect to
+            SortedSet sortedSet=null;
+            if (Auth.MANAGER.equals(AuthUtil.getUserType(servletRequest.getSession()))) {
+                sortedSet=SystemDB.getSystemSet(new SortedSet());
+            } else {
+                sortedSet=SystemDB.getUserSystemSet(new SortedSet(), userId);
+            }
+            if(sortedSet!=null) {
+                allocatedSystemList = (List<HostSystem>) sortedSet.getItemList();
+            }
+
         }
 
 
@@ -152,12 +166,8 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         Long userId = AuthUtil.getUserId(servletRequest.getSession());
 
         if (systemSelectId != null && !systemSelectId.isEmpty()) {
-            //check to see if user has perms to access selected systems
-            if (!Auth.MANAGER.equals(AuthUtil.getUserType(servletRequest.getSession()))) {
-                systemSelectId = SystemDB.checkSystemPerms(systemSelectId, userId);
-            }
 
-            SystemStatusDB.setInitialSystemStatus(systemSelectId, userId);
+            SystemStatusDB.setInitialSystemStatus(systemSelectId, userId, AuthUtil.getUserType(servletRequest.getSession()));
             pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
 
             AuthUtil.setSessionId(servletRequest.getSession(), SessionAuditDB.createSessionLog(userId));
@@ -219,16 +229,13 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
 
     @Action(value = "/admin/duplicateSession")
     public String duplicateSession() {
-        //todo need to clean this up!!!!
+        
         Long userId = AuthUtil.getUserId(servletRequest.getSession());
 
         if (systemSelectId != null && !systemSelectId.isEmpty()) {
-            //check to see if user has perms to access selected systems
-            if (!Auth.MANAGER.equals(AuthUtil.getUserType(servletRequest.getSession()))) {
-                systemSelectId = SystemDB.checkSystemPerms(systemSelectId, userId);
-            }
 
-            SystemStatusDB.setInitialSystemStatus(systemSelectId, userId);
+            SystemStatusDB.setInitialSystemStatus(systemSelectId, userId, AuthUtil.getUserType(servletRequest.getSession()));
+            
             pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
 
         }
@@ -428,6 +435,14 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
 
     public void setPtyHeight(Integer ptyHeight) {
         this.ptyHeight = ptyHeight;
+    }
+
+    public List<HostSystem> getAllocatedSystemList() {
+        return allocatedSystemList;
+    }
+
+    public void setAllocatedSystemList(List<HostSystem> allocatedSystemList) {
+        this.allocatedSystemList = allocatedSystemList;
     }
 }
 

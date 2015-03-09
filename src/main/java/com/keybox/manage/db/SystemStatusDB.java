@@ -15,6 +15,8 @@
  */
 package com.keybox.manage.db;
 
+import com.keybox.common.util.AuthUtil;
+import com.keybox.manage.model.Auth;
 import com.keybox.manage.model.HostSystem;
 import com.keybox.manage.model.SortedSet;
 import com.keybox.manage.util.DBUtils;
@@ -39,11 +41,17 @@ public class SystemStatusDB {
      *
      * @param systemSelectIds systems ids to set initial status
      * @param userId user id
+     * @param userType user type
      */
-    public static void setInitialSystemStatus(List<Long> systemSelectIds, Long userId) {
+    public static void setInitialSystemStatus(List<Long> systemSelectIds, Long userId, String userType) {
         Connection con = null;
         try {
             con = DBUtils.getConn();
+
+            //checks perms if to see if in assigned profiles
+            if (!Auth.MANAGER.equals(userType)) {
+                systemSelectIds = SystemDB.checkSystemPerms(con, systemSelectIds, userId);
+            }
 
             //deletes all old systems
             deleteAllSystemStatus(con, userId);
