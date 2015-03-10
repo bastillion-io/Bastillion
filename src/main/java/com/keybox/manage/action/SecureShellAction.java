@@ -52,6 +52,7 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
     Integer id;
     List<HostSystem> systemList = new ArrayList<HostSystem>();
     List<HostSystem> allocatedSystemList = new ArrayList<HostSystem>();
+    UserTheme userTheme;
     Integer ptyWidth;
     Integer ptyHeight;
 
@@ -113,15 +114,18 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
             setSystemList(userId, sessionId);
             
             //set allocated systems for connect to
-            SortedSet sortedSet=null;
+            SortedSet sortedSet=new SortedSet();
+            sortedSet.setOrderByField(SystemDB.SORT_BY_NAME);
             if (Auth.MANAGER.equals(AuthUtil.getUserType(servletRequest.getSession()))) {
-                sortedSet=SystemDB.getSystemSet(new SortedSet());
+                sortedSet=SystemDB.getSystemSet(sortedSet);
             } else {
-                sortedSet=SystemDB.getUserSystemSet(new SortedSet(), userId);
+                sortedSet=SystemDB.getUserSystemSet(sortedSet, userId);
             }
-            if(sortedSet!=null) {
+            if(sortedSet!=null && sortedSet.getItemList()!=null) {
                 allocatedSystemList = (List<HostSystem>) sortedSet.getItemList();
             }
+            //set theme
+            this.userTheme=UserThemeDB.getTheme(userId);
 
         }
 
@@ -227,8 +231,8 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
     }
 
 
-    @Action(value = "/admin/duplicateSession")
-    public String duplicateSession() {
+    @Action(value = "/admin/createSession")
+    public String createSession() {
         
         Long userId = AuthUtil.getUserId(servletRequest.getSession());
 
@@ -443,6 +447,14 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
 
     public void setAllocatedSystemList(List<HostSystem> allocatedSystemList) {
         this.allocatedSystemList = allocatedSystemList;
+    }
+
+    public UserTheme getUserTheme() {
+        return userTheme;
+    }
+
+    public void setUserTheme(UserTheme userTheme) {
+        this.userTheme = userTheme;
     }
 }
 

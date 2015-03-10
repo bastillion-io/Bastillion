@@ -184,21 +184,22 @@ div.termwrapper div h6 {
 }
 
 .run_cmd {
-    background: #eee;
+    background: #f0f0f0;
+    border: 1px solid #cccccc;
 }
 
 .run_cmd_active {
-    background: #4d4d4d;
+    background: #555753;
+    border: 1px solid #cccccc;
 }
 
 .run_cmd_active h6 {
-    color: #eee;
+    color: #f0f0f0;
 }
 
 .run_cmd {
     border-radius: 4px;
     margin-top: 5px;
-    border: 1px solid #CCC;
     float: left;
     width: 50%;
 }
@@ -237,7 +238,6 @@ div.termwrapper div h6 {
 }
 
 .terminal {
-    border: #f0f0f0 solid 5px;
     font-family: "DejaVu Sans Mono", "Liberation Mono", monospace;
     font-size: 12px;
     color: #000;

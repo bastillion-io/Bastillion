@@ -70,27 +70,31 @@
                     $.ajax({url: '../admin/disconnectTerm.action?id=' + id, cache: false});
                     $('#run_cmd_'+id).remove();
                     termMap[id].destroy();
-                    termMap[id]==null;
                     delete termMap[id];
                 }
                 
             });
             
-            //if terminal window toggle active for commands
-            $(".run_cmd").click(function () {
-
+            //toggle term state
+            function toggleTerm(element){
                 //check for cmd-click / ctr-click
                 if (!keys[17] && !keys[91] && !keys[93] && !keys[224]) {
                     $(".run_cmd").removeClass('run_cmd_active');
                 }
 
-                if ($(this).hasClass('run_cmd_active')) {
-                    $(this).removeClass('run_cmd_active');
+                if (element.hasClass('run_cmd_active')) {
+                    element.removeClass('run_cmd_active');
                 } else {
-                    $(this).addClass('run_cmd_active')
+                    element.addClass('run_cmd_active')
                 }
-
+                
+            }
+            
+            //if terminal window toggle active for commands
+            $(".run_cmd").click(function () {
+                toggleTerm($(this));
             });
+            
 
             //select all
             $('#select_all').click(function () {
@@ -259,6 +263,7 @@
             });
 
 
+            //resize element during drag event. Makes call to set pty width and height
             function resize(element) {
                 var id = element.attr("id").replace("run_cmd_", "");
 
@@ -320,11 +325,24 @@
                 }else {
                     termMap[id] = new Terminal({
                         cols: Math.floor($('.output:first').innerWidth() / 7.2981), rows: 24,
+                        <s:if test="%{userTheme !=null && userTheme.colors!=null && userTheme.colors.length==16}">
+                        colors: [
+                        <s:iterator status="stat" value="userTheme.colors">
+                            '<s:property/>'<s:if test="%{#stat.count<16}">,</s:if>
+                        </s:iterator>
+                        ],
+                        </s:if>
                         screenKeys: false,
                         useStyle: true,
                         cursorBlink: true,
                         convertEol: true
                     });
+                    <s:if test="%{userTheme !=null && userTheme.bg !=null}">
+                    termMap[id].colors[256] = '<s:property value="userTheme.bg"/>';
+                    </s:if>
+                    <s:if test="%{userTheme !=null && userTheme.fg!=null}">
+                    termMap[id].colors[257] = '<s:property value="userTheme.fg"/>';
+                    </s:if>
                     termMap[id].open($("#run_cmd_" + id).find('.output'));
                     
                     resize($("#run_cmd_" + id));
@@ -414,16 +432,17 @@
                     var hostId=$('#run_cmd_'+instanceId).find(".host").attr("data-hostId");
 
                     //call server to create instances - returned the new cloned instance id
-                    $.getJSON('../admin/duplicateSession.action?systemSelectId=' + hostId, function (data) {
+                    $.getJSON('../admin/createSession.action?systemSelectId=' + hostId, function (data) {
                         newInstanceId= parseInt(data);
                     });
 
 
                     if (newInstanceId!=null && newInstanceId >= 1) {
-
+                        
+                        //destroy resize so original event isn't copied
                         $("#run_cmd_" + instanceId).resizable('destroy');
 
-                        var clone = $("#run_cmd_" + instanceId).clone(true, true);
+                        var clone = $("#run_cmd_" + instanceId).clone(true, false);
                         clone.attr("id", "run_cmd_" + newInstanceId);
                         clone.find(".output").remove();
 
@@ -431,21 +450,61 @@
 
                         clone.insertAfter($("#run_cmd_" + instanceId));
                         
-
+                        //create new resize for both new and old
                         $("#run_cmd_" + newInstanceId+",#run_cmd_" + instanceId ).resizable({
                             ghost: true,
                             stop: function (event, ui) {
                                 resize($(this));
                             }
                         });
-
-                    
-
-
                     }
                 }
 
             });
+
+            //function that connects to allocated hosts
+            $('.connect_btn').click(function () {
+
+                    var hostId=$('#connectHostId').val();
+
+                    var displayLabel=$('#connectHostId option:selected').text();
+
+                
+                    //call server to create instances - returned the new cloned instance id
+                    $.getJSON('../admin/createSession.action?systemSelectId=' + hostId, function (data) {
+                        newInstanceId= parseInt(data);
+                    });
+
+
+                    if (newInstanceId!=null && newInstanceId >= 1) {
+
+
+                        var instance =
+                                "<div id=\"run_cmd_" +newInstanceId + "\" class=\"run_cmd_active run_cmd\">"
+                                    + "<h6 class=\"term-header\">" + displayLabel + "</h6>"
+                                    + "<div class=\"term\">"
+                                        +   "<div id=\"output_" + newInstanceId + "\" class=\"output\"></div>"
+                                    + "</div>"
+                                    + "<div data-hostId=\""+ hostId +"\" class=\"host\"></div>"
+                                +"</div>";
+
+                        $(instance).prependTo(".termwrapper");
+
+                        //create new resize for both new and old
+                        $("#run_cmd_" + newInstanceId).resizable({
+                            ghost: true,
+                            stop: function (event, ui) {
+                                resize($(this));
+                            }
+                        });
+
+                        $("#run_cmd_" + newInstanceId).click(function () {
+                            toggleTerm($(this));
+                        });
+                    }
+
+            });
+            
            //default to active
            $(".run_cmd").addClass('run_cmd_active');
 
@@ -467,7 +526,7 @@
 
         .term-container {
             width: 100%;
-            padding: 25px 0px;
+            padding: 10px 0px;
             margin: 0px;
         }
 
@@ -508,6 +567,7 @@
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Terminal Actions<b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             <li><a id="upload_push" href="#">Upload &amp; Push</a></li>
+                            <li><a id="connect_to_host" data-toggle="modal" data-target="#connect_to_host_dialog" href="#">Connect to Host</a></li>
                             <li><a id="dup_session" href="#">Duplicate Session</a></li>
                             <li><a id="reset_size" href="#">Reset Size</a></li>
                             <li><a id="disconnect" href="#">Disconnect</a></li>
@@ -549,7 +609,7 @@
         <s:iterator value="systemList">
 
             <div id="run_cmd_<s:property value="instanceId"/>" class="run_cmd_active run_cmd">
-                <h6 class="term-header" style="white-space: nowrap"><s:property value="displayLabel"/></h6>
+                <h6 class="term-header"><s:property value="displayLabel"/></h6>
                 <div class="term">
                     <div id="output_<s:property value="instanceId"/>" class="output"></div>
                 </div>
@@ -569,6 +629,31 @@
         <p class="error">No sessions could be created</p>
     </div>
     </s:else>
+
+    <div id="connect_to_host_dialog" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close cancel_btn" data-dismiss="modal" aria-hidden="true">x</button>
+                    <h4 class="modal-title">Connect to Host</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+
+                            <s:select id="connectHostId" listKey="id" listValue="displayLabel"
+                                      class="host_frm_select"
+                                      list="allocatedSystemList"
+                                      />
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-default connect_btn" data-dismiss="modal">Connect</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div id="set_password_dialog" class="modal fade">
         <div class="modal-dialog">
