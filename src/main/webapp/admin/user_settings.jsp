@@ -72,7 +72,12 @@
                       label="Terminal Theme" headerKey="" headerValue="- Select Theme -"/>
             
             <s:select name="userTheme.plane"
-                      list="#{'#f0f0f0,#555753':'Light / Dark', '#000000,#f0f0f0':'Dark / Light'}" label="Background / Foreground" headerKey=""
+                      list="#{'#FFFFDD,#000000':'Black on light yellow',
+                              '#FFFFFF,#000000':'Black on white',
+                              '#000000,#AAAAAA':'Gray on black',
+                              '#000000,#00FF00':'Green on black',
+                              '#000000,#FFFFFF':'White on black'
+                              }" label="Background / Foreground" headerKey=""
                       headerValue="- Select BG / FG -"/>
 
 

@@ -17,7 +17,6 @@ package com.keybox.manage.model;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Arrays;
 
 /**
  * User theme value object
@@ -72,7 +71,7 @@ public class UserTheme {
 
     public String getTheme() {
         if(this.colors!=null && this.colors.length==16){
-            theme= StringUtils.join(this.colors,",");
+            theme=StringUtils.join(this.colors,",");
         }
         return theme;
     }
