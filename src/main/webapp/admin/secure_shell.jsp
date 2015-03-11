@@ -75,26 +75,7 @@
                 
             });
             
-            //toggle term state
-            function toggleTerm(element){
-                //check for cmd-click / ctr-click
-                if (!keys[17] && !keys[91] && !keys[93] && !keys[224]) {
-                    $(".run_cmd").removeClass('run_cmd_active');
-                }
-
-                if (element.hasClass('run_cmd_active')) {
-                    element.removeClass('run_cmd_active');
-                } else {
-                    element.addClass('run_cmd_active')
-                }
-                
-            }
-            
-            //if terminal window toggle active for commands
-            $(".run_cmd").click(function () {
-                toggleTerm($(this));
-            });
-            
+         
 
             //select all
             $('#select_all').click(function () {
@@ -146,11 +127,6 @@
             </s:else>
             </s:elseif>
 
-
-
-
-
-
             <s:if test="pendingSystemStatus==null">
 
             $('#dummy').focus();
@@ -165,10 +141,7 @@
                 termFocus = true;
             });
 
-            $(".output").click().mouseover().mousedown(function () {
-                termFocus = false;
-            });
-
+           
 
             $(document).keypress(function (e) {
                 if (termFocus) {
@@ -243,14 +216,6 @@
 
             var termMap = {};
 
-            var y_offset = $('.run_cmd:first').innerHeight() - $('.run_cmd').find(".output:first").innerHeight();
-
-            $(".run_cmd").resizable({
-                ghost: true,
-                stop: function (event, ui) {
-                    resize($(this));
-                }
-            });
 
             $("#reset_size").click(function () {
                 var ids = getActiveTermsInstanceIds();
@@ -261,7 +226,6 @@
                 }
                 
             });
-
 
             //resize element during drag event. Makes call to set pty width and height
             function resize(element) {
@@ -274,16 +238,11 @@
                     termMap[id].resize(Math.floor(width / 7.2981), Math.floor(height / 14.4166));
 
                     $.ajax({
-                        url: '../admin/setPtyType.action?id=' + id + '&ptyWidth=' + width + '&ptyHeight=' + height,
+                        url: '../admin/setPtyType.action?id=' + id + '&userSettings.ptyWidth=' + width + '&userSettings.ptyHeight=' + height,
                         cache: false
                     });
                 }
             }
-
-            
-            
-               
-
 
             var loc = window.location, ws_uri;
             if (loc.protocol === "https:") {
@@ -325,9 +284,9 @@
                 }else {
                     termMap[id] = new Terminal({
                         cols: Math.floor($('.output:first').innerWidth() / 7.2981), rows: 24,
-                        <s:if test="%{userTheme !=null && userTheme.colors!=null && userTheme.colors.length==16}">
+                        <s:if test="%{userSettings !=null && userSettings.colors!=null && userSettings.colors.length==16}">
                         colors: [
-                        <s:iterator status="stat" value="userTheme.colors">
+                        <s:iterator status="stat" value="userSettings.colors">
                             '<s:property/>'<s:if test="%{#stat.count<16}">,</s:if>
                         </s:iterator>
                         ],
@@ -337,11 +296,11 @@
                         cursorBlink: true,
                         convertEol: true
                     });
-                    <s:if test="%{userTheme !=null && userTheme.bg !=null}">
-                    termMap[id].colors[256] = '<s:property value="userTheme.bg"/>';
+                    <s:if test="%{userSettings !=null && userSettings.bg !=null}">
+                    termMap[id].colors[256] = '<s:property value="userSettings.bg"/>';
                     </s:if>
-                    <s:if test="%{userTheme !=null && userTheme.fg!=null}">
-                    termMap[id].colors[257] = '<s:property value="userTheme.fg"/>';
+                    <s:if test="%{userSettings !=null && userSettings.fg!=null}">
+                    termMap[id].colors[257] = '<s:property value="userSettings.fg"/>';
                     </s:if>
                     termMap[id].open($("#run_cmd_" + id).find('.output'));
                     
@@ -422,6 +381,52 @@
                 }
             }
 
+
+            //function to set all terminal bindings when creating a term window
+            function setTerminalEvents(element)
+            {
+
+                //if terminal window toggle active for commands
+                element.mousedown(function () {
+                    //check for cmd-click / ctr-click
+                    if (!keys[17] && !keys[91] && !keys[93] && !keys[224]) {
+                        $(".run_cmd").removeClass('run_cmd_active');
+                    }
+
+                    if (element.hasClass('run_cmd_active')) {
+                        element.removeClass('run_cmd_active');
+                    } else {
+                        element.addClass('run_cmd_active')
+                    }
+                });
+
+                //set focus to term
+                element.find(".output").click().mouseover().mousedown(function () {
+                    termFocus = false;
+                });
+
+                //set resizable
+                element.resizable({
+                    ghost: true,
+                    stop: function (event, ui) {
+                        resize($(this));
+                    }
+                });
+            }
+            
+            //returns div for newly created terminal element
+            function createTermElement(instanceId, hostId, displayLabel){
+                var instance =
+                        "<div id=\"run_cmd_" +instanceId + "\" class=\"run_cmd_active run_cmd\">"
+                        + "<h6 class=\"term-header\">" + displayLabel + "</h6>"
+                        + "<div class=\"term\">"
+                        +   "<div id=\"output_" + instanceId + "\" class=\"output\"></div>"
+                        + "</div>"
+                        + "<div data-hostId=\""+ hostId +"\" class=\"host\"></div>"
+                        +"</div>";
+               return instance;
+            }
+
             //function clones terminals based on active
             var newInstanceId=-1;
             $('#dup_session').click(function () {
@@ -430,33 +435,19 @@
 
                     var instanceId = instanceIds[i];
                     var hostId=$('#run_cmd_'+instanceId).find(".host").attr("data-hostId");
+                    var displayLabel=$('#run_cmd_'+instanceId).find(".term-header").text();
 
                     //call server to create instances - returned the new cloned instance id
                     $.getJSON('../admin/createSession.action?systemSelectId=' + hostId, function (data) {
                         newInstanceId= parseInt(data);
                     });
 
-
                     if (newInstanceId!=null && newInstanceId >= 1) {
-                        
-                        //destroy resize so original event isn't copied
-                        $("#run_cmd_" + instanceId).resizable('destroy');
 
-                        var clone = $("#run_cmd_" + instanceId).clone(true, false);
-                        clone.attr("id", "run_cmd_" + newInstanceId);
-                        clone.find(".output").remove();
+                        $(createTermElement(newInstanceId,hostId,displayLabel)).insertAfter($('#run_cmd_'+instanceId));
 
-                        $("<div id='output_" + newInstanceId + "' class='output' />").appendTo(clone.find(".term"));
+                        setTerminalEvents($("#run_cmd_"+newInstanceId));
 
-                        clone.insertAfter($("#run_cmd_" + instanceId));
-                        
-                        //create new resize for both new and old
-                        $("#run_cmd_" + newInstanceId+",#run_cmd_" + instanceId ).resizable({
-                            ghost: true,
-                            stop: function (event, ui) {
-                                resize($(this));
-                            }
-                        });
                     }
                 }
 
@@ -469,45 +460,28 @@
 
                     var displayLabel=$('#connectHostId option:selected').text();
 
-                
                     //call server to create instances - returned the new cloned instance id
                     $.getJSON('../admin/createSession.action?systemSelectId=' + hostId, function (data) {
                         newInstanceId= parseInt(data);
                     });
 
-
                     if (newInstanceId!=null && newInstanceId >= 1) {
 
+                        $(createTermElement(newInstanceId,hostId,displayLabel)).prependTo(".termwrapper");
 
-                        var instance =
-                                "<div id=\"run_cmd_" +newInstanceId + "\" class=\"run_cmd_active run_cmd\">"
-                                    + "<h6 class=\"term-header\">" + displayLabel + "</h6>"
-                                    + "<div class=\"term\">"
-                                        +   "<div id=\"output_" + newInstanceId + "\" class=\"output\"></div>"
-                                    + "</div>"
-                                    + "<div data-hostId=\""+ hostId +"\" class=\"host\"></div>"
-                                +"</div>";
+                        setTerminalEvents($("#run_cmd_"+newInstanceId));
 
-                        $(instance).prependTo(".termwrapper");
-
-                        //create new resize for both new and old
-                        $("#run_cmd_" + newInstanceId).resizable({
-                            ghost: true,
-                            stop: function (event, ui) {
-                                resize($(this));
-                            }
-                        });
-
-                        $("#run_cmd_" + newInstanceId).click(function () {
-                            toggleTerm($(this));
-                        });
                     }
 
             });
-            
-           //default to active
-           $(".run_cmd").addClass('run_cmd_active');
 
+            //set connected systems
+            <s:iterator value="systemList">
+                $(createTermElement(<s:property value="instanceId"/>,<s:property value="id"/>,'<s:property value="displayLabel"/>')).appendTo(".termwrapper");
+                setTerminalEvents($("#run_cmd_"+<s:property value="instanceId"/>));
+            </s:iterator>
+
+            var y_offset = $('.run_cmd:first').innerHeight() - $('.run_cmd').find(".output:first").innerHeight();
 
             </s:if>
 
@@ -604,18 +578,6 @@
 
 
     <div class="termwrapper">
-
-
-        <s:iterator value="systemList">
-
-            <div id="run_cmd_<s:property value="instanceId"/>" class="run_cmd_active run_cmd">
-                <h6 class="term-header"><s:property value="displayLabel"/></h6>
-                <div class="term">
-                    <div id="output_<s:property value="instanceId"/>" class="output"></div>
-                </div>
-                <div data-hostId="<s:property value="id"/>" class="host"></div>
-            </div>
-        </s:iterator>
 
 
     </div>

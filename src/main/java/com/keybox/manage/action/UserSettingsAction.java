@@ -19,10 +19,9 @@ import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.db.AuthDB;
 import com.keybox.manage.db.UserThemeDB;
 import com.keybox.manage.model.Auth;
-import com.keybox.manage.model.UserTheme;
+import com.keybox.manage.model.UserSettings;
 import com.keybox.manage.util.PasswordUtil;
 import com.opensymphony.xwork2.ActionSupport;
-import org.apache.commons.lang.StringUtils;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
@@ -32,11 +31,11 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * Action for user settings
  */
-public class SettingsAction extends ActionSupport implements ServletRequestAware {
+public class UserSettingsAction extends ActionSupport implements ServletRequestAware {
 
     HttpServletRequest servletRequest;
     Auth auth;
-    UserTheme userTheme;
+    UserSettings userSettings;
 
     @Action(value = "/admin/userSettings",
             results = {
@@ -44,7 +43,7 @@ public class SettingsAction extends ActionSupport implements ServletRequestAware
             }
     )
     public String userSettings() {
-        userTheme = UserThemeDB.getTheme(AuthUtil.getUserId(servletRequest.getSession()));
+        userSettings = UserThemeDB.getTheme(AuthUtil.getUserId(servletRequest.getSession()));
         return SUCCESS;
     }
 
@@ -85,7 +84,7 @@ public class SettingsAction extends ActionSupport implements ServletRequestAware
     )
     public String themeSubmit() {
 
-        UserThemeDB.saveTheme(AuthUtil.getUserId(servletRequest.getSession()),userTheme);
+        UserThemeDB.saveTheme(AuthUtil.getUserId(servletRequest.getSession()), userSettings);
 
         return SUCCESS;
     }
@@ -127,11 +126,11 @@ public class SettingsAction extends ActionSupport implements ServletRequestAware
         this.auth = auth;
     }
 
-    public UserTheme getUserTheme() {
-        return userTheme;
+    public UserSettings getUserSettings() {
+        return userSettings;
     }
 
-    public void setUserTheme(UserTheme userTheme) {
-        this.userTheme = userTheme;
+    public void setUserSettings(UserSettings userSettings) {
+        this.userSettings = userSettings;
     }
 }

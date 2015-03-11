@@ -15,7 +15,7 @@
  */
 package com.keybox.manage.db;
 
-import com.keybox.manage.model.UserTheme;
+import com.keybox.manage.model.UserSettings;
 import com.keybox.manage.util.DBUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -34,9 +34,9 @@ public class UserThemeDB {
      * @param userId object
      * @return user theme object
      */
-    public static UserTheme getTheme(Long userId) {
+    public static UserSettings getTheme(Long userId) {
 
-        UserTheme theme=null;
+        UserSettings theme=null;
         Connection con = null;
         try {
             con = DBUtils.getConn();
@@ -45,7 +45,7 @@ public class UserThemeDB {
             stmt.setLong(1, userId);
             ResultSet rs = stmt.executeQuery();
             if(rs.next()) {
-                theme= new UserTheme();
+                theme= new UserSettings();
                 theme.setBg(rs.getString("bg"));
                 theme.setFg(rs.getString("fg"));
                 if(StringUtils.isNotEmpty(rs.getString("d1"))) {
@@ -87,7 +87,7 @@ public class UserThemeDB {
      * 
      * @param userId object
      */
-    public static void saveTheme(Long userId, UserTheme theme) {
+    public static void saveTheme(Long userId, UserSettings theme) {
 
 
         Connection con = null;

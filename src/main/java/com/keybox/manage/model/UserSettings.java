@@ -21,13 +21,15 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * User theme value object
  */
-public class UserTheme {
+public class UserSettings {
 
     String[] colors = null;
     String bg;
     String fg;
     String plane;
     String theme;
+    Integer ptyWidth;
+    Integer ptyHeight;
 
     public String[] getColors() {
         return colors;
@@ -81,5 +83,21 @@ public class UserTheme {
             this.setColors(theme.split(","));
         }
         this.theme = theme;
+    }
+
+    public Integer getPtyWidth() {
+        return ptyWidth;
+    }
+
+    public void setPtyWidth(Integer ptyWidth) {
+        this.ptyWidth = ptyWidth;
+    }
+
+    public Integer getPtyHeight() {
+        return ptyHeight;
+    }
+
+    public void setPtyHeight(Integer ptyHeight) {
+        this.ptyHeight = ptyHeight;
     }
 }

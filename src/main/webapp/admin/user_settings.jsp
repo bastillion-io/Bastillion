@@ -66,19 +66,19 @@
         <p>Change the theme for your terminals below</p>
         <s:form action="themeSubmit">
 
-            <s:select name="userTheme.theme"
+            <s:select name="userSettings.theme"
                       list="#{'#2e3436,#cc0000,#4e9a06,#c4a000,#3465a4,#75507b,#06989a,#d3d7cf,#555753,#ef2929,#8ae234,#fce94f,#729fcf,#ad7fa8,#34e2e2,#eeeeec':'Tango',
                               '#000000,#cd0000,#00cd00,#cdcd00,#0000ee,#cd00cd,#00cdcd,#e5e5e5,#7f7f7f,#ff0000,#00ff00,#ffff00,#5c5cff,#ff00ff,#00ffff,#ffffff':'XTerm'}" 
                       label="Terminal Theme" headerKey="" headerValue="- Select Theme -"/>
             
-            <s:select name="userTheme.plane"
+            <s:select name="userSettings.plane"
                       list="#{'#FFFFDD,#000000':'Black on light yellow',
                               '#FFFFFF,#000000':'Black on white',
                               '#000000,#AAAAAA':'Gray on black',
                               '#000000,#00FF00':'Green on black',
                               '#000000,#FFFFFF':'White on black'
-                              }" label="Background / Foreground" headerKey=""
-                      headerValue="- Select BG / FG -"/>
+                              }" label="Foreground / Background" headerKey=""
+                      headerValue="- Select FG / BG -"/>
 
 
             

@@ -52,9 +52,7 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
     Integer id;
     List<HostSystem> systemList = new ArrayList<HostSystem>();
     List<HostSystem> allocatedSystemList = new ArrayList<HostSystem>();
-    UserTheme userTheme;
-    Integer ptyWidth;
-    Integer ptyHeight;
+    UserSettings userSettings;
 
     static Map<Long, UserSchSessions> userSchSessionMap = new ConcurrentHashMap<Long, UserSchSessions>();
 
@@ -125,7 +123,7 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
                 allocatedSystemList = (List<HostSystem>) sortedSet.getItemList();
             }
             //set theme
-            this.userTheme=UserThemeDB.getTheme(userId);
+            this.userSettings =UserThemeDB.getTheme(userId);
 
         }
 
@@ -271,7 +269,7 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
                 SchSession schSession = userSchSessions.getSchSessionMap().get(id);
 
                 ChannelShell channel = (ChannelShell) schSession.getChannel();
-                channel.setPtySize((int) Math.floor(ptyWidth / 7.2981), (int) Math.floor(ptyHeight / 14.4166), ptyWidth, ptyHeight);
+                channel.setPtySize((int) Math.floor(userSettings.getPtyWidth() / 7.2981), (int) Math.floor(userSettings.getPtyHeight() / 14.4166), userSettings.getPtyWidth(), userSettings.getPtyHeight());
                 schSession.setChannel(channel);
 
             }
@@ -425,22 +423,6 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         SecureShellAction.userSchSessionMap = userSchSessionMap;
     }
 
-    public Integer getPtyWidth() {
-        return ptyWidth;
-    }
-
-    public void setPtyWidth(Integer ptyWidth) {
-        this.ptyWidth = ptyWidth;
-    }
-
-    public Integer getPtyHeight() {
-        return ptyHeight;
-    }
-
-    public void setPtyHeight(Integer ptyHeight) {
-        this.ptyHeight = ptyHeight;
-    }
-
     public List<HostSystem> getAllocatedSystemList() {
         return allocatedSystemList;
     }
@@ -449,12 +431,12 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         this.allocatedSystemList = allocatedSystemList;
     }
 
-    public UserTheme getUserTheme() {
-        return userTheme;
+    public UserSettings getUserSettings() {
+        return userSettings;
     }
 
-    public void setUserTheme(UserTheme userTheme) {
-        this.userTheme = userTheme;
+    public void setUserSettings(UserSettings userSettings) {
+        this.userSettings = userSettings;
     }
 }
 
