@@ -15,6 +15,8 @@
  */
 package com.keybox.manage.util;
 
+import com.keybox.common.util.AppConfig;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,8 +27,8 @@ public class PasswordUtil {
 
 
 
-        public static final String PASSWORD_REGEX="((?=.*\\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[!@#$%^&*()+=]).{8,20})";
-        public static final String PASSWORD_REQ_ERROR_MSG="Passwords must be 8 to 20 characters, contain one digit, one lowercase, one uppercase, and one special character";
+        public static final String PASSWORD_REGEX= AppConfig.getProperty("passwordComplexityRegEx");
+        public static final String PASSWORD_REQ_ERROR_MSG=AppConfig.getProperty("passwordComplexityMsg");
 
         private static Pattern pattern = Pattern.compile(PASSWORD_REGEX);
 
