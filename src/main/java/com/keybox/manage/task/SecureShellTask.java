@@ -43,7 +43,7 @@ public class SecureShellTask implements Runnable {
         BufferedReader br = new BufferedReader(isr);
         try {
 
-            SessionOutputUtil.addOutput(sessionOutput.getSessionId(), sessionOutput);
+            SessionOutputUtil.addOutput(sessionOutput.getSessionId(), sessionOutput.getHostSystemId(), sessionOutput);
 
             char[] buff = new char[1024];
             int read;

@@ -235,11 +235,11 @@ public class SessionAuditDB {
 
             if (sessionOutput != null && sessionOutput.getSessionId() != null && sessionOutput.getInstanceId() != null && sessionOutput.getOutput() != null && !sessionOutput.getOutput().equals("")) {
                 //insert
-                PreparedStatement stmt = con.prepareStatement("insert into terminal_log (session_id, system_id, output) values(?,?,?)");
+                PreparedStatement stmt = con.prepareStatement("insert into terminal_log (session_id, instance_id, system_id, output) values(?,?,?,?)");
                 stmt.setLong(1, sessionOutput.getSessionId());
                 stmt.setLong(2, sessionOutput.getInstanceId());
-                //todo host system id`
-                stmt.setString(3, sessionOutput.getOutput());
+                stmt.setLong(3, sessionOutput.getHostSystemId());
+                stmt.setString(4, sessionOutput.getOutput());
                 stmt.execute();
                 DBUtils.closeStmt(stmt);
             }
@@ -254,17 +254,17 @@ public class SessionAuditDB {
     /**
      * returns terminal logs for user session for host system
      *
-     * @param sessionId    session id
-     * @param hostSystemId host system id
+     * @param sessionId     session id
+     * @param instanceId    instance id for terminal session
      * @return session output for session
      */
-    public static List<SessionOutput> getTerminalLogsForSession(Long sessionId, Long hostSystemId) {
+    public static List<SessionOutput> getTerminalLogsForSession(Long sessionId, Integer instanceId) {
         //get db connection
         Connection con = DBUtils.getConn();
         List<SessionOutput> outputList = null;
 
         try {
-            outputList = getTerminalLogsForSession(con, sessionId, hostSystemId);
+            outputList = getTerminalLogsForSession(con, sessionId, instanceId);
 
 
         } catch (Exception e) {
@@ -281,16 +281,16 @@ public class SessionAuditDB {
     /**
      * returns terminal logs for user session for host system
      *
-     * @param sessionId    session id
-     * @param hostSystemId host system id
+     * @param sessionId     session id
+     * @param instanceId    instance id for terminal session
      * @return session output for session
      */
-    public static List<SessionOutput> getTerminalLogsForSession(Connection con, Long sessionId, Long hostSystemId) {
+    public static List<SessionOutput> getTerminalLogsForSession(Connection con, Long sessionId, Integer instanceId) {
 
         List<SessionOutput> outputList = new LinkedList<SessionOutput>();
         try {
-            PreparedStatement stmt = con.prepareStatement("select * from terminal_log where system_id=? and session_id=? order by log_tm asc");
-            stmt.setLong(1, hostSystemId);
+            PreparedStatement stmt = con.prepareStatement("select * from terminal_log where instance_id=? and session_id=? order by log_tm asc");
+            stmt.setLong(1, instanceId);
             stmt.setLong(2, sessionId);
             ResultSet rs = stmt.executeQuery();
             String output = "";
@@ -298,15 +298,15 @@ public class SessionAuditDB {
                 output = output + rs.getString("output");
             }
 
-            output = output.replaceAll("(\\u0007|\u001B\\[K)", "");
+            output = output.replaceAll("\\u0007|\u001B\\[K|\\]0;|\\[\\d\\d;\\d\\dm|\\[\\dm","");
             while (output.contains("\b")) {
                 output = output.replaceFirst(".\b", "");
             }
             DBUtils.closeRs(rs);
 
             SessionOutput sessionOutput = new SessionOutput();
-            sessionOutput.setHostSystemId(hostSystemId);
             sessionOutput.setSessionId(sessionId);
+            sessionOutput.setInstanceId(instanceId);
             sessionOutput.setOutput(output);
 
 
@@ -336,11 +336,12 @@ public class SessionAuditDB {
 
         List<HostSystem> hostSystemList = new ArrayList<HostSystem>();
         try {
-            PreparedStatement stmt = con.prepareStatement("select distinct system_id from terminal_log where session_id=?");
+            PreparedStatement stmt = con.prepareStatement("select distinct instance_id, system_id from terminal_log where session_id=?");
             stmt.setLong(1, sessionId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 HostSystem hostSystem = SystemDB.getSystem(con, rs.getLong("system_id"));
+                hostSystem.setInstanceId(rs.getInt("instance_id"));
                 hostSystemList.add(hostSystem);
             }
 

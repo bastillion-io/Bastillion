@@ -16,8 +16,8 @@
 package com.keybox.manage.util;
 
 import com.keybox.common.util.AppConfig;
-import com.keybox.manage.action.SecureShellAction;
 import com.keybox.manage.db.SessionAuditDB;
+import com.keybox.manage.model.SessionHostOutput;
 import com.keybox.manage.model.SessionOutput;
 import com.keybox.manage.model.UserSessionsOutput;
 import org.apache.commons.lang3.StringUtils;
@@ -68,16 +68,17 @@ public class SessionOutputUtil {
      * adds a new output
      *
      * @param sessionId     session id
+     * @param hostId        host id
      * @param sessionOutput session output object
      */
-    public static void addOutput(Long sessionId, SessionOutput sessionOutput) {
+    public static void addOutput(Long sessionId, Long hostId, SessionOutput sessionOutput) {
 
         UserSessionsOutput userSessionsOutput = userSessionsOutputMap.get(sessionId);
         if (userSessionsOutput == null) {
             userSessionsOutputMap.put(sessionId, new UserSessionsOutput());
             userSessionsOutput = userSessionsOutputMap.get(sessionId);
         }
-        userSessionsOutput.getSessionOutputMap().put(sessionOutput.getInstanceId(), new StringBuilder());
+        userSessionsOutput.getSessionOutputMap().put(sessionOutput.getInstanceId(), new SessionHostOutput(hostId, new StringBuilder()));
 
 
     }
@@ -97,7 +98,7 @@ public class SessionOutputUtil {
 
         UserSessionsOutput userSessionsOutput = userSessionsOutputMap.get(sessionId);
         if (userSessionsOutput != null) {
-            userSessionsOutput.getSessionOutputMap().get(instanceId).append(value, offset, count);
+            userSessionsOutput.getSessionOutputMap().get(instanceId).getOutput().append(value, offset, count);
         }
 
     }
@@ -122,10 +123,13 @@ public class SessionOutputUtil {
 
                 //get output chars and set to output
                 try {
-                    StringBuilder sb = userSessionsOutput.getSessionOutputMap().get(key);
+                    SessionHostOutput sessionHostOutput = userSessionsOutput.getSessionOutputMap().get(key);
+                    Long hostId = sessionHostOutput.getId();
+                    StringBuilder sb = sessionHostOutput.getOutput();
                     if (sb != null) {
                         SessionOutput sessionOutput = new SessionOutput();
                         sessionOutput.setSessionId(sessionId);
+                        sessionOutput.setHostSystemId(hostId);
                         sessionOutput.setInstanceId(key);
 
                         sessionOutput.setOutput(sb.toString());
@@ -134,13 +138,10 @@ public class SessionOutputUtil {
                             outputList.add(sessionOutput);
 
                             if (enableAudit) {
-
-                                //todo figure a way to do this better!!
-                                sessionOutput.setHostSystemId(SecureShellAction.getUserSchSessionMap().get(sessionId).getSchSessionMap().get(key).getHostSystem().getId());
                                 SessionAuditDB.insertTerminalLog(con, sessionOutput);
                             }
 
-                            userSessionsOutput.getSessionOutputMap().put(key, new StringBuilder());
+                            userSessionsOutput.getSessionOutputMap().put(key, new SessionHostOutput(hostId, new StringBuilder()));
                         }
                     }
                 } catch (Exception ex) {

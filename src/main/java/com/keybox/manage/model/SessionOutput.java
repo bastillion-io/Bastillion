@@ -16,9 +16,6 @@
 package com.keybox.manage.model;
 
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Output from ssh session
  */

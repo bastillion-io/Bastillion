@@ -15,23 +15,31 @@
  */
 package com.keybox.manage.model;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-public class UserSessionsOutput {
-
-    //instance id, host output
-    Map<Integer, SessionHostOutput> sessionOutputMap = new ConcurrentHashMap<Integer,SessionHostOutput>();
-
-
-    public Map<Integer, SessionHostOutput> getSessionOutputMap() {
-        return sessionOutputMap;
+/**
+ * host id and string builder output
+ */
+public class SessionHostOutput {
+    Long id;
+    StringBuilder output;
+    
+    public SessionHostOutput(Long id, StringBuilder output){
+        this.id=id;
+        this.output=output;
     }
 
-    public void setSessionOutputMap(Map<Integer, SessionHostOutput> sessionOutputMap) {
-        this.sessionOutputMap = sessionOutputMap;
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public StringBuilder getOutput() {
+        return output;
+    }
+
+    public void setOutput(StringBuilder output) {
+        this.output = output;
     }
 }
-
-
-
