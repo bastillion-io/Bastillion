@@ -106,20 +106,20 @@
         </s:if>
         <s:if test="profileList!= null && !profileList.isEmpty()">
            <div>
-                        <table style="min-width:0px">
+                     <table>
                         <tr>
-                            <td style="padding-left:0px;">
+                            <td class="align_left">
                                 <s:select name="sortedSet.filterMap['%{@com.keybox.manage.db.SystemDB@FILTER_BY_PROFILE_ID}']" listKey="id" listValue="nm"
                                 class="view_frm_select"
                                 list="profileList"
                                 headerKey=""
                                 headerValue="-Select Profile-"/>
                             </td>
-                            <td style="padding-left:0px;">
+                            <td>
                                 <div id="view_btn" class="btn btn-default">Filter</div>
                             </td>
                         </tr>
-                        </table>
+                     </table>
            </div>
         </s:if>
         </s:form>
