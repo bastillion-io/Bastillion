@@ -240,18 +240,9 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
             
             pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
 
+            createTerms();
+            
         }
-        //if success return instance id
-        if (SUCCESS.equals(createTerms())) {
-
-            String json = new Gson().toJson(getSystemList().size());
-            try {
-                servletResponse.getOutputStream().write(json.getBytes());
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-
 
         return null;
 

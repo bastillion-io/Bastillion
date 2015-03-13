@@ -382,7 +382,33 @@ public class SSHUtil {
 
 	}
 
+	/**
+	 * return the next instance id based on ids defined in the session map
+	 *
+	 * @param sessionId      session id
+	 * @param userSessionMap user session map
+	 * @return
+	 */
+	private static int getNextInstanceId(Long sessionId, Map<Long, UserSchSessions> userSessionMap ){
 
+		Integer instanceId=1;
+		if(userSessionMap.get(sessionId)!=null){
+
+			for(Integer id :userSessionMap.get(sessionId).getSchSessionMap().keySet()) {
+				if (!id.equals(instanceId) ) {
+
+					if(userSessionMap.get(sessionId).getSchSessionMap().get(instanceId) == null) {
+						return instanceId;
+					}
+				}
+				instanceId = instanceId + 1;
+			}
+		}
+		return instanceId;
+
+	}
+	
+	
 	/**
 	 * open new ssh session on host system
 	 *
@@ -398,7 +424,7 @@ public class SSHUtil {
 
 		JSch jsch = new JSch();
 
-		int instanceId = userSessionMap.get(sessionId)!=null ? userSessionMap.get(sessionId).getSchSessionMap().size()+1 : 1;
+		int instanceId = getNextInstanceId(sessionId,userSessionMap);
 		hostSystem.setStatusCd(HostSystem.SUCCESS_STATUS);
 		hostSystem.setInstanceId(instanceId);
 

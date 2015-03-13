@@ -279,36 +279,32 @@
             
             function  createTermMap(id, output){
 
-                if($("#run_cmd_" + id).find('.output').length == 0) {
-                    setTimeout(createTermMap(id,output), 1000)
-                }else {
-                    termMap[id] = new Terminal({
+                termMap[id] = new Terminal({
                         cols: Math.floor($('.output:first').innerWidth() / 7.2981), rows: 24,
-                        <s:if test="%{userSettings !=null && userSettings.colors!=null && userSettings.colors.length==16}">
+                    <s:if test="%{userSettings !=null && userSettings.colors!=null && userSettings.colors.length==16}">
                         colors: [
                         <s:iterator status="stat" value="userSettings.colors">
                             '<s:property/>'<s:if test="%{#stat.count<16}">,</s:if>
                         </s:iterator>
                         ],
-                        </s:if>
-                        screenKeys: false,
-                        useStyle: true,
-                        cursorBlink: true,
-                        convertEol: true
-                    });
-                    <s:if test="%{userSettings !=null && userSettings.bg !=null}">
+                    </s:if>
+                    screenKeys: false,
+                    useStyle: true,
+                    cursorBlink: true,
+                    convertEol: true
+                });
+                <s:if test="%{userSettings !=null && userSettings.bg !=null}">
                     termMap[id].colors[256] = '<s:property value="userSettings.bg"/>';
-                    </s:if>
-                    <s:if test="%{userSettings !=null && userSettings.fg!=null}">
+                </s:if>
+                <s:if test="%{userSettings !=null && userSettings.fg!=null}">
                     termMap[id].colors[257] = '<s:property value="userSettings.fg"/>';
-                    </s:if>
-                    termMap[id].open($("#run_cmd_" + id).find('.output'));
+                </s:if>
+                termMap[id].open($("#run_cmd_" + id).find('.output'));
                     
-                    resize($("#run_cmd_" + id));
+                resize($("#run_cmd_" + id));
                     
-                    termMap[id].write(output);
+                termMap[id].write(output);
 
-                }
                 
             }
           
@@ -436,19 +432,17 @@
                     var instanceId = instanceIds[i];
                     var hostId=$('#run_cmd_'+instanceId).find(".host").attr("data-hostId");
                     var displayLabel=$('#run_cmd_'+instanceId).find(".term-header").text();
+                    var newInstanceId=getNextInstanceId();
 
+                    $(createTermElement(newInstanceId,hostId,displayLabel)).insertAfter($('#run_cmd_'+instanceId));
+
+                    setTerminalEvents($("#run_cmd_"+newInstanceId));
+                    
+                    
                     //call server to create instances - returned the new cloned instance id
-                    $.getJSON('../admin/createSession.action?systemSelectId=' + hostId, function (data) {
-                        newInstanceId= parseInt(data);
-                    });
+                    $.getJSON('../admin/createSession.action?systemSelectId=' + hostId);
 
-                    if (newInstanceId!=null && newInstanceId >= 1) {
-
-                        $(createTermElement(newInstanceId,hostId,displayLabel)).insertAfter($('#run_cmd_'+instanceId));
-
-                        setTerminalEvents($("#run_cmd_"+newInstanceId));
-
-                    }
+                   
                 }
 
             });
@@ -456,24 +450,34 @@
             //function that connects to allocated hosts
             $('.connect_btn').click(function () {
 
-                    var hostId=$('#connectHostId').val();
+                var hostId=$('#connectHostId').val();
+                var newInstanceId=getNextInstanceId();
+                var displayLabel=$('#connectHostId option:selected').text();
 
-                    var displayLabel=$('#connectHostId option:selected').text();
+                $(createTermElement(newInstanceId,hostId,displayLabel)).prependTo(".termwrapper");
 
-                    //call server to create instances - returned the new cloned instance id
-                    $.getJSON('../admin/createSession.action?systemSelectId=' + hostId, function (data) {
-                        newInstanceId= parseInt(data);
-                    });
+                setTerminalEvents($("#run_cmd_"+newInstanceId)); 
 
-                    if (newInstanceId!=null && newInstanceId >= 1) {
+                //call server to create instances - returned the new cloned instance id
+                $.getJSON('../admin/createSession.action?systemSelectId=' + hostId);
 
-                        $(createTermElement(newInstanceId,hostId,displayLabel)).prependTo(".termwrapper");
-
-                        setTerminalEvents($("#run_cmd_"+newInstanceId));
-
-                    }
 
             });
+            
+            //returns next instance id
+            function getNextInstanceId() {
+                var newInstanceId=1;
+
+                for(var i=1;i<=$('.run_cmd').size();i++){
+
+                    if($("#run_cmd_" + i).length == 0) {
+                        newInstanceId=i;
+                        break;
+                    }
+                    newInstanceId++;
+                }
+                return newInstanceId;
+            }
 
             //set connected systems
             <s:iterator value="systemList">
