@@ -494,7 +494,6 @@ public class SSHUtil {
 
 
 		} catch (Exception e) {
-			e.printStackTrace();
 			hostSystem.setErrorMsg(e.getMessage());
 			if (e.getMessage().toLowerCase().contains("userauth fail")) {
 				hostSystem.setStatusCd(HostSystem.PUBLIC_KEY_FAIL_STATUS);
