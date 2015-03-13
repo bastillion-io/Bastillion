@@ -32,6 +32,7 @@ public class HostSystem {
     String statusCd=INITIAL_STATUS;
     String errorMsg;
     List<String> publicKeyList;
+    Integer instanceId;
 
     public static final String INITIAL_STATUS="INITIAL";
     public static final String AUTH_FAIL_STATUS="AUTHFAIL";
@@ -131,5 +132,13 @@ public class HostSystem {
 
     public void setPublicKeyList(List<String> publicKeyList) {
         this.publicKeyList = publicKeyList;
+    }
+
+    public Integer getInstanceId() {
+        return instanceId;
+    }
+
+    public void setInstanceId(Integer instanceId) {
+        this.instanceId = instanceId;
     }
 }

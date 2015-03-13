@@ -75,16 +75,16 @@
     <h3>Audit Sessions</h3>
 
            Audit sessions below
-                <table style="min-width:0px">
+                <table>
                     <tr>
                         <td class="align_left">
                             <s:form id="viewSessions" action="viewSessions" theme="simple">
                                 <s:hidden name="sortedSet.orderByDirection"/>
                                 <s:hidden name="sortedSet.orderByField"/>
-                                <table style="min-width:0px">
+                                <table>
                                 <tr>
                                     <s:if test="userList!= null && !userList.isEmpty()">
-                                        <td style="padding-left:0px;">
+                                        <td class="align_left">
                                            <s:select name="sortedSet.filterMap['%{@com.keybox.manage.db.SessionAuditDB@FILTER_BY_USER_ID}']" listKey="id" listValue="username"
                                            class="view_frm_select"
                                             list="userList"
@@ -93,7 +93,7 @@
                                         </td>
                                      </s:if>
                                     <s:if test="systemList!= null && !systemList.isEmpty()">
-                                            <td style="padding-left:0px;">
+                                            <td class="align_left">
                                             <s:select name="sortedSet.filterMap['%{@com.keybox.manage.db.SessionAuditDB@FILTER_BY_SYSTEM_ID}']" listKey="id" listValue="displayLabel"
                                             class="view_frm_select"
                                             list="systemList"
@@ -112,7 +112,8 @@
                </table>
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
 
-            <table class="table-striped scrollableTable" style="min-width:80%">
+    <div class="scrollWrapper">
+            <table class="table-striped scrollableTable" >
                 <thead>
                 <tr>
 
@@ -154,6 +155,7 @@
                 </s:iterator>
                 </tbody>
             </table>
+        </div>
         </s:if>
         <s:else>
             <p class="error">No session audits available</p>

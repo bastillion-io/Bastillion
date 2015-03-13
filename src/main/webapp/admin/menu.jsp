@@ -142,11 +142,9 @@
             <s:if test="%{!@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled || #session.authType==\"BASIC\"}">
             <tr>
                 <td>
-                  <a href="../admin/setPassword.action">Change Password</a>
+                  <a href="../admin/userSettings.action">Settings</a>
                 </td>
-                <td>
-                    Change administrative login to application.
-                </td>
+                <td>Change administrative login and settings</td>
             </tr>
             </s:if>
             </tbody>

@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
+ * Copyright 2015 Sean Kavanagh - sean.p.kavanagh6@gmail.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,31 @@
  */
 package com.keybox.manage.model;
 
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-public class UserSchSessions {
-
-    Map<Integer, SchSession> schSessionMap = new ConcurrentHashMap<Integer, SchSession>();
-
-
-    public Map<Integer, SchSession> getSchSessionMap() {
-        return schSessionMap;
+/**
+ * host id and string builder output
+ */
+public class SessionHostOutput {
+    Long id;
+    StringBuilder output;
+    
+    public SessionHostOutput(Long id, StringBuilder output){
+        this.id=id;
+        this.output=output;
     }
 
-    public void setSchSessionMap(Map<Integer, SchSession> schSessionMap) {
-        this.schSessionMap = schSessionMap;
+    public Long getId() {
+        return id;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public StringBuilder getOutput() {
+        return output;
+    }
+
+    public void setOutput(StringBuilder output) {
+        this.output = output;
+    }
 }

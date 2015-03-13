@@ -103,7 +103,8 @@
         <p>Add / Delete users or select a user below to assign profile</p>
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
-                <table class="table-striped  scrollableTable" style="min-width: 85%">
+            <div class="scrollWrapper">
+                <table class="table-striped  scrollableTable">
 
                     <thead>
                     <tr>
@@ -182,6 +183,7 @@
                     </s:iterator>
                     </tbody>
                 </table>
+                </div>
         </s:if>
 
 
