@@ -382,7 +382,33 @@ public class SSHUtil {
 
 	}
 
+	/**
+	 * return the next instance id based on ids defined in the session map
+	 *
+	 * @param sessionId      session id
+	 * @param userSessionMap user session map
+	 * @return
+	 */
+	private static int getNextInstanceId(Long sessionId, Map<Long, UserSchSessions> userSessionMap ){
 
+		Integer instanceId=1;
+		if(userSessionMap.get(sessionId)!=null){
+
+			for(Integer id :userSessionMap.get(sessionId).getSchSessionMap().keySet()) {
+				if (!id.equals(instanceId) ) {
+
+					if(userSessionMap.get(sessionId).getSchSessionMap().get(instanceId) == null) {
+						return instanceId;
+					}
+				}
+				instanceId = instanceId + 1;
+			}
+		}
+		return instanceId;
+
+	}
+	
+	
 	/**
 	 * open new ssh session on host system
 	 *
@@ -398,7 +424,10 @@ public class SSHUtil {
 
 		JSch jsch = new JSch();
 
+		int instanceId = getNextInstanceId(sessionId,userSessionMap);
 		hostSystem.setStatusCd(HostSystem.SUCCESS_STATUS);
+		hostSystem.setInstanceId(instanceId);
+
 
 		SchSession schSession = null;
 
@@ -436,6 +465,7 @@ public class SSHUtil {
 			//new session output
 			SessionOutput sessionOutput = new SessionOutput();
 			sessionOutput.setHostSystemId(hostSystem.getId());
+			sessionOutput.setInstanceId(instanceId);
 			sessionOutput.setSessionId(sessionId);
 
 
@@ -487,10 +517,10 @@ public class SSHUtil {
 			if (userSchSessions == null) {
 				userSchSessions = new UserSchSessions();
 			}
-			Map<Long, SchSession> schSessionMap = userSchSessions.getSchSessionMap();
+			Map<Integer, SchSession> schSessionMap = userSchSessions.getSchSessionMap();
 
 			//add server information
-			schSessionMap.put(hostSystem.getId(), schSession);
+			schSessionMap.put(instanceId, schSession);
 			userSchSessions.setSchSessionMap(schSessionMap);
 			//add back to map
 			userSessionMap.put(sessionId, userSchSessions);

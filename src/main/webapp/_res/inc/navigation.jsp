@@ -84,7 +84,7 @@
                 </s:if>
 
                 <s:if test="%{!@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled || #session.authType==\"BASIC\"}">
-                    <li><a href="../admin/setPassword.action">Change Password</a></li>
+                    <li><a href="../admin/userSettings.action">Settings</a></li>
                 </s:if>
                 <li><a href="../logout.action">Logout</a></li>
             </ul>

@@ -25,6 +25,6 @@ jQuery : MIT License - jQuery Foundation, Inc.
 
 jQueryUI : MIT License - jQuery Foundation, Inc.
 
-jQuery Tablescroll : MIT License - Dimas Begunoff
+jquery.floatThead : MIT License - Misha Koryak
 
 term.js : MIT License - Christopher Jeffrey
