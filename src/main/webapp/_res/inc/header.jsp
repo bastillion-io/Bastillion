@@ -17,7 +17,7 @@
 %>
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-<script src="<%= request.getContextPath() %>/_res/js/jquery-2.1.1.js"></script>
+<script src="<%= request.getContextPath() %>/_res/js/jquery-2.1.3.js"></script>
 <script src="<%= request.getContextPath() %>/_res/js/jquery.floatThead.js"></script>
 <script src="<%= request.getContextPath() %>/_res/js/tty/term.js"></script>
 <script src="<%= request.getContextPath() %>/_res/js/bootstrap.js"></script>
