@@ -553,12 +553,6 @@
                     </li>
                     <li><a href="exitTerms.action">Exit Terminals</a></li>
                 </ul>
-                <div style="float:right;width:1px;">
-                    <textarea name="dummy" id="dummy" size="1"
-                              style="border:none;color:#FFFFFF;width:1px;height:1px"></textarea>
-                    <input type="text" name="dummy2" id="dummy2" size="1"
-                           style="border:none;color:#FFFFFF;width:1px;height:1px"/>
-                </div>
                 <div class="align-right">
                     <s:form id="match_frm" theme="simple">
                         <label>Sort By</label>&nbsp;&nbsp;<s:textfield id="match" name="match"
@@ -570,6 +564,12 @@
                 </div>
 
                 <div class="clear"></div>
+                <div style="float:right;width:1px;height:1px;overflow:hidden">
+                    <textarea name="dummy" id="dummy" size="1"
+                              style="border:none;color:#FFFFFF;width:1px;height:1px"></textarea>
+                    <input type="text" name="dummy2" id="dummy2" size="1"
+                           style="border:none;color:#FFFFFF;width:1px;height:1px"/>
+                </div>
             </s:if>
         </div>
         <!--/.nav-collapse -->

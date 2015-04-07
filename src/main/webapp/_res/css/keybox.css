@@ -365,3 +365,13 @@ table.floatThead-table {
     border-bottom: none;
     background-color: #FFF;
 }
+.show {
+    display: block;
+}
+.hidden {
+    display: none;
+    visibility: hidden;
+}
+.invisible {
+    visibility: hidden;
+}
