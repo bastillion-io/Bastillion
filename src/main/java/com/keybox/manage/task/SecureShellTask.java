@@ -43,19 +43,19 @@ public class SecureShellTask implements Runnable {
         BufferedReader br = new BufferedReader(isr);
         try {
 
-            SessionOutputUtil.addOutput(sessionOutput.getSessionId(), sessionOutput);
+            SessionOutputUtil.addOutput(sessionOutput.getSessionId(), sessionOutput.getHostSystemId(), sessionOutput);
 
             char[] buff = new char[1024];
             int read;
             while((read = br.read(buff)) != -1) {
 
-                SessionOutputUtil.addToOutput(sessionOutput.getSessionId(), sessionOutput.getHostSystemId(), buff,0,read);
+                SessionOutputUtil.addToOutput(sessionOutput.getSessionId(), sessionOutput.getInstanceId(), buff,0,read);
                 Thread.sleep(50);
             }
 
 
 
-            SessionOutputUtil.removeOutput(sessionOutput.getSessionId(), sessionOutput.getHostSystemId());
+            SessionOutputUtil.removeOutput(sessionOutput.getSessionId(), sessionOutput.getInstanceId());
 
         } catch (Exception ex) {
 

@@ -169,6 +169,10 @@ div.termwrapper div h6 {
     margin: 8px 0 0 8px;
 }
 
+.term-header {
+    white-space: nowrap;
+}
+
 .top_nav {
     padding: 0;
     list-style: none;
@@ -180,21 +184,22 @@ div.termwrapper div h6 {
 }
 
 .run_cmd {
-    background: #eee;
+    background: #f0f0f0;
+    border: 1px solid #cccccc;
 }
 
 .run_cmd_active {
-    background: #4d4d4d;
+    background: #555753;
+    border: 1px solid #cccccc;
 }
 
 .run_cmd_active h6 {
-    color: #eee;
+    color: #f0f0f0;
 }
 
 .run_cmd {
     border-radius: 4px;
     margin-top: 5px;
-    border: 1px solid #CCC;
     float: left;
     width: 50%;
 }
@@ -233,7 +238,6 @@ div.termwrapper div h6 {
 }
 
 .terminal {
-    border: #f0f0f0 solid 5px;
     font-family: "DejaVu Sans Mono", "Liberation Mono", monospace;
     font-size: 12px;
     color: #000;
@@ -334,4 +338,40 @@ a.btn {
     float:right;
     margin-right:30px;
     padding:6px 18px;
+}
+
+.scrollWrapperActive {
+    overflow-y: scroll;
+    height:450px;
+    display: inline-block;
+}
+.uploadScrollWrapperActive{
+    overflow-y: scroll;
+    height:200px;
+    display: inline-block;
+}
+
+.uploadScrollableTable {
+    min-width: 600px;
+}
+.scrollableTable {
+    min-width: 700px;
+}
+.scrollableTable th {
+    background-color: #e0e0e0;
+}
+table.floatThead-table {
+    border-top: none;
+    border-bottom: none;
+    background-color: #FFF;
+}
+.show {
+    display: block;
+}
+.hidden {
+    display: none;
+    visibility: hidden;
+}
+.invisible {
+    visibility: hidden;
 }

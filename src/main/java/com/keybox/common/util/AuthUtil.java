@@ -40,6 +40,29 @@ public class AuthUtil {
     }
 
     /**
+     * set authentication type
+     *
+     * @param session http session
+     * @param authType authentication type
+     */
+    public static void setAuthType(HttpSession session, String authType) {
+        if (authType != null) {
+            session.setAttribute("authType", authType);
+        }
+    }
+
+    /**
+     * query authentication type
+     *
+     * @param session http session
+     * @return authentication type
+     */
+    public static String getAuthType(HttpSession session) {
+        String authType= (String)session.getAttribute("authType");
+        return authType;
+    }
+    
+    /**
      * set user type
      *
      * @param session http session

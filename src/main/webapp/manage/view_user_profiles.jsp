@@ -51,15 +51,19 @@
 
     <p>Add / Delete profiles to be assigned to the current user.</p>
 
-    <h5><s:property value="user.username"/>&nbsp;:&nbsp;<s:property value="user.lastNm"/>,&nbsp;<s:property
-            value="user.firstNm"/>
+    <h5><s:property value="user.username"/>
+    <s:if test="%{user.lastNm!=null && user.firstNm!=null}">
+        &nbsp;:&nbsp;<s:property value="user.lastNm"/>,&nbsp;<s:property value="user.firstNm"/>
+    </s:if> <s:if test="%{user.email!=null}">
         &nbsp;(<s:property value="user.email"/>)
+    </s:if>
 
     </h5>
 
 
     <s:if test="user.profileList!= null && !user.profileList.isEmpty()">
 
+    <div class="scrollWrapper">
         <table class="table-striped scrollableTable">
             <thead>
 
@@ -103,6 +107,7 @@
 
 
         </table>
+        </div>
     </s:if>
 
     <s:if test="profileList!= null && !profileList.isEmpty()">

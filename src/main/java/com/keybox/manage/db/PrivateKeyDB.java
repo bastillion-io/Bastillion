@@ -30,7 +30,7 @@ public class PrivateKeyDB {
 
 
     /**
-     * returns public private key for applcation
+     * returns public private key for application
      * @return app key values
      */
     public static ApplicationKey getApplicationKey() {

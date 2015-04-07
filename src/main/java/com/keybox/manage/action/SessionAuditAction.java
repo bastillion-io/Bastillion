@@ -15,7 +15,6 @@
  */
 package com.keybox.manage.action;
 
-import com.keybox.common.util.AppConfig;
 import com.keybox.manage.db.SessionAuditDB;
 import com.keybox.manage.db.SystemDB;
 import com.keybox.manage.db.UserDB;
@@ -39,10 +38,9 @@ public class SessionAuditAction extends ActionSupport implements ServletResponse
 
     SortedSet sortedSet=new SortedSet();
     Long sessionId;
-    Long hostSystemId;
+    Integer instanceId;
     SessionAudit sessionAudit;
     HttpServletResponse servletResponse;
-    String enableAudit = AppConfig.getProperty("enableAudit");
     List<HostSystem> systemList= SystemDB.getSystemSet(new SortedSet(SystemDB.SORT_BY_NAME)).getItemList();
     List<User> userList= UserDB.getUserSet(new SortedSet(SessionAuditDB.SORT_BY_USERNAME)).getItemList();
 
@@ -82,7 +80,7 @@ public class SessionAuditAction extends ActionSupport implements ServletResponse
     @Action(value = "/manage/getJSONTermOutputForSession")
     public String getJSONTermOutputForSession() {
 
-        String json=new Gson().toJson(SessionAuditDB.getTerminalLogsForSession(sessionId, hostSystemId));
+        String json=new Gson().toJson(SessionAuditDB.getTerminalLogsForSession(sessionId, instanceId));
         try {
             servletResponse.getOutputStream().write(json.getBytes());
         } catch (Exception ex) {
@@ -141,20 +139,11 @@ public class SessionAuditAction extends ActionSupport implements ServletResponse
         this.servletResponse = servletResponse;
     }
 
-    public Long getHostSystemId() {
-        return hostSystemId;
+    public Integer getInstanceId() {
+        return instanceId;
     }
 
-    public void setHostSystemId(Long hostSystemId) {
-        this.hostSystemId = hostSystemId;
+    public void setInstanceId(Integer instanceId) {
+        this.instanceId = instanceId;
     }
-
-    public String getEnableAudit() {
-        return enableAudit;
-    }
-
-    public void setEnableAudit(String enableAudit) {
-        this.enableAudit = enableAudit;
-    }
-
 }

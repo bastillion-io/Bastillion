@@ -57,13 +57,21 @@
             <div class="row featurette">
                 <div class="col-md-7">
 
-                    <img src="qrImage.action?qrImage=<s:property value="qrImage"/>" alt="<s:property value="qrImage"/>"/>
+                    <div class="panel panel-default">
+                        <div class="panel-body" >
+                            <img src="qrImage.action?qrImage=<s:property value="qrImage"/>" alt="<s:property value="qrImage"/>"/>
+                        </div>
+                        <div class="panel-footer">
+                            <label>Can't scan QR code?</label>&nbsp;&nbsp;<a href="#" onclick="$('#shared-secret').toggleClass('hidden');">Show secret</a>
+                            <span id="shared-secret" class="hidden"> - <s:property value="sharedSecret"/></span>
+                        </div>
+                    </div>
 
                 </div>
                 <div class="col-md-5">
                     <p>
-                        Scan the QR Code using <a href="https://fedorahosted.org/freeotp" target="_blank">FreeOTP</a> 
-                        or <a href="https://github.com/google/google-authenticator" target="_blank">Google Authenticator</a> 
+                        Scan the QR code using <a href="https://fedorahosted.org/freeotp" target="_blank">FreeOTP</a>
+                        or <a href="https://github.com/google/google-authenticator" target="_blank">Google Authenticator</a>
                         on your Android or iOS device to setup two-factor authentication.
                     </p>
                     <table class="table table-striped table-hover ">
@@ -98,9 +106,11 @@
                             </tr>
                         </tbody>
                     </table>
-
+                    <s:form action="otpSubmit" theme="simple" cssStyle="float:left">
+                        <s:hidden name="sharedSecret"/>
+                        <s:submit cssClass="btn btn-default spacer spacer-left" value="Got It!"/>
+                    </s:form>
                     <button onclick="window.location = 'menu.action'" class="btn btn-danger spacer spacer-left">Skip for Now</button>
-                    <button onclick="window.location = 'otpSubmit.action'" class="btn btn-default spacer spacer-right">Got It!</button>
                 </div>
             </div>
         </div>
