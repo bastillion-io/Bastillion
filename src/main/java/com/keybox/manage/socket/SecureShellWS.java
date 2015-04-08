@@ -234,6 +234,16 @@ public class SecureShellWS {
         keyMap.put(219, new byte[]{(byte) 0x1B});
         //CTR-]
         keyMap.put(221, new byte[]{(byte) 0x1D});
+        //INSERT
+        keyMap.put(45, "\033[2~".getBytes());
+        //PG UP
+        keyMap.put(33, "\033[5~".getBytes());
+        //PG DOWN
+        keyMap.put(34, "\033[6~".getBytes());
+        //END
+        keyMap.put(35, "\033[4~".getBytes());
+        //HOME
+        keyMap.put(36, "\033[1~".getBytes());
 
     }
 
