@@ -150,9 +150,9 @@
                     if (String.fromCharCode(keyCode) && String.fromCharCode(keyCode) != ''
                             && !keys[91] && !keys[93] && !keys[224] && !keys[27]
                             && !keys[37] && !keys[38] && !keys[39] && !keys[40]
-                            && !keys[13] && !keys[8] && !keys[9] && !keys[17]
-                            && !keys[46] && !keys[45] && !keys[33] && !keys[34]
-                            && !keys[35] && !keys[36]) {
+                            && !keys[13] && !keys[8] && !keys[9] && (!keys[17] 
+                            || keys[18]) && !keys[46] && !keys[45] && !keys[33] 
+                            && !keys[34] && !keys[35] && !keys[36]) {
                         var cmdStr = String.fromCharCode(keyCode);
                         connection.send(JSON.stringify({id: getActiveTermsInstanceIds(), command: cmdStr}));
                     }
@@ -165,8 +165,9 @@
                     var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
                     keys[keyCode] = true;
                     //prevent default for unix ctrl commands
-                    if (keys[17] && (keyCode == 83 || keyCode == 81 || keyCode == 67 || keyCode == 220 || keyCode == 90 || keyCode == 72 || keyCode == 87 || keyCode == 85 || keyCode == 82 || keyCode == 68)) {
+                    if (keys[17] && (keyCode == 83 || keyCode == 81 || keyCode == 84 || keyCode == 220 || keyCode == 90 || keyCode == 72 || keyCode == 87 || keyCode == 85 || keyCode == 82 || keyCode == 68)) {
                         e.preventDefault();
+                        e.stopImmediatePropagation();
                     }
 
                     //27 - ESC
@@ -184,7 +185,7 @@
                     //34 - PG DOWN
                     //35 - END
                     //36 - HOME
-                    if(keys[17] || keyCode== 27 || keyCode == 37 || keyCode == 38 || keyCode == 39 || keyCode == 40 || keyCode == 13 || keyCode == 8 || keyCode == 9 || keyCode == 46 || keyCode == 45 || keyCode == 33 || keyCode == 34 || keyCode == 35 || keyCode == 36) {
+                    if((keys[17] && !keys[18]) || keyCode == 27 || keyCode == 37 || keyCode == 38 || keyCode == 39 || keyCode == 40 || keyCode == 13 || keyCode == 8 || keyCode == 9 || keyCode == 46 || keyCode == 45 || keyCode == 33 || keyCode == 34 || keyCode == 35 || keyCode == 36) {
                         connection.send(JSON.stringify({id: getActiveTermsInstanceIds(), keyCode: keyCode}));
                     }
                 }

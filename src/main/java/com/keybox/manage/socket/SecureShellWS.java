@@ -221,7 +221,7 @@ public class SecureShellWS {
         //CTR-U
         keyMap.put(85, new byte[]{(byte) 0x15});
         //CTR-V
-        //keyMap.put(86, new byte[]{(byte) 0x16});
+        keyMap.put(86, new byte[]{(byte) 0x16});
         //CTR-W
         keyMap.put(87, new byte[]{(byte) 0x17});
         //CTR-X
