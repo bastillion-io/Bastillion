@@ -19,11 +19,17 @@ import com.keybox.manage.model.SortedSet;
 import com.keybox.manage.model.User;
 import com.keybox.manage.util.DBUtils;
 import com.keybox.manage.util.EncryptionUtil;
+import com.keybox.service.mail.MailSend;
+import com.keybox.service.mail.MassageParamter;
+
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Savepoint;
 import java.sql.Statement;
 import java.util.ArrayList;
 
@@ -134,6 +140,7 @@ public class UserDB {
                 user.setAuthType(rs.getString("auth_type"));
                 user.setUserType(rs.getString("user_type"));
                 user.setSalt(rs.getString("salt"));
+                user.setPwreset(rs.getBoolean("pwreset"));
                 user.setProfileList(UserProfileDB.getProfilesByUser(con, userId));
             }
             DBUtils.closeRs(rs);
@@ -343,6 +350,70 @@ public class UserDB {
         return isUnique;
 
     }
+
+    /**
+     * Methode to Password reset and Mail send
+     * 
+     * @param email EMail address from User
+     * @return <strong>true:</strong> Password reset OK <p>
+     * 			<strong>false:</strong> EMail address not available, Error with Mail send or DB Update
+     */
+	public static boolean resetPWMail(String email) {
+		boolean PW_reset_OK = false;
+		Connection con = null;
+		Savepoint spt = null;
+        try {
+            con = DBUtils.getConn();
+            PreparedStatement stmt = con.prepareStatement("select * from users where enabled=true and lower(email) like lower(?)");
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next())
+            {
+            	PW_reset_OK = true;
+            	String newPW = RandomStringUtils.randomAlphanumeric(20);
+            	PreparedStatement stmt_up = con.prepareStatement("update users set password=?, salt=?,pwreset=? where id=?");
+                
+            	//SavePoint for Rollback
+            	con.setAutoCommit(false);
+                spt = con.setSavepoint("sp_PW_Reset");
+            	
+                //Update DB
+            	String salt=EncryptionUtil.generateSalt();
+            	stmt_up.setString(1, EncryptionUtil.hash(newPW + salt));
+            	stmt_up.setString(2, salt);
+            	stmt_up.setBoolean(3, true);
+            	stmt_up.setLong(4, rs.getLong("id"));
+            	stmt_up.execute();
+                DBUtils.closeStmt(stmt_up);
+                
+                //Mail send
+                ArrayList<MassageParamter> mps = new ArrayList<MassageParamter>();
+        		mps.add(new MassageParamter(">>user_name<<", rs.getString("username")));
+        		mps.add(new MassageParamter(">>name<<", rs.getString("first_nm") + " " + rs.getString("last_nm")));
+        		mps.add(new MassageParamter(">>pw<<", newPW));
+        		MailSend.sendMail("pw_reset_mail.properties", email, rs.getString("first_nm") + " " + rs.getString("last_nm"),mps);
+        		con.commit();
+            }
+            
+            DBUtils.closeRs(rs);
+            DBUtils.closeStmt(stmt);
+
+        } catch(Exception ex){
+        	PW_reset_OK = false;
+        	if(spt != null)
+        	{
+        		try {
+					con.rollback(spt);
+					con.commit();
+				} catch (SQLException e1) {
+					e1.printStackTrace();
+				}
+        	}
+            ex.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+        return PW_reset_OK;
+	}
 
 
 

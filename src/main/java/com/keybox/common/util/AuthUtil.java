@@ -138,6 +138,16 @@ public class AuthUtil {
         authToken = EncryptionUtil.decrypt(authToken);
         return authToken;
     }
+    
+    /**
+     * set session Password reset Info
+     * 
+     * @param session http session
+     * @param pwreset Password reset Info
+     */
+    public static boolean getPWReset(HttpSession session) {
+    	return (boolean) session.getAttribute("pwreset");
+	}
 
     /**
      * query session for timeout
@@ -186,6 +196,16 @@ public class AuthUtil {
             session.setAttribute("authToken", EncryptionUtil.encrypt(authToken));
         }
     }
+    
+    /**
+     * set session Password reset Info
+     * 
+     * @param session http session
+     * @param pwreset Password reset Info
+     */
+    public static void setPWReset(HttpSession session, boolean pwreset) {
+		session.setAttribute("pwreset", pwreset);
+	}
 
     /**
      * set session timeout
@@ -214,5 +234,7 @@ public class AuthUtil {
 
         session.invalidate();
     }
+
+	
 
 }
