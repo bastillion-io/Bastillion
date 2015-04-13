@@ -32,6 +32,7 @@ public class HostSystem {
     String statusCd=INITIAL_STATUS;
     String errorMsg;
     List<String> publicKeyList;
+    boolean enabled = true;
     Integer instanceId;
 
     public static final String INITIAL_STATUS="INITIAL";
@@ -133,6 +134,14 @@ public class HostSystem {
     public void setPublicKeyList(List<String> publicKeyList) {
         this.publicKeyList = publicKeyList;
     }
+    
+    public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
 
     public Integer getInstanceId() {
         return instanceId;

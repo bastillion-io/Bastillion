@@ -18,6 +18,7 @@ package com.keybox.manage.db;
 import com.keybox.manage.model.HostSystem;
 import com.keybox.manage.model.SortedSet;
 import com.keybox.manage.util.DBUtils;
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
@@ -38,6 +39,7 @@ public class SystemDB {
 	public static final String SORT_BY_USER = "user";
 	public static final String SORT_BY_HOST = "host";
 	public static final String SORT_BY_STATUS = "status_cd";
+	public static final String SORT_BY_ENABLED = "enabled";
 
 
 	/**
@@ -81,6 +83,7 @@ public class SystemDB {
 				hostSystem.setPort(rs.getInt("port"));
 				hostSystem.setAuthorizedKeys(rs.getString("authorized_keys"));
 				hostSystem.setStatusCd(rs.getString("status_cd"));
+				hostSystem.setEnabled(rs.getBoolean("enabled"));
 				hostSystemList.add(hostSystem);
 			}
 			DBUtils.closeRs(rs);
@@ -134,6 +137,7 @@ public class SystemDB {
 				hostSystem.setPort(rs.getInt("port"));
 				hostSystem.setAuthorizedKeys(rs.getString("authorized_keys"));
 				hostSystem.setStatusCd(rs.getString("status_cd"));
+				hostSystem.setEnabled(rs.getBoolean("enabled"));
 				hostSystemList.add(hostSystem);
 			}
 			DBUtils.closeRs(rs);
@@ -206,6 +210,7 @@ public class SystemDB {
 				hostSystem.setPort(rs.getInt("port"));
 				hostSystem.setAuthorizedKeys(rs.getString("authorized_keys"));
 				hostSystem.setStatusCd(rs.getString("status_cd"));
+				hostSystem.setEnabled(rs.getBoolean("enabled"));
 			}
 			DBUtils.closeRs(rs);
 			DBUtils.closeStmt(stmt);
@@ -233,13 +238,14 @@ public class SystemDB {
 		Long userId = null;
 		try {
 			con = DBUtils.getConn();
-			PreparedStatement stmt = con.prepareStatement("insert into system (display_nm, user, host, port, authorized_keys, status_cd) values (?,?,?,?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
+			PreparedStatement stmt = con.prepareStatement("insert into system (display_nm, user, host, port, authorized_keys, status_cd, enabled) values (?,?,?,?,?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
 			stmt.setString(1, hostSystem.getDisplayNm());
 			stmt.setString(2, hostSystem.getUser());
 			stmt.setString(3, hostSystem.getHost());
 			stmt.setInt(4, hostSystem.getPort());
 			stmt.setString(5, hostSystem.getAuthorizedKeys());
 			stmt.setString(6, hostSystem.getStatusCd());
+			stmt.setBoolean(7, hostSystem.isEnabled());
 			stmt.execute();
 
 			ResultSet rs = stmt.getGeneratedKeys();
@@ -269,14 +275,16 @@ public class SystemDB {
 		try {
 			con = DBUtils.getConn();
 
-			PreparedStatement stmt = con.prepareStatement("update system set display_nm=?, user=?, host=?, port=?, authorized_keys=?, status_cd=?  where id=?");
+			PreparedStatement stmt = con.prepareStatement("update system set display_nm=?, user=?, host=?, port=?, authorized_keys=?, status_cd=?, enabled=?  where id=?");
 			stmt.setString(1, hostSystem.getDisplayNm());
 			stmt.setString(2, hostSystem.getUser());
 			stmt.setString(3, hostSystem.getHost());
 			stmt.setInt(4, hostSystem.getPort());
 			stmt.setString(5, hostSystem.getAuthorizedKeys());
 			stmt.setString(6, hostSystem.getStatusCd());
-			stmt.setLong(7, hostSystem.getId());
+			stmt.setBoolean(7, hostSystem.isEnabled());
+			stmt.setLong(8, hostSystem.getId());
+			
 			stmt.execute();
 			DBUtils.closeStmt(stmt);
 
@@ -368,6 +376,7 @@ public class SystemDB {
 				hostSystem.setPort(rs.getInt("port"));
 				hostSystem.setAuthorizedKeys(rs.getString("authorized_keys"));
 				hostSystem.setStatusCd(rs.getString("status_cd"));
+				hostSystem.setEnabled(rs.getBoolean("enabled"));
 				hostSystemList.add(hostSystem);
 			}
 			DBUtils.closeRs(rs);
@@ -507,5 +516,51 @@ public class SystemDB {
 		return systemIdList;
 
 	}
+	
+	
+	/**
+	 * method to disable System
+	 * (Change enable-Attribute to false)
+	 * 
+	 * @param id System-ID
+	 * @author Robert Vorkoeper
+	 */
+	public static void disableSystem(Long id) {
+		
+		Connection con = null;
+		try {
+			con = DBUtils.getConn();
+			PreparedStatement stmt = con.prepareStatement("update system set enabled = false where id=?");
+			stmt.setLong(1, id);
+			stmt.execute();
+			DBUtils.closeStmt(stmt);
+			
+		} catch (Exception e) {
+            e.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+	}
 
+	/**
+	 * method to enable System
+	 * (Change enable-Attribute to true)
+	 * 
+	 * @param id System-ID
+	 * @author Robert Vorkoeper
+	 */
+	public static void enableSystem(Long id) {
+		
+		Connection con = null;
+		try {
+			con = DBUtils.getConn();
+			PreparedStatement stmt = con.prepareStatement("update system set enabled = true where id=?");
+			stmt.setLong(1, id);
+			stmt.execute();
+			DBUtils.closeStmt(stmt);
+			
+		} catch (Exception e) {
+            e.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+	}
 }

@@ -112,6 +112,7 @@ public class ProfileSystemsDB {
 				hostSystem.setHost(rs.getString("host"));
 				hostSystem.setPort(rs.getInt("port"));
 				hostSystem.setAuthorizedKeys(rs.getString("authorized_keys"));
+				hostSystem.setEnabled(rs.getBoolean("enabled"));
 				hostSystemList.add(hostSystem);
 			}
 			DBUtils.closeRs(rs);
