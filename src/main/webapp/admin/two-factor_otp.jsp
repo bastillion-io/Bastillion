@@ -106,11 +106,11 @@
                             </tr>
                         </tbody>
                     </table>
-                    <s:form action="otpSubmit" theme="simple" cssStyle="float:left">
+                    <button onclick="window.location = 'menu.action'" class="btn btn-danger spacer spacer-left" style="float:left">Skip for Now</button>
+                    <s:form action="otpSubmit" theme="simple" >
                         <s:hidden name="sharedSecret"/>
-                        <s:submit cssClass="btn btn-default spacer spacer-left" value="Got It!"/>
+                        <s:submit cssClass="btn btn-default spacer spacer-right" value="Got It!"/>
                     </s:form>
-                    <button onclick="window.location = 'menu.action'" class="btn btn-danger spacer spacer-left">Skip for Now</button>
                 </div>
             </div>
         </div>
