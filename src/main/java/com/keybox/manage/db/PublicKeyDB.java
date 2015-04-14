@@ -567,4 +567,38 @@ public class PublicKeyDB {
         return new ArrayList(keyMap.values());
 
     }
+    
+    public static List<PublicKey> getPublicKeysForUserandSystem(Long userId, Long systemId) {
+		
+    	Connection con = null;
+        Map<String, PublicKey> keyMap = new LinkedHashMap();
+        try {
+            con = DBUtils.getConn();
+            PreparedStatement stmt = con.prepareStatement("select * from public_keys where user_id=? and enabled=true and profile_id in (select profile_id from system_map where system_id=?)");
+            stmt.setLong(1, userId);
+            stmt.setLong(2, systemId);
+            ResultSet rs = stmt.executeQuery();
+            while(rs.next()){
+
+                PublicKey publicKey = new PublicKey();
+                publicKey.setId(rs.getLong("id"));
+                publicKey.setKeyNm(rs.getString("key_nm"));
+                publicKey.setPublicKey(rs.getString("public_key"));
+                publicKey.setProfile(ProfileDB.getProfile(con, rs.getLong("profile_id")));
+                publicKey.setType(SSHUtil.getKeyType(publicKey.getPublicKey()));
+                publicKey.setFingerprint(SSHUtil.getFingerprint(publicKey.getPublicKey()));
+                publicKey.setCreateDt(rs.getTimestamp("create_dt"));
+                keyMap.put(publicKey.getKeyNm() + " (" + publicKey.getFingerprint() + ")", publicKey);
+                
+            }
+            DBUtils.closeRs(rs);
+            DBUtils.closeStmt(stmt);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+        
+        return new ArrayList(keyMap.values());
+	}
 }

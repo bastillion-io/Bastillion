@@ -81,6 +81,7 @@ public class SystemDB {
 				hostSystem.setPort(rs.getInt("port"));
 				hostSystem.setAuthorizedKeys(rs.getString("authorized_keys"));
 				hostSystem.setStatusCd(rs.getString("status_cd"));
+				hostSystem.setPublicKeyList(PublicKeyDB.getPublicKeysForUserandSystem(userId, hostSystem.getId()));
 				hostSystemList.add(hostSystem);
 			}
 			DBUtils.closeRs(rs);

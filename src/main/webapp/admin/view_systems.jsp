@@ -143,6 +143,7 @@
                         </th>
                         <th id="<s:property value="@com.keybox.manage.db.SystemDB@SORT_BY_HOST"/>" class="sort">Host
                         </th>
+                        <th>&nbsp;</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -159,13 +160,19 @@
                             </td>
                             <td><s:property value="user"/></td>
                             <td><s:property value="host"/>:<s:property value="port"/></td>
+                            <td>
+                            	
+                            	<button type="button" class="btn btn-default ssh_btn" data-toggle="modal" data-target="#ssh_access_<s:property value="id"/>">SSH Access</button>
+                            	<%-- formaction="viewSystems" --%>
+                            </td>
+                            
                         </tr>
 
                     </s:iterator>
                     </tbody>
                 </table>
                 </div>
-	    </s:form>
+	    	</s:form>
         </s:if>
         <s:if test="script!=null && sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
             <div class="btn btn-default select_frm_btn spacer spacer-bottom">Execute Script</div>
@@ -182,6 +189,45 @@
                  </p>
                 </div>
         </s:else>
+        
+        <s:iterator var="system" value="sortedSet.itemList" status="stat">
+            <div id="ssh_access_<s:property value="id"/>" class="modal fade">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                            <h4 class="modal-title">Connect To Your Instance</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <s:form>
+                                    <H4>To access your instance:</H4>
+                                    <ol>
+										<li>Locate your private key file 
+										(abcd.key). The wizard automatically detects the key you used to launch the instance</li>
+										<li>Your key must not be publicly viewable for SSH to work. Use this command if needed:<br>
+											<blockquote>chmod 400 abcd.key</blockquote>
+										</li>
+										<li>Connect to your instance using its Public IP:<br>
+											<blockquote><s:property value="host"/></blockquote>
+										</li>
+									</ol>
+									
+									<H4>Example:</H4>
+										<blockquote>ssh -i ...  <s:property value="user"/>@<s:property value="host"/></blockquote>
+										
+										Please note that in most cases the username and private key file above will be correct.
+                                    
+                                </s:form>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+       </s:iterator>
     </div>
 
 
