@@ -148,11 +148,9 @@
                     var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
 
                     if (String.fromCharCode(keyCode) && String.fromCharCode(keyCode) != ''
-                            && !keys[91] && !keys[93] && !keys[224] && !keys[27]
-                            && !keys[37] && !keys[38] && !keys[39] && !keys[40]
-                            && !keys[13] && !keys[8] && !keys[9] && (!keys[17] 
-                            || keys[18]) && !keys[46] && !keys[45] && !keys[33] 
-                            && !keys[34] && !keys[35] && !keys[36]) {
+                            && (!e.ctrlKey || e.altKey) && !e.metaKey && !keys[27] && !keys[37]
+                            && !keys[38] && !keys[39] && !keys[40] && !keys[13] && !keys[8] && !keys[9] 
+                            && !keys[46] && !keys[45] && !keys[33] && !keys[34] && !keys[35] && !keys[36]) {
                         var cmdStr = String.fromCharCode(keyCode);
                         connection.send(JSON.stringify({id: getActiveTermsInstanceIds(), command: cmdStr}));
                     }
@@ -164,12 +162,7 @@
                 if (termFocus) {
                     var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
                     keys[keyCode] = true;
-                    //prevent default for unix ctrl commands
-                    if (keys[17] && (keyCode == 83 || keyCode == 81 || keyCode == 84 || keyCode == 220 || keyCode == 90 || keyCode == 72 || keyCode == 87 || keyCode == 85 || keyCode == 82 || keyCode == 68)) {
-                        e.preventDefault();
-                        e.stopImmediatePropagation();
-                    }
-
+                    
                     //27 - ESC
                     //37 - LEFT
                     //38 - UP
@@ -185,9 +178,16 @@
                     //34 - PG DOWN
                     //35 - END
                     //36 - HOME
-                    if((keys[17] && !keys[18]) || keyCode == 27 || keyCode == 37 || keyCode == 38 || keyCode == 39 || keyCode == 40 || keyCode == 13 || keyCode == 8 || keyCode == 9 || keyCode == 46 || keyCode == 45 || keyCode == 33 || keyCode == 34 || keyCode == 35 || keyCode == 36) {
+                    if((e.ctrlKey && !e.altKey) || keyCode == 27 || keyCode == 37 || keyCode == 38 || keyCode == 39 || keyCode == 40 || keyCode == 13 || keyCode == 8 || keyCode == 9 || keyCode == 46 || keyCode == 45 || keyCode == 33 || keyCode == 34 || keyCode == 35 || keyCode == 36) {
                         connection.send(JSON.stringify({id: getActiveTermsInstanceIds(), keyCode: keyCode}));
                     }
+                    
+                    //prevent default for unix ctrl commands
+                    if (e.ctrlKey && (keyCode == 83 || keyCode == 81 || keyCode == 84 || keyCode == 220 || keyCode == 90 || keyCode == 72 || keyCode == 87 || keyCode == 85 || keyCode == 82 || keyCode == 68)) {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                    }
+
                 }
 
             });
@@ -391,9 +391,9 @@
             {
 
                 //if terminal window toggle active for commands
-                element.mousedown(function () {
+                element.mousedown(function (e) {
                     //check for cmd-click / ctr-click
-                    if (!keys[17] && !keys[91] && !keys[93] && !keys[224]) {
+                    if (!e.ctrlKey && !e.metaKey) {
                         $(".run_cmd").removeClass('run_cmd_active');
                     }
 
