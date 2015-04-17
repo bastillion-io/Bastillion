@@ -148,11 +148,9 @@
                     var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
 
                     if (String.fromCharCode(keyCode) && String.fromCharCode(keyCode) != ''
-                            && !keys[91] && !keys[93] && !keys[224] && !keys[27]
-                            && !keys[37] && !keys[38] && !keys[39] && !keys[40]
-                            && !keys[13] && !keys[8] && !keys[9] && (!e.ctrlKey 
-                            || e.altKey) && !keys[46] && !keys[45] && !keys[33] 
-                            && !keys[34] && !keys[35] && !keys[36]) {
+                            && (!e.ctrlKey || e.altKey) && !e.metaKey && !keys[27] && !keys[37]
+                            && !keys[38] && !keys[39] && !keys[40] && !keys[13] && !keys[8] && !keys[9] 
+                            && !keys[46] && !keys[45] && !keys[33] && !keys[34] && !keys[35] && !keys[36]) {
                         var cmdStr = String.fromCharCode(keyCode);
                         connection.send(JSON.stringify({id: getActiveTermsInstanceIds(), command: cmdStr}));
                     }
@@ -393,9 +391,9 @@
             {
 
                 //if terminal window toggle active for commands
-                element.mousedown(function () {
+                element.mousedown(function (e) {
                     //check for cmd-click / ctr-click
-                    if (!keys[17] && !keys[91] && !keys[93] && !keys[224]) {
+                    if (!e.ctrlKey && !e.metaKey) {
                         $(".run_cmd").removeClass('run_cmd_active');
                     }
 
