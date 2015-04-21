@@ -161,9 +161,7 @@
                             <td><s:property value="user"/></td>
                             <td><s:property value="host"/>:<s:property value="port"/></td>
                             <td>
-                            	
-                            	<button type="button" class="btn btn-default ssh_btn" data-toggle="modal" data-target="#ssh_access_<s:property value="id"/>">SSH Access</button>
-                            	<%-- formaction="viewSystems" --%>
+                            	<button type="button" class="btn btn-default ssh_btn" data-toggle="modal" data-target="#ssh_access_<s:property value="id"/>">Your SSH Access</button>
                             </td>
                             
                         </tr>
@@ -203,10 +201,29 @@
                                 <s:form>
                                     <H4>To access your instance:</H4>
                                     <ol>
-										<li>Locate your private key file 
-										(abcd.key). The wizard automatically detects the key you used to launch the instance</li>
+										<li>Locate your private key file
+										<s:if test="publicKeyList!= null && !publicKeyList.isEmpty()">
+											(
+											<s:iterator var="system" value="publicKeyList" status="stat" >
+												
+						                        <s:property value="keyNm"/>.key
+						
+						                    </s:iterator>
+						                    )
+										</s:if>
+										<s:else>
+											(excample.key)
+										</s:else>.
+										The wizard automatically detects the key you used to launch the instance</li>
 										<li>Your key must not be publicly viewable for SSH to work. Use this command if needed:<br>
-											<blockquote>chmod 400 abcd.key</blockquote>
+											<s:if test="publicKeyList!= null && !publicKeyList.isEmpty()">
+												<s:iterator var="system" value="publicKeyList" status="stat">
+													<blockquote>chmod 400 <s:property value="keyNm"/>.key</blockquote>
+							                    </s:iterator>
+											</s:if>
+											<s:else>
+												<blockquote>chmod 400 excample.key</blockquote>
+											</s:else>
 										</li>
 										<li>Connect to your instance using its Public IP:<br>
 											<blockquote><s:property value="host"/></blockquote>
@@ -214,8 +231,18 @@
 									</ol>
 									
 									<H4>Example:</H4>
-										<blockquote>ssh -i ...  <s:property value="user"/>@<s:property value="host"/></blockquote>
-										
+										<s:if test="publicKeyList!= null && !publicKeyList.isEmpty()">
+											<s:iterator var="system" value="publicKeyList" status="stat">
+												<blockquote>
+													From Profile <s:property value="profile.nm"/>:
+													<br>
+													ssh -i <s:property value="keyNm"/>.key <s:property value="user"/>@<s:property value="host"/>
+												</blockquote>
+						                    </s:iterator>
+										</s:if>
+										<s:else>
+											<blockquote>ssh -i excample.key <s:property value="user"/>@<s:property value="host"/></blockquote>
+										</s:else>
 										Please note that in most cases the username and private key file above will be correct.
                                     
                                 </s:form>
