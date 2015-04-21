@@ -43,7 +43,7 @@
 
             <div class="navbar-header">
                 <div class="navbar-brand" >
-                    <div class="nav-img"><img src="<%= request.getContextPath() %>/img/keybox_50x38.png" alt="keybox"/></div>
+                    <div class="nav-img"><img src="<%= request.getContextPath() %>/img/keybox_40x40.png" alt="keybox"/></div>
                  KeyBox</div>
             </div>
             <!--/.nav-collapse -->
@@ -62,6 +62,11 @@
             <tr> <td>&nbsp;</td>
                 <td align="right">  <div id="login_btn" class="btn btn-default login" >Login</div></td>
             </tr>
+            <s:if test="pwMailResetEnabled">
+	            <tr> <td>&nbsp;</td>
+	                <td align="right">  <a href="/pwReset.action">Forgot your password?</a></td>
+	            </tr>
+        	</s:if>
         </s:form>
         </p>
 

@@ -48,6 +48,7 @@ public class OTPAction extends ActionSupport implements ServletRequestAware, Ser
     HttpServletRequest servletRequest;
     HttpServletResponse servletResponse;
     String qrImage;
+    String sharedSecret;
 
     @Action(value = "/admin/viewOTP",
             results = {
@@ -56,8 +57,13 @@ public class OTPAction extends ActionSupport implements ServletRequestAware, Ser
             }
     )
     public String viewOTP() {
-
+        
+        sharedSecret = OTPUtil.generateSecret();
+        
+        AuthUtil.setOTPSecret(servletRequest.getSession(), sharedSecret);
+        
         this.setQrImage(Long.toString(new Date().getTime()) + ".png");
+
         return SUCCESS;
 
     }
@@ -70,10 +76,7 @@ public class OTPAction extends ActionSupport implements ServletRequestAware, Ser
     )
     public String otpSubmit() {
 
-        String sharedSecret = AuthUtil.getOTPSecret(servletRequest.getSession());
-
         AuthDB.updateSharedSecret(sharedSecret, AuthUtil.getAuthToken(servletRequest.getSession()));
-
         return SUCCESS;
 
     }
@@ -84,8 +87,10 @@ public class OTPAction extends ActionSupport implements ServletRequestAware, Ser
 
         String username = UserDB.getUser(AuthUtil.getUserId(servletRequest.getSession())).getUsername();
 
-        String secret = OTPUtil.generateSecret();
-        AuthUtil.setOTPSecret(servletRequest.getSession(), secret);
+        String secret = AuthUtil.getOTPSecret(servletRequest.getSession());
+        
+        AuthUtil.setOTPSecret(servletRequest.getSession(), null);
+
         try {
 
             String qrCodeText = "otpauth://totp/KeyBox%20%28" + URLEncoder.encode(servletRequest.getHeader("host").replaceAll("\\:.*$",""), "utf-8") + "%29:" + username + "?secret=" + secret;
@@ -114,7 +119,10 @@ public class OTPAction extends ActionSupport implements ServletRequestAware, Ser
                 }
             }
             ImageIO.write(image, "png", servletResponse.getOutputStream());
+            
             servletResponse.getOutputStream().flush();
+            servletResponse.getOutputStream().close();
+            
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -146,5 +154,13 @@ public class OTPAction extends ActionSupport implements ServletRequestAware, Ser
 
     public void setServletRequest(HttpServletRequest servletRequest) {
         this.servletRequest = servletRequest;
+    }
+
+    public String getSharedSecret() {
+        return sharedSecret;
+    }
+
+    public void setSharedSecret(String sharedSecret) {
+        this.sharedSecret = sharedSecret;
     }
 }

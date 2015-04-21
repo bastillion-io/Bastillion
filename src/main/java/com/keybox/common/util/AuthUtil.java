@@ -40,6 +40,29 @@ public class AuthUtil {
     }
 
     /**
+     * set authentication type
+     *
+     * @param session http session
+     * @param authType authentication type
+     */
+    public static void setAuthType(HttpSession session, String authType) {
+        if (authType != null) {
+            session.setAttribute("authType", authType);
+        }
+    }
+
+    /**
+     * query authentication type
+     *
+     * @param session http session
+     * @return authentication type
+     */
+    public static String getAuthType(HttpSession session) {
+        String authType= (String)session.getAttribute("authType");
+        return authType;
+    }
+    
+    /**
      * set user type
      *
      * @param session http session
@@ -115,6 +138,16 @@ public class AuthUtil {
         authToken = EncryptionUtil.decrypt(authToken);
         return authToken;
     }
+    
+    /**
+     * set session Password reset Info
+     * 
+     * @param session http session
+     * @param pwreset Password reset Info
+     */
+    public static boolean getPWReset(HttpSession session) {
+    	return (boolean) session.getAttribute("pwreset");
+	}
 
     /**
      * query session for timeout
@@ -163,6 +196,16 @@ public class AuthUtil {
             session.setAttribute("authToken", EncryptionUtil.encrypt(authToken));
         }
     }
+    
+    /**
+     * set session Password reset Info
+     * 
+     * @param session http session
+     * @param pwreset Password reset Info
+     */
+    public static void setPWReset(HttpSession session, boolean pwreset) {
+		session.setAttribute("pwreset", pwreset);
+	}
 
     /**
      * set session timeout
@@ -191,5 +234,7 @@ public class AuthUtil {
 
         session.invalidate();
     }
+
+	
 
 }

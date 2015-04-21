@@ -43,7 +43,7 @@
 
                 <div class="navbar-header">
                     <div class="navbar-brand" >
-                        <div class="nav-img"><img src="<%= request.getContextPath()%>/img/keybox_50x38.png" alt="keybox"/></div>
+                        <div class="nav-img"><img src="<%= request.getContextPath()%>/img/keybox_40x40.png" alt="keybox"/></div>
                         KeyBox</div>
                 </div>
                 <!--/.nav-collapse -->
@@ -57,13 +57,21 @@
             <div class="row featurette">
                 <div class="col-md-7">
 
-                    <img src="qrImage.action?qrImage=<s:property value="qrImage"/>" alt="<s:property value="qrImage"/>"/>
+                    <div class="panel panel-default">
+                        <div class="panel-body" >
+                            <img src="qrImage.action?qrImage=<s:property value="qrImage"/>" alt="<s:property value="qrImage"/>"/>
+                        </div>
+                        <div class="panel-footer">
+                            <label>Can't scan QR code?</label>&nbsp;&nbsp;<a href="#" onclick="$('#shared-secret').toggleClass('hidden');">Show secret</a>
+                            <span id="shared-secret" class="hidden"> - <s:property value="sharedSecret"/></span>
+                        </div>
+                    </div>
 
                 </div>
                 <div class="col-md-5">
                     <p>
-                        Scan the QR Code using <a href="https://fedorahosted.org/freeotp" target="_blank">FreeOTP</a> 
-                        or <a href="https://github.com/google/google-authenticator" target="_blank">Google Authenticator</a> 
+                        Scan the QR code using <a href="https://fedorahosted.org/freeotp" target="_blank">FreeOTP</a>
+                        or <a href="https://github.com/google/google-authenticator" target="_blank">Google Authenticator</a>
                         on your Android or iOS device to setup two-factor authentication.
                     </p>
                     <table class="table table-striped table-hover ">
@@ -98,9 +106,11 @@
                             </tr>
                         </tbody>
                     </table>
-
-                    <button onclick="window.location = 'menu.action'" class="btn btn-danger spacer spacer-left">Skip for Now</button>
-                    <button onclick="window.location = 'otpSubmit.action'" class="btn btn-default spacer spacer-right">Got It!</button>
+                    <button onclick="window.location = 'menu.action'" class="btn btn-danger spacer spacer-left" style="float:left">Skip for Now</button>
+                    <s:form action="otpSubmit" theme="simple" >
+                        <s:hidden name="sharedSecret"/>
+                        <s:submit cssClass="btn btn-default spacer spacer-right" value="Got It!"/>
+                    </s:form>
                 </div>
             </div>
         </div>

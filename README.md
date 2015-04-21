@@ -4,7 +4,7 @@ KeyBox is a web-based SSH console that centrally manages administrative access t
 
 Administrators can login using two-factor authentication with [FreeOTP](https://fedorahosted.org/freeotp) or [Google Authenticator](https://github.com/google/google-authenticator). From there they can manage their public SSH keys or connect to their systems through a web-shell. Commands can be shared across shells to make patching easier and eliminate redundant command execution.
 
-KeyBox layers TLS/SSL on top of SSH and can act as a bastion host for administration. Layering protocols for security is described in detail in [The Security Implications of SSH](http://www.sans.org/reading-room/whitepapers/vpns/security-implications-ssh-1180) whitepaper. SSH key management is enabled by default to prevent unmanaged public keys and enforce best practices.
+KeyBox layers TLS/SSL on top of SSH and acts as a bastion host for administration. Protocols are stacked (TLS/SSL + SSH) so infrastructure cannot be exposed through tunneling / port forwarding. More details can be found in the following whitepaper: [The Security Implications of SSH](http://www.sans.org/reading-room/whitepapers/vpns/security-implications-ssh-1180). Also, SSH key management is enabled by default to prevent unmanaged public keys and enforce best practices.
 
 ![Terminals](http://sshkeybox.com/img/screenshots/medium/terms.png)
 
@@ -117,6 +117,31 @@ For example:
 	defaultSSHPassphrase=myPa$$w0rd
 	
 After startup and once the key has been registered it can then be removed from the system. The passphrase and the key paths will be removed from the configuration file.
+
+
+External Authentication
+------
+External Authentication can be enabled through the KeyBoxConfig.properties.
+
+For example:
+
+	#specify a external authentication module (ex: ldap-ol, ldap-ad).  Edit the jaas.conf to set connection details
+	jaasModule=ldap-ol
+    
+Connection details need to be set in the jaas.conf file
+
+    ldap-ol {
+    	com.sun.security.auth.module.LdapLoginModule SUFFICIENT
+    	userProvider="ldap://hostname:389/ou=example,dc=keybox,dc=com"
+    	userFilter="(&(uid={USERNAME})(objectClass=inetOrgPerson))"
+    	authzIdentity="{cn}"
+    	useSSL=false
+    	debug=false;
+    };
+    
+
+Administrators will be added as they are authenticated and profiles of systems may be assigned by full-privileged users.
+
 
 Auditing
 ------

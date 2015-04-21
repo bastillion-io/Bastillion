@@ -16,9 +16,12 @@
 package com.keybox.manage.action;
 
 import com.keybox.common.util.AuthUtil;
+import com.keybox.manage.db.SystemDB;
 import com.keybox.manage.db.SystemStatusDB;
+import com.keybox.manage.model.Auth;
 import com.keybox.manage.model.SchSession;
 import com.keybox.manage.model.HostSystem;
+import com.keybox.manage.model.UserSchSessions;
 import com.keybox.manage.util.DBUtils;
 import com.keybox.manage.util.SSHUtil;
 import com.opensymphony.xwork2.ActionSupport;
@@ -56,7 +59,8 @@ public class UploadAndPushAction extends ActionSupport implements ServletRequest
     )
     public String setUpload() throws Exception {
         Long userId= AuthUtil.getUserId(servletRequest.getSession());
-        SystemStatusDB.setInitialSystemStatus(idList, userId);
+
+        SystemStatusDB.setInitialSystemStatus(idList, userId, AuthUtil.getUserType(servletRequest.getSession()));
         return SUCCESS;
 
     }
@@ -104,14 +108,25 @@ public class UploadAndPushAction extends ActionSupport implements ServletRequest
             pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
             if (pendingSystemStatus != null) {
                 //get session for system
-                SchSession session = SecureShellAction.getUserSchSessionMap().get(sessionId).getSchSessionMap().get(pendingSystemStatus.getId());
-                //push upload to system
-                currentSystemStatus = SSHUtil.pushUpload(pendingSystemStatus, session.getSession(), UPLOAD_PATH + "/" + uploadFileName, pushDir + "/" + uploadFileName);
+                SchSession session = null; 
+                for(Integer instanceId : SecureShellAction.getUserSchSessionMap().get(sessionId).getSchSessionMap().keySet()) {
+                    
+                    //if host system id matches pending system then upload
+                    if(pendingSystemStatus.getId().equals(SecureShellAction.getUserSchSessionMap().get(sessionId).getSchSessionMap().get(instanceId).getHostSystem().getId())){
+                        session = SecureShellAction.getUserSchSessionMap().get(sessionId).getSchSessionMap().get(instanceId);
+                    }
+                }
+                
+                if(session!=null) {
 
-                //update system status
-                SystemStatusDB.updateSystemStatus(currentSystemStatus, userId);
+                    //push upload to system
+                    currentSystemStatus = SSHUtil.pushUpload(pendingSystemStatus, session.getSession(), UPLOAD_PATH + "/" + uploadFileName, pushDir + "/" + uploadFileName);
 
-                pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
+                    //update system status
+                    SystemStatusDB.updateSystemStatus(currentSystemStatus, userId);
+
+                    pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
+                }
 
             }
 

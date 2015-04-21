@@ -85,8 +85,7 @@ public class SecureShellWS {
                 }
 
                 for (String idStr : (ArrayList<String>) jsonRoot.get("id")) {
-                    Long id = Long.parseLong(idStr);
-
+                    Integer id = Integer.parseInt(idStr);
 
                     //get servletRequest.getSession() for user
                     UserSchSessions userSchSessions = SecureShellAction.getUserSchSessionMap().get(sessionId);
@@ -122,9 +121,9 @@ public class SecureShellWS {
         if (SecureShellAction.getUserSchSessionMap() != null) {
             UserSchSessions userSchSessions = SecureShellAction.getUserSchSessionMap().get(sessionId);
             if (userSchSessions != null) {
-                Map<Long, SchSession> schSessionMap = userSchSessions.getSchSessionMap();
+                Map<Integer, SchSession> schSessionMap = userSchSessions.getSchSessionMap();
 
-                for (Long sessionKey : schSessionMap.keySet()) {
+                for (Integer sessionKey : schSessionMap.keySet()) {
 
                     SchSession schSession = schSessionMap.get(sessionKey);
 
@@ -222,7 +221,7 @@ public class SecureShellWS {
         //CTR-U
         keyMap.put(85, new byte[]{(byte) 0x15});
         //CTR-V
-        //keyMap.put(86, new byte[]{(byte) 0x16});
+        keyMap.put(86, new byte[]{(byte) 0x16});
         //CTR-W
         keyMap.put(87, new byte[]{(byte) 0x17});
         //CTR-X
@@ -235,6 +234,16 @@ public class SecureShellWS {
         keyMap.put(219, new byte[]{(byte) 0x1B});
         //CTR-]
         keyMap.put(221, new byte[]{(byte) 0x1D});
+        //INSERT
+        keyMap.put(45, "\033[2~".getBytes());
+        //PG UP
+        keyMap.put(33, "\033[5~".getBytes());
+        //PG DOWN
+        keyMap.put(34, "\033[6~".getBytes());
+        //END
+        keyMap.put(35, "\033[4~".getBytes());
+        //HOME
+        keyMap.put(36, "\033[1~".getBytes());
 
     }
 

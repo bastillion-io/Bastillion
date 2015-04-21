@@ -64,7 +64,7 @@ public class AuthFilter implements Filter {
         //check if exists
         if (authToken != null && !authToken.trim().equals("")) {
             //check if valid admin auth token
-            String userType = AuthDB.isAuthorized(authToken);
+            String userType = AuthDB.isAuthorized(AuthUtil.getUserId(servletRequest.getSession()), authToken);
             if (userType != null) {
                 String uri = servletRequest.getRequestURI();
                 if (Auth.MANAGER.equals(userType)) {
@@ -106,7 +106,15 @@ public class AuthFilter implements Filter {
             servletResponse.sendRedirect(servletRequest.getContextPath() + "/login.action");
         }
         else{
-            chain.doFilter(req, resp);
+        	
+        	if(AuthUtil.getPWReset(servletRequest.getSession()))
+        	{
+        		servletResponse.sendRedirect(servletRequest.getContextPath() + "/userSettingsPWchange.action");
+        	}
+        	else
+        	{
+        		chain.doFilter(req, resp);
+        	}
         }
     }
 

@@ -93,13 +93,13 @@
                 <s:form id="viewKeys" action="viewKeys" theme="simple">
                     <s:hidden name="sortedSet.orderByDirection"/>
                     <s:hidden name="sortedSet.orderByField"/>
-                    
+
                     <table>
                         <tr>
                             <td class="align_left"><a href="../admin/viewKeys.action" class="btn btn-success">Add / Remove Keys</a></td>
                             <td>|</td>
                             <s:if test="userList!= null && !userList.isEmpty()">
-                                <td style="padding-left:0px;">
+                                <td >
                                     <s:select name="sortedSet.filterMap['%{@com.keybox.manage.db.PublicKeyDB@FILTER_BY_USER_ID}']" listKey="id" listValue="username"
                                               class="view_frm_select"
                                               list="userList"
@@ -108,7 +108,7 @@
                                 </td>
                             </s:if>
                             <s:if test="profileList!= null && !profileList.isEmpty()">
-                                <td style="padding-left:0px;">
+                                <td>
                                     <s:select name="sortedSet.filterMap['%{@com.keybox.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID}']" listKey="id" listValue="nm"
                                               class="view_frm_select"
                                               list="profileList"
@@ -119,9 +119,7 @@
                             <td>
                             <s:select name="sortedSet.filterMap['%{@com.keybox.manage.db.PublicKeyDB@FILTER_BY_ENABLED}']"
                                       class="view_frm_select"
-                                      list="#{'true':'Enabled', 'false':'Disabled' }"
-                                      headerKey=""
-                                      headerValue="-Select Status-" />
+                                      list="#{true:'Enabled', false:'Disabled'}"/>
                             </td>
                             <td>
                                 <div id="view_btn" class="btn btn-default">Filter</div>
@@ -134,7 +132,8 @@
     </table>
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
-            <table class="table-striped scrollableTable" style="min-width:80%">
+            <div class="scrollWrapper">
+            <table class="table-striped scrollableTable" >
                 <thead>
 
                 <tr>
@@ -157,7 +156,9 @@
                     <th id="<s:property value="@com.keybox.manage.db.PublicKeyDB@SORT_BY_CREATE_DT"/>" class="sort">
                         Created
                     </th>
-                    <th>&nbsp;</th>
+                    <th id="<s:property value="@com.keybox.manage.db.PublicKeyDB@SORT_BY_ENABLED"/>" class="sort" >
+                    	Action
+                    </th>
                 </tr>
                 </thead>
                 <tbody>
@@ -179,12 +180,12 @@
                         <td>
                             <div>
                                 <s:if test="%{enabled}">
-                                    <button class="btn btn-default btn-danger spacer spacer-left disable_btn" data-toggle="modal"
+                                    <button class="btn btn-default btn-danger btn-disable_enable spacer spacer-left disable_btn" data-toggle="modal"
                                             id="disable_btn_<s:property value="id"/>">Disable
                                     </button>
                                 </s:if>
                                 <s:else>
-                                    <button class="btn btn-default btn-success spacer spacer-left enable_btn" data-toggle="modal"
+                                    <button class="btn btn-default btn-success btn-disable_enable spacer spacer-left enable_btn" data-toggle="modal"
                                             id="enable_btn_<s:property value="id"/>">Enable
                                     </button>
                                 </s:else>
@@ -195,6 +196,7 @@
                 </s:iterator>
                 </tbody>
             </table>
+            </div>
         </s:if>
 
 </div>

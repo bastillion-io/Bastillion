@@ -72,17 +72,16 @@ $(document).ready(function() {
 
                var id = $(this).attr("id").replace("output_", "");
 
-
-               $.getJSON('getJSONTermOutputForSession.action?sessionId=<s:property value="sessionAudit.id"/>&hostSystemId='+id+'&t='+new Date().getTime(), function(data) {
+               $.getJSON('getJSONTermOutputForSession.action?sessionId=<s:property value="sessionAudit.id"/>&instanceId='+id+'&t='+new Date().getTime(), function(data) {
                    $.each(data, function(key, val) {
-                       if (val.output != '' && val.hostSystemId!=null) {
+                       if (val.output != '' && val.instanceId!=null) {
 
-                               $("#output_"+val.hostSystemId+"> .terminal").empty();
+                               $("#output_"+val.instanceId+"> .terminal").empty();
                                var output=val.output;
                                output = output.replace(/\r\n\r\n/g, '\r\n \r\n');
                                var outputList = output.split('\r\n');
                                for(var i=0; i<outputList.length;i++){
-                                   $("#output_"+val.hostSystemId+"> .terminal").append("<pre>"+outputList[i]+"</pre>");;
+                                   $("#output_"+val.instanceId+"> .terminal").append("<pre>"+outputList[i]+"</pre>");;
                                }
 
 
@@ -147,7 +146,7 @@ $(document).ready(function() {
 
         <div class="navbar-header">
             <div class="navbar-brand" >
-            <div class="nav-img"><img src="<%= request.getContextPath() %>/img/keybox_50x38.png" alt="keybox"/></div>
+            <div class="nav-img"><img src="<%= request.getContextPath() %>/img/keybox_40x40.png" alt="keybox"/></div>
              KeyBox</div>
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                 <span class="sr-only">Toggle navigation</span>
@@ -191,12 +190,12 @@ $(document).ready(function() {
 
             <div class="termwrapper">
                 <s:iterator value="sessionAudit.hostSystemList">
-                    <div id="run_cmd_<s:property value="id"/>" class="run_cmd_active run_cmd">
+                    <div id="run_cmd_<s:property value="instanceId"/>" class="run_cmd_active run_cmd">
 
                         <h6 class="term-header"><s:property value="displayLabel"/></h6>
 
                         <div id="term" class="term">
-                            <div id="output_<s:property value="id"/>" class="output">
+                            <div id="output_<s:property value="instanceId"/>" class="output">
                             <div class="terminal" >
                             </div>
                             </div>

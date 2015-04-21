@@ -20,6 +20,7 @@ import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.db.PublicKeyDB;
 import com.keybox.manage.db.ScriptDB;
 import com.keybox.manage.db.UserDB;
+import com.keybox.manage.model.Auth;
 import com.keybox.manage.model.Script;
 import com.keybox.manage.model.SortedSet;
 import com.keybox.manage.model.User;
@@ -131,8 +132,7 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
                     addActionError(PasswordUtil.PASSWORD_REQ_ERROR_MSG);
             }
         }
-
-        if(user!=null && user.getId()==null && (user.getPassword()==null || user.getPassword().trim().equals(""))){
+        if(user!=null && user.getId()==null && !Auth.AUTH_EXTERNAL.equals(user.getAuthType()) && (user.getPassword()==null || user.getPassword().trim().equals(""))){
             addActionError("Password is required");
         }
 

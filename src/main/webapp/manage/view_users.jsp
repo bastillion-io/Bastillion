@@ -52,8 +52,20 @@
             $('#<s:property value="sortedSet.orderByField"/>').attr('class', '<s:property value="sortedSet.orderByDirection"/>');
             </s:if>
 
-
+            $('.auth_type').change(function() {
+                hideShowPassword($(this).val());
+            });
+            
         });
+        
+        //hide show passwords
+        function hideShowPassword(val){
+            if(val=='EXTERNAL'){
+                $('.password').closest('tr').hide();
+            }else {
+                $('.password').closest('tr').show();
+            }
+        }
     </script>
 
     <s:if test="fieldErrors.size > 0 || actionErrors.size > 0">
@@ -64,6 +76,9 @@
                 </s:if>
                 <s:else>
                 $("#add_dialog").modal();
+                <s:if test="%{@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}">
+                    hideShowPassword($('.auth_type:checked').val());
+                </s:if>
                 </s:else>
             });
         </script>
@@ -88,14 +103,19 @@
         <p>Add / Delete users or select a user below to assign profile</p>
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
-                <table class="table-striped  scrollableTable" style="min-width: 85%">
+            <div class="scrollWrapper">
+                <table class="table-striped  scrollableTable">
 
                     <thead>
                     <tr>
                         <th id="<s:property value="@com.keybox.manage.db.UserDB@SORT_BY_USERNAME"/>" class="sort">Username
                         </th>
-                         <th id="<s:property value="@com.keybox.manage.db.UserDB@SORT_BY_USER_TYPE"/>" class="sort">User Type
-                                                </th>
+                        <th id="<s:property value="@com.keybox.manage.db.UserDB@SORT_BY_USER_TYPE"/>" class="sort">User Type
+                        </th>
+                        <s:if test="%{@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}">
+                            <th id="<s:property value="@com.keybox.manage.db.UserDB@SORT_BY_AUTH_TYPE"/>" class="sort">Auth Type
+                            </th>
+                        </s:if>
                         <th id="<s:property value="@com.keybox.manage.db.UserDB@SORT_BY_LAST_NM"/>" class="sort">Last
                             Name
                         </th>
@@ -130,6 +150,16 @@
                             Full Access
                          </s:else>
                         </td>
+                        <s:if test="%{@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}">
+                            <td>
+                                <s:if test="authType==\"BASIC\"">
+                                    Basic
+                                </s:if>
+                                <s:else>
+                                    External
+                                </s:else>
+                            </td>
+                        </s:if>
                         <td><s:property value="lastNm"/></td>
                         <td><s:property value="firstNm"/></td>
                         <td><s:property value="email"/></td>
@@ -153,6 +183,7 @@
                     </s:iterator>
                     </tbody>
                 </table>
+                </div>
         </s:if>
 
 
@@ -172,11 +203,14 @@
                             <s:form action="saveUser" class="save_user_form_add" autocomplete="off">
                                 <s:textfield name="user.username" label="Username" size="15"/>
                                 <s:select name="user.userType" list="#{'A':'Administrative Only','M':'Full Access'}" label="UserType"/>
+                                <s:if test="%{@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}">
+                                    <s:radio name="user.authType" label="Authentication Type" list="#{'BASIC':'Basic', 'EXTERNAL':'External'}" cssClass="auth_type"/>
+                                </s:if>
                                 <s:textfield name="user.firstNm" label="First Name" size="15"/>
                                 <s:textfield name="user.lastNm" label="Last Name" size="15"/>
                                 <s:textfield name="user.email" label="Email Address" size="25"/>
-                                <s:password name="user.password" value="" label="Password" size="15"/>
-                                <s:password name="user.passwordConfirm" value="" label="Confirm Password" size="15"/>
+                                <s:password name="user.password" value="" label="Password" size="15" cssClass="password"/>
+                                <s:password name="user.passwordConfirm" value="" label="Confirm Password" size="15" cssClass="password"/>
                                 <s:hidden name="resetSharedSecret"/>
                                 <s:hidden name="sortedSet.orderByDirection"/>
                                 <s:hidden name="sortedSet.orderByField"/>
@@ -198,7 +232,7 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                                <h4 class="modal-title">Edit System</h4>
+                                <h4 class="modal-title">Edit User</h4>
                             </div>
                             <div class="modal-body">
                                 <div class="row">
@@ -206,11 +240,27 @@
                                     <s:form action="saveUser" id="save_user_form_edit_%{id}" autocomplete="off">
                                         <s:textfield name="user.username" value="%{username}" label="Username" size="15"/>
                                         <s:select name="user.userType" value="%{userType}" list="#{'A':'Administrative Only','M':'Full Access'}" label="UserType"/>
+                                        <s:if test="%{@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}">
+                                            <s:hidden name="user.authType" value="%{authType}"/>
+                                            <tr>
+                                                <td class="tdLabel"><label class="label">Authentication Type</label></td>
+                                                <td>
+                                                    <s:if test="authType==\"BASIC\"">
+                                                        Basic
+                                                    </s:if>
+                                                    <s:else>
+                                                        External
+                                                    </s:else>
+                                                </td>
+                                            </tr>
+                                        </s:if>
                                         <s:textfield name="user.firstNm" value="%{firstNm}" label="First Name" size="15"/>
                                         <s:textfield name="user.lastNm" value="%{lastNm}" label="Last Name" size="15"/>
                                         <s:textfield name="user.email" value="%{email}" label="Email Address" size="25"/>
-                                        <s:password name="user.password" value="" label="Password" size="15"/>
-                                        <s:password name="user.passwordConfirm" value="" label="Confirm Password" size="15"/>
+                                        <s:if test="%{!@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled || #user.authType==\"BASIC\"}">
+                                            <s:password name="user.password" value="" label="Password" size="15"/>
+                                            <s:password name="user.passwordConfirm" value="" label="Confirm Password" size="15"/>
+                                        </s:if>
                                         <s:checkbox name="resetSharedSecret" label="Reset OTP Code"/>
                                         <s:hidden name="user.id" value="%{id}"/>
                                         <s:hidden name="sortedSet.orderByDirection"/>

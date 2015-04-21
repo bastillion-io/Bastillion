@@ -25,13 +25,17 @@
        <script type="text/javascript">
         $(document).ready(function() {
 
-
-            $("#change_pass_btn").button().click(function() {
-                $('#passwordSubmit').submit();
+            $(".submit_btn").button().click(function() {
+                $(this).closest('form').submit();
             });
         });
 
     </script>
+    <style>
+        form table {
+            width:350px;
+        }
+    </style>
 
     <title>KeyBox - Set Admin Password</title>
 </head>
@@ -46,15 +50,14 @@
         <p>Change your administrative password below</p>
 
         <s:actionerror/>
-        <s:form action="passwordSubmit" autocomplete="off">
+        <s:form action="passwordchangeSubmit" autocomplete="off">
             <s:password name="auth.prevPassword" label="Current Password" />
             <s:password name="auth.password" label="New Password" />
             <s:password name="auth.passwordConfirm" label="Confirm New Password" />
             <tr> <td>&nbsp;</td>
-                <td align="right">  <div id="change_pass_btn" class="btn btn-default" >Change Password</div></td>
+                <td align="right">  <div id="change_btn" class="btn btn-default submit_btn" >Change Password</div></td>
             </tr>
         </s:form>
-
     </div>
 
 

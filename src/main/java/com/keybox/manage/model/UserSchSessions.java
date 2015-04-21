@@ -21,14 +21,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class UserSchSessions {
 
-    Map<Long, SchSession> schSessionMap = new ConcurrentHashMap<Long, SchSession>();
+    Map<Integer, SchSession> schSessionMap = new ConcurrentHashMap<Integer, SchSession>();
 
 
-    public Map<Long, SchSession> getSchSessionMap() {
+    public Map<Integer, SchSession> getSchSessionMap() {
         return schSessionMap;
     }
 
-    public void setSchSessionMap(Map<Long, SchSession> schSessionMap) {
+    public void setSchSessionMap(Map<Integer, SchSession> schSessionMap) {
         this.schSessionMap = schSessionMap;
     }
 

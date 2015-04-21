@@ -488,14 +488,15 @@ public class SystemDB {
 	/**
 	 * method to check system permissions for user
 	 *
+	 * @param con DB connection
 	 * @param systemSelectIdList list of system ids to check
 	 * @param userId             user id
 	 * @return only system ids that user has perms for
 	 */
-	public static List<Long> checkSystemPerms(List<Long> systemSelectIdList, Long userId) {
+	public static List<Long> checkSystemPerms(Connection con, List<Long> systemSelectIdList, Long userId) {
 
 		List<Long> systemIdList = new ArrayList<Long>();
-		List<Long> userSystemIdList = getAllSystemIdsForUser(userId);
+		List<Long> userSystemIdList = getAllSystemIdsForUser(con, userId);
 
 		for (Long systemId : userSystemIdList) {
 			if (systemSelectIdList.contains(systemId)) {
