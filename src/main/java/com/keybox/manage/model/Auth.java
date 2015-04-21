@@ -31,8 +31,9 @@ public class Auth {
     String username;
     String password;
     String passwordConfirm;
-    String prevPassword;
-    String authToken;
+	String prevPassword;
+	boolean pwreset;
+	String authToken;
     String otpSecret;
     Long otpToken;
     String salt;
@@ -94,7 +95,14 @@ public class Auth {
     public void setPasswordConfirm(String passwordConfirm) {
         this.passwordConfirm = passwordConfirm;
     }
+    public boolean isPwreset() {
+		return pwreset;
+	}
 
+	public void setPwreset(boolean pwreset) {
+		this.pwreset = pwreset;
+	}
+    
     public String getPrevPassword() {
         return prevPassword;
     }
