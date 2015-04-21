@@ -24,12 +24,12 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.4.186</version>
+            <version>1.4.187</version>
         </dependency>
         <dependency>
             <groupId>com.jcraft</groupId>
             <artifactId>jsch</artifactId>
-            <version>0.1.51</version>
+            <version>0.1.52</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
