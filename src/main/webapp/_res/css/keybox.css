@@ -277,8 +277,12 @@ div.termwrapper div h6 {
 
 .nav-img {
     float: left;
-    margin-top: -8px;
+    margin-top: -10px;
     margin-left: -50px;
+}
+
+.navbar-brand {
+    font-weight: bold;
 }
 
 .align_left {
