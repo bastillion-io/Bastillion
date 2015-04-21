@@ -34,6 +34,19 @@
                 var id = $(this).attr('id').replace("del_btn_", "");
                 window.location = 'deleteSystem.action?hostSystem.id=' + id + '&sortedSet.orderByDirection=<s:property value="sortedSet.orderByDirection" />&sortedSet.orderByField=<s:property value="sortedSet.orderByField"/>';
             });
+            
+            //call disable action
+            $(".disable_btn").button().click(function () {
+            	var id = $(this).attr('id').replace("disable_btn_", "");
+            	window.location = 'disableSystem.action?hostSystem.id=' + id + '&sortedSet.orderByDirection=<s:property value="sortedSet.orderByDirection" />&sortedSet.orderByField=<s:property value="sortedSet.orderByField"/>';
+            });
+            
+          //call enable action
+            $(".enable_btn").button().click(function () {
+            	var id = $(this).attr('id').replace("enable_btn_", "");
+            	window.location = 'enableSystem.action?hostSystem.id=' + id + '&sortedSet.orderByDirection=<s:property value="sortedSet.orderByDirection" />&sortedSet.orderByField=<s:property value="sortedSet.orderByField"/>';
+            });
+            
             //submit add or edit form
             $(".submit_btn").button().click(function () {
                 $(this).parents('.modal').find('form').submit();
@@ -153,10 +166,22 @@
                         </td>
                         <td>
 
-                            <div style="width:160px">
+                            <div style="width:220px">
                                     <button id="refresh_btn_<s:property value="id"/>" class="btn btn-default refresh_btn spacer spacer-left"><img src="../../img/refresh.png" alt="Refresh" style="float:left;width:20px;height:20px;"/></button>
                                     <button class="btn btn-default spacer spacer-middle" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>">Edit</button>
-                                    <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn spacer spacer-right">Delete</button>
+                                    <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn spacer spacer-middle">Delete</button>
+                                    
+                                    <s:if test="%{enabled}">
+	                                    <button class="btn btn-default btn-danger btn-disable_enable spacer spacer-right disable_btn" data-toggle="modal"
+	                                            id="disable_btn_<s:property value="id"/>">Disable
+	                                    </button>
+	                                </s:if>
+	                                <s:else>
+	                                    <button class="btn btn-default btn-success btn-disable_enable spacer spacer-right enable_btn" data-toggle="modal"
+	                                            id="enable_btn_<s:property value="id"/>">Enable
+	                                    </button>
+	                                </s:else>
+                                    
                                 <div style="clear:both"></div>
                             </div>
                         </td>
@@ -217,6 +242,7 @@
                                     <s:textfield name="hostSystem.authorizedKeys" value="%{authorizedKeys}"
                                                  label="Authorized Keys" size="30"/>
                                     <s:hidden name="hostSystem.id" value="%{id}"/>
+                                    <s:hidden name="hostSystem.enabled" value="%{enabled}"/>
                                     <s:hidden name="sortedSet.orderByDirection"/>
                                     <s:hidden name="sortedSet.orderByField"/>
                                 </s:form>

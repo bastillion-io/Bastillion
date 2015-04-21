@@ -43,6 +43,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
     String password;
     String passphrase;
     List<Profile> profileList= new ArrayList<>();
+    boolean ismanager;
 
 
     @Action(value = "/admin/viewSystems",
@@ -53,7 +54,8 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
     public String viewAdminSystems() {
         Long userId = AuthUtil.getUserId(servletRequest.getSession());
 
-        if (Auth.MANAGER.equals(AuthUtil.getUserType(servletRequest.getSession()))) {
+        ismanager = Auth.MANAGER.equals(AuthUtil.getUserType(servletRequest.getSession()));
+        if (ismanager) {
             sortedSet = SystemDB.getSystemSet(sortedSet);
             profileList=ProfileDB.getAllProfiles();
         } else {
@@ -114,6 +116,44 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
             SystemDB.deleteSystem(hostSystem.getId());
         }
         return SUCCESS;
+    }
+    
+    /**
+     * Action to Disable System
+     * @return
+     * 
+     * @author Robert Vorkoeper
+     */
+    @Action(value = "/manage/disableSystem",
+    		results = {
+    				@Result(name = "success", location = "/manage/viewSystems.action?sortedSet.orderByDirection=${sortedSet.orderByDirection}&sortedSet.orderByField=${sortedSet.orderByField}", type = "redirect")
+    	}
+    )
+    public String disableSystem() {
+    	
+    	if (hostSystem.getId() != null) {
+    		SystemDB.disableSystem(hostSystem.getId());
+    	}
+    	return SUCCESS;
+    }
+    
+    /**
+     * Action to Enable System
+     * @return
+     * 
+     * @author Robert Vorkoeper
+     */
+    @Action(value = "/manage/enableSystem",
+    		results = {
+    				@Result(name = "success", location = "/manage/viewSystems.action?sortedSet.orderByDirection=${sortedSet.orderByDirection}&sortedSet.orderByField=${sortedSet.orderByField}", type = "redirect")
+    	}
+    )
+    public String enableSystem() {
+    	
+    	if (hostSystem.getId() != null) {
+    		SystemDB.enableSystem(hostSystem.getId());
+    	}
+    	return SUCCESS;
     }
 
     /**
@@ -213,4 +253,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
         this.servletRequest = servletRequest;
     }
 
+    public boolean isIsmanager() {
+		return ismanager;
+	}
 }

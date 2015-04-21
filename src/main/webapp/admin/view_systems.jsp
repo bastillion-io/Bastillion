@@ -97,6 +97,8 @@
                 <h3>Composite SSH Terminals</h3>
                 <p>Select the systems below to generate composite SSH sessions in multiple terminals</p>
             </s:else>
+            
+           
 
         <s:form id="viewSystems" action="viewSystems" theme="simple">
         <s:hidden name="sortedSet.orderByDirection"/>
@@ -143,6 +145,8 @@
                         </th>
                         <th id="<s:property value="@com.keybox.manage.db.SystemDB@SORT_BY_HOST"/>" class="sort">Host
                         </th>
+                        <th id="<s:property value="@com.keybox.manage.db.SystemDB@SORT_BY_STATUS"/>" class="sort">Status
+                    	</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -151,14 +155,40 @@
                         <tr>
 
                             <td>
-                                <s:checkboxlist name="systemSelectId" list="#{id:''}" cssClass="systemSelect"
+                            	<s:if test="enabled || ismanager">
+                            		<s:checkboxlist name="systemSelectId" list="#{id:''}" cssClass="systemSelect"
                                                 theme="simple"/>
+                            	</s:if>
                             </td>
                             <td>
                                 <s:property value="displayNm"/>
                             </td>
                             <td><s:property value="user"/></td>
                             <td><s:property value="host"/>:<s:property value="port"/></td>
+                            <td>
+                            	<s:if test="!enabled">
+                            		<div class="error">Temporarily disabled</div>
+                            	</s:if>
+                            	
+	                            <s:if test="statusCd=='INITIAL'">
+	                                <div class="warning">Not Started</div>
+	                            </s:if>
+	                            <s:elseif test="statusCd=='AUTHFAIL'">
+	                                <div class="warning">Authentication Failed</div>
+	                            </s:elseif>
+	                            <s:elseif test="statusCd=='HOSTFAIL'">
+				                	<div class="error">DNS Lookup Failed</div>
+				                </s:elseif>
+	                            <s:elseif test="statusCd=='KEYAUTHFAIL'">
+	                                <div class="warning">Passphrase Authentication Failed</div>
+	                            </s:elseif>
+	                            <s:elseif test="statusCd=='GENERICFAIL'">
+	                                <div class="error">Failed</div>
+	                            </s:elseif>
+	                            <s:elseif test="statusCd=='SUCCESS'">
+	                                <div class="success">Success</div>
+	                            </s:elseif>
+                        	</td>
                         </tr>
 
                     </s:iterator>
