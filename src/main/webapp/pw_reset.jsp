@@ -1,6 +1,6 @@
 <%
 /**
- * Copyright 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
+ * Copyright 2015 Robert Vorkoeper - robert-vor@gmx.de
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,13 +28,13 @@
 
         $(document).ready(function() {
 
-            $("#login_btn").button().click(function() {
-                $('#loginSubmit').submit();
+            $("#pwrest_btn").button().click(function() {
+                $('#pwResetSubmit').submit();
             });
         });
 		
     </script>
-    <title>KeyBox - Login </title>
+    <title>KeyBox - PW Reset </title>
 </head>
 <body>
 
@@ -43,30 +43,27 @@
 
             <div class="navbar-header">
                 <div class="navbar-brand" >
-                    <div class="nav-img"><img src="<%= request.getContextPath() %>/img/keybox_40x40.png" alt="keybox"/></div>
+                    <div class="nav-img"><img src="<%= request.getContextPath() %>/img/keybox_50x38.png" alt="keybox"/></div>
                  KeyBox</div>
             </div>
             <!--/.nav-collapse -->
         </div>
     </div>
 
+	
+	
     <div class="container">
         <p>
+        <s:actionmessage/>
         <s:actionerror/>
-        <s:form action="loginSubmit"  autocomplete="off">
-            <s:textfield name="auth.username" label="Username"/>
-            <s:password name="auth.password" label="Password" value="" />
-            <s:if test="otpEnabled">
-                <s:textfield name="auth.otpToken" label="OTP Access Code"  autocomplete="off" value=""/>
-            </s:if>
-            <tr> <td>&nbsp;</td>
-                <td align="right">  <div id="login_btn" class="btn btn-default login" >Login</div></td>
-            </tr>
-            <s:if test="pwMailResetEnabled">
-	            <tr> <td>&nbsp;</td>
-	                <td align="right">  <a href="/pwReset.action">Forgot your password?</a></td>
-	            </tr>
-        	</s:if>
+        <s:form action="pwResetSubmit"  autocomplete="off">
+        	<s:textfield name="email" label="E-Mail"/>
+			<tr> <td>&nbsp;</td>
+        		<td align="right">  <div id="pwrest_btn" class="btn btn-default" >Reset password</div></td>
+	    	</tr>
+	    	<tr> <td>&nbsp;</td>
+	    	<td align="right">  <a href="/login.action">Back to Login</a></td>
+	    	</tr>
         </s:form>
         </p>
 

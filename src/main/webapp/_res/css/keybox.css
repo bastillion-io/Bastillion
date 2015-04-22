@@ -274,6 +274,9 @@ div.termwrapper div h6 {
 .btn {
     padding: 5px;
 }
+.btn-disable_enable {
+  width: 60px;
+}
 
 .nav-img {
     float: left;

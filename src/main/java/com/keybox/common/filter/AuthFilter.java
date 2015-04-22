@@ -106,7 +106,15 @@ public class AuthFilter implements Filter {
             servletResponse.sendRedirect(servletRequest.getContextPath() + "/login.action");
         }
         else{
-            chain.doFilter(req, resp);
+        	
+        	if(AuthUtil.getPWReset(servletRequest.getSession()))
+        	{
+        		servletResponse.sendRedirect(servletRequest.getContextPath() + "/userSettingsPWchange.action");
+        	}
+        	else
+        	{
+        		chain.doFilter(req, resp);
+        	}
         }
     }
 
