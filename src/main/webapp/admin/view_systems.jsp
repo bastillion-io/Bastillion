@@ -220,10 +220,18 @@
                                         <li>Example:<br>
                                             <s:if test="publicKeyList!= null && !publicKeyList.isEmpty()">
                                                 <s:iterator var="system" value="publicKeyList" status="stat">
-                                                    Profile <s:property value="profile.nm"/>:
+                                                    Profile 
+                                                    	<s:if test="profile== null">
+    	                                                	All Systems:
+                                                    	</s:if>
+                                                    	<s:else>
+	                                                    	<s:property value="profile.nm"/>:
+                                                    	</s:else>
                                                     <br>
                                                     <pre>ssh -i <s:property value="keyNm"/>.key <s:property value="user"/>@<s:property value="host"/></pre>
                                                 </s:iterator>
+                                                
+                                                 
                                             </s:if>
                                             <s:else>
                                                 <pre>ssh -i excample.key <s:property value="user"/>@<s:property value="host"/></pre>

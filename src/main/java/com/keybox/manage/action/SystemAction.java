@@ -54,7 +54,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
         Long userId = AuthUtil.getUserId(servletRequest.getSession());
 
         if (Auth.MANAGER.equals(AuthUtil.getUserType(servletRequest.getSession()))) {
-            sortedSet = SystemDB.getSystemSet(sortedSet);
+            sortedSet = SystemDB.getAdminSystemSet(sortedSet, userId);
             profileList=ProfileDB.getAllProfiles();
         } else {
             sortedSet = SystemDB.getUserSystemSet(sortedSet, userId);
