@@ -215,10 +215,8 @@
 													<pre>chmod 400 excample.key</pre>
 												</s:else>
 											
-											Ensure that  ~./.ssh folder is set to 600
-										</li>
-										
-										<li>Example:
+											Ensure that  ~./.ssh folder is set to 600				
+										<li>Example:<br>
 											
 												<s:if test="publicKeyList!= null && !publicKeyList.isEmpty()">
 													<s:iterator var="system" value="publicKeyList" status="stat">
@@ -230,7 +228,6 @@
 												<s:else>
 													<pre>ssh -i excample.key <s:property value="user"/>@<s:property value="host"/></pre>
 												</s:else>
-											
                                     	</li>
 									</ol>
                                 </s:form>
