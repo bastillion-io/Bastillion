@@ -206,28 +206,28 @@
 										<li>Your key must not be publicly viewable for SSH to work if you use an ssh-client within Unix/Linux environment.<br><br>
 											Use this command if needed:
 											
-												<s:if test="publicKeyList!= null && !publicKeyList.isEmpty()">
-													<s:iterator var="system" value="publicKeyList" status="stat">
-														<pre>chmod 400 <s:property value="keyNm"/>.key</pre>
-								                    </s:iterator>
-												</s:if>
-												<s:else>
-													<pre>chmod 400 excample.key</pre>
-												</s:else>
+											<s:if test="publicKeyList!= null && !publicKeyList.isEmpty()">
+												<s:iterator var="system" value="publicKeyList" status="stat">
+													<pre>chmod 400 <s:property value="keyNm"/>.key</pre>
+							                    </s:iterator>
+											</s:if>
+											<s:else>
+												<pre>chmod 400 excample.key</pre>
+											</s:else>
 											
 											Ensure that  ~./.ssh folder is set to 600				
+										
 										<li>Example:<br>
-											
-												<s:if test="publicKeyList!= null && !publicKeyList.isEmpty()">
-													<s:iterator var="system" value="publicKeyList" status="stat">
-														Profile <s:property value="profile.nm"/>:
-														<br>
-														<pre>ssh -i <s:property value="keyNm"/>.key <s:property value="user"/>@<s:property value="host"/></pre>
-								                    </s:iterator>
-												</s:if>
-												<s:else>
-													<pre>ssh -i excample.key <s:property value="user"/>@<s:property value="host"/></pre>
-												</s:else>
+											<s:if test="publicKeyList!= null && !publicKeyList.isEmpty()">
+												<s:iterator var="system" value="publicKeyList" status="stat">
+													Profile <s:property value="profile.nm"/>:
+													<br>
+													<pre>ssh -i <s:property value="keyNm"/>.key <s:property value="user"/>@<s:property value="host"/></pre>
+							                    </s:iterator>
+											</s:if>
+											<s:else>
+												<pre>ssh -i excample.key <s:property value="user"/>@<s:property value="host"/></pre>
+											</s:else>
                                     	</li>
 									</ol>
                                 </s:form>
