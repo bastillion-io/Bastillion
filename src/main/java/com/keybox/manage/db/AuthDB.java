@@ -175,10 +175,11 @@ public class AuthDB {
             if (rs.next()) {
 
                 String salt = EncryptionUtil.generateSalt();
-                stmt = con.prepareStatement("update users set password=?, salt=? where auth_token like ?");
+                stmt = con.prepareStatement("update users set password=?, salt=?, pwreset=? where auth_token like ?");
                 stmt.setString(1, EncryptionUtil.hash(auth.getPassword() + salt));
                 stmt.setString(2, salt);
-                stmt.setString(3, auth.getAuthToken());
+                stmt.setBoolean(3, false);
+                stmt.setString(4, auth.getAuthToken());
                 stmt.execute();
                 success = true;
             }

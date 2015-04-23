@@ -45,6 +45,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
     private final String AUTH_ERROR="Authentication Failed : Login credentials are invalid";
     //check if otp is enabled
     boolean otpEnabled="true".equals(AppConfig.getProperty("enableOTP"));
+    boolean pwMailResetEnabled="true".equals(AppConfig.getProperty("pwMailReset"));
 
     @Action(value = "/login",
             results = {
@@ -100,6 +101,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
                 AuthUtil.setAuthToken(servletRequest.getSession(), authToken);
                 AuthUtil.setUserId(servletRequest.getSession(), user.getId());
                 AuthUtil.setAuthType(servletRequest.getSession(), user.getAuthType());
+                AuthUtil.setPWReset(servletRequest.getSession(), user.isPwreset());
                 AuthUtil.setTimeout(servletRequest.getSession());
 
                 //for first time login redirect to set OTP
@@ -154,6 +156,14 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
     public void setOtpEnabled(boolean otpEnabled) {
         this.otpEnabled = otpEnabled;
     }
+    
+    public boolean isPwMailResetEnabled() {
+		return pwMailResetEnabled;
+	}
+
+	public void setPwMailResetEnabled(boolean pwMailResetEnabled) {
+		this.pwMailResetEnabled = pwMailResetEnabled;
+	}
 
     public Auth getAuth() {
         return auth;

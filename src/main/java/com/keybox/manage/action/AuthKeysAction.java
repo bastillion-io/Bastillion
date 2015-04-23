@@ -26,6 +26,7 @@ import com.keybox.manage.util.PasswordUtil;
 import com.keybox.manage.util.RefreshAuthKeyUtil;
 import com.keybox.manage.util.SSHUtil;
 import com.opensymphony.xwork2.ActionSupport;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
@@ -34,6 +35,7 @@ import org.apache.struts2.interceptor.ServletResponseAware;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.List;
@@ -235,7 +237,7 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 		String pubKey=null;
 		try {
 
-			KeyPair keyPair = KeyPair.genKeyPair(jsch, type);
+			KeyPair keyPair = KeyPair.genKeyPair(jsch, type, Integer.parseInt(AppConfig.getProperty("KeyStrengh")));
 
 			OutputStream os = new ByteArrayOutputStream();
 			keyPair.writePrivateKey(os, publicKey.getPassphrase().getBytes());
@@ -311,8 +313,12 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 			} else if (PublicKeyDB.isKeyRegistered(userId, publicKey)) {
 				addActionError("This key has already been registered under selected profile.");
 				addFieldError("publicKey.publicKey", "Invalid");
-
+				
+			} else if (PublicKeyDB.isKeyExists(userId, publicKey)) {
+				addActionError("This key has already been registered unter a other User or key deleted.");
+				addFieldError("publicKey.publicKey", "Invalid");
 			}
+				
 		}
 
 		if (!this.getFieldErrors().isEmpty()) {

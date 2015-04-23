@@ -20,6 +20,7 @@ import com.keybox.common.util.AppConfig;
 import com.keybox.manage.db.*;
 import com.keybox.manage.model.*;
 import com.keybox.manage.task.SecureShellTask;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -168,7 +169,7 @@ public class SSHUtil {
 
 			try {
 
-				KeyPair keyPair = KeyPair.genKeyPair(jsch, type);
+				KeyPair keyPair = KeyPair.genKeyPair(jsch, type, Integer.parseInt(AppConfig.getProperty("KeyStrengh")));
 
 				keyPair.writePrivateKey(PVT_KEY, passphrase.getBytes());
 				keyPair.writePublicKey(PUB_KEY, comment);
