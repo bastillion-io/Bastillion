@@ -15,6 +15,7 @@
  */
 package com.keybox.manage.task;
 
+import com.keybox.common.util.AppConfig;
 import com.keybox.manage.util.SessionOutputUtil;
 import com.keybox.manage.model.SessionOutput;
 
@@ -45,7 +46,7 @@ public class SecureShellTask implements Runnable {
 
             SessionOutputUtil.addOutput(sessionOutput.getSessionId(), sessionOutput.getHostSystemId(), sessionOutput);
 
-            char[] buff = new char[1024];
+            char[] buff = new char[Integer.parseInt(AppConfig.getProperty("KeyStrengh"))];
             int read;
             while((read = br.read(buff)) != -1) {
 
