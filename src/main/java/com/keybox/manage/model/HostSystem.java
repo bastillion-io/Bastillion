@@ -31,7 +31,7 @@ public class HostSystem {
     boolean checked=false;
     String statusCd=INITIAL_STATUS;
     String errorMsg;
-    List<String> publicKeyList;
+    List<PublicKey> publicKeyList;
     Integer instanceId;
 
     public static final String INITIAL_STATUS="INITIAL";
@@ -126,11 +126,11 @@ public class HostSystem {
         this.errorMsg = errorMsg;
     }
 
-    public List<String> getPublicKeyList() {
+    public List<PublicKey> getPublicKeyList() {
         return publicKeyList;
     }
 
-    public void setPublicKeyList(List<String> publicKeyList) {
+    public void setPublicKeyList(List<PublicKey> publicKeyList) {
         this.publicKeyList = publicKeyList;
     }
 

@@ -46,6 +46,10 @@ table td, table th {
     padding:10px;
 }
 
+ol li{
+    padding: 4px;
+}
+
 .table-striped {
     border: 1px solid #CCCCCC;
 }

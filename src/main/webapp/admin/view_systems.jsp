@@ -125,8 +125,8 @@
         </s:form>
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
 
-  	        <s:form action="selectSystemsForCompositeTerms" id="select_frm" theme="simple">
-  	             <s:if test="script!=null">
+              <s:form action="selectSystemsForCompositeTerms" id="select_frm" theme="simple">
+                   <s:if test="script!=null">
                         <s:hidden name="script.id"/>
                  </s:if>
                 <div class="scrollWrapper">
@@ -143,6 +143,7 @@
                         </th>
                         <th id="<s:property value="@com.keybox.manage.db.SystemDB@SORT_BY_HOST"/>" class="sort">Host
                         </th>
+                        <th>&nbsp;</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -159,13 +160,17 @@
                             </td>
                             <td><s:property value="user"/></td>
                             <td><s:property value="host"/>:<s:property value="port"/></td>
+                            <td>
+                                <button type="button" class="btn btn-default ssh_btn" data-toggle="modal" data-target="#ssh_access_<s:property value="id"/>">Your SSH Access</button>
+                            </td>
+                            
                         </tr>
 
                     </s:iterator>
                     </tbody>
                 </table>
                 </div>
-	    </s:form>
+            </s:form>
         </s:if>
         <s:if test="script!=null && sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
             <div class="btn btn-default select_frm_btn spacer spacer-bottom">Execute Script</div>
@@ -182,6 +187,67 @@
                  </p>
                 </div>
         </s:else>
+        
+        <s:iterator var="system" value="sortedSet.itemList" status="stat">
+            <div id="ssh_access_<s:property value="id"/>" class="modal fade">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                            <h4 class="modal-title">Connect To Your Instance</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <s:form>
+                                    <H4>To access your instance:</H4>
+                                    <ol>
+                                        <li>Locate your private key file(s).
+                                        Keybox provides the file names based on the keys you've added.</li>
+                                        <li>Your key must not be publicly viewable for SSH to work if you use an ssh-client within Unix/Linux environment.<br><br>
+                                            Use this command if needed:
+                                            
+                                            <s:if test="publicKeyList!= null && !publicKeyList.isEmpty()">
+                                                <s:iterator var="system" value="publicKeyList" status="stat">
+                                                    <pre>chmod 400 <s:property value="keyNm"/>.key</pre>
+                                                </s:iterator>
+                                            </s:if>
+                                            <s:else>
+                                                <pre>chmod 400 excample.key</pre>
+                                            </s:else>
+                                            
+                                            Ensure that  ~./.ssh folder is set to 600                
+                                        
+                                        <li>Example:<br>
+                                            <s:if test="publicKeyList!= null && !publicKeyList.isEmpty()">
+                                                <s:iterator var="system" value="publicKeyList" status="stat">
+                                                    Profile 
+                                                    	<s:if test="profile== null">
+    	                                                	All Systems:
+                                                    	</s:if>
+                                                    	<s:else>
+	                                                    	<s:property value="profile.nm"/>:
+                                                    	</s:else>
+                                                    <br>
+                                                    <pre>ssh -i <s:property value="keyNm"/>.key <s:property value="user"/>@<s:property value="host"/></pre>
+                                                </s:iterator>
+                                                
+                                                 
+                                            </s:if>
+                                            <s:else>
+                                                <pre>ssh -i excample.key <s:property value="user"/>@<s:property value="host"/></pre>
+                                            </s:else>
+                                        </li>
+                                    </ol>
+                                </s:form>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+       </s:iterator>
     </div>
 
 
