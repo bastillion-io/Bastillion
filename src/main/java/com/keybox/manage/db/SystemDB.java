@@ -83,6 +83,7 @@ public class SystemDB {
 				hostSystem.setPort(rs.getInt("port"));
 				hostSystem.setAuthorizedKeys(rs.getString("authorized_keys"));
 				hostSystem.setStatusCd(rs.getString("status_cd"));
+				hostSystem.setEnabled(rs.getBoolean("enabled"));
 				hostSystem.setPublicKeyList(PublicKeyDB.getPublicKeysForUserandSystem(userId, hostSystem.getId()));
 				hostSystemList.add(hostSystem);
 			}
@@ -594,6 +595,7 @@ public class SystemDB {
 				hostSystem.setPort(rs.getInt("port"));
 				hostSystem.setAuthorizedKeys(rs.getString("authorized_keys"));
 				hostSystem.setStatusCd(rs.getString("status_cd"));
+				hostSystem.setEnabled(rs.getBoolean("enabled"));
 				hostSystem.setPublicKeyList(PublicKeyDB.getPublicKeysForAdminandSystem(userId, hostSystem.getId()));
 				hostSystemList.add(hostSystem);
 			}
