@@ -139,14 +139,12 @@
                 </td>
             </tr>
             </s:if>
-            <s:if test="%{!@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled || #session.authType==\"BASIC\"}">
-            <tr>
+             <tr>
                 <td>
                   <a href="../admin/userSettings.action">Settings</a>
                 </td>
-                <td>Change administrative login and settings</td>
+                <td>Administrative settings</td>
             </tr>
-            </s:if>
             </tbody>
         </table>
     </div>
