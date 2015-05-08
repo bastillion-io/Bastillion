@@ -1,6 +1,6 @@
 KeyBox
 ======
-KeyBox is a web-based SSH console that centrally manages administrative access to systems. KeyBox combines key management and administration through profiles assigned to defined users.
+KeyBox is a web-based SSH console that centrally manages administrative access to systems. Web-based administration is combined with management and distribution of user's public SSH keys. Key management and administration is based on profiles assigned to defined users.
 
 Administrators can login using two-factor authentication with [FreeOTP](https://fedorahosted.org/freeotp) or [Google Authenticator](https://github.com/google/google-authenticator). From there they can manage their public SSH keys or connect to their systems through a web-shell. Commands can be shared across shells to make patching easier and eliminate redundant command execution.
 

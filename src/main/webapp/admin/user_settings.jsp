@@ -45,6 +45,7 @@
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
     <div class="container">
+    <s:if test="%{!@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled || #session.authType==\"BASIC\"}">
 
         <h3>Set Admin Password</h3>
         <p>Change your administrative password below</p>
@@ -58,6 +59,7 @@
                 <td align="right">  <div id="change_btn" class="btn btn-default submit_btn" >Change Password</div></td>
             </tr>
         </s:form>
+    </s:if>
 
 
 
