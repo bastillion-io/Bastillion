@@ -362,7 +362,7 @@ public class SSHUtil {
 
 			InputStream inputStreamAuthKeyVal = new ByteArrayInputStream(keyValue.getBytes());
 			c.put(inputStreamAuthKeyVal, authorizedKeys);
-
+			c.chmod(Integer.parseInt("600",8), authorizedKeys);
 
 		} catch (Exception e) {
 			hostSystem.setErrorMsg(e.getMessage());
