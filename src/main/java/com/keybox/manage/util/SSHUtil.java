@@ -41,6 +41,7 @@ public class SSHUtil {
 
 	//key type - rsa or dsa
 	public static final String KEY_TYPE = AppConfig.getProperty("sshKeyType");
+	public static final int KEY_LENGTH= StringUtils.isNumeric(AppConfig.getProperty("sshKeyLength")) ? Integer.parseInt(AppConfig.getProperty("sshKeyLength")) : 2048;
 
 	//private key name
 	public static final String PVT_KEY = KEY_PATH + "/id_" + KEY_TYPE;
@@ -168,7 +169,7 @@ public class SSHUtil {
 
 			try {
 
-				KeyPair keyPair = KeyPair.genKeyPair(jsch, type);
+				KeyPair keyPair = KeyPair.genKeyPair(jsch, type, KEY_LENGTH);
 
 				keyPair.writePrivateKey(PVT_KEY, passphrase.getBytes());
 				keyPair.writePublicKey(PUB_KEY, comment);

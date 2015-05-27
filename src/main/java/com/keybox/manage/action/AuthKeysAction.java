@@ -230,7 +230,7 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 		String pubKey=null;
 		try {
 
-			KeyPair keyPair = KeyPair.genKeyPair(jsch, type);
+			KeyPair keyPair = KeyPair.genKeyPair(jsch, type, SSHUtil.KEY_LENGTH);
 
 			OutputStream os = new ByteArrayOutputStream();
 			keyPair.writePrivateKey(os, publicKey.getPassphrase().getBytes());
