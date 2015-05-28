@@ -15,7 +15,6 @@
  */
 package com.keybox.manage.task;
 
-import com.keybox.common.util.AppConfig;
 import com.keybox.manage.util.SSHUtil;
 import com.keybox.manage.util.SessionOutputUtil;
 import com.keybox.manage.model.SessionOutput;
