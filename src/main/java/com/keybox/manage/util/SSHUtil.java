@@ -163,7 +163,7 @@ public class SSHUtil {
 
 			//set key type
 			int type = KEY_TYPE.equals("rsa") ? KeyPair.RSA : KeyPair.DSA;
-			String comment = "KeyBox generated key pair";
+			String comment = "keybox@global_key";
 
 			JSch jsch = new JSch();
 

@@ -116,7 +116,7 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 				pStmt.execute();
 				DBUtils.closeStmt(pStmt);
 
-				System.out.println("KeyBox Public Key:");
+				System.out.println("KeyBox Generated Global Public Key:");
 				System.out.println(publicKey);
 
 				passphrase = null;
