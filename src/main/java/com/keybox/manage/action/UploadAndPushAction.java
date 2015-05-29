@@ -16,12 +16,9 @@
 package com.keybox.manage.action;
 
 import com.keybox.common.util.AuthUtil;
-import com.keybox.manage.db.SystemDB;
 import com.keybox.manage.db.SystemStatusDB;
-import com.keybox.manage.model.Auth;
 import com.keybox.manage.model.SchSession;
 import com.keybox.manage.model.HostSystem;
-import com.keybox.manage.model.UserSchSessions;
 import com.keybox.manage.util.DBUtils;
 import com.keybox.manage.util.SSHUtil;
 import com.opensymphony.xwork2.ActionSupport;

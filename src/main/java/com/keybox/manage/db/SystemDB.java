@@ -24,7 +24,10 @@ import org.apache.commons.lang3.StringUtils;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 
@@ -84,6 +87,7 @@ public class SystemDB {
 				hostSystem.setAuthorizedKeys(rs.getString("authorized_keys"));
 				hostSystem.setStatusCd(rs.getString("status_cd"));
 				hostSystem.setEnabled(rs.getBoolean("enabled"));
+				hostSystem.setApplicationKey(PrivateKeyDB.getApplicationKeyBySystemID(hostSystem.getId()));
 				hostSystem.setPublicKeyList(PublicKeyDB.getPublicKeysForUserandSystem(userId, hostSystem.getId()));
 				hostSystemList.add(hostSystem);
 			}
@@ -139,6 +143,7 @@ public class SystemDB {
 				hostSystem.setAuthorizedKeys(rs.getString("authorized_keys"));
 				hostSystem.setStatusCd(rs.getString("status_cd"));
 				hostSystem.setEnabled(rs.getBoolean("enabled"));
+				hostSystem.setApplicationKey(PrivateKeyDB.getApplicationKeyBySystemID(hostSystem.getId()));
 				hostSystemList.add(hostSystem);
 			}
 			DBUtils.closeRs(rs);
@@ -171,7 +176,7 @@ public class SystemDB {
 		try {
 			con = DBUtils.getConn();
 
-			getSystem(con, id);
+			hostSystem = getSystem(con, id);
 
 
 		} catch (Exception e) {
@@ -212,6 +217,7 @@ public class SystemDB {
 				hostSystem.setAuthorizedKeys(rs.getString("authorized_keys"));
 				hostSystem.setStatusCd(rs.getString("status_cd"));
 				hostSystem.setEnabled(rs.getBoolean("enabled"));
+				hostSystem.setApplicationKey(PrivateKeyDB.getApplicationKeyBySystemID(hostSystem.getId()));
 			}
 			DBUtils.closeRs(rs);
 			DBUtils.closeStmt(stmt);
@@ -229,14 +235,14 @@ public class SystemDB {
 	 * inserts host system into DB
 	 *
 	 * @param hostSystem host system object
-	 * @return user id
+	 * @return system id
 	 */
 	public static Long insertSystem(HostSystem hostSystem) {
 
 
 		Connection con = null;
 
-		Long userId = null;
+		Long systemId = null;
 		try {
 			con = DBUtils.getConn();
 			PreparedStatement stmt = con.prepareStatement("insert into system (display_nm, user, host, port, authorized_keys, status_cd, enabled) values (?,?,?,?,?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
@@ -248,18 +254,19 @@ public class SystemDB {
 			stmt.setString(6, hostSystem.getStatusCd());
 			stmt.setBoolean(7, hostSystem.isEnabled());
 			stmt.execute();
-
+			
 			ResultSet rs = stmt.getGeneratedKeys();
 			if (rs.next()) {
-				userId = rs.getLong(1);
+				systemId = rs.getLong(1);
 			}
 			DBUtils.closeStmt(stmt);
+			PrivateKeyDB.setActiveApplicationKeyforSystemID(hostSystem.getApplicationKey().getId(), systemId);
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		DBUtils.closeConn(con);
-		return userId;
+		return systemId;
 
 	}
 
@@ -285,7 +292,9 @@ public class SystemDB {
 			stmt.setString(6, hostSystem.getStatusCd());
 			stmt.setBoolean(7, hostSystem.isEnabled());
 			stmt.setLong(8, hostSystem.getId());
-			
+			if(hostSystem.getApplicationKey().getId()!=null){
+				PrivateKeyDB.updateActiveApplicationKeyforSystemID(hostSystem.getApplicationKey().getId(), hostSystem.getId());
+			}
 			stmt.execute();
 			DBUtils.closeStmt(stmt);
 
@@ -378,6 +387,7 @@ public class SystemDB {
 				hostSystem.setAuthorizedKeys(rs.getString("authorized_keys"));
 				hostSystem.setStatusCd(rs.getString("status_cd"));
 				hostSystem.setEnabled(rs.getBoolean("enabled"));
+				hostSystem.setApplicationKey(PrivateKeyDB.getApplicationKeyBySystemID(hostSystem.getId()));
 				hostSystemList.add(hostSystem);
 			}
 			DBUtils.closeRs(rs);
@@ -610,6 +620,48 @@ public class SystemDB {
 
 		sortedSet.setItemList(hostSystemList);
 		return sortedSet;
+	}
+
+
+	/**
+	 * Get all HostSystems Where ApplicationKey older than X days and not InitialApplicationKeys
+	 * 
+	 * @param days older than X days
+	 * @return HostSystems
+	 */
+	public static List<HostSystem> getAllSystemsWhereApplicationKeyOlderThan(Integer days) {
+		
+		List<HostSystem> hostSystemList = new ArrayList<HostSystem>();
+
+		Connection con = null;
+
+		Calendar moment = Calendar.getInstance();
+		moment.add(Calendar.DAY_OF_MONTH, -days);
+		Timestamp momentTS = new Timestamp(moment.getTimeInMillis());
+		
+		try {
+			con=DBUtils.getConn();
+			PreparedStatement stmt = con.prepareStatement("SELECT sys.ID FROM SYSTEM sys " +
+									"JOIN APPLICATION_KEY_SYSTEM appkey_sys on appkey_sys.system_id = sys.id " +
+									"JOIN APPLICATION_KEY appkey on appkey_sys.application_key_id = appkey.id " +
+									"WHERE appkey_sys.active = true "+
+									"AND appkey.initialkey = false " +
+									"AND appkey.create_dt < ? ");
+			stmt.setTimestamp(1, momentTS);
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()) {
+				hostSystemList.add(getSystem(rs.getLong("ID")));
+			}
+			DBUtils.closeRs(rs);
+			DBUtils.closeStmt(stmt);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		DBUtils.closeConn(con);
+		
+		return hostSystemList;
 	}
 
 }

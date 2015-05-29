@@ -15,17 +15,86 @@
  */
 package com.keybox.manage.model;
 
+import java.util.ArrayList;
+import java.util.Date;
+
+import com.keybox.manage.db.PrivateKeyDB;
+
 /**
  * Value object for applications ssh keys
  */
 public class ApplicationKey {
     Long id;
+    String keyname;
+    Long userId;
+    String username;
     String privateKey;
     String publicKey;
     String passphrase;
+    boolean initialkey;
+    String type;
+    Fingerprint fingerprint;
+    boolean enabled;
+    Date createDt;
+    String passphraseConfirm;
 
+    public Long getUserId() {
+		return userId;
+	}
 
-    public Long getId() {
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public boolean isInitialkey() {
+		return initialkey;
+	}
+
+	public void setInitialkey(boolean initialkey) {
+		this.initialkey = initialkey;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public Fingerprint getFingerprint() {
+		return fingerprint;
+	}
+
+	public void setFingerprint(Fingerprint fingerprint) {
+		this.fingerprint = fingerprint;
+	}
+
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	public Date getCreateDt() {
+		return createDt;
+	}
+
+	public void setCreateDt(Date createDt) {
+		this.createDt = createDt;
+	}
+
+	public Long getId() {
         return id;
     }
 
@@ -56,4 +125,25 @@ public class ApplicationKey {
     public void setPassphrase(String passphrase) {
         this.passphrase = passphrase;
     }
+
+	public String getPassphraseConfirm() {
+		return passphraseConfirm;
+	}
+
+	public void setPassphraseConfirm(String passphraseConfirm) {
+		this.passphraseConfirm = passphraseConfirm;
+	}
+
+	public String getKeyname() {
+		return keyname;
+	}
+
+	public void setKeyname(String keyname) {
+		this.keyname = keyname;
+	}
+
+	public ArrayList<String> getUseOnSystem() {
+		return PrivateKeyDB.getSystemNamesByApplicationId(this.id);
+	}
+
 }

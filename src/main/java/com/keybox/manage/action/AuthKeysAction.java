@@ -225,9 +225,11 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 	/**
 	 * generates public private key from passphrase
 	 *  
+	 * @param username username to set in public key comment
+	 * @param keyname keyname to set in public key comment
 	 * @return public key
 	 */
-	public String generateUserKey() {
+	public String generateUserKey(String username, String keyname) {
 
 		//set key type
 		int type = SSHUtil.KEY_TYPE.equals("rsa") ? KeyPair.RSA : KeyPair.DSA;
@@ -237,7 +239,7 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 		String pubKey=null;
 		try {
 
-			KeyPair keyPair = KeyPair.genKeyPair(jsch, type, Integer.parseInt(AppConfig.getProperty("KeyStrengh")));
+			KeyPair keyPair = KeyPair.genKeyPair(jsch, type, SSHUtil.KEY_LENGTH);
 
 			OutputStream os = new ByteArrayOutputStream();
 			keyPair.writePrivateKey(os, publicKey.getPassphrase().getBytes());
@@ -245,7 +247,7 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 			servletRequest.getSession().setAttribute(PVT_KEY, EncryptionUtil.encrypt(os.toString()));
 			
 			os = new ByteArrayOutputStream();
-			keyPair.writePublicKey(os, null);
+			keyPair.writePublicKey(os, username + "@" + keyname);
 			pubKey = os.toString();
 
 
@@ -296,7 +298,7 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 					addActionError(PasswordUtil.PASSWORD_REQ_ERROR_MSG);
 				}
 				else {
-					publicKey.setPublicKey(generateUserKey());
+					publicKey.setPublicKey(generateUserKey(UserDB.getUser(userId).getUsername(), publicKey.getKeyNm()));
 				}
 			}
 			

@@ -17,22 +17,13 @@ package com.keybox.manage.action;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
-import org.apache.struts2.interceptor.ServletRequestAware;
-import org.apache.struts2.interceptor.ServletResponseAware;
 
 import com.keybox.common.util.AppConfig;
-import com.keybox.common.util.AuthUtil;
-import com.keybox.manage.db.AuthDB;
 import com.keybox.manage.db.UserDB;
-import com.keybox.manage.model.Auth;
-import com.keybox.manage.model.User;
-import com.keybox.manage.util.OTPUtil;
 import com.opensymphony.xwork2.ActionSupport;
 
 /**

@@ -21,14 +21,12 @@ import com.keybox.manage.db.AuthDB;
 import com.keybox.manage.model.Auth;
 import com.keybox.manage.model.User;
 import com.keybox.manage.util.OTPUtil;
-import com.keybox.manage.util.PasswordUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.apache.struts2.interceptor.ServletResponseAware;
-import sun.misc.SharedSecrets;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

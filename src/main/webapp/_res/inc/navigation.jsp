@@ -61,6 +61,10 @@
                                     <li><a href="../admin/viewKeys.action">Manage SSH Keys</a></li>
                                 </s:else>
                             </s:if>
+                            
+                            <s:if test="%{#session.userType==\"M\"}">
+                            	<li><a href="../manage/ViewApplicationKeys.action">Manage System Keys</a></li>
+                            </s:if>
                         </ul>
                     </li>
 

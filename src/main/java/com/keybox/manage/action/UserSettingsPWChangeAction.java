@@ -17,7 +17,6 @@ package com.keybox.manage.action;
 
 import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.db.AuthDB;
-import com.keybox.manage.db.UserThemeDB;
 import com.keybox.manage.model.Auth;
 import com.keybox.manage.model.UserSettings;
 import com.keybox.manage.util.PasswordUtil;
