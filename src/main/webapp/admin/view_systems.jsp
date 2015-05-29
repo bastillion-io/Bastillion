@@ -178,6 +178,9 @@
 	                            <s:elseif test="statusCd=='HOSTFAIL'">
 				                	<div class="error">DNS Lookup Failed</div>
 				                </s:elseif>
+				                <s:elseif test="statusCd=='PRIVATKEYFAIL'">
+				                	<div class="error">System Key disable</div>
+				                </s:elseif>
 	                            <s:elseif test="statusCd=='KEYAUTHFAIL'">
 	                                <div class="warning">Passphrase Authentication Failed</div>
 	                            </s:elseif>
@@ -218,7 +221,7 @@
         
         <s:iterator var="system" value="sortedSet.itemList" status="stat">
             <div id="ssh_access_<s:property value="id"/>" class="modal fade">
-                <div class="modal-dialog">
+                <div class="modal-dialog" style="width: 800px;">
                     <div class="modal-content">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>

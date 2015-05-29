@@ -41,12 +41,24 @@
             	window.location = 'disableSystem.action?hostSystem.id=' + id + '&sortedSet.orderByDirection=<s:property value="sortedSet.orderByDirection" />&sortedSet.orderByField=<s:property value="sortedSet.orderByField"/>';
             });
             
-          //call enable action
+          	//call enable action
             $(".enable_btn").button().click(function () {
             	var id = $(this).attr('id').replace("enable_btn_", "");
             	window.location = 'enableSystem.action?hostSystem.id=' + id + '&sortedSet.orderByDirection=<s:property value="sortedSet.orderByDirection" />&sortedSet.orderByField=<s:property value="sortedSet.orderByField"/>';
             });
             
+          	//call download Key action
+            $(".down_btn").button().click(function () {
+            	var id = $(this).attr('id').replace("down_btn_", "");
+            	window.location = 'downloadSystemKey.action?hostSystem.id=' + id + '&sortedSet.orderByDirection=<s:property value="sortedSet.orderByDirection" />&sortedSet.orderByField=<s:property value="sortedSet.orderByField"/>';
+            });
+          	
+          	//gen new System Key on System action
+            $(".genNewKeyOnSystem_btn").button().click(function () {
+            	var id = $(this).attr('id').replace("genNewKeyOnSystem_btn_", "");
+            	window.location = 'genNewKeyOnSystem.action?hostSystem.id=' + id + '&sortedSet.orderByDirection=<s:property value="sortedSet.orderByDirection" />&sortedSet.orderByField=<s:property value="sortedSet.orderByField"/>';
+            });
+          	
             //submit add or edit form
             $(".submit_btn").button().click(function () {
                 $(this).parents('.modal').find('form').submit();
@@ -68,6 +80,11 @@
             $('#<s:property value="sortedSet.orderByField"/>').attr('class', '<s:property value="sortedSet.orderByDirection"/>');
             </s:if>
 
+            //Download System Key
+            <s:if test="#session['privateKey']!=null">
+	            window.location='../manage/downloadPvtKey.action';
+	        </s:if>
+            
 
             <s:if test="hostSystem.statusCd=='AUTHFAIL'">
             $("#set_password_dialog").modal();
@@ -90,6 +107,16 @@
                 <s:else>
                 $("#add_dialog").modal();
                 </s:else>
+            });
+        </script>
+    </s:if>
+    
+    <s:if test="actionErrors.size > 0">
+    	<script type="text/javascript">
+            $(document).ready(function () {
+                <s:if test="hostSystem.id>0">
+                $("#down_dialog_<s:property value="hostSystem.id"/>").modal();
+                </s:if>
             });
         </script>
     </s:if>
@@ -154,6 +181,9 @@
                             <s:elseif test="statusCd=='HOSTFAIL'">
 			                	<div class="error">DNS Lookup Failed</div>
 			                </s:elseif>
+			                <s:elseif test="statusCd=='PRIVATKEYFAIL'">
+			                	<div class="error">System Key disable</div>
+			                </s:elseif>
                             <s:elseif test="statusCd=='KEYAUTHFAIL'">
                                 <div class="warning">Passphrase Authentication Failed</div>
                             </s:elseif>
@@ -163,25 +193,29 @@
                             <s:elseif test="statusCd=='SUCCESS'">
                                 <div class="success">Success</div>
                             </s:elseif>
+                            
                         </td>
                         <td>
 
-                            <div style="width:220px">
+                            <div>
                                     <button id="refresh_btn_<s:property value="id"/>" class="btn btn-default refresh_btn spacer spacer-left"><img src="../img/refresh.png" alt="Refresh" style="float:left;width:20px;height:20px;"/></button>
                                     <button class="btn btn-default spacer spacer-middle" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>">Edit</button>
                                     <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn spacer spacer-middle">Delete</button>
                                     
                                     <s:if test="%{enabled}">
-	                                    <button class="btn btn-default btn-danger btn-disable_enable spacer spacer-right disable_btn" data-toggle="modal"
+	                                    <button class="btn btn-default btn-danger btn-disable_enable spacer spacer-middle disable_btn" data-toggle="modal"
 	                                            id="disable_btn_<s:property value="id"/>">Disable
 	                                    </button>
 	                                </s:if>
 	                                <s:else>
-	                                    <button class="btn btn-default btn-success btn-disable_enable spacer spacer-right enable_btn" data-toggle="modal"
+	                                    <button class="btn btn-default btn-success btn-disable_enable spacer spacer-middle enable_btn" data-toggle="modal"
 	                                            id="enable_btn_<s:property value="id"/>">Enable
 	                                    </button>
 	                                </s:else>
-                                    
+									<s:if test="%{!applicationKey.initialkey && downloadKey}">
+										<button class="btn btn-default spacer spacer-middle down_dialog_btn" data-toggle="modal" data-target="#down_dialog_<s:property value="id"/>">Download Key</button>
+                                    </s:if>
+                                    <button id="genNewKeyOnSystem_btn_<s:property value="id"/>" class="btn btn-default spacer spacer-right genNewKeyOnSystem_btn">gen. new Key</button>
                                 <div style="clear:both"></div>
                             </div>
                         </td>
@@ -211,6 +245,8 @@
                                 <s:textfield name="hostSystem.host" label="Host" size="18"/>
                                 <s:textfield name="hostSystem.port" label="Port" size="2"/>
                                 <s:textfield name="hostSystem.authorizedKeys" label="Authorized Keys" size="30"/>
+                                <s:select name="hostSystem.applicationKey.id" list="initAppList"
+                                	listKey="id" listValue="%{keyname}" label="initial System Key" value="%{applicationKey.id}" />
                                 <s:hidden name="sortedSet.orderByDirection"/>
                                 <s:hidden name="sortedSet.orderByField"/>
                             </s:form>
@@ -241,8 +277,50 @@
                                     <s:textfield name="hostSystem.port" value="%{port}" label="Port" size="2"/>
                                     <s:textfield name="hostSystem.authorizedKeys" value="%{authorizedKeys}"
                                                  label="Authorized Keys" size="30"/>
+                                    <s:if test="%{applicationKey.initialkey}">
+                                        <s:select name="hostSystem.applicationKey.id" list="initAppList"
+                                        listKey="id" listValue="%{keyname}" label="initial System Key" value="%{applicationKey.id}" />
+                                    </s:if>
+                                    <s:else>
+                                        <s:textfield disabled="true" label="initial System Key" value="System managed" size="18"/>
+                                        <s:hidden name="hostSystem.applicationKey.id" value="%{applicationKey.id}"/>
+                                    </s:else>
                                     <s:hidden name="hostSystem.id" value="%{id}"/>
                                     <s:hidden name="hostSystem.enabled" value="%{enabled}"/>
+                                    <s:hidden name="sortedSet.orderByDirection"/>
+                                    <s:hidden name="sortedSet.orderByField"/>
+                                </s:form>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                        
+                            <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-default submit_btn">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+       	</s:iterator>
+
+
+		<s:iterator var="system" value="sortedSet.itemList" status="stat">
+            <div id="down_dialog_<s:property value="id"/>" class="modal fade">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                            <h4 class="modal-title">Download SystemKey</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                            	<s:actionerror/>
+                                <s:form action="downloadSystemKey" id="download_system_key_%{id}">
+                                    <s:textfield disabled="true" name="hostSystem.displayNm" value="%{displayNm}" label="Display Name" size="10"/>
+                                    <s:password name="hostSystem.applicationKey.passphrase" label="Passphrase"/>
+                                    <s:password name="hostSystem.applicationKey.passphraseConfirm" label="Confirm Passphrase"/>
+                                    <s:hidden name="hostSystem.id" value="%{id}"/>
+<%--                                     <s:hidden name="hostSystem.applicationKey.id" value="%{applicationKey.id}"/> --%>
+<%--                                     <s:hidden name="hostSystem.applicationKey.initialkey" value="%{applicationKey.initialkey}"/> --%>
                                     <s:hidden name="sortedSet.orderByDirection"/>
                                     <s:hidden name="sortedSet.orderByField"/>
                                 </s:form>
@@ -256,6 +334,8 @@
                 </div>
             </div>
        </s:iterator>
+
+
 
 
 
@@ -276,6 +356,7 @@
                                 <s:hidden name="hostSystem.host"/>
                                 <s:hidden name="hostSystem.port"/>
                                 <s:hidden name="hostSystem.authorizedKeys"/>
+                                <s:hidden name="hostSystem.applicationKey.id"/>
                                 <s:hidden name="sortedSet.orderByDirection"/>
                                 <s:hidden name="sortedSet.orderByField"/>
                                 <s:password name="password" label="Password" size="15" value="" autocomplete="off"/>
@@ -310,6 +391,7 @@
                                 <s:hidden name="hostSystem.host"/>
                                 <s:hidden name="hostSystem.port"/>
                                 <s:hidden name="hostSystem.authorizedKeys"/>
+                                <s:hidden name="hostSystem.applicationKey.id"/>
                                 <s:hidden name="sortedSet.orderByDirection"/>
                                 <s:hidden name="sortedSet.orderByField"/>
                                 <s:password name="passphrase" label="Passphrase" size="15" value="" autocomplete="off"/>

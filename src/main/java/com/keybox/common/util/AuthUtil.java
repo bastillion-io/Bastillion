@@ -16,7 +16,6 @@
 package com.keybox.common.util;
 
 import com.keybox.manage.util.EncryptionUtil;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

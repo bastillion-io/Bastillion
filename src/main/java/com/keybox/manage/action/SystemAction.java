@@ -15,35 +15,50 @@
  */
 package com.keybox.manage.action;
 
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.KeyPair;
 import com.keybox.common.util.AuthUtil;
+import com.keybox.manage.db.PrivateKeyDB;
 import com.keybox.manage.db.ProfileDB;
 import com.keybox.manage.db.ScriptDB;
 import com.keybox.manage.db.SystemDB;
 import com.keybox.manage.db.UserProfileDB;
 import com.keybox.manage.model.*;
+import com.keybox.manage.util.EncryptionUtil;
+import com.keybox.manage.util.RefreshApplicationKeyUtil;
 import com.keybox.manage.util.SSHUtil;
 import com.opensymphony.xwork2.ActionSupport;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
+import org.apache.struts2.interceptor.ServletResponseAware;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Action to manage systems
  */
-public class SystemAction extends ActionSupport implements ServletRequestAware {
+public class SystemAction extends ActionSupport implements ServletRequestAware, ServletResponseAware {
 
+
+	HttpServletRequest servletRequest;
+	HttpServletResponse servletResponse;
     SortedSet sortedSet = new SortedSet();
     HostSystem hostSystem = new HostSystem();
-    Script script = null;
-    HttpServletRequest servletRequest;
+    List<ApplicationKey> initAppList;
+	Script script = null;
     String password;
     String passphrase;
     List<Profile> profileList= new ArrayList<>();
     boolean ismanager;
+    boolean downloadKey = !RefreshApplicationKeyUtil.getDynamicKeyRotation();
 
 
     @Action(value = "/admin/viewSystems",
@@ -53,7 +68,6 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
     )
     public String viewAdminSystems() {
         Long userId = AuthUtil.getUserId(servletRequest.getSession());
-
         ismanager = Auth.MANAGER.equals(AuthUtil.getUserType(servletRequest.getSession()));
         if (ismanager) {
             sortedSet = SystemDB.getAdminSystemSet(sortedSet, userId);
@@ -76,6 +90,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
     )
     public String viewManageSystems() {
 
+    	initAppList = PrivateKeyDB.getInitialApplicationKey();
         sortedSet = SystemDB.getSystemSet(sortedSet); 
 
         return SUCCESS;
@@ -89,8 +104,20 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
     )
     public String saveSystem() {
         String retVal=SUCCESS;
+        initAppList = PrivateKeyDB.getInitialApplicationKey();
 
-        hostSystem = SSHUtil.authAndAddPubKey(hostSystem, passphrase, password);
+        if(hostSystem.getApplicationKey().getId() != null)
+        {
+        	hostSystem.setApplicationKey(PrivateKeyDB.getApplicationKeyByID(hostSystem.getApplicationKey().getId()));
+        	boolean newAppKey = false;
+        	if(SSHUtil.dynamicKeys && hostSystem.getApplicationKey().isInitialkey())
+			{
+				newAppKey = true;
+			}
+	        hostSystem = SSHUtil.authAndAddPubKey(hostSystem, passphrase, password, newAppKey);
+        } else {
+        	hostSystem.setStatusCd(HostSystem.PRIVAT_KEY_FAIL_STATUS);
+        }
 
         if (hostSystem.getId() != null) {
             SystemDB.updateSystem(hostSystem);
@@ -102,6 +129,31 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
         if (!HostSystem.SUCCESS_STATUS.equals(hostSystem.getStatusCd())) {
             retVal=INPUT;
         }
+        return retVal;
+    }
+    
+    @Action(value = "/manage/genNewKeyOnSystem",
+            results = {
+                    @Result(name = "success", location = "/manage/viewSystems.action?sortedSet.orderByDirection=${sortedSet.orderByDirection}&sortedSet.orderByField=${sortedSet.orderByField}", type = "redirect")
+            }
+    )
+    public String genNewKeyOnSystem() {
+        String retVal=SUCCESS;
+        initAppList = PrivateKeyDB.getInitialApplicationKey();
+
+        hostSystem = SystemDB.getSystem(hostSystem.getId());
+        if(hostSystem.getApplicationKey().getId() != null)
+        {
+        	hostSystem.setApplicationKey(PrivateKeyDB.getApplicationKeyByID(hostSystem.getApplicationKey().getId()));
+	        hostSystem = SSHUtil.authAndAddPubKey(hostSystem, passphrase, password, true);
+        } else {
+        	hostSystem.setStatusCd(HostSystem.PRIVAT_KEY_FAIL_STATUS);
+        }
+
+        SystemDB.updateSystem(hostSystem);
+        
+        sortedSet = SystemDB.getSystemSet(sortedSet);
+
         return retVal;
     }
 
@@ -155,6 +207,55 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
     	}
     	return SUCCESS;
     }
+    
+    @Action(value = "/manage/downloadSystemKey",
+    		results = {
+    			@Result(name = "input", location = "/manage/view_systems.jsp"),
+				@Result(name = "success", location = "/manage/viewSystems.action?sortedSet.orderByDirection=${sortedSet.orderByDirection}&sortedSet.orderByField=${sortedSet.orderByField}", type = "redirect")
+    	}
+    )
+    public String downloadSystemKey() {
+    	sortedSet = SystemDB.getSystemSet(sortedSet);
+        initAppList = PrivateKeyDB.getInitialApplicationKey();
+        
+    	return SUCCESS;
+    }
+    
+    
+    public static final String PVT_KEY="privateKey";
+    public static final String PVT_KEY_Name="privateKeyName";
+    
+    /**
+     * Generated Download Key-File 
+     * 
+     * @return null
+     */
+    @Action(value = "/manage/downloadPvtKey")
+	public String downloadPvtKey() {
+		
+		String privateKey=EncryptionUtil.decrypt((String)servletRequest.getSession().getAttribute(PVT_KEY));
+		String privateKeyName=(String)servletRequest.getSession().getAttribute(PVT_KEY_Name);
+		
+		if(StringUtils.isNotEmpty(privateKeyName) && StringUtils.isNotEmpty(privateKey)) {
+			try {
+				servletResponse.setContentType("application/octet-stream");
+				servletResponse.setHeader("Content-Disposition", "attachment;filename=" + privateKeyName + ".key");
+				servletResponse.getOutputStream().write(privateKey.getBytes());
+				servletResponse.getOutputStream().flush();
+				servletResponse.getOutputStream().close();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+		//remove pvt key
+		servletRequest.getSession().setAttribute(PVT_KEY, null);
+		servletRequest.getSession().removeAttribute(PVT_KEY);
+		servletRequest.getSession().setAttribute(PVT_KEY_Name, null);
+		servletRequest.getSession().removeAttribute(PVT_KEY_Name);
+		
+		return null;
+	}
+
 
     /**
      * Validates all fields for adding a host system
@@ -191,11 +292,52 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
         if (!this.getFieldErrors().isEmpty()) {
 
             sortedSet = SystemDB.getSystemSet(sortedSet);
+            initAppList = PrivateKeyDB.getInitialApplicationKey();
         }
 
     }
 
-   
+    /**
+     * Validates Passphrase fields for download private system key
+     */
+    public void validateDownloadSystemKey() {
+    	clearActionErrors();
+    	if(!hostSystem.getApplicationKey().getPassphrase().equals(hostSystem.getApplicationKey().getPassphraseConfirm())) {
+			addActionError("Passphrases do not match");
+    	} else {
+    		
+    		String passphrase = hostSystem.getApplicationKey().getPassphrase();
+        	hostSystem = SystemDB.getSystem(hostSystem.getId());
+    		
+        	try {
+        		JSch jsch = new JSch();
+        		KeyPair keyPair = KeyPair.load(jsch,hostSystem.getApplicationKey().getPrivateKey().getBytes(),hostSystem.getApplicationKey().getPublicKey().getBytes());
+        		
+        		ByteArrayOutputStream out = new ByteArrayOutputStream();
+    			if(passphrase == null || passphrase.equals(""))
+    			{
+    				keyPair.writePrivateKey(out);
+    			}
+    			else{
+    				keyPair.writePrivateKey(out, passphrase.getBytes());
+    			}
+    			
+    			//set private key
+    			servletRequest.getSession().setAttribute(PVT_KEY, EncryptionUtil.encrypt(out.toString()));
+    			//set Key Name
+    			servletRequest.getSession().setAttribute(PVT_KEY_Name, hostSystem.getDisplayNm());
+        	} catch (Exception ex) {
+    			ex.printStackTrace();
+    		}
+    	}
+    	
+
+        if (!this.getActionErrors().isEmpty()) {	
+			sortedSet = SystemDB.getSystemSet(sortedSet);
+            initAppList = PrivateKeyDB.getInitialApplicationKey();
+            hostSystem = SystemDB.getSystem(hostSystem.getId());
+    	}
+	}
 
     public List<Profile> getProfileList() {
         return profileList;
@@ -255,5 +397,29 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
 
     public boolean isIsmanager() {
 		return ismanager;
+	}
+    
+    public boolean isDownloadKey() {
+		return downloadKey;
+	}
+
+	public void setDownloadKey(boolean downloadKey) {
+		this.downloadKey = downloadKey;
+	}
+
+	public List<ApplicationKey> getInitAppList() {
+		return initAppList;
+	}
+
+	public void setInitAppList(List<ApplicationKey> initAppList) {
+		this.initAppList = initAppList;
+	}
+	
+	public HttpServletResponse getServletResponse() {
+		return servletResponse;
+	}
+
+	public void setServletResponse(HttpServletResponse servletResponse) {
+		this.servletResponse = servletResponse;
 	}
 }

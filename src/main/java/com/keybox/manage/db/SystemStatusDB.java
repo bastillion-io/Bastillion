@@ -15,12 +15,10 @@
  */
 package com.keybox.manage.db;
 
-import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.model.Auth;
 import com.keybox.manage.model.HostSystem;
 import com.keybox.manage.model.SortedSet;
 import com.keybox.manage.util.DBUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
 

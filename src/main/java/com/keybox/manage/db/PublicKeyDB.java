@@ -23,7 +23,6 @@ import com.keybox.manage.util.SSHUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
-import java.sql.ParameterMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -110,7 +109,7 @@ public class PublicKeyDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("select pk.*, pkf.fingerprint from public_keys pk JOIN public_keys_fingerprint pkf on pk.fingerprint_id = pkf.id where pkf.fingerprint like ? and pk.enabled=false");
+            PreparedStatement stmt = con.prepareStatement("select pk.*, pkf.fingerprint from public_keys pk JOIN fingerprint pkf on pk.fingerprint_id = pkf.id where pkf.fingerprint like ? and pk.enabled=false");
             stmt.setString(1, fingerprint);
             ResultSet rs = stmt.executeQuery();
             
@@ -281,7 +280,7 @@ public class PublicKeyDB {
 
         PublicKey publicKey = null;
         try {
-            PreparedStatement stmt = con.prepareStatement("select pk.*, pkf.fingerprint from public_keys pk JOIN public_keys_fingerprint pkf on pk.fingerprint_id = pkf.id where pk.id=?");
+            PreparedStatement stmt = con.prepareStatement("select pk.*, pkf.fingerprint from public_keys pk JOIN fingerprint pkf on pk.fingerprint_id = pkf.id where pk.id=?");
             stmt.setLong(1, publicKeyId);
             ResultSet rs = stmt.executeQuery();
 
@@ -320,13 +319,13 @@ public class PublicKeyDB {
         	ResultSet rs_pkf;
         	long fingerprint_ID;
         	if(isKeyExists(publicKey.getUserId(), publicKey)) { //fingerprint exists
-        		stmt_pkf = con.prepareStatement("select * from public_keys_fingerprint where fingerprint");
+        		stmt_pkf = con.prepareStatement("select * from fingerprint where fingerprint");
         		stmt_pkf.setString(1, SSHUtil.getFingerprint(publicKey.getPublicKey()));
                 rs_pkf = stmt_pkf.executeQuery();
                 rs_pkf.next();
                 fingerprint_ID = rs_pkf.getLong("id");
         	} else { //fingerprint not exists
-        		stmt_pkf = con.prepareStatement("insert into public_keys_fingerprint(fingerprint) values (?)", Statement.RETURN_GENERATED_KEYS);
+        		stmt_pkf = con.prepareStatement("insert into fingerprint(fingerprint) values (?)", Statement.RETURN_GENERATED_KEYS);
                 con.setAutoCommit(false);
                 spt = con.setSavepoint("sp_Fingerprint");
                 stmt_pkf.setString(1, SSHUtil.getFingerprint(publicKey.getPublicKey()));
@@ -383,7 +382,7 @@ public class PublicKeyDB {
             con = DBUtils.getConn();
             
             // Test whether the SSH-key has changed
-            PreparedStatement stmt_pk_pkf_test = con.prepareStatement("select pk.*, pkf.fingerprint from public_keys pk JOIN public_keys_fingerprint pkf on pk.fingerprint_id = pkf.id where pk.id=? AND pkf.fingerprint like ?"); 
+            PreparedStatement stmt_pk_pkf_test = con.prepareStatement("select pk.*, pkf.fingerprint from public_keys pk JOIN fingerprint pkf on pk.fingerprint_id = pkf.id where pk.id=? AND pkf.fingerprint like ?"); 
             stmt_pk_pkf_test.setLong(1, publicKey.getId());
             stmt_pk_pkf_test.setString(2, SSHUtil.getFingerprint(publicKey.getPublicKey()));
             ResultSet rs = stmt_pk_pkf_test.executeQuery();
@@ -549,7 +548,7 @@ public class PublicKeyDB {
         try {
           con = DBUtils.getConn();
 
-          stmt = con.prepareStatement("select pk.*, pkf.fingerprint from public_keys pk JOIN public_keys_fingerprint pkf on pk.fingerprint_id = pkf.id where pk.user_id=? and pkf.fingerprint like ? and pk.profile_id is ? and pk.id is not ?");
+          stmt = con.prepareStatement("select pk.*, pkf.fingerprint from public_keys pk JOIN fingerprint pkf on pk.fingerprint_id = pkf.id where pk.user_id=? and pkf.fingerprint like ? and pk.profile_id is ? and pk.id is not ?");
            
           stmt.setLong(1, userId);
           stmt.setString(2, SSHUtil.getFingerprint(publicKey.getPublicKey()));
@@ -634,13 +633,13 @@ public class PublicKeyDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            stmt = con.prepareStatement("select pkf.fingerprint from public_keys_fingerprint pkf where pkf.fingerprint like ?");
+            stmt = con.prepareStatement("select pkf.fingerprint from fingerprint pkf where pkf.fingerprint like ?");
             stmt.setString(1, SSHUtil.getFingerprint(publicKey.getPublicKey()));
             
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
             	// Test whether it is registered under another user
-            	PreparedStatement stmt_pk_pkf_test = con.prepareStatement("select pk.*, pkf.fingerprint from public_keys pk JOIN public_keys_fingerprint pkf on pk.fingerprint_id = pkf.id where pk.user_id!=? and pkf.fingerprint like ?");
+            	PreparedStatement stmt_pk_pkf_test = con.prepareStatement("select pk.*, pkf.fingerprint from public_keys pk JOIN fingerprint pkf on pk.fingerprint_id = pkf.id where pk.user_id!=? and pkf.fingerprint like ?");
             	stmt_pk_pkf_test.setLong(1, userId);
                 stmt_pk_pkf_test.setString(2, SSHUtil.getFingerprint(publicKey.getPublicKey()));
                 ResultSet rs_pk_pkf_test = stmt_pk_pkf_test.executeQuery();

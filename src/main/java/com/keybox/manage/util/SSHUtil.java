@@ -25,6 +25,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,10 +51,15 @@ public class SSHUtil {
 	//public key name
 	public static final String PUB_KEY = PVT_KEY + ".pub";
 
-
+	public static final boolean dynamicKeys = AppConfig.getProperty("dynamicKeys").equals("true");
+	
 	public static final int SESSION_TIMEOUT = 60000;
 	public static final int CHANNEL_TIMEOUT = 60000;
-
+	
+	public static final String SAVEFILE = "/tmp/tmp_authorized_keys_KeyBox";
+	
+	public static final String KEY_COMMENT = "KeyBox generated key pair from ";
+	
 	/**
 	 * returns the system's public key
 	 *
@@ -72,7 +79,6 @@ public class SSHUtil {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-
 		return publicKey;
 	}
 
@@ -97,7 +103,6 @@ public class SSHUtil {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-
 		return privateKey;
 	}
 
@@ -107,8 +112,6 @@ public class SSHUtil {
 	 * @return passphrase for system generated key
 	 */
 	public static String keyGen() {
-
-
 		//get passphrase cmd from properties file
 		Map<String, String> replaceMap = new HashMap<String, String>();
 		replaceMap.put("randomPassphrase", UUID.randomUUID().toString());
@@ -118,14 +121,12 @@ public class SSHUtil {
 		AppConfig.updateProperty("defaultSSHPassphrase", "${randomPassphrase}");
 
 		return keyGen(passphrase);
-
 	}
 
 	/**
 	 * delete SSH keys
 	 */
 	public static void deleteGenSSHKeys() {
-
 		deletePvtGenSSHKey();
 		//delete public key
 		try {
@@ -140,15 +141,12 @@ public class SSHUtil {
 	 * delete SSH keys
 	 */
 	public static void deletePvtGenSSHKey() {
-
 		//delete private key
 		try {
 			File file = new File(PVT_KEY);
 			FileUtils.forceDelete(file);
 		} catch (Exception ex) {
 		}
-
-
 	}
 
 	/**
@@ -157,9 +155,7 @@ public class SSHUtil {
 	 * @return passphrase for system generated key
 	 */
 	public static String keyGen(String passphrase) {
-
 		deleteGenSSHKeys();
-
 		if (StringUtils.isEmpty(AppConfig.getProperty("privateKey")) || StringUtils.isEmpty(AppConfig.getProperty("publicKey"))) {
 
 			//set key type
@@ -167,11 +163,8 @@ public class SSHUtil {
 			String comment = "keybox@global_key";
 
 			JSch jsch = new JSch();
-
 			try {
-
 				KeyPair keyPair = KeyPair.genKeyPair(jsch, type, KEY_LENGTH);
-
 				keyPair.writePrivateKey(PVT_KEY, passphrase.getBytes());
 				keyPair.writePublicKey(PUB_KEY, comment);
 				System.out.println("Finger print: " + keyPair.getFingerPrint());
@@ -180,11 +173,7 @@ public class SSHUtil {
 				e.printStackTrace();
 			}
 		}
-
-
 		return passphrase;
-
-
 	}
 
 	/**
@@ -193,16 +182,16 @@ public class SSHUtil {
 	 * @param hostSystem      object contains host system information
 	 * @param passphrase      ssh key passphrase
 	 * @param password        password to host system if needed
+	 * @param newAppKey       generated a new KeyPair
 	 * @return status of key distribution
 	 */
-	public static HostSystem authAndAddPubKey(HostSystem hostSystem, String passphrase, String password) {
-
-
+	public static HostSystem authAndAddPubKey(HostSystem hostSystem, String passphrase, String password, boolean newAppKey) {
 		JSch jsch = new JSch();
 		Session session = null;
 		hostSystem.setStatusCd(HostSystem.SUCCESS_STATUS);
 		try {
-			ApplicationKey appKey = PrivateKeyDB.getApplicationKey();
+			
+			ApplicationKey appKey = hostSystem.getApplicationKey();
 			//check to see if passphrase has been provided
 			if (passphrase == null || passphrase.trim().equals("")) {
 				passphrase = appKey.getPassphrase();
@@ -225,10 +214,13 @@ public class SSHUtil {
 			config.put("StrictHostKeyChecking", "no");
 			session.setConfig(config);
 			session.connect(SESSION_TIMEOUT);
-
-
-			addPubKey(hostSystem, session, appKey.getPublicKey());
-
+			ApplicationKey genAppKey = null;
+			//Generate new Key?
+			if(newAppKey)
+			{
+				genAppKey = keyGenIntern();
+			}
+			addPubKey(hostSystem, session, genAppKey);
 		} catch (Exception e) {
 			hostSystem.setErrorMsg(e.getMessage());
 			if (e.getMessage().toLowerCase().contains("userauth fail")) {
@@ -241,17 +233,12 @@ public class SSHUtil {
 			} else {
 				hostSystem.setStatusCd(HostSystem.GENERIC_FAIL_STATUS);
 			}
-
-
 		}
 
 		if (session != null) {
 			session.disconnect();
 		}
-
 		return hostSystem;
-
-
 	}
 
 
@@ -265,15 +252,11 @@ public class SSHUtil {
 	 * @return status uploaded file
 	 */
 	public static HostSystem pushUpload(HostSystem hostSystem, Session session, String source, String destination) {
-
-
 		hostSystem.setStatusCd(HostSystem.SUCCESS_STATUS);
 		Channel channel = null;
 		ChannelSftp c = null;
 
 		try {
-
-
 			channel = session.openChannel("sftp");
 			channel.setInputStream(System.in);
 			channel.setOutputStream(System.out);
@@ -281,7 +264,6 @@ public class SSHUtil {
 
 			c = (ChannelSftp) channel;
 			destination = destination.replaceAll("~\\/|~", "");
-
 
 			//get file input stream
 			FileInputStream file = new FileInputStream(source);
@@ -302,27 +284,21 @@ public class SSHUtil {
 		}
 
 		return hostSystem;
-
-
 	}
 
 
 	/**
-	 * distributes authorized keys for host system
+	 * distributes authorized keys for host system and change application public key
 	 *
 	 * @param hostSystem      object contains host system information
 	 * @param session         an established SSH session
-	 * @param appPublicKey    application public key value
+	 * @param genAppKey new application public key value (if null, no Change of application public key)
 	 * @return status of key distribution
 	 */
-	public static HostSystem addPubKey(HostSystem hostSystem, Session session, String appPublicKey) {
-
-
+	public static HostSystem addPubKey(HostSystem hostSystem, Session session, ApplicationKey genAppKey) {
 		Channel channel = null;
 		ChannelSftp c = null;
-
 		try {
-
 			channel = session.openChannel("sftp");
 			channel.setInputStream(System.in);
 			channel.setOutputStream(System.out);
@@ -333,7 +309,7 @@ public class SSHUtil {
 			//return public key list into a input stream
 			String authorizedKeys = hostSystem.getAuthorizedKeys().replaceAll("~\\/|~", "");
 
-			String appPubKey = appPublicKey.replace("\n", "").trim();
+			String appPubKey = hostSystem.getApplicationKey().getPublicKey().replace("\n", "").trim();
 
 			String keyValue = "";
 			//if no overwrite then append to previous auth keys file
@@ -360,12 +336,40 @@ public class SSHUtil {
 					//ignore exception if file doesn't exist
 				}
 			}
+			
+			//New SystemKey set?
+			if(genAppKey != null)
+			{
+				appPubKey = genAppKey.getPublicKey().replace("\n", "").trim();
+			}
 			keyValue = keyValue + appPubKey + "\n";
 
+			//Save authorizedKeys 
+			try {
+				c.rename(authorizedKeys, SAVEFILE);
+			} catch (SftpException ex) {
+				//ignore exception if file doesn't exist
+			}
+			
+			//Write new authorizedKey
 			InputStream inputStreamAuthKeyVal = new ByteArrayInputStream(keyValue.getBytes());
 			c.put(inputStreamAuthKeyVal, authorizedKeys);
 			c.chmod(Integer.parseInt("600",8), authorizedKeys);
-
+			
+			//Test Connection
+			if(testConnection(hostSystem, genAppKey)){
+				if(genAppKey !=null)
+				{
+					hostSystem.setApplicationKey(genAppKey);
+				}
+			}else{
+				try {
+					c.rename(SAVEFILE,authorizedKeys);
+				} catch (SftpException ex) {
+					//ignore exception if file doesn't exist
+				}
+			}
+			
 		} catch (Exception e) {
 			hostSystem.setErrorMsg(e.getMessage());
 			hostSystem.setStatusCd(HostSystem.GENERIC_FAIL_STATUS);
@@ -378,11 +382,81 @@ public class SSHUtil {
 		if (channel != null) {
 			channel.disconnect();
 		}
-
 		return hostSystem;
-
-
 	}
+
+	/**
+	 * Test Connection to System
+	 * 
+	 * @param hostSystem System to Connection Test
+	 * @param genAppKey New generated ApplicationKey from System;
+	 * 							if <strong> null </strong>, test with ApplicationKey from System 
+	 * @return <strong>TRUE</strong> Test OK <br>
+	 * 			<strong>FALSE</strong> Test not OK
+	 */
+	private static boolean testConnection(HostSystem hostSystem, ApplicationKey genAppKey) {
+		JSch jsch = new JSch();
+		Session session = null;
+		Channel channel = null;
+		ChannelSftp c = null;
+		boolean testio = true;
+		
+		try{
+			ApplicationKey appKey = hostSystem.getApplicationKey();
+			if(genAppKey != null)
+			{
+				appKey = genAppKey;
+			}
+			String passphrase = appKey.getPassphrase();
+			//check for null inorder to use key without passphrase
+			if (passphrase == null) {
+				passphrase = "";
+			}
+			//add private key
+			jsch.addIdentity(appKey.getId().toString()+"test", appKey.getPrivateKey().trim().getBytes(), appKey.getPublicKey().getBytes(), passphrase.getBytes());
+			
+			//create session
+			session = jsch.getSession(hostSystem.getUser(), hostSystem.getHost(), hostSystem.getPort());
+
+			java.util.Properties config = new java.util.Properties();
+			config.put("StrictHostKeyChecking", "no");
+			session.setConfig(config);
+			
+			session.connect(SESSION_TIMEOUT);
+			
+			channel = session.openChannel("sftp");
+			channel.setInputStream(System.in);
+			channel.setOutputStream(System.out);
+			channel.connect(CHANNEL_TIMEOUT);
+			
+			c = (ChannelSftp) channel;
+			
+			try {
+				c.rm(SAVEFILE);
+			} catch (SftpException ex) {
+				//ignore exception if file doesn't exist
+			}
+
+		} catch(Exception e){
+			e.printStackTrace();
+			testio = false;
+		}
+		
+		//exit
+		if (c != null) {
+			c.exit();
+		}
+		//disconnect
+		if (channel != null) {
+			channel.disconnect();
+		}
+		
+		if (session != null) {
+			session.disconnect();
+		}
+		return testio;
+	}
+
 
 	/**
 	 * return the next instance id based on ids defined in the session map
@@ -392,7 +466,6 @@ public class SSHUtil {
 	 * @return
 	 */
 	private static int getNextInstanceId(Long sessionId, Map<Long, UserSchSessions> userSessionMap ){
-
 		Integer instanceId=1;
 		if(userSessionMap.get(sessionId)!=null){
 
@@ -407,7 +480,6 @@ public class SSHUtil {
 			}
 		}
 		return instanceId;
-
 	}
 	
 	
@@ -423,18 +495,22 @@ public class SSHUtil {
 	 * @return status of systems
 	 */
 	public static HostSystem openSSHTermOnSystem(String passphrase, String password, Long userId, Long sessionId, HostSystem hostSystem, Map<Long, UserSchSessions> userSessionMap) {
-
 		JSch jsch = new JSch();
-
 		int instanceId = getNextInstanceId(sessionId,userSessionMap);
 		hostSystem.setStatusCd(HostSystem.SUCCESS_STATUS);
 		hostSystem.setInstanceId(instanceId);
 
-
 		SchSession schSession = null;
-
 		try {
-			ApplicationKey appKey = PrivateKeyDB.getApplicationKey();
+			ApplicationKey appKey = hostSystem.getApplicationKey();
+			if(appKey == null){
+				hostSystem.setErrorMsg("System Key disabled");
+				hostSystem.setStatusCd(HostSystem.PRIVAT_KEY_FAIL_STATUS);
+				SystemStatusDB.updateSystemStatus(hostSystem, userId);
+				SystemDB.updateSystem(hostSystem);
+				return hostSystem;
+			}
+
 			//check to see if passphrase has been provided
 			if (passphrase == null || passphrase.trim().equals("")) {
 				passphrase = appKey.getPassphrase();
@@ -463,22 +539,18 @@ public class SSHUtil {
 
 			InputStream outFromChannel = channel.getInputStream();
 
-
 			//new session output
 			SessionOutput sessionOutput = new SessionOutput();
 			sessionOutput.setHostSystemId(hostSystem.getId());
 			sessionOutput.setInstanceId(instanceId);
 			sessionOutput.setSessionId(sessionId);
 
-
 			Runnable run = new SecureShellTask(sessionOutput, outFromChannel);
 			Thread thread = new Thread(run);
 			thread.start();
 
-
 			OutputStream inputToChannel = channel.getOutputStream();
 			PrintStream commander = new PrintStream(inputToChannel, true);
-
 
 			channel.connect();
 
@@ -491,9 +563,15 @@ public class SSHUtil {
 			schSession.setOutFromChannel(outFromChannel);
 			schSession.setHostSystem(hostSystem);
 
+			ApplicationKey genAppKey = null;
+			
+			if(dynamicKeys && hostSystem.getApplicationKey().isInitialkey())
+			{
+				genAppKey = keyGenIntern();
+			}
+			
 			//refresh keys for session
-			addPubKey(hostSystem, session, appKey.getPublicKey());
-
+			addPubKey(hostSystem, session, genAppKey);
 
 		} catch (Exception e) {
 			hostSystem.setErrorMsg(e.getMessage());
@@ -508,7 +586,6 @@ public class SSHUtil {
 				hostSystem.setStatusCd(HostSystem.GENERIC_FAIL_STATUS);
 			}
 		}
-
 
 		//add session to map
 		if (hostSystem.getStatusCd().equals(HostSystem.SUCCESS_STATUS)) {
@@ -530,7 +607,6 @@ public class SSHUtil {
 
 		SystemStatusDB.updateSystemStatus(hostSystem, userId);
 		SystemDB.updateSystem(hostSystem);
-
 		return hostSystem;
 	}
 
@@ -543,7 +619,7 @@ public class SSHUtil {
 		if (keyManagementEnabled) {
 			List<HostSystem> hostSystemList = SystemDB.getAllSystems();
 			for (HostSystem hostSystem : hostSystemList) {
-				hostSystem = SSHUtil.authAndAddPubKey(hostSystem, null, null);
+				hostSystem = SSHUtil.authAndAddPubKey(hostSystem, null, null, false);
 				SystemDB.updateSystem(hostSystem);
 			}
 		}
@@ -560,7 +636,7 @@ public class SSHUtil {
 		if (keyManagementEnabled) {
 			List<HostSystem> hostSystemList = ProfileSystemsDB.getSystemsByProfile(profileId);
 			for (HostSystem hostSystem : hostSystemList) {
-				hostSystem = SSHUtil.authAndAddPubKey(hostSystem, null, null);
+				hostSystem = SSHUtil.authAndAddPubKey(hostSystem, null, null, false);
 				SystemDB.updateSystem(hostSystem);
 			}
 		}
@@ -577,7 +653,7 @@ public class SSHUtil {
 			for (Profile profile : UserProfileDB.getProfilesByUser(userId)) {
 				List<HostSystem> hostSystemList = ProfileSystemsDB.getSystemsByProfile(profile.getId());
 				for (HostSystem hostSystem : hostSystemList) {
-					hostSystem = SSHUtil.authAndAddPubKey(hostSystem, null, null);
+					hostSystem = SSHUtil.authAndAddPubKey(hostSystem, null, null, false);
 					SystemDB.updateSystem(hostSystem);
 				}
 			}
@@ -602,10 +678,8 @@ public class SSHUtil {
 			} catch (JSchException ex){
 				ex.printStackTrace();
 			}
-			
 		}
 		return fingerprint;
-
 	}
 
 	/**
@@ -631,17 +705,69 @@ public class SSHUtil {
 						keyType="ERROR";
 					}
 				}
-
 			} catch (JSchException ex){
 				ex.printStackTrace();
 			}
 		}
 		return keyType;
-
 	}
 
-	
+	/**
+	 * Generate ApplicationKey for dynamic Keys
+	 * 
+	 * @return Generated ApplicationKey
+	 */
+	private static ApplicationKey keyGenIntern() {
+		int type = KEY_TYPE.equals("rsa") ? KeyPair.RSA : KeyPair.DSA;
+		JSch jsch = new JSch();
+		ApplicationKey applicationKey = new ApplicationKey();
+		KeyPair keyPair = null;
+		try{
+			do {
+				keyPair = KeyPair.genKeyPair(jsch, type, KEY_LENGTH);
+				keyPair.setPublicKeyComment(KEY_COMMENT + Calendar.getInstance().getTime().toString());
+			} while (FingerprintDB.isFingerprintExists(keyPair.getFingerPrint()));
 
+			applicationKey.setKeyname(Long.toString((new Date()).getTime()));
+			
+			applicationKey.setInitialkey(false);
+			applicationKey.setFingerprint(new Fingerprint(keyPair.getFingerPrint()));
+			
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			applicationKey.setPassphrase(null);
+			keyPair.writePrivateKey(out);
+			
+			String privateKey = out.toString();
+			applicationKey.setPrivateKey(privateKey);
+			
+			out = new ByteArrayOutputStream();
+			keyPair.writePublicKey(out, keyPair.getPublicKeyComment());
+			String publicKey = out.toString();
+			applicationKey.setPublicKey(publicKey);
+			
+			applicationKey.setType(SSHUtil.getKeyType(publicKey));
+			applicationKey.setUserId(null);
+			applicationKey.setEnabled(true);
+			PrivateKeyDB.insertApplicationKey(applicationKey);
+			applicationKey = PrivateKeyDB.getApplicationKeyByFingerprint(applicationKey.getFingerprint().getFingerprint());
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return applicationKey;
+	}
 
-
+	/**
+	 * Refresh Systems there ApplicationKey older then X days and set new ApplecationKeys
+	 * 
+	 * @param days Older Then X days
+	 */
+	public static void refreshApplicationKey(Integer days) {
+		List<HostSystem> systemList = SystemDB.getAllSystemsWhereApplicationKeyOlderThan(days);
+		
+		for (HostSystem hostSystem : systemList) {
+			hostSystem = SSHUtil.authAndAddPubKey(hostSystem, null, null, true);
+			SystemDB.updateSystem(hostSystem);
+		}
+	}
 }

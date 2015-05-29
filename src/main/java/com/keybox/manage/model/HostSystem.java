@@ -34,6 +34,7 @@ public class HostSystem {
     List<PublicKey> publicKeyList;
     boolean enabled = true;
     Integer instanceId;
+    ApplicationKey applicationKey;
 
     public static final String INITIAL_STATUS="INITIAL";
     public static final String AUTH_FAIL_STATUS="AUTHFAIL";
@@ -41,6 +42,7 @@ public class HostSystem {
     public static final String GENERIC_FAIL_STATUS="GENERICFAIL";
     public static final String SUCCESS_STATUS="SUCCESS";
     public static final String HOST_FAIL_STATUS="HOSTFAIL";
+	public static final String PRIVAT_KEY_FAIL_STATUS = "PRIVATKEYFAIL";
 
 
 
@@ -150,4 +152,12 @@ public class HostSystem {
     public void setInstanceId(Integer instanceId) {
         this.instanceId = instanceId;
     }
+
+	public ApplicationKey getApplicationKey() {
+		return applicationKey;
+	}
+
+	public void setApplicationKey(ApplicationKey applicationKey) {
+		this.applicationKey = applicationKey;
+	}
 }
