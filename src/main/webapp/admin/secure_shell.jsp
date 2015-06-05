@@ -212,7 +212,7 @@
 
 
             //get cmd text from paste
-            $("#dummy").bind('paste', function (e) {
+            $(this).bind('paste', function (e) {
                 $('#dummy').focus();
                 $('#dummy').val('');
                 setTimeout(function () {
@@ -405,8 +405,19 @@
                 });
 
                 //set focus to term
-                element.find(".output").click().mouseover().mousedown(function () {
-                    termFocus = false;
+                $(".output").mouseup(function (e) {
+                    if(window.getSelection().toString()) {
+                        termFocus = false;
+                    } else {
+                        termFocus = true;
+                    }
+                });
+
+                $(".output").bind('copy', function () {
+                    setTimeout(function () {
+                        termFocus = true;
+                        window.getSelection().removeAllRanges();
+                    }, 100);
                 });
 
                 //set resizable
