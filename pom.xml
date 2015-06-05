@@ -108,7 +108,7 @@
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-                <version>9.2.10.v20150310</version>
+                <version>9.2.11.v20150529</version>
                 <configuration>
                     <jettyXml>${basedir}/src/test/resources/jetty.xml,${basedir}/src/test/resources/jetty-ssl.xml,${basedir}/src/test/resources/jetty-https.xml</jettyXml>
                     <scanIntervalSeconds>-1</scanIntervalSeconds>
