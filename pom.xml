@@ -29,7 +29,7 @@
         <dependency>
             <groupId>com.jcraft</groupId>
             <artifactId>jsch</artifactId>
-            <version>0.1.52</version>
+            <version>0.1.53</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
