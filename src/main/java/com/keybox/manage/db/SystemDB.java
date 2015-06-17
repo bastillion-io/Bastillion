@@ -15,8 +15,19 @@
  */
 package com.keybox.manage.db;
 
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.ec2.AmazonEC2;
+import com.amazonaws.services.ec2.AmazonEC2Client;
+import com.amazonaws.services.ec2.model.*;
+import com.amazonaws.services.opsworks.model.DescribeUserProfilesRequest;
+import com.amazonaws.services.opsworks.model.DescribeUserProfilesResult;
+import com.keybox.common.util.AppConfig;
+import com.keybox.manage.model.AWSCred;
+import com.keybox.manage.model.ApplicationKey;
 import com.keybox.manage.model.HostSystem;
 import com.keybox.manage.model.SortedSet;
+import com.keybox.manage.util.AWSClientConfig;
 import com.keybox.manage.util.DBUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -37,12 +48,14 @@ import java.util.List;
 public class SystemDB {
 
 	public static final String FILTER_BY_PROFILE_ID = "profile_id";
+	public static final String FILTER_BY_REGION_ID = "region";
 
 	public static final String SORT_BY_NAME = "display_nm";
 	public static final String SORT_BY_USER = "user";
 	public static final String SORT_BY_HOST = "host";
 	public static final String SORT_BY_STATUS = "status_cd";
 	public static final String SORT_BY_ENABLED = "enabled";
+	public static final String SORT_BY_INSTANCE_ID = "instance_id";
 
 
 	/**
@@ -78,16 +91,7 @@ public class SystemDB {
 			ResultSet rs = stmt.executeQuery();
 
 			while (rs.next()) {
-				HostSystem hostSystem = new HostSystem();
-				hostSystem.setId(rs.getLong("id"));
-				hostSystem.setDisplayNm(rs.getString("display_nm"));
-				hostSystem.setUser(rs.getString("user"));
-				hostSystem.setHost(rs.getString("host"));
-				hostSystem.setPort(rs.getInt("port"));
-				hostSystem.setAuthorizedKeys(rs.getString("authorized_keys"));
-				hostSystem.setStatusCd(rs.getString("status_cd"));
-				hostSystem.setEnabled(rs.getBoolean("enabled"));
-				hostSystem.setApplicationKey(PrivateKeyDB.getApplicationKeyBySystemID(hostSystem.getId()));
+				HostSystem hostSystem = getSystem(rs.getLong("id"));
 				hostSystem.setPublicKeyList(PublicKeyDB.getPublicKeysForUserandSystem(userId, hostSystem.getId()));
 				hostSystemList.add(hostSystem);
 			}
@@ -122,29 +126,30 @@ public class SystemDB {
 		String sql = "select * from  system s ";
 		//if profile id exists add to statement
 		sql += StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID)) ? ",system_map m where s.id=m.system_id and m.profile_id=?" : "";
+		
+		sql += (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID)) & StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_REGION_ID))) ? " and " : "";
+		sql += (!StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID)) & StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_REGION_ID))) ? " where " : "";
+		
+		sql += StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_REGION_ID)) ? "s.region = ?" : "";
+		
 		sql += orderBy;
 
 		Connection con = null;
 		try {
 			con = DBUtils.getConn();
 			PreparedStatement stmt = con.prepareStatement(sql);
+			int i = 1;
 			if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID))) {
-				stmt.setLong(1, Long.valueOf(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID)));
+				stmt.setLong(i, Long.valueOf(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID)));
+				i++;
+			}
+			if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_REGION_ID))) {
+				stmt.setString(i, sortedSet.getFilterMap().get(FILTER_BY_REGION_ID));
 			}
 			ResultSet rs = stmt.executeQuery();
 
 			while (rs.next()) {
-				HostSystem hostSystem = new HostSystem();
-				hostSystem.setId(rs.getLong("id"));
-				hostSystem.setDisplayNm(rs.getString("display_nm"));
-				hostSystem.setUser(rs.getString("user"));
-				hostSystem.setHost(rs.getString("host"));
-				hostSystem.setPort(rs.getInt("port"));
-				hostSystem.setAuthorizedKeys(rs.getString("authorized_keys"));
-				hostSystem.setStatusCd(rs.getString("status_cd"));
-				hostSystem.setEnabled(rs.getBoolean("enabled"));
-				hostSystem.setApplicationKey(PrivateKeyDB.getApplicationKeyBySystemID(hostSystem.getId()));
-				hostSystemList.add(hostSystem);
+				hostSystemList.add(getSystem(rs.getLong("id")));
 			}
 			DBUtils.closeRs(rs);
 			DBUtils.closeStmt(stmt);
@@ -200,9 +205,7 @@ public class SystemDB {
 
 		HostSystem hostSystem = null;
 
-
 		try {
-
 			PreparedStatement stmt = con.prepareStatement("select * from  system where id=?");
 			stmt.setLong(1, id);
 			ResultSet rs = stmt.executeQuery();
@@ -217,6 +220,8 @@ public class SystemDB {
 				hostSystem.setAuthorizedKeys(rs.getString("authorized_keys"));
 				hostSystem.setStatusCd(rs.getString("status_cd"));
 				hostSystem.setEnabled(rs.getBoolean("enabled"));
+				hostSystem.setInstance(rs.getString("instance_id"));
+				hostSystem.setEc2Region(rs.getString("region"));
 				hostSystem.setApplicationKey(PrivateKeyDB.getApplicationKeyBySystemID(hostSystem.getId()));
 			}
 			DBUtils.closeRs(rs);
@@ -225,7 +230,6 @@ public class SystemDB {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 
 		return hostSystem;
 	}
@@ -245,7 +249,7 @@ public class SystemDB {
 		Long systemId = null;
 		try {
 			con = DBUtils.getConn();
-			PreparedStatement stmt = con.prepareStatement("insert into system (display_nm, user, host, port, authorized_keys, status_cd, enabled) values (?,?,?,?,?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
+			PreparedStatement stmt = con.prepareStatement("insert into system (display_nm, user, host, port, authorized_keys, status_cd, enabled, instance_id, region) values (?,?,?,?,?,?,?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
 			stmt.setString(1, hostSystem.getDisplayNm());
 			stmt.setString(2, hostSystem.getUser());
 			stmt.setString(3, hostSystem.getHost());
@@ -253,6 +257,8 @@ public class SystemDB {
 			stmt.setString(5, hostSystem.getAuthorizedKeys());
 			stmt.setString(6, hostSystem.getStatusCd());
 			stmt.setBoolean(7, hostSystem.isEnabled());
+			stmt.setString(8, hostSystem.getInstance());
+			stmt.setString(9, hostSystem.getEc2Region());
 			stmt.execute();
 			
 			ResultSet rs = stmt.getGeneratedKeys();
@@ -283,7 +289,7 @@ public class SystemDB {
 		try {
 			con = DBUtils.getConn();
 
-			PreparedStatement stmt = con.prepareStatement("update system set display_nm=?, user=?, host=?, port=?, authorized_keys=?, status_cd=?, enabled=?  where id=?");
+			PreparedStatement stmt = con.prepareStatement("update system set display_nm=?, user=?, host=?, port=?, authorized_keys=?, status_cd=?, enabled=?, instance_id=?, region=? where id=?");
 			stmt.setString(1, hostSystem.getDisplayNm());
 			stmt.setString(2, hostSystem.getUser());
 			stmt.setString(3, hostSystem.getHost());
@@ -291,7 +297,9 @@ public class SystemDB {
 			stmt.setString(5, hostSystem.getAuthorizedKeys());
 			stmt.setString(6, hostSystem.getStatusCd());
 			stmt.setBoolean(7, hostSystem.isEnabled());
-			stmt.setLong(8, hostSystem.getId());
+			stmt.setString(8, hostSystem.getInstance());
+			stmt.setString(9, hostSystem.getEc2Region());
+			stmt.setLong(10, hostSystem.getId());
 			if(hostSystem.getApplicationKey().getId()!=null){
 				PrivateKeyDB.updateActiveApplicationKeyforSystemID(hostSystem.getApplicationKey().getId(), hostSystem.getId());
 			}
@@ -378,17 +386,7 @@ public class SystemDB {
 			ResultSet rs = stmt.executeQuery();
 
 			while (rs.next()) {
-				HostSystem hostSystem = new HostSystem();
-				hostSystem.setId(rs.getLong("id"));
-				hostSystem.setDisplayNm(rs.getString("display_nm"));
-				hostSystem.setUser(rs.getString("user"));
-				hostSystem.setHost(rs.getString("host"));
-				hostSystem.setPort(rs.getInt("port"));
-				hostSystem.setAuthorizedKeys(rs.getString("authorized_keys"));
-				hostSystem.setStatusCd(rs.getString("status_cd"));
-				hostSystem.setEnabled(rs.getBoolean("enabled"));
-				hostSystem.setApplicationKey(PrivateKeyDB.getApplicationKeyBySystemID(hostSystem.getId()));
-				hostSystemList.add(hostSystem);
+				hostSystemList.add(getSystem(rs.getLong("id")));
 			}
 			DBUtils.closeRs(rs);
 			DBUtils.closeStmt(stmt);
@@ -597,15 +595,7 @@ public class SystemDB {
 			ResultSet rs = stmt.executeQuery();
 
 			while (rs.next()) {
-				HostSystem hostSystem = new HostSystem();
-				hostSystem.setId(rs.getLong("id"));
-				hostSystem.setDisplayNm(rs.getString("display_nm"));
-				hostSystem.setUser(rs.getString("user"));
-				hostSystem.setHost(rs.getString("host"));
-				hostSystem.setPort(rs.getInt("port"));
-				hostSystem.setAuthorizedKeys(rs.getString("authorized_keys"));
-				hostSystem.setStatusCd(rs.getString("status_cd"));
-				hostSystem.setEnabled(rs.getBoolean("enabled"));
+				HostSystem hostSystem = getSystem(rs.getLong("id"));
 				hostSystem.setPublicKeyList(PublicKeyDB.getPublicKeysForAdminandSystem(userId, hostSystem.getId()));
 				hostSystemList.add(hostSystem);
 			}
@@ -664,4 +654,143 @@ public class SystemDB {
 		return hostSystemList;
 	}
 
+	
+	/**
+	 * Update AWS Systems
+	 */
+	public static void updateAWSSystems() {
+
+		List<String> ec2RegionList = PrivateKeyDB.getEC2Regions();
+		
+		try {
+			//get AWS credentials from DB
+	        for (AWSCred awsCred : AWSCredDB.getAWSCredList()) {
+	
+	            if (awsCred != null) {
+	                //set  AWS credentials for service
+	                BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsCred.getAccessKey(), awsCred.getSecretKey());
+	
+	                for (String ec2Region : ec2RegionList) {
+	                    //create service
+	
+	                    AmazonEC2 service = new AmazonEC2Client(awsCredentials, AWSClientConfig.getClientConfig());
+	                    service.setEndpoint(ec2Region);
+	
+	
+	                    //only return systems that have keys set
+	                    List<String> keyValueList = new ArrayList<String>();
+	                    for (ApplicationKey ec2Key : PrivateKeyDB.getEC2KeyByRegion(ec2Region, awsCred.getId())) {
+	                    	if(ec2Key.isEnabled())
+	                    	{
+	                    		keyValueList.add(ec2Key.getKeyname());
+	                    	}
+	                    }
+	
+	                    DescribeInstancesRequest describeInstancesRequest = new DescribeInstancesRequest();
+	                    
+	                    Filter keyNmFilter = new Filter("key-name", keyValueList);
+	                    
+	                    describeInstancesRequest.withFilters(keyNmFilter);
+	
+	                    DescribeInstancesResult describeInstancesResult = service.describeInstances(describeInstancesRequest);
+	                    
+	                    for (Reservation res : describeInstancesResult.getReservations()) {
+	                        for (Instance instance : res.getInstances()) {
+	                            HostSystem hostSystem = transformerEC2InstanzToHostSystem(instance, ec2Region, awsCred);
+	                            
+	                            setEC2System(hostSystem);
+	                        }
+	                    }
+	                }
+	            }
+	        }			
+		} catch (AmazonServiceException ex)
+        {
+            ex.printStackTrace();
+        }	
+	}
+	
+	/**
+	 * Insert or Update EC2System
+	 * 
+	 * @param hostSystem EC2System
+	 */
+	private static void setEC2System(HostSystem hostSystem) {
+		HostSystem hostSystemTmp = getSystemByInstance(hostSystem.getInstance());
+        if (hostSystemTmp == null) {
+            insertSystem(hostSystem);
+        } else {
+        	hostSystem.setId(hostSystemTmp.getId());
+            updateSystem(hostSystem);
+        }
+	}
+
+
+	/**
+	 * returns system by system instance id
+     *
+     * @param instanceId system instance id
+     * @return system
+	 */
+	public static HostSystem getSystemByInstance(String instanceId) {
+		HostSystem hostSystem = null;
+		Connection con = null;
+		try {
+			con = DBUtils.getConn();
+			PreparedStatement stmt = con.prepareStatement("select * from  system where instance_id like ?");
+			stmt.setString(1, instanceId);
+            ResultSet rs = stmt.executeQuery();
+            
+            if(rs.next()){
+            	hostSystem = getSystem(rs.getLong("id"));
+            }
+            DBUtils.closeRs(rs);
+            DBUtils.closeStmt(stmt);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+		
+		DBUtils.closeConn(con);
+		
+        return hostSystem;
+	}
+
+
+	/**
+     * HelpMethode to Transform EC2Instanz in HostSystem 
+     * 
+     * @param instance EC2Instanz
+     * @param ec2Region EC2Region
+     * @param awsCrde AWS Credential
+     * @return hostSystem
+     */
+    private static HostSystem transformerEC2InstanzToHostSystem(Instance instance, String ec2Region, AWSCred awsCrde) {
+    	HostSystem hostSystem = new HostSystem();
+        hostSystem.setInstance(instance.getInstanceId());
+
+        //check for public dns if doesn't exist set to ip or pvt dns
+        if (!"true".equals(AppConfig.getProperty("useEC2PvtDNS")) && StringUtils.isNotEmpty(instance.getPublicDnsName())) {
+            hostSystem.setHost(instance.getPublicDnsName());
+        } else if (!"true".equals(AppConfig.getProperty("useEC2PvtDNS")) && StringUtils.isNotEmpty(instance.getPublicIpAddress())) {
+            hostSystem.setHost(instance.getPublicIpAddress());
+        } else if (StringUtils.isNotEmpty(instance.getPrivateDnsName())) {
+            hostSystem.setHost(instance.getPrivateDnsName());
+        } else {
+            hostSystem.setHost(instance.getPrivateIpAddress());
+        }
+
+        hostSystem.setApplicationKey(PrivateKeyDB.getEC2KeyByNmRegion(instance.getKeyName(), ec2Region, awsCrde.getId()));
+        hostSystem.setEc2Region(ec2Region);
+        hostSystem.setStatusCd(instance.getState().getName().toUpperCase());
+        hostSystem.setUser(AppConfig.getProperty("defaultEC2User"));
+        for (Tag tag : instance.getTags()) {
+            if ("Name".equals(tag.getKey())) {
+                hostSystem.setDisplayNm(tag.getValue());
+            }
+        }
+        
+        return hostSystem;
+	}
+	
 }

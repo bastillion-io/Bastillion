@@ -24,6 +24,7 @@ public class Profile {
     Long id;
     String nm;
     String desc;
+    String tag;
     List<HostSystem> hostSystemList;
 
     public Long getId() {
@@ -56,5 +57,13 @@ public class Profile {
 
     public void setDesc(String desc) {
         this.desc = desc;
+    }
+    
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 }

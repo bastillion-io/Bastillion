@@ -9,6 +9,8 @@ JSch : BSD License - Atsuhiko Yamanaka, JCraft,Inc
 
 Google-Gson : Apache License, Version 2.0 - Google, Inc.
 
+AWS SDK für Java : Apache Licensev, Version 2.0 - Amazon Web Services
+
 Apache Commons FileUpload : Apache License, Version 2.0 -  The Apache Software Foundation
 
 Apache Commons Codec : Apache License, Version 2.0 -  The Apache Software Foundation

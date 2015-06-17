@@ -139,6 +139,9 @@
                         <th id="<s:property value="@com.keybox.manage.db.SystemDB@SORT_BY_NAME"/>" class="sort">Display
                             Name
                         </th>
+                        <th id="<s:property value="@com.keybox.manage.db.SystemDB@SORT_BY_INSTANCE_ID"/>" class="sort"> 
+                    		AWS Instance ID
+                    	</th>
                         <th id="<s:property value="@com.keybox.manage.db.SystemDB@SORT_BY_USER"/>" class="sort">User
                         </th>
                         <th id="<s:property value="@com.keybox.manage.db.SystemDB@SORT_BY_HOST"/>" class="sort">Host
@@ -162,6 +165,7 @@
                             <td>
                                 <s:property value="displayNm"/>
                             </td>
+                            <td><s:property value="instance"/></td>
                             <td><s:property value="user"/></td>
                             <td><s:property value="host"/>:<s:property value="port"/></td>
                             <td>
@@ -187,8 +191,14 @@
 	                            <s:elseif test="statusCd=='GENERICFAIL'">
 	                                <div class="error">Failed</div>
 	                            </s:elseif>
-	                            <s:elseif test="statusCd=='SUCCESS'">
+	                            <s:elseif test="statusCd=='SUCCESS' || statusCd=='RUNNING'">
 	                                <div class="success">Success</div>
+	                            </s:elseif>
+	                            <s:elseif test="statusCd=='PENDING'">
+	                                <div class="warning">Pending</div>
+	                            </s:elseif>
+	                            <s:elseif test="statusCd=='SHUTTING-DOWN' || statusCd=='TERMINATED' || statusCd=='STOPPING' || statusCd=='STOPPED'">
+	                                <div class="error">Server Down</div>
 	                            </s:elseif>
                         	</td>
                             <td>

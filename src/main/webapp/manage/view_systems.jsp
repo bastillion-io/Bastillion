@@ -240,6 +240,7 @@
                     <div class="modal-body">
                         <div class="row">
                             <s:form action="saveSystem" class="save_sys_form_add">
+                            	<s:actionerror/>
                                 <s:textfield name="hostSystem.displayNm" label="Display Name" size="10"/>
                                 <s:textfield name="hostSystem.user" label="System User" size="10"/>
                                 <s:textfield name="hostSystem.host" label="Host" size="18"/>
@@ -249,6 +250,8 @@
                                 	listKey="id" listValue="%{keyname}" label="initial System Key" value="%{applicationKey.id}" />
                                 <s:hidden name="sortedSet.orderByDirection"/>
                                 <s:hidden name="sortedSet.orderByField"/>
+                                <s:hidden name="testUser"/>
+                                <s:hidden name="testHost"/>
                             </s:form>
                         </div>
                     </div>
@@ -271,6 +274,7 @@
                         <div class="modal-body">
                             <div class="row">
                                 <s:form action="saveSystem" id="save_sys_form_edit_%{id}">
+                                	<s:actionerror/>
                                     <s:textfield name="hostSystem.displayNm" value="%{displayNm}" label="Display Name" size="10"/>
                                     <s:textfield name="hostSystem.user" value="%{user}" label="System User" size="10"/>
                                     <s:textfield name="hostSystem.host" value="%{host}" label="Host" size="18"/>
@@ -289,6 +293,8 @@
                                     <s:hidden name="hostSystem.enabled" value="%{enabled}"/>
                                     <s:hidden name="sortedSet.orderByDirection"/>
                                     <s:hidden name="sortedSet.orderByField"/>
+                                    <s:hidden name="testUser"/>
+                                	<s:hidden name="testHost"/>
                                 </s:form>
                             </div>
                         </div>
