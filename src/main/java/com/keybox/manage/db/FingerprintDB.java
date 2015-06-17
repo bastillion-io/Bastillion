@@ -62,6 +62,38 @@ public class FingerprintDB {
 	}
 	
 	/**
+	 * Checks if Fingerprint registered on Region
+	 * 
+	 * @param fingerprint Fingerprint
+	 * @param region EC2Region
+	 * @return <strong>true</strong>, if Fingerprint exists <br>
+	 * 			<strong>false</strong>, if Fingerprint not exists
+	 */
+	public static boolean isFingerprintExistsInRegion(String fingerprint,String region) {
+		boolean isexisted = false;
+		PreparedStatement stmt;
+        Connection con = null;
+        try{
+        	con = DBUtils.getConn();
+            stmt = con.prepareStatement("select * from fingerprint fp JOIN application_key appk ON fp.id = appK.fingerprint_id where fp.fingerprint like ? and appK.ec2_region like ?");
+            stmt.setString(1, fingerprint);
+            stmt.setString(2, region);
+            
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+    			isexisted = true;
+            }
+            DBUtils.closeRs(rs);
+            DBUtils.closeStmt(stmt);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+		
+		return isexisted;
+	}
+	
+	/**
 	 * Insert new fingerprint
 	 * 
 	 * @param fingerprint Fingerprint
@@ -70,6 +102,14 @@ public class FingerprintDB {
 	public static long insertFingerprint(Fingerprint fingerprint) {
 		Connection con = null;
         long fingerprintID = 0;
+        Fingerprint existingfingerprint = getFingerprint(fingerprint.getFingerprint());
+        //If Fingerprint exist
+        if(existingfingerprint != null)
+        {
+        	return existingfingerprint.getId();
+        }
+        
+        //If Fingerprint not exists
         try{
         	con = DBUtils.getConn();
         	PreparedStatement stmt_kf;

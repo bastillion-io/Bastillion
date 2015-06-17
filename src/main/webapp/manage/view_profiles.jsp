@@ -84,9 +84,9 @@
         </s:form>
 
 
-        <h3>Manage System Profiles</h3>
+        <h3>Manage System/Instance Profiles</h3>
 
-        <p>Add / Delete profiles or select a profile below to assign systems to that profile.</p>
+        <p>Add / Delete profiles or select a profile below to assign systems to that profile. For EC2 Connection use tags to control user access</p>
 
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
@@ -143,6 +143,7 @@
                         <s:form action="saveProfile" class="save_profile_form_add">
                             <s:textfield name="profile.nm" label="Name" size="15"/>
                             <s:textarea name="profile.desc" label="Profile Description" rows="5" cols="25"/>
+                            <s:textarea name="profile.tag" label="AWS-Tag" placeholder="tag-name[=value[,tag-name[=value]]" rows="5" cols="25"/>
                             <s:hidden name="sortedSet.orderByDirection"/>
                             <s:hidden name="sortedSet.orderByField"/>
                          </s:form>
@@ -169,6 +170,7 @@
                                     <s:textfield name="profile.nm" value="%{nm}" label="Name" size="15"/>
                                     <s:textarea name="profile.desc" value="%{desc}" label="Profile Description" rows="5"
                                                 cols="25"/>
+                                    <s:textarea name="profile.tag" value="%{tag}" label="AWS-Tag" placeholder="tag-name[=value[,tag-name[=value]]" rows="5" cols="25"/>
                                     <s:hidden name="profile.id" value="%{id}"/>
                                     <s:hidden name="sortedSet.orderByDirection"/>
                                     <s:hidden name="sortedSet.orderByField"/>

@@ -565,7 +565,7 @@ public class SSHUtil {
 
 			ApplicationKey genAppKey = null;
 			
-			if(dynamicKeys && hostSystem.getApplicationKey().isInitialkey())
+			if(dynamicKeys && hostSystem.getApplicationKey().isInitialkey() && hostSystem.getInstance().equals("---"))
 			{
 				genAppKey = keyGenIntern();
 			}
@@ -726,7 +726,7 @@ public class SSHUtil {
 			do {
 				keyPair = KeyPair.genKeyPair(jsch, type, KEY_LENGTH);
 				keyPair.setPublicKeyComment(KEY_COMMENT + Calendar.getInstance().getTime().toString());
-			} while (FingerprintDB.isFingerprintExists(keyPair.getFingerPrint()));
+			} while (FingerprintDB.isFingerprintExistsInRegion(keyPair.getFingerPrint(),applicationKey.getEc2Region()));
 
 			applicationKey.setKeyname(Long.toString((new Date()).getTime()));
 			
@@ -766,8 +766,10 @@ public class SSHUtil {
 		List<HostSystem> systemList = SystemDB.getAllSystemsWhereApplicationKeyOlderThan(days);
 		
 		for (HostSystem hostSystem : systemList) {
-			hostSystem = SSHUtil.authAndAddPubKey(hostSystem, null, null, true);
-			SystemDB.updateSystem(hostSystem);
+			if(hostSystem.getInstance().equals("---")){
+				hostSystem = SSHUtil.authAndAddPubKey(hostSystem, null, null, true);
+				SystemDB.updateSystem(hostSystem);
+			}
 		}
 	}
 }

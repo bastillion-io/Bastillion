@@ -27,6 +27,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * DAO that returns public / private key for the system generated private key
@@ -49,7 +50,7 @@ public class PrivateKeyDB {
     		fingerprintID = FingerprintDB.insertFingerprint(applicarionKey.getFingerprint());
     		
     		con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("insert into application_key (keyname, public_key, private_key, passphrase, initialKey, user_id,type, fingerprint_id, enabled) values(?,?,?,?,?,?,?,?,?)");
+            PreparedStatement stmt = con.prepareStatement("insert into application_key (keyname, public_key, private_key, passphrase, initialKey, user_id, type, fingerprint_id, enabled, ec2_region, aws_cred_id) values(?,?,?,?,?,?,?,?,?,?,?)");
             stmt.setString(1, applicarionKey.getKeyname());
             stmt.setString(2, applicarionKey.getPublicKey());
             stmt.setString(3, EncryptionUtil.encrypt(applicarionKey.getPrivateKey()));
@@ -63,6 +64,12 @@ public class PrivateKeyDB {
             stmt.setString(7, applicarionKey.getType());
             stmt.setLong(8, fingerprintID);
             stmt.setBoolean(9, applicarionKey.isEnabled());
+            stmt.setString(10, applicarionKey.getEc2Region());
+            if(applicarionKey.getAwsCredentials() == null){
+            	stmt.setNull(11, Types.INTEGER);		
+            }else {
+            	stmt.setLong(11, applicarionKey.getAwsCredentials().getId());
+            }
             stmt.execute();
             DBUtils.closeStmt(stmt);
 		} catch (SQLException e) {
@@ -87,7 +94,7 @@ public class PrivateKeyDB {
 		if(sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")){
 			orderBy = " oder by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
 		}
-		String sql = "select appKey.id from application_key appKey where initialKey = true";
+		String sql = "select appKey.id from application_key appKey where initialKey = true AND ec2_region LIKE 'NO_EC2_REGION'";
 		
 		// sql+= StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_ENABLED)) ? " and enabled=? " : "";
 		sql=sql+orderBy;
@@ -119,6 +126,52 @@ public class PrivateKeyDB {
         return sortedSet;
 	}
 
+	
+    /**
+     * return application keys base on sort oder defined
+     * 
+     * @param sortedSet object that defines sort oder
+     * @return sort script list
+     */
+	public static SortedSet getEC2KeySet(SortedSet sortedSet) {
+		
+		ArrayList<ApplicationKey> applicationKeysList = new ArrayList<ApplicationKey>();
+		
+		String orderBy = "";
+		if(sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")){
+			orderBy = " oder by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
+		}
+		String sql = "select appKey.id from application_key appKey where initialKey = true AND ec2_region NOT LIKE 'NO_EC2_REGION'";
+		
+		// sql+= StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_ENABLED)) ? " and enabled=? " : "";
+		sql=sql+orderBy;
+		
+		Connection con = null;
+		try {
+		
+			con = DBUtils.getConn();
+			PreparedStatement stmt = con.prepareStatement(sql);
+			
+//			int i=1;
+//            //set filters in prepared statement
+//            if(StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_ENABLED))){
+//                stmt.setBoolean(i++, Boolean.valueOf(sortedSet.getFilterMap().get(FILTER_BY_ENABLED)));
+//            }
+			
+            ResultSet rs = stmt.executeQuery();
+			while (rs.next()) {
+				applicationKeysList.add(getApplicationKeyByID(rs.getLong("id")));
+			}
+			DBUtils.closeRs(rs);
+            DBUtils.closeStmt(stmt);
+		} catch (SQLException e) {
+			e.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+		
+        sortedSet.setItemList(applicationKeysList);
+        return sortedSet;
+	}
 
 	/**
 	 * returns ApplicationKey base on applicationKeyID
@@ -156,18 +209,22 @@ public class PrivateKeyDB {
 				applicationKey.setFingerprint(FingerprintDB.getFingerprint(rs.getLong("fingerprint_id")));
 				applicationKey.setEnabled(rs.getBoolean("enabled"));
 				applicationKey.setCreateDt(rs.getTimestamp("create_dt"));
-				
+				applicationKey.setEc2Region(rs.getString("ec2_region"));
+				Long awsCredID = rs.getLong("aws_cred_id");
+				if(awsCredID == null || userID == 0){
+					applicationKey.setAwsCredentials(null);
+				}else{
+					applicationKey.setAwsCredentials(AWSCredDB.getAWSCred(awsCredID));
+				}
 			}
 			DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
 		} catch (SQLException e) {
 			e.printStackTrace();
         }
-        DBUtils.closeConn(con);
-		
+        DBUtils.closeConn(con);		
 		
 		return applicationKey;
-		
 	}
 
 	/**
@@ -253,7 +310,7 @@ public class PrivateKeyDB {
 		Connection con = null;
 		try{
 			con = DBUtils.getConn();
-			PreparedStatement stmt = con.prepareStatement("select id from application_key where initialKey = true and enabled = true");
+			PreparedStatement stmt = con.prepareStatement("select id from application_key where initialKey = true and enabled = true AND ec2_region LIKE 'NO_EC2_REGION'");
 			ResultSet rs = stmt.executeQuery();
 			while (rs.next()) {
 				applicationKeysList.add(getApplicationKeyByID(rs.getLong("id")));
@@ -442,5 +499,120 @@ public class PrivateKeyDB {
         }
         DBUtils.closeConn(con);
 		return systemNames;
+	}
+
+	/**
+	 * Test if Keyname exist in the Region
+	 * 
+	 * @param keyname Keyname
+	 * @param ec2Region EC2Region
+	 * @return
+	 */
+	public static boolean keyNameExistsInRegion(String keyname, String ec2Region) {
+		boolean isexisted = false;
+		Connection con = null;
+		try{
+			con = DBUtils.getConn();
+			PreparedStatement stmt = con.prepareStatement("select id from application_key where keyname = ? and ec2_region = ?");
+			stmt.setString(1, keyname);
+			stmt.setString(2, ec2Region);
+			ResultSet rs = stmt.executeQuery();
+			if (rs.next()) {
+				isexisted = true;
+			}
+			DBUtils.closeRs(rs);
+            DBUtils.closeStmt(stmt);
+		} catch (SQLException e) {
+			e.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+		return isexisted;
+	}
+
+	/**
+     * returns the EC2 region
+     *
+     * @return region set
+     */
+	public static List<String> getEC2Regions() {
+		List<String> ec2RegionList = new ArrayList<String>();
+
+        Connection con = null;
+        try {
+            con = DBUtils.getConn();
+            PreparedStatement stmt = con.prepareStatement("select distinct ec2_region from APPLICATION_KEY");
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+            	if(!rs.getString("ec2_region").equals("NO_EC2_REGION")){
+            		ec2RegionList.add(rs.getString("ec2_region"));
+            	}
+            }
+            DBUtils.closeStmt(stmt);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+        return ec2RegionList;
+	}
+
+	/**
+     * returns private keys information for region and AWS Credential
+     *
+     * @param ec2Region ec2 region
+     * @param awsCredId aws cred id
+     * @return key information
+     */
+	public static List<ApplicationKey> getEC2KeyByRegion(String ec2Region, Long awsCredId) {
+		List<ApplicationKey> ec2KeyList = new ArrayList<ApplicationKey>();
+
+        Connection con = null;
+        try {
+            con = DBUtils.getConn();
+            PreparedStatement stmt = con.prepareStatement("select * from APPLICATION_KEY where ec2_region like ? and aws_cred_id=?");
+            stmt.setString(1, ec2Region);
+            stmt.setLong(2, awsCredId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+            	ec2KeyList.add(getApplicationKeyByID(rs.getLong("id")));
+            }
+            DBUtils.closeStmt(stmt);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+        return ec2KeyList;
+	}
+	
+	/**
+     * returns private keys information for region and user
+     * 
+     * @param keyName 
+     * @param ec2Region ec2 region
+     * @param awsCredId aws cred id
+     * @return key information
+     */
+	public static ApplicationKey getEC2KeyByNmRegion(String keyName, String ec2Region, Long awsCredId) {
+		ApplicationKey ec2Key=null;
+
+        Connection con = null;
+        try {
+            con = DBUtils.getConn();
+            PreparedStatement stmt = con.prepareStatement("select * from APPLICATION_KEY where KEYNAME like ? and ec2_region like ? and aws_cred_id=?");
+            stmt.setString(1, keyName);
+            stmt.setString(2, ec2Region);
+            stmt.setLong(3, awsCredId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                ec2Key = getApplicationKeyByID(rs.getLong("id")); 
+            }
+
+            DBUtils.closeStmt(stmt);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        DBUtils.closeConn(con);
+        
+        return ec2Key;
 	}
 }

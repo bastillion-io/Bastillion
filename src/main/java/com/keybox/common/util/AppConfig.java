@@ -101,5 +101,24 @@ public class AppConfig {
         }
     }
 
+    /**
+     * gets the property from config and returns map of name / value pairs
+     *
+     * @param name property name
+     * @return configuration property
+     */
+    public static Map<String,String> getMapProperties(String name) {
+
+        String[] values= prop.getStringArray(name);
+        Map<String,String> map= new LinkedHashMap<String, String>();
+
+        for(String set:values){
+            String key=set.split(";")[0];
+            String val =set.split(";")[1];
+            map.put(key,val);
+
+        }
+        return map;
+    }
 
 }

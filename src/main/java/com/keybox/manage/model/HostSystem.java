@@ -35,7 +35,11 @@ public class HostSystem {
     boolean enabled = true;
     Integer instanceId;
     ApplicationKey applicationKey;
-
+    
+    String instance = "---";
+    String ec2Region = "---";
+    
+    //KeyBox Status
     public static final String INITIAL_STATUS="INITIAL";
     public static final String AUTH_FAIL_STATUS="AUTHFAIL";
     public static final String PUBLIC_KEY_FAIL_STATUS="KEYAUTHFAIL";
@@ -43,12 +47,18 @@ public class HostSystem {
     public static final String SUCCESS_STATUS="SUCCESS";
     public static final String HOST_FAIL_STATUS="HOSTFAIL";
 	public static final String PRIVAT_KEY_FAIL_STATUS = "PRIVATKEYFAIL";
-
-
+	
+	//EC2Box Status
+	public static final String PENDING_STATUS="PENDING";
+	public static final String RUNNING_STATUS="RUNNING";
+	public static final String SHUTTING_DOWN_STATUS="SHUTTING-DOWN";
+	public static final String TERMINATED_STATUS="TERMINATED";
+	public static final String STOPPING_STATUS="STOPPING";
+	public static final String STOPPED_STATUS="STOPPED";
+	
 
     public Long getId() {
         return id;
-
     }
 
     public void setId(Long id) {
@@ -78,8 +88,6 @@ public class HostSystem {
     public void setHost(String host){
         this.host = host;
     }
-
-
 
     public String getDisplayLabel() {
         return getDisplayNm() +" - ( " +getUser() +"@"+getHost()+":"+getPort()+" )";
@@ -159,5 +167,21 @@ public class HostSystem {
 
 	public void setApplicationKey(ApplicationKey applicationKey) {
 		this.applicationKey = applicationKey;
+	}
+
+	public String getInstance() {
+		return instance;
+	}
+
+	public void setInstance(String instance) {
+		this.instance = instance;
+	}
+
+	public String getEc2Region() {
+		return ec2Region;
+	}
+
+	public void setEc2Region(String ec2Region) {
+		this.ec2Region = ec2Region;
 	}
 }

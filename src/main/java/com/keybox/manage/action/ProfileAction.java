@@ -85,6 +85,9 @@ public class ProfileAction extends ActionSupport {
                 || profile.getNm().trim().equals("")) {
             addFieldError("profile.nm", "Required");
         }
+        if (ProfileDB.existsProfileName(profile)){
+        	addFieldError("profile.nm", "Name already in use.");
+        }
 
         if (!this.getFieldErrors().isEmpty()) {
             sortedSet = ProfileDB.getProfileSet(sortedSet);
