@@ -17,9 +17,11 @@ package com.keybox.manage.action;
 
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.KeyPair;
+import com.keybox.common.util.AppConfig;
 import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.db.PrivateKeyDB;
 import com.keybox.manage.db.ProfileDB;
+import com.keybox.manage.db.ProfileSystemsDB;
 import com.keybox.manage.db.ScriptDB;
 import com.keybox.manage.db.SystemDB;
 import com.keybox.manage.db.UserProfileDB;
@@ -40,7 +42,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+import com.amazonaws.services.ec2.model.Instance;
+import com.amazonaws.services.ec2.model.Tag;
 
 /**
  * Action to manage systems
@@ -59,14 +65,20 @@ public class SystemAction extends ActionSupport implements ServletRequestAware, 
     List<Profile> profileList= new ArrayList<>();
     boolean ismanager;
     boolean downloadKey = !RefreshApplicationKeyUtil.getDynamicKeyRotation();
-
-
+    
+    String infoAWS = "You are about to create an Amazon EC2 server."+
+    		"Better use the AWS Credentials and EC2 Keys, so as not to inadvertently shut out at Amazon."+
+    		"If they do want to create the system over here again press Submit.";
+    
+    
     @Action(value = "/admin/viewSystems",
             results = {
                     @Result(name = "success", location = "/admin/view_systems.jsp")
             }
     )
     public String viewAdminSystems() {
+    	ProfileSystemsDB.updateProfileAWSSysteme();
+    	
         Long userId = AuthUtil.getUserId(servletRequest.getSession());
         ismanager = Auth.MANAGER.equals(AuthUtil.getUserType(servletRequest.getSession()));
         if (ismanager) {
@@ -91,6 +103,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware, 
     public String viewManageSystems() {
 
     	initAppList = PrivateKeyDB.getInitialApplicationKey();
+    	sortedSet.getFilterMap().put("region", "---");
         sortedSet = SystemDB.getSystemSet(sortedSet); 
 
         return SUCCESS;
@@ -110,7 +123,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware, 
         {
         	hostSystem.setApplicationKey(PrivateKeyDB.getApplicationKeyByID(hostSystem.getApplicationKey().getId()));
         	boolean newAppKey = false;
-        	if(SSHUtil.dynamicKeys && hostSystem.getApplicationKey().isInitialkey())
+        	if(SSHUtil.dynamicKeys && hostSystem.getApplicationKey().isInitialkey() && hostSystem.getInstance().equals("---"))
 			{
 				newAppKey = true;
 			}
@@ -124,6 +137,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware, 
         } else {
             hostSystem.setId(SystemDB.insertSystem(hostSystem));
         }
+        sortedSet.getFilterMap().put("region", "---");
         sortedSet = SystemDB.getSystemSet(sortedSet);
 
         if (!HostSystem.SUCCESS_STATUS.equals(hostSystem.getStatusCd())) {
@@ -149,11 +163,9 @@ public class SystemAction extends ActionSupport implements ServletRequestAware, 
         } else {
         	hostSystem.setStatusCd(HostSystem.PRIVAT_KEY_FAIL_STATUS);
         }
-
         SystemDB.updateSystem(hostSystem);
-        
+        sortedSet.getFilterMap().put("region", "---");
         sortedSet = SystemDB.getSystemSet(sortedSet);
-
         return retVal;
     }
 
@@ -163,7 +175,6 @@ public class SystemAction extends ActionSupport implements ServletRequestAware, 
             }
     )
     public String deleteSystem() {
-
         if (hostSystem.getId() != null) {
             SystemDB.deleteSystem(hostSystem.getId());
         }
@@ -182,7 +193,6 @@ public class SystemAction extends ActionSupport implements ServletRequestAware, 
     	}
     )
     public String disableSystem() {
-    	
     	if (hostSystem.getId() != null) {
     		SystemDB.disableSystem(hostSystem.getId());
     	}
@@ -201,7 +211,6 @@ public class SystemAction extends ActionSupport implements ServletRequestAware, 
     	}
     )
     public String enableSystem() {
-    	
     	if (hostSystem.getId() != null) {
     		SystemDB.enableSystem(hostSystem.getId());
     	}
@@ -215,6 +224,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware, 
     	}
     )
     public String downloadSystemKey() {
+    	sortedSet.getFilterMap().put("region", "---");
     	sortedSet = SystemDB.getSystemSet(sortedSet);
         initAppList = PrivateKeyDB.getInitialApplicationKey();
         
@@ -257,6 +267,8 @@ public class SystemAction extends ActionSupport implements ServletRequestAware, 
 	}
 
 
+    String testUser = "";
+    String testHost = "";
     /**
      * Validates all fields for adding a host system
      */
@@ -288,13 +300,31 @@ public class SystemAction extends ActionSupport implements ServletRequestAware, 
                 || hostSystem.getAuthorizedKeys().trim().equals("") || hostSystem.getAuthorizedKeys().trim().equals("~")) {
             addFieldError("hostSystem.authorizedKeys", "Required");
         }
+        
+        //Test whether there is a possible AWS server
+    	//TODO: better test for AWS Server
+        if (hostSystem.getUser().equals("ec2-user")){
+        	if(!hostSystem.getUser().equals(testUser)){
+        		addFieldError("hostSystem.user", "Amazon EC2 User");
+        		testUser = hostSystem.getUser();
+        		addActionError(infoAWS);
+        	}
+        }
+        if (hostSystem.getHost().indexOf("compute.amazonaws.com")>-1){
+        	if(!hostSystem.getHost().equals(testHost)){
+        		addFieldError("hostSystem.host", "Amazon EC2 Host");
+        		testHost = hostSystem.getHost();
+        		if(this.getActionErrors().isEmpty()){
+        			addActionError(infoAWS);
+        		}
+        	}
+        }
 
         if (!this.getFieldErrors().isEmpty()) {
-
+        	sortedSet.getFilterMap().put("region", "---");
             sortedSet = SystemDB.getSystemSet(sortedSet);
             initAppList = PrivateKeyDB.getInitialApplicationKey();
         }
-
     }
 
     /**
@@ -330,8 +360,6 @@ public class SystemAction extends ActionSupport implements ServletRequestAware, 
     			ex.printStackTrace();
     		}
     	}
-    	
-
         if (!this.getActionErrors().isEmpty()) {	
 			sortedSet = SystemDB.getSystemSet(sortedSet);
             initAppList = PrivateKeyDB.getInitialApplicationKey();
@@ -421,5 +449,21 @@ public class SystemAction extends ActionSupport implements ServletRequestAware, 
 
 	public void setServletResponse(HttpServletResponse servletResponse) {
 		this.servletResponse = servletResponse;
+	}
+
+	public String getTestUser() {
+		return testUser;
+	}
+
+	public void setTestUser(String testUser) {
+		this.testUser = testUser;
+	}
+
+	public String getTestHost() {
+		return testHost;
+	}
+
+	public void setTestHost(String testHost) {
+		this.testHost = testHost;
 	}
 }

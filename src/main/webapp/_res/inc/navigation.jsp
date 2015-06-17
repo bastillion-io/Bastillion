@@ -64,6 +64,8 @@
                             
                             <s:if test="%{#session.userType==\"M\"}">
                             	<li><a href="../manage/ViewApplicationKeys.action">Manage System Keys</a></li>
+                            	
+                            	<li><a href="../manage/viewAWSCred.action">Set AWS Credentials</a></li>
                             </s:if>
                         </ul>
                     </li>

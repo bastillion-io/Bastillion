@@ -58,6 +58,7 @@ public class ProfileDB {
                 profile.setId(rs.getLong("id"));
                 profile.setNm(rs.getString("nm"));
                 profile.setDesc(rs.getString("desc"));
+                profile.setTag(rs.getString("tag"));
                 profileList.add(profile);
 
             }
@@ -93,6 +94,7 @@ public class ProfileDB {
                 profile.setId(rs.getLong("id"));
                 profile.setNm(rs.getString("nm"));
                 profile.setDesc(rs.getString("desc"));
+                profile.setTag(rs.getString("tag"));
                 profileList.add(profile);
 
             }
@@ -119,7 +121,7 @@ public class ProfileDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-           profile=getProfile(con, profileId);
+            profile=getProfile(con, profileId);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -148,6 +150,7 @@ public class ProfileDB {
                 profile.setId(rs.getLong("id"));
                 profile.setNm(rs.getString("nm"));
                 profile.setDesc(rs.getString("desc"));
+                profile.setTag(rs.getString("tag"));
                 profile.setHostSystemList(ProfileSystemsDB.getSystemsByProfile(con, profileId));
 
             }
@@ -168,13 +171,13 @@ public class ProfileDB {
      */
     public static void insertProfile(Profile profile) {
 
-
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("insert into profiles (nm, desc) values (?,?)");
+            PreparedStatement stmt = con.prepareStatement("insert into profiles (nm, desc, tag) values (?,?,?)");
             stmt.setString(1, profile.getNm());
             stmt.setString(2, profile.getDesc());
+            stmt.setString(3, profile.getTag());
             stmt.execute();
             DBUtils.closeStmt(stmt);
 
@@ -192,14 +195,14 @@ public class ProfileDB {
      */
     public static void updateProfile(Profile profile) {
 
-
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("update profiles set nm=?, desc=? where id=?");
+            PreparedStatement stmt = con.prepareStatement("update profiles set nm=?, desc=?, tag=? where id=?");
             stmt.setString(1, profile.getNm());
             stmt.setString(2, profile.getDesc());
-            stmt.setLong(3, profile.getId());
+            stmt.setString(3, profile.getTag());
+            stmt.setLong(4, profile.getId());
             stmt.execute();
             DBUtils.closeStmt(stmt);
 
@@ -207,7 +210,6 @@ public class ProfileDB {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-
     }
 
     /**
@@ -232,6 +234,40 @@ public class ProfileDB {
         DBUtils.closeConn(con);
 
     }
+
+    /**
+     * Test if ProfileName exists for new or edit Profile
+     * 
+     * @param profile new or edit Profile
+     * @return <strong>true</strong> ProfileName exists under a other Profile<br>
+     * 			<strong>false</strong> ProfileName not exists or on edit Profile ProfileName not changes
+     */
+	public static boolean existsProfileName(Profile profile) {
+		boolean isexisted = false;
+		Connection con = null;
+        try {
+        	con = DBUtils.getConn();
+            PreparedStatement stmt = con.prepareStatement("select * from profiles where nm=?");
+            stmt.setString(1, profile.getNm());
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+            	if(profile.getId() == null || profile.getId() != rs.getLong("id"))
+            	{
+            		isexisted = true;
+            	}
+            }
+            DBUtils.closeRs(rs);
+            DBUtils.closeStmt(stmt);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+        DBUtils.closeConn(con);
+        
+		return isexisted;
+	}
 
 
 }

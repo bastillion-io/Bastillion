@@ -55,7 +55,6 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
 
     static Map<Long, UserSchSessions> userSchSessionMap = new ConcurrentHashMap<Long, UserSchSessions>();
 
-
     Script script = new Script();
 
 
@@ -73,7 +72,6 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         Long sessionId = AuthUtil.getSessionId(servletRequest.getSession());
         if (pendingSystemStatus != null && pendingSystemStatus.getId() != null) {
 
-
             //get status
             currentSystemStatus = SystemStatusDB.getSystemStatus(pendingSystemStatus.getId(), userId);
             //if initial status run script
@@ -85,14 +83,12 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
 
                 //set current session
                 currentSystemStatus = SSHUtil.openSSHTermOnSystem(passphrase, password, userId, sessionId, currentSystemStatus, userSchSessionMap);
-
             }
             if (currentSystemStatus != null
                     && (HostSystem.AUTH_FAIL_STATUS.equals(currentSystemStatus.getStatusCd())
                     || HostSystem.PUBLIC_KEY_FAIL_STATUS.equals(currentSystemStatus.getStatusCd()))) {
 
                 pendingSystemStatus = currentSystemStatus;
-
             } else {
 
                 pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
@@ -101,10 +97,7 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
                     currentSystemStatus = SSHUtil.openSSHTermOnSystem(passphrase, password, userId, sessionId, pendingSystemStatus, userSchSessionMap);
                     pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
                 }
-
-
             }
-
         }
         //set system list if no pending systems
         if (SystemStatusDB.getNextPendingSystem(userId) == null) {
@@ -125,8 +118,6 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
             this.userSettings =UserThemeDB.getTheme(userId);
 
         }
-
-
         return SUCCESS;
     }
 
@@ -429,5 +420,3 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         this.userSettings = userSettings;
     }
 }
-
-

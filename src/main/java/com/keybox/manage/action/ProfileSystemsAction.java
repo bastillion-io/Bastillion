@@ -45,6 +45,7 @@ public class ProfileSystemsAction extends ActionSupport {
     public String viewProfileSystems() {
         if (profile != null && profile.getId() != null) {
             profile = ProfileDB.getProfile(profile.getId());
+            sortedSet.getFilterMap().put("region", "---");
             sortedSet = SystemDB.getSystemSet(sortedSet);
         }
         return SUCCESS;

@@ -37,6 +37,9 @@ public class ApplicationKey {
     boolean enabled;
     Date createDt;
     String passphraseConfirm;
+    
+    String ec2Region = "NO_EC2_REGION";
+    AWSCred awsCredentials = null;
 
     public Long getUserId() {
 		return userId;
@@ -146,4 +149,19 @@ public class ApplicationKey {
 		return PrivateKeyDB.getSystemNamesByApplicationId(this.id);
 	}
 
+	public String getEc2Region() {
+		return ec2Region;
+	}
+
+	public void setEc2Region(String ec2Region) {
+		this.ec2Region = ec2Region;
+	}
+
+	public AWSCred getAwsCredentials() {
+		return awsCredentials;
+	}
+
+	public void setAwsCredentials(AWSCred awsCredentials) {
+		this.awsCredentials = awsCredentials;
+	}
 }
