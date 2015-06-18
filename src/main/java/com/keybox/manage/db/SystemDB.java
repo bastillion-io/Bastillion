@@ -680,7 +680,10 @@ public class SystemDB {
 	                    //only return systems that have keys set
 	                    List<String> keyValueList = new ArrayList<String>();
 	                    for (ApplicationKey ec2Key : PrivateKeyDB.getEC2KeyByRegion(ec2Region, awsCred.getId())) {
-	                        keyValueList.add(ec2Key.getKeyname());
+	                    	if(ec2Key.isEnabled())
+	                    	{
+	                    		keyValueList.add(ec2Key.getKeyname());
+	                    	}
 	                    }
 	
 	                    DescribeInstancesRequest describeInstancesRequest = new DescribeInstancesRequest();

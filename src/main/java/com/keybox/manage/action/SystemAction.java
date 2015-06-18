@@ -66,9 +66,11 @@ public class SystemAction extends ActionSupport implements ServletRequestAware, 
     boolean ismanager;
     boolean downloadKey = !RefreshApplicationKeyUtil.getDynamicKeyRotation();
     
-    String infoAWS = "You are about to create an Amazon EC2 server."+
-    		"Better use the AWS Credentials and EC2 Keys, so as not to inadvertently shut out at Amazon."+
-    		"If they do want to create the system over here again press Submit.";
+    String infoAWS = "You're about to manually set up an EC2 connection."+ ""
+    		+ "You rather use the EC2 settings. "
+    		+ "By a manual setup Keybox is going to change the default key."
+    		+ "You can't access the server with the default AWS key then. "
+    		+ "Press okay to go ahead, or cancel the setup.";
     
     
     @Action(value = "/admin/viewSystems",
