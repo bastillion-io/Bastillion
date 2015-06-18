@@ -60,12 +60,6 @@ $(document).ready(function() {
 
    }
 
-
-
-
-
-
-
   function loadTerms(){
 
         $(".output").each(function (index, value){
@@ -184,38 +178,23 @@ $(document).ready(function() {
 
 
 <div class="term-container container">
- <s:if test="sessionAudit!= null">
+	<s:if test="sessionAudit!= null">
+    	<div class="termwrapper">
+        	<s:iterator value="sessionAudit.hostSystemList">
+            	<div id="run_cmd_<s:property value="instanceId"/>" class="run_cmd_active run_cmd">
 
-
-
-            <div class="termwrapper">
-                <s:iterator value="sessionAudit.hostSystemList">
-                    <div id="run_cmd_<s:property value="instanceId"/>" class="run_cmd_active run_cmd">
-
-                        <h6 class="term-header"><s:property value="displayLabel"/></h6>
-
+                	<h6 class="term-header"><s:property value="displayLabel"/></h6>
                         <div id="term" class="term">
                             <div id="output_<s:property value="instanceId"/>" class="output">
-                            <div class="terminal" >
+                            	<div class="terminal" >
+                            	</div>
                             </div>
-                            </div>
-
-
-
                         </div>
-
-
-
-                    </div>
-                </s:iterator>
-            </div>
-</s:if>
-
-
+		        </div>
+		    </s:iterator>
+		</div>
+	</s:if>
 </div>
-
-
-
 
 </body>
 </html>

@@ -87,9 +87,7 @@ public class SystemDB {
 			if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID))) {
 				stmt.setLong(2, Long.valueOf(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID)));
 			}
-
 			ResultSet rs = stmt.executeQuery();
-
 			while (rs.next()) {
 				HostSystem hostSystem = getSystem(rs.getLong("id"));
 				hostSystem.setPublicKeyList(PublicKeyDB.getPublicKeysForUserandSystem(userId, hostSystem.getId()));
@@ -102,11 +100,8 @@ public class SystemDB {
 			e.printStackTrace();
 		}
 		DBUtils.closeConn(con);
-
-
 		sortedSet.setItemList(hostSystemList);
 		return sortedSet;
-
 	}
 
 
@@ -158,11 +153,8 @@ public class SystemDB {
 			e.printStackTrace();
 		}
 		DBUtils.closeConn(con);
-
-
 		sortedSet.setItemList(hostSystemList);
 		return sortedSet;
-
 	}
 
 
@@ -175,21 +167,14 @@ public class SystemDB {
 	public static HostSystem getSystem(Long id) {
 
 		HostSystem hostSystem = null;
-
 		Connection con = null;
-
 		try {
 			con = DBUtils.getConn();
-
 			hostSystem = getSystem(con, id);
-
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		DBUtils.closeConn(con);
-
-
 		return hostSystem;
 	}
 
@@ -226,11 +211,9 @@ public class SystemDB {
 			}
 			DBUtils.closeRs(rs);
 			DBUtils.closeStmt(stmt);
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 		return hostSystem;
 	}
 
@@ -243,9 +226,7 @@ public class SystemDB {
 	 */
 	public static Long insertSystem(HostSystem hostSystem) {
 
-
 		Connection con = null;
-
 		Long systemId = null;
 		try {
 			con = DBUtils.getConn();
@@ -273,7 +254,6 @@ public class SystemDB {
 		}
 		DBUtils.closeConn(con);
 		return systemId;
-
 	}
 
 	/**
@@ -283,12 +263,9 @@ public class SystemDB {
 	 */
 	public static void updateSystem(HostSystem hostSystem) {
 
-
 		Connection con = null;
-
 		try {
 			con = DBUtils.getConn();
-
 			PreparedStatement stmt = con.prepareStatement("update system set display_nm=?, user=?, host=?, port=?, authorized_keys=?, status_cd=?, enabled=?, instance_id=?, region=? where id=?");
 			stmt.setString(1, hostSystem.getDisplayNm());
 			stmt.setString(2, hostSystem.getUser());
@@ -310,7 +287,6 @@ public class SystemDB {
 			e.printStackTrace();
 		}
 		DBUtils.closeConn(con);
-
 	}
 
 	/**
@@ -320,22 +296,17 @@ public class SystemDB {
 	 */
 	public static void deleteSystem(Long hostSystemId) {
 
-
 		Connection con = null;
-
 		try {
 			con = DBUtils.getConn();
-
 			PreparedStatement stmt = con.prepareStatement("delete from system where id=?");
 			stmt.setLong(1, hostSystemId);
 			stmt.execute();
 			DBUtils.closeStmt(stmt);
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		DBUtils.closeConn(con);
-
 	}
 
 	/**
@@ -346,25 +317,19 @@ public class SystemDB {
 	 */
 	public static List<HostSystem> getSystems(List<Long> systemIdList) {
 
-
 		Connection con = null;
 		List<HostSystem> hostSystemListReturn = new ArrayList<HostSystem>();
-
 		try {
 			con = DBUtils.getConn();
 			for (Long systemId : systemIdList) {
 				HostSystem hostSystem = getSystem(con, systemId);
 				hostSystemListReturn.add(hostSystem);
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		DBUtils.closeConn(con);
-
-
 		return hostSystemListReturn;
-
 	}
 
 
@@ -377,28 +342,21 @@ public class SystemDB {
 	public static List<HostSystem> getAllSystems() {
 
 		List<HostSystem> hostSystemList = new ArrayList<HostSystem>();
-
 		Connection con = null;
-
 		try {
 			con=DBUtils.getConn();
 			PreparedStatement stmt = con.prepareStatement("select * from  system");
 			ResultSet rs = stmt.executeQuery();
-
 			while (rs.next()) {
 				hostSystemList.add(getSystem(rs.getLong("id")));
 			}
 			DBUtils.closeRs(rs);
 			DBUtils.closeStmt(stmt);
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 		DBUtils.closeConn(con);
-
 		return hostSystemList;
-
 	}
 
 
@@ -411,25 +369,18 @@ public class SystemDB {
 	public static List<Long> getAllSystemIds(Connection con) {
 
 		List<Long> systemIdList = new ArrayList<Long>();
-
-
 		try {
 			PreparedStatement stmt = con.prepareStatement("select * from  system");
 			ResultSet rs = stmt.executeQuery();
-
 			while (rs.next()) {
 				systemIdList.add(rs.getLong("id"));
 			}
 			DBUtils.closeRs(rs);
 			DBUtils.closeStmt(stmt);
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
-
 		return systemIdList;
-
 	}
 
 	/**
@@ -442,25 +393,19 @@ public class SystemDB {
 	public static List<Long> getAllSystemIdsForUser(Connection con, Long userId) {
 
 		List<Long> systemIdList = new ArrayList<Long>();
-
-
 		try {
 			PreparedStatement stmt = con.prepareStatement("select distinct system_id from  system_map m, user_map um where m.profile_id=um.profile_id and um.user_id=?");
 			stmt.setLong(1, userId);
 			ResultSet rs = stmt.executeQuery();
-
 			while (rs.next()) {
 				systemIdList.add(rs.getLong("system_id"));
 			}
 			DBUtils.closeRs(rs);
 			DBUtils.closeStmt(stmt);
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 		return systemIdList;
-
 	}
 
 	/**
@@ -475,7 +420,6 @@ public class SystemDB {
 		try {
 			con = DBUtils.getConn();
 			systemIdList = getAllSystemIdsForUser(con, userId);
-
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -494,13 +438,11 @@ public class SystemDB {
 		try {
 			con = DBUtils.getConn();
 			systemIdList = getAllSystemIds(con);
-
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 		DBUtils.closeConn(con);
 		return systemIdList;
-
 	}
 
 	/**
@@ -521,9 +463,7 @@ public class SystemDB {
 				systemIdList.add(systemId);
 			}
 		}
-
 		return systemIdList;
-
 	}
 	
 	
@@ -566,13 +506,19 @@ public class SystemDB {
 			stmt.setLong(1, id);
 			stmt.execute();
 			DBUtils.closeStmt(stmt);
-			
 		} catch (Exception e) {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
 	}
 
+	/**
+	 * method to do order by based on the sorted set object for systems for admin
+	 *
+	 * @param sortedSet sorted set object
+	 * @param userId    user id
+	 * @return sortedSet with list of host systems
+	 */
 	public static SortedSet getAdminSystemSet(SortedSet sortedSet, Long userId) {
 		List<HostSystem> hostSystemList = new ArrayList<HostSystem>();
 
@@ -606,8 +552,6 @@ public class SystemDB {
 			e.printStackTrace();
 		}
 		DBUtils.closeConn(con);
-
-
 		sortedSet.setItemList(hostSystemList);
 		return sortedSet;
 	}
@@ -622,9 +566,8 @@ public class SystemDB {
 	public static List<HostSystem> getAllSystemsWhereApplicationKeyOlderThan(Integer days) {
 		
 		List<HostSystem> hostSystemList = new ArrayList<HostSystem>();
-
 		Connection con = null;
-
+		
 		Calendar moment = Calendar.getInstance();
 		moment.add(Calendar.DAY_OF_MONTH, -days);
 		Timestamp momentTS = new Timestamp(moment.getTimeInMillis());
@@ -648,15 +591,16 @@ public class SystemDB {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 		DBUtils.closeConn(con);
-		
 		return hostSystemList;
 	}
 
 	
 	/**
 	 * Update AWS Systems
+	 * <br><br>
+	 * Update all EC2 System based on setting AWS Credentials and the EC2 Keys
+	 * and added new System
 	 */
 	public static void updateAWSSystems() {
 
@@ -676,11 +620,13 @@ public class SystemDB {
 	                    AmazonEC2 service = new AmazonEC2Client(awsCredentials, AWSClientConfig.getClientConfig());
 	                    service.setEndpoint(ec2Region);
 	
-	
 	                    //only return systems that have keys set
 	                    List<String> keyValueList = new ArrayList<String>();
 	                    for (ApplicationKey ec2Key : PrivateKeyDB.getEC2KeyByRegion(ec2Region, awsCred.getId())) {
-	                        keyValueList.add(ec2Key.getKeyname());
+	                    	if(ec2Key.isEnabled())
+	                    	{
+	                    		keyValueList.add(ec2Key.getKeyname());
+	                    	}
 	                    }
 	
 	                    DescribeInstancesRequest describeInstancesRequest = new DescribeInstancesRequest();
@@ -693,8 +639,7 @@ public class SystemDB {
 	                    
 	                    for (Reservation res : describeInstancesResult.getReservations()) {
 	                        for (Instance instance : res.getInstances()) {
-	                            HostSystem hostSystem = transformerEC2InstanzToHostSystem(instance, ec2Region, awsCred);
-	                            
+	                            HostSystem hostSystem = transformerEC2InstanzToHostSystem(instance, ec2Region, awsCred);	                            
 	                            setEC2System(hostSystem);
 	                        }
 	                    }
@@ -743,13 +688,10 @@ public class SystemDB {
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-		
 		DBUtils.closeConn(con);
-		
         return hostSystem;
 	}
 
@@ -786,8 +728,6 @@ public class SystemDB {
                 hostSystem.setDisplayNm(tag.getValue());
             }
         }
-        
         return hostSystem;
 	}
-	
 }

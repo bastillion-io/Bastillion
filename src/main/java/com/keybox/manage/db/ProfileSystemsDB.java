@@ -86,7 +86,6 @@ public class ProfileSystemsDB {
 			stmt.setLong(1, profileId);
 			stmt.execute();
 			DBUtils.closeStmt(stmt);
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -122,7 +121,6 @@ public class ProfileSystemsDB {
 			}
 			DBUtils.closeRs(rs);
 			DBUtils.closeStmt(stmt);
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -147,7 +145,6 @@ public class ProfileSystemsDB {
 			e.printStackTrace();
 		}
 		DBUtils.closeConn(con);
-
 		return hostSystemList;
 	}
 
@@ -165,13 +162,11 @@ public class ProfileSystemsDB {
 			PreparedStatement stmt = con.prepareStatement("select * from  system s, system_map m where s.id=m.system_id and m.profile_id=? order by display_nm asc");
 			stmt.setLong(1, profileId);
 			ResultSet rs = stmt.executeQuery();
-
 			while (rs.next()) {
 				systemIdList.add(rs.getLong("id"));
 			}
 			DBUtils.closeRs(rs);
 			DBUtils.closeStmt(stmt);
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -252,6 +247,10 @@ public class ProfileSystemsDB {
 	
 	/**
 	 * Update Profile and AWS Systems in DB
+	 * <br><br>
+	 * Call first updateAWSSystem() to Update EC2 systems<br>
+	 * Clean SystemProfileEntries from EC2 systems<br>
+	 * Rebuild SystemProfileEntries for EC2 systems
 	 */
 	public static void updateProfileAWSSysteme() {
 		
@@ -303,7 +302,10 @@ public class ProfileSystemsDB {
                             //only return systems that have keys set
                             List<String> keyValueList = new ArrayList<String>();
                             for (ApplicationKey ec2Key : PrivateKeyDB.getEC2KeyByRegion(ec2Region, awsCred.getId())) {
-    	                        keyValueList.add(ec2Key.getKeyname());
+                            	if(ec2Key.isEnabled())
+    	                    	{
+    	                    		keyValueList.add(ec2Key.getKeyname());
+    	                    	}
     	                    }
                             
                             DescribeInstancesRequest describeInstancesRequest = new DescribeInstancesRequest();
@@ -357,8 +359,5 @@ public class ProfileSystemsDB {
 			e.printStackTrace();
 		}
 		DBUtils.closeConn(con);
-		
 	}
-	
-	
 }

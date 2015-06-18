@@ -34,7 +34,6 @@
             $(".submit_btn").button().click(function () {
                 $(this).parents('.modal').find('form').submit();
             });
-
         });
     </script>
 
@@ -74,11 +73,8 @@
             </thead>
             <tbody>
 
-
             <s:iterator var="profile" value="user.profileList" status="stat">
                 <tr>
-
-
                     <td>
                         <a href="viewProfileSystems.action?profile.id=<s:property value="id"/>"
                            title="Manage Systems in Profile">
@@ -87,31 +83,21 @@
                     </td>
 
                     <td>
-
                         <a href="viewProfileSystems.action?profile.id=<s:property value="id"/>">
                             <div id="assign_btn_<s:property value="id"/>" class="btn btn-default edit_btn spacer spacer-left"
                                  style="float:left">Assign Systems
                             </div>
                         </a>
-
                         <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn spacer spacer-right">Delete</button>
-
                     </td>
-
-
                 </tr>
-
             </s:iterator>
-
             </tbody>
-
-
         </table>
         </div>
     </s:if>
 
     <s:if test="profileList!= null && !profileList.isEmpty()">
-
 
         <button class="btn btn-default add_btn spacer spacer-bottom" data-toggle="modal" data-target="#add_dialog">Add Profile</button>
         <div id="add_dialog" class="modal fade">

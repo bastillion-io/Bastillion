@@ -44,7 +44,6 @@ public class ScriptDB {
 
         ArrayList<Script> scriptList = new ArrayList<Script>();
 
-
         String orderBy = "";
         if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
             orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
@@ -65,16 +64,13 @@ public class ScriptDB {
                 script.setScript(rs.getString("script"));
 
                 scriptList.add(script);
-
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-
         sortedSet.setItemList(scriptList);
         return sortedSet;
     }
@@ -93,13 +89,10 @@ public class ScriptDB {
         try {
             con = DBUtils.getConn();
             script = getScript(con, scriptId, userId);
-
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-
         return script;
     }
 
@@ -131,7 +124,6 @@ public class ScriptDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return script;
     }
 
@@ -141,7 +133,6 @@ public class ScriptDB {
      * @param userId user id
      */
     public static void insertScript(Script script, Long userId) {
-
 
         Connection con = null;
         try {
@@ -157,7 +148,6 @@ public class ScriptDB {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-
     }
 
     /**
@@ -166,7 +156,6 @@ public class ScriptDB {
      * @param userId user id
      */
     public static void updateScript(Script script, Long userId) {
-
 
         Connection con = null;
         try {
@@ -183,7 +172,6 @@ public class ScriptDB {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-
     }
 
     /**
@@ -193,7 +181,6 @@ public class ScriptDB {
      */
     public static void deleteScript(Long scriptId, Long userId) {
 
-
         Connection con = null;
         try {
             con = DBUtils.getConn();
@@ -202,13 +189,9 @@ public class ScriptDB {
             stmt.setLong(2, userId);
             stmt.execute();
             DBUtils.closeStmt(stmt);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-
     }
-
-
 }

@@ -90,7 +90,6 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
 
                 pendingSystemStatus = currentSystemStatus;
             } else {
-
                 pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
                 //if success loop through systems until finished or need password
                 while (pendingSystemStatus != null && currentSystemStatus != null && HostSystem.SUCCESS_STATUS.equals(currentSystemStatus.getStatusCd())) {
@@ -116,7 +115,6 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
             }
             //set theme
             this.userSettings =UserThemeDB.getTheme(userId);
-
         }
         return SUCCESS;
     }
@@ -133,7 +131,6 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         currentSystemStatus.setErrorMsg("Auth fail");
         currentSystemStatus.setStatusCd(HostSystem.GENERIC_FAIL_STATUS);
 
-
         SystemStatusDB.updateSystemStatus(currentSystemStatus, userId);
         SystemDB.updateSystem(currentSystemStatus);
 
@@ -143,7 +140,6 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         if (pendingSystemStatus == null) {
             setSystemList(userId, AuthUtil.getSessionId(servletRequest.getSession()));
         }
-
         return SUCCESS;
     }
 
@@ -154,17 +150,13 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
     )
     public String selectSystemsForCompositeTerms() {
 
-
         Long userId = AuthUtil.getUserId(servletRequest.getSession());
-
         if (systemSelectId != null && !systemSelectId.isEmpty()) {
 
             SystemStatusDB.setInitialSystemStatus(systemSelectId, userId, AuthUtil.getUserType(servletRequest.getSession()));
             pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
 
             AuthUtil.setSessionId(servletRequest.getSession(), SessionAuditDB.createSessionLog(userId));
-
-
         }
         return SUCCESS;
     }
@@ -173,12 +165,9 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
     @Action(value = "/admin/exitTerms",
             results = {
                     @Result(name = "success", location = "/admin/menu.action", type = "redirect")
-
             }
     )
     public String exitTerms() {
-
-
         return SUCCESS;
     }
 
@@ -210,11 +199,7 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
                     ex.printStackTrace();
                 }
             }
-
-
         }
-
-
         return null;
     }
 
@@ -223,20 +208,12 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
     public String createSession() {
         
         Long userId = AuthUtil.getUserId(servletRequest.getSession());
-
         if (systemSelectId != null && !systemSelectId.isEmpty()) {
-
             SystemStatusDB.setInitialSystemStatus(systemSelectId, userId, AuthUtil.getUserType(servletRequest.getSession()));
-            
             pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
-
             createTerms();
-            
         }
-
         return null;
-
-
     }
 
     @Action(value = "/admin/setPtyType")
@@ -246,18 +223,12 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
         if (SecureShellAction.getUserSchSessionMap() != null) {
             UserSchSessions userSchSessions = SecureShellAction.getUserSchSessionMap().get(sessionId);
             if (userSchSessions != null && userSchSessions.getSchSessionMap() != null) {
-
                 SchSession schSession = userSchSessions.getSchSessionMap().get(id);
-
                 ChannelShell channel = (ChannelShell) schSession.getChannel();
                 channel.setPtySize((int) Math.floor(userSettings.getPtyWidth() / 7.2981), (int) Math.floor(userSettings.getPtyHeight() / 14.4166), userSettings.getPtyWidth(), userSettings.getPtyHeight());
                 schSession.setChannel(channel);
-
             }
-
-
         }
-
         return null;
     }
 
@@ -269,13 +240,10 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
      */
     private void setSystemList(Long userId, Long sessionId) {
 
-
         //check user map
         if (userSchSessionMap != null && !userSchSessionMap.isEmpty() && userSchSessionMap.get(sessionId) != null) {
-
             //get user sessions
             Map<Integer, SchSession> schSessionMap = userSchSessionMap.get(sessionId).getSchSessionMap();
-
 
             for (SchSession schSession : schSessionMap.values()) {
                 //add to host system list
@@ -286,18 +254,15 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
                     BufferedReader reader = new BufferedReader(new StringReader(script.getScript()));
                     String line;
                     try {
-
                         while ((line = reader.readLine()) != null) {
                             schSession.getCommander().println(line);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
-
                     }
                 }
             }
         }
-
     }
 
     public List<SessionOutput> getOutputList() {

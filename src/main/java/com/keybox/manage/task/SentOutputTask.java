@@ -29,18 +29,15 @@ import java.util.List;
  */
 public class SentOutputTask implements Runnable {
 
-
     Session session;
     Long sessionId;
 
     public SentOutputTask(Long sessionId, Session session) {
         this.sessionId = sessionId;
         this.session = session;
-
     }
 
     public void run() {
-
         Connection con = DBUtils.getConn();
         while (session.isOpen()) {
             List<SessionOutput> outputList = SessionOutputUtil.getOutput(con, sessionId);
@@ -54,10 +51,7 @@ public class SentOutputTask implements Runnable {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-
-
         }
-
         DBUtils.closeConn(con);
     }
 }

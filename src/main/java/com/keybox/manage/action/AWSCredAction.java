@@ -31,13 +31,17 @@ import java.util.Map;
 
 /**
  * Action to set aws credentials
+ * adapted from EC2Box
  */
 public class AWSCredAction extends ActionSupport {
 
     AWSCred awsCred;
     SortedSet sortedSet= new SortedSet();
 
-
+    /**
+     * Show AWS Credentials list
+     * @return
+     */
     @Action(value = "/manage/viewAWSCred",
             results = {
                     @Result(name = "success", location = "/manage/view_aws_cred.jsp")
@@ -46,33 +50,36 @@ public class AWSCredAction extends ActionSupport {
     public String viewAWSCred() {
         sortedSet = AWSCredDB.getAWSCredSet(sortedSet);
         return SUCCESS;
-
     }
 
+    /**
+     * Save AWS Credential
+     * @return
+     */
     @Action(value = "/manage/saveAWSCred",
             results = {
                     @Result(name = "success", location = "/manage/viewAWSCred.action", type="redirect"),
                     @Result(name = "input", location = "/manage/view_aws_cred.jsp")
             }
     )
-
     public String saveAWSCred() {
         AWSCredDB.saveAWSCred(awsCred);
         return SUCCESS;
-
     }
 
 
+    /**
+     * Delete AWS Credential
+     * @return
+     */
     @Action(value = "/manage/deleteAWSCred",
             results = {
                     @Result(name = "success", location = "/manage/viewAWSCred.action", type="redirect")
             }
     )
-
     public String deleteAWSCred() {
         AWSCredDB.deleteAWSCred(awsCred.getId());
         return SUCCESS;
-
     }
 
     /**

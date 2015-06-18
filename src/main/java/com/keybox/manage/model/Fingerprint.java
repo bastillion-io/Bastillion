@@ -16,6 +16,10 @@
 
 package com.keybox.manage.model;
 
+/**
+ * Value object for Fingerprint
+ * Use for ApplicationKey and PublicKey
+ */
 public class Fingerprint {
 	Long id;
 	String fingerprint;

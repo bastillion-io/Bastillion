@@ -1,5 +1,5 @@
 /**
- * Copyright 2015 Sean Kavanagh - sean.p.kavanagh6@gmail.com
+ * Copyright 2015 Robert Vorkoeper - robert-vor@gmx.de
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,10 @@ public class UserSettingsPWChangeAction extends ActionSupport implements Servlet
     Auth auth;
     UserSettings userSettings;
 
+    /**
+     * Show Password change Page
+     * @return
+     */
     @Action(value = "/userSettingsPWchange",
             results = {
                     @Result(name = "success", location = "/admin/user_settings_PWchange.jsp"),
@@ -52,6 +56,10 @@ public class UserSettingsPWChangeAction extends ActionSupport implements Servlet
     	}
     }
 
+    /**
+     * Save change password
+     * @return
+     */
     @Action(value = "/passwordchangeSubmit",
             results = {
                     @Result(name = "input", location = "/admin/user_settings_PWchange.jsp"),
@@ -69,7 +77,6 @@ public class UserSettingsPWChangeAction extends ActionSupport implements Servlet
 
         } else {
             auth.setAuthToken(AuthUtil.getAuthToken(servletRequest.getSession()));
-
             if (AuthDB.updatePassword(auth)) {
                 retVal = SUCCESS;
                 AuthUtil.setPWReset(servletRequest.getSession(), false);
@@ -77,8 +84,6 @@ public class UserSettingsPWChangeAction extends ActionSupport implements Servlet
                 addActionError("Current password is invalid");
             }
         }
-
-
         return retVal;
     }
 
@@ -98,9 +103,7 @@ public class UserSettingsPWChangeAction extends ActionSupport implements Servlet
                 auth.getPrevPassword().trim().equals("")) {
             addFieldError("auth.prevPassword", "Required");
         }
-
     }
-
 
     public HttpServletRequest getServletRequest() {
         return servletRequest;

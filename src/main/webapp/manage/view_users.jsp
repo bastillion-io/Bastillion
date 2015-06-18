@@ -186,9 +186,6 @@
                 </div>
         </s:if>
 
-
-
-
         <button class="btn btn-default add_btn spacer spacer-bottom" data-toggle="modal" data-target="#add_dialog">Add User</button>
         <div id="add_dialog" class="modal fade">
             <div class="modal-dialog">
@@ -225,59 +222,56 @@
             </div>
         </div>
 
-
-            <s:iterator var="user" value="sortedSet.itemList" status="stat">
-                <div id="edit_dialog_<s:property value="id"/>" class="modal fade">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                                <h4 class="modal-title">Edit User</h4>
-                            </div>
-                            <div class="modal-body">
-                                <div class="row">
-                                    <s:actionerror/>
-                                    <s:form action="saveUser" id="save_user_form_edit_%{id}" autocomplete="off">
-                                        <s:textfield name="user.username" value="%{username}" label="Username" size="15"/>
-                                        <s:select name="user.userType" value="%{userType}" list="#{'A':'Administrative Only','M':'Full Access'}" label="UserType"/>
-                                        <s:if test="%{@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}">
-                                            <s:hidden name="user.authType" value="%{authType}"/>
-                                            <tr>
-                                                <td class="tdLabel"><label class="label">Authentication Type</label></td>
-                                                <td>
-                                                    <s:if test="authType==\"BASIC\"">
-                                                        Basic
-                                                    </s:if>
-                                                    <s:else>
-                                                        External
-                                                    </s:else>
-                                                </td>
-                                            </tr>
-                                        </s:if>
-                                        <s:textfield name="user.firstNm" value="%{firstNm}" label="First Name" size="15"/>
-                                        <s:textfield name="user.lastNm" value="%{lastNm}" label="Last Name" size="15"/>
-                                        <s:textfield name="user.email" value="%{email}" label="Email Address" size="25"/>
-                                        <s:if test="%{!@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled || #user.authType==\"BASIC\"}">
-                                            <s:password name="user.password" value="" label="Password" size="15"/>
-                                            <s:password name="user.passwordConfirm" value="" label="Confirm Password" size="15"/>
-                                        </s:if>
-                                        <s:checkbox name="resetSharedSecret" label="Reset OTP Code"/>
-                                        <s:hidden name="user.id" value="%{id}"/>
-                                        <s:hidden name="sortedSet.orderByDirection"/>
-                                        <s:hidden name="sortedSet.orderByField"/>
-                                    </s:form>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
-                                <button type="button" class="btn btn-default submit_btn">Submit</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </s:iterator>
-
-
+		<s:iterator var="user" value="sortedSet.itemList" status="stat">
+	    	<div id="edit_dialog_<s:property value="id"/>" class="modal fade">
+               <div class="modal-dialog">
+                   <div class="modal-content">
+                       <div class="modal-header">
+                           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                           <h4 class="modal-title">Edit User</h4>
+                       </div>
+                       <div class="modal-body">
+                           <div class="row">
+                               <s:actionerror/>
+                               <s:form action="saveUser" id="save_user_form_edit_%{id}" autocomplete="off">
+                                   <s:textfield name="user.username" value="%{username}" label="Username" size="15"/>
+                                   <s:select name="user.userType" value="%{userType}" list="#{'A':'Administrative Only','M':'Full Access'}" label="UserType"/>
+                                   <s:if test="%{@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}">
+                                       <s:hidden name="user.authType" value="%{authType}"/>
+                                       <tr>
+                                           <td class="tdLabel"><label class="label">Authentication Type</label></td>
+                                           <td>
+                                               <s:if test="authType==\"BASIC\"">
+                                                   Basic
+                                               </s:if>
+                                               <s:else>
+                                                   External
+                                               </s:else>
+                                           </td>
+                                       </tr>
+                                   </s:if>
+                                   <s:textfield name="user.firstNm" value="%{firstNm}" label="First Name" size="15"/>
+                                   <s:textfield name="user.lastNm" value="%{lastNm}" label="Last Name" size="15"/>
+                                   <s:textfield name="user.email" value="%{email}" label="Email Address" size="25"/>
+                                   <s:if test="%{!@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled || #user.authType==\"BASIC\"}">
+                                       <s:password name="user.password" value="" label="Password" size="15"/>
+                                       <s:password name="user.passwordConfirm" value="" label="Confirm Password" size="15"/>
+                                   </s:if>
+                                   <s:checkbox name="resetSharedSecret" label="Reset OTP Code"/>
+                                   <s:hidden name="user.id" value="%{id}"/>
+                                   <s:hidden name="sortedSet.orderByDirection"/>
+                                   <s:hidden name="sortedSet.orderByField"/>
+                               </s:form>
+                           </div>
+                       </div>
+                       <div class="modal-footer">
+                           <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
+                           <button type="button" class="btn btn-default submit_btn">Submit</button>
+                       </div>
+                   </div>
+               </div>
+           </div>
+       </s:iterator>
     </div>
 
 </body>

@@ -282,7 +282,6 @@ public class SSHUtil {
 		if (channel != null) {
 			channel.disconnect();
 		}
-
 		return hostSystem;
 	}
 
@@ -436,7 +435,6 @@ public class SSHUtil {
 			} catch (SftpException ex) {
 				//ignore exception if file doesn't exist
 			}
-
 		} catch(Exception e){
 			e.printStackTrace();
 			testio = false;
@@ -468,10 +466,8 @@ public class SSHUtil {
 	private static int getNextInstanceId(Long sessionId, Map<Long, UserSchSessions> userSessionMap ){
 		Integer instanceId=1;
 		if(userSessionMap.get(sessionId)!=null){
-
 			for(Integer id :userSessionMap.get(sessionId).getSchSessionMap().keySet()) {
 				if (!id.equals(instanceId) ) {
-
 					if(userSessionMap.get(sessionId).getSchSessionMap().get(instanceId) == null) {
 						return instanceId;
 					}

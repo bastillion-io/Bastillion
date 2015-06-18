@@ -51,12 +51,9 @@
         </div>
 
         <div class="container">
-
             <h3>Setup Two-Factor Authentication</h3>
-
             <div class="row featurette">
                 <div class="col-md-7">
-
                     <div class="panel panel-default">
                         <div class="panel-body" >
                             <img src="qrImage.action?qrImage=<s:property value="qrImage"/>" alt="<s:property value="qrImage"/>"/>
@@ -66,7 +63,6 @@
                             <span id="shared-secret" class="hidden"> - <s:property value="sharedSecret"/></span>
                         </div>
                     </div>
-
                 </div>
                 <div class="col-md-5">
                     <p>

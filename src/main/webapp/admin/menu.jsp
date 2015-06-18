@@ -22,12 +22,10 @@
 
     <jsp:include page="../_res/inc/header.jsp"/>
 
-
     <title>KeyBox - Main Menu</title>
 
     <script type="text/javascript">
         $(document).ready(function() {
-
 
             $("table").css("background-color", "#ffffff");
             $("table tr:even").css("background-color", "#e0e0e0");
@@ -35,12 +33,7 @@
         });
     </script>
 
-
-
-
-
 </head>
-
 
 <body >
 
@@ -48,8 +41,6 @@
 
     <div class="container">
         <div class="template">
-
-
         <table class="table-striped">
             <thead>
             <tr>
@@ -61,17 +52,13 @@
 
             <s:if test="%{#session.userType==\"M\"}">
             <tr>
-
                 <td>
                     <a  href="../manage/viewSystems.action">Systems</a>
-
                 </td>
-
 
                 <td>
                     Manage systems so that access may be granted for establishing SSH sessions.
                 </td>
-
             </tr>
             <tr>
                <td>
@@ -84,15 +71,12 @@
             <tr>
                 <td>
                     <a href="../manage/viewUsers.action">Users</a>
-
                 </td>
                 <td>
                     Manage user accounts and profiles. Profiles grants a user access to the defined systems.
                 </td>
             </tr>
             </s:if>
-
-
              <tr>
                 <td>
                     <a href="../admin/viewSystems.action">Composite SSH Terms</a>
@@ -129,6 +113,26 @@
                 </s:else>
             </tr>
             </s:if>
+            
+            <s:if test="%{#session.userType==\"M\"}">
+            	<tr>
+            		<td>
+            			<a href="../manage/ViewApplicationKeys.action">Manage System Keys</a>
+            		</td>
+            		<td>
+            			Manage Initial System Keys and EC2 Keys
+            		</td>
+            	</tr>
+            	<tr>
+            		<td>
+            			<a href="../manage/viewAWSCred.action">Set AWS Credentials</a>
+            		</td>
+            		<td>
+            			Manage AWS Credentials
+            		</td>
+            	</tr>
+            </s:if>
+            
             <s:if test="%{@com.keybox.manage.util.SessionOutputUtil@enableAudit && #session.userType==\"M\"}">
              <tr>
                 <td>

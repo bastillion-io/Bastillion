@@ -42,7 +42,6 @@ public class ProfileAction extends ActionSupport {
     public String viewSystems() {
 
         sortedSet = ProfileDB.getProfileSet(sortedSet);
-
         return SUCCESS;
     }
 
@@ -92,9 +91,7 @@ public class ProfileAction extends ActionSupport {
         if (!this.getFieldErrors().isEmpty()) {
             sortedSet = ProfileDB.getProfileSet(sortedSet);
         }
-
     }
-
 
     public Profile getProfile() {
         return profile;

@@ -66,13 +66,10 @@ public class PublicKeyDB {
             stmt.setLong(1, id);
             stmt.execute();
             DBUtils.closeStmt(stmt);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-        
-         
     }
 
     /**
@@ -94,7 +91,6 @@ public class PublicKeyDB {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-
     }
 
     /**
@@ -112,21 +108,16 @@ public class PublicKeyDB {
             PreparedStatement stmt = con.prepareStatement("select pk.*, pkf.fingerprint from public_keys pk JOIN fingerprint pkf on pk.fingerprint_id = pkf.id where pkf.fingerprint like ? and pk.enabled=false");
             stmt.setString(1, fingerprint);
             ResultSet rs = stmt.executeQuery();
-            
             if (rs.next()) {
                 isDisabled=true;
             }
-            
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
         } catch (Exception e) {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-        
         return isDisabled;
-        
-        
     }
 
 
@@ -139,7 +130,6 @@ public class PublicKeyDB {
     public static SortedSet getPublicKeySet(SortedSet sortedSet) {
 
         ArrayList<PublicKey> publicKeysList = new ArrayList<PublicKey>();
-
 
         String orderBy = "";
         if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
@@ -186,12 +176,10 @@ public class PublicKeyDB {
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-
         sortedSet.setItemList(publicKeysList);
         return sortedSet;
     }
@@ -206,8 +194,7 @@ public class PublicKeyDB {
     public static SortedSet getPublicKeySet(SortedSet sortedSet, Long userId) {
 
         ArrayList<PublicKey> publicKeysList = new ArrayList<PublicKey>();
-
-
+        
         String orderBy = "";
         if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
             orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
@@ -231,16 +218,13 @@ public class PublicKeyDB {
                 publicKey.setFingerprint(SSHUtil.getFingerprint(publicKey.getPublicKey()));
                 publicKey.setCreateDt(rs.getTimestamp("create_dt"));
                 publicKeysList.add(publicKey);
-
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-
         sortedSet.setItemList(publicKeysList);
         return sortedSet;
     }
@@ -259,13 +243,10 @@ public class PublicKeyDB {
         try {
             con = DBUtils.getConn();
             publicKey = getPublicKey(con, publicKeyId);
-
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-
         return publicKey;
     }
 
@@ -296,11 +277,9 @@ public class PublicKeyDB {
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return publicKey;
     }
 
@@ -366,7 +345,6 @@ public class PublicKeyDB {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-
     }
 
 
@@ -405,16 +383,12 @@ public class PublicKeyDB {
             	} else {
 					throw new Exception("Key already used for other purposes");
 				}
-            		
-            	
             }
             DBUtils.closeStmt(stmt_pk_pkf_test);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-
     }
 
 
@@ -426,7 +400,6 @@ public class PublicKeyDB {
      * @param userId  user id
      */
     public static void deletePublicKey(Long publicKeyId, Long userId) {
-
 
         Connection con = null;
         try {
@@ -441,7 +414,6 @@ public class PublicKeyDB {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-
     }
 
     /**
@@ -450,7 +422,6 @@ public class PublicKeyDB {
      * @param userId  user id
      */
     public static void deleteUserPublicKeys(Long userId) {
-
 
         Connection con = null;
         try {
@@ -464,7 +435,6 @@ public class PublicKeyDB {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-
     }
 
     /**
@@ -473,7 +443,6 @@ public class PublicKeyDB {
      * @param profileId profile id
      */
     public static void deleteProfilePublicKeys(Long profileId) {
-
 
         Connection con = null;
         try {
@@ -487,7 +456,6 @@ public class PublicKeyDB {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-
     }
 
 
@@ -497,17 +465,12 @@ public class PublicKeyDB {
         List<String> publicKeyList = new ArrayList<String>();
         try {
             con = DBUtils.getConn();
-
             publicKeyList = getPublicKeysForSystem(con, systemId);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-
         return publicKeyList;
-
-
     }
 
     public static List<String> getPublicKeysForSystem(Connection con, Long systemId) {
@@ -528,10 +491,7 @@ public class PublicKeyDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return publicKeyList;
-
-
     }
     
     /**
@@ -573,9 +533,7 @@ public class PublicKeyDB {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        
         DBUtils.closeConn(con);
-
         return isDuplicate;
     }
 
@@ -587,7 +545,6 @@ public class PublicKeyDB {
      */
     public static List<PublicKey> getUniquePublicKeysForUser(Long userId) {
 
-
         Connection con = null;
         Map<String, PublicKey> keyMap = new LinkedHashMap();
         try {
@@ -596,7 +553,6 @@ public class PublicKeyDB {
             stmt.setLong(1, userId);
             ResultSet rs = stmt.executeQuery();
             while(rs.next()){
-
                 PublicKey publicKey = new PublicKey();
                 publicKey.setId(rs.getLong("id"));
                 publicKey.setKeyNm(rs.getString("key_nm"));
@@ -606,7 +562,6 @@ public class PublicKeyDB {
                 publicKey.setFingerprint(SSHUtil.getFingerprint(publicKey.getPublicKey()));
                 publicKey.setCreateDt(rs.getTimestamp("create_dt"));
                 keyMap.put(publicKey.getKeyNm() + " (" + publicKey.getFingerprint() + ")", publicKey);
-                
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
@@ -649,17 +604,20 @@ public class PublicKeyDB {
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
-            
-        
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        
         DBUtils.closeConn(con);
-		
 		return isexisted;
 	}
     
+	/**
+     * select public keys for user and system
+     *
+     * @param userId user id
+     * @param systemId system id
+     * @return public  key list for user
+     */
     public static List<PublicKey> getPublicKeysForUserandSystem(Long userId, Long systemId) {
 		
     	Connection con = null;
@@ -671,7 +629,6 @@ public class PublicKeyDB {
             stmt.setLong(2, systemId);
             ResultSet rs = stmt.executeQuery();
             while(rs.next()){
-
                 PublicKey publicKey = new PublicKey();
                 publicKey.setId(rs.getLong("id"));
                 publicKey.setKeyNm(rs.getString("key_nm"));
@@ -681,7 +638,6 @@ public class PublicKeyDB {
                 publicKey.setFingerprint(SSHUtil.getFingerprint(publicKey.getPublicKey()));
                 publicKey.setCreateDt(rs.getTimestamp("create_dt"));
                 keyMap.put(publicKey.getKeyNm() + " (" + publicKey.getFingerprint() + ")", publicKey);
-                
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
@@ -690,10 +646,16 @@ public class PublicKeyDB {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-        
         return new ArrayList<PublicKey>(keyMap.values());
 	}
     
+    /**
+     * select public keys for admin and system
+     *
+     * @param userId user id
+     * @param systemId system id
+     * @return public  key list for admin
+     */
     public static List<PublicKey> getPublicKeysForAdminandSystem(Long userId, Long systemId) {
 		
     	Connection con = null;
@@ -705,7 +667,6 @@ public class PublicKeyDB {
             stmt.setLong(2, systemId);
             ResultSet rs = stmt.executeQuery();
             while(rs.next()){
-
                 PublicKey publicKey = new PublicKey();
                 publicKey.setId(rs.getLong("id"));
                 publicKey.setKeyNm(rs.getString("key_nm"));
@@ -715,16 +676,13 @@ public class PublicKeyDB {
                 publicKey.setFingerprint(SSHUtil.getFingerprint(publicKey.getPublicKey()));
                 publicKey.setCreateDt(rs.getTimestamp("create_dt"));
                 keyMap.put(publicKey.getKeyNm() + " (" + publicKey.getFingerprint() + ")", publicKey);
-                
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-        
         return new ArrayList(keyMap.values());
 	}
 }

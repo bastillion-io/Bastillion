@@ -52,9 +52,7 @@ public class MailSend {
 		props.put("mail.smtp.ssl.checkserveridentity", mcl.getProperty("mail.smtp.ssl.checkserveridentity"));
 		MailAuthenticator mailauth = new MailAuthenticator(mcl.getProperty("mail.auth.user"), mcl.getProperty("mail.auth.pw"));
 		Session session = Session.getDefaultInstance(props, mailauth);
-		 
-		
-		
+
 		//Change message and subject text 
 		String subjectText = mcl.getProperty("mail.subject");
 		for (MassageParamter mp : massageParameter) {
@@ -64,8 +62,7 @@ public class MailSend {
 		for (MassageParamter mp : massageParameter) {
 			messageText = messageText.replace(mp.getPattern(), mp.getValue());
 		}
-		
-		
+
 		// Build and send a message
 		Message msg = new MimeMessage(session);
 		
@@ -75,7 +72,5 @@ public class MailSend {
 		msg.setText(messageText);
 		msg.saveChanges();
 		Transport.send(msg);
-	
-		
 	}
 }

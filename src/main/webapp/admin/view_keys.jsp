@@ -150,9 +150,7 @@
         <div class="scrollWrapper">
             <table class="table-striped scrollableTable" >
                 <thead>
-
                 <tr>
-
                     <th id="<s:property value="@com.keybox.manage.db.PublicKeyDB@SORT_BY_KEY_NM"/>" class="sort">Key
                         Name
                     </th>

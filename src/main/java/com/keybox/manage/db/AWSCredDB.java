@@ -28,6 +28,8 @@ import java.util.List;
 
 /**
  * DAO to manage amazon credentials (access and secret key)
+ * 
+ * adopted from EC2Box
  */
 public class AWSCredDB {
 
@@ -43,50 +45,34 @@ public class AWSCredDB {
      */
     public static SortedSet getAWSCredSet(SortedSet sortedSet) {
 
-
         List<AWSCred> awsCredList = new ArrayList<AWSCred>();
-
-
         String orderBy = "";
         if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
             orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
         }
         String sql = "select * from aws_credentials " + orderBy;
 
-
         Connection con = null;
         try {
             con = DBUtils.getConn();
-
-
             PreparedStatement stmt = con.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
-
             while (rs.next()) {
-
                 AWSCred awsCred = new AWSCred();
                 awsCred.setId(rs.getLong("id"));
                 awsCred.setAccessKey(rs.getString("access_key"));
                 //awsCred.setSecretKey(EncryptionUtil.decrypt(rs.getString("secret_key")));
                 awsCredList.add(awsCred);
-
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
-
-
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
         //close db connection
         DBUtils.closeConn(con);
-
         sortedSet.setItemList(awsCredList);
-
         return sortedSet;
-
-
     }
 
 
@@ -97,43 +83,29 @@ public class AWSCredDB {
      */
     public static List<AWSCred> getAWSCredList() {
 
-
         List<AWSCred> awsCredList = new ArrayList<AWSCred>();
-
-
         Connection con = null;
         try {
             con = DBUtils.getConn();
-
-
             PreparedStatement stmt = con.prepareStatement("select * from aws_credentials");
             ResultSet rs = stmt.executeQuery();
-
             while (rs.next()) {
-
                 AWSCred awsCred = new AWSCred();
                 awsCred.setId(rs.getLong("id"));
                 awsCred.setAccessKey(rs.getString("access_key"));
                 awsCred.setSecretKey(EncryptionUtil.decrypt(rs.getString("secret_key")));
                 awsCredList.add(awsCred);
-
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
-
-
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
         //close db connection
         DBUtils.closeConn(con);
-
-
         return awsCredList;
-
-
     }
+    
     /**
      * returns amazon credentials
      *
@@ -142,38 +114,27 @@ public class AWSCredDB {
      */
     public static AWSCred getAWSCred(String accessKey) {
 
-
         AWSCred awsCred = null;
         Connection con = null;
         try {
             con = DBUtils.getConn();
-
             PreparedStatement stmt = con.prepareStatement("select * from aws_credentials where access_key like ?");
             stmt.setString(1, accessKey);
             ResultSet rs = stmt.executeQuery();
-
             if (rs.next()) {
-
                 awsCred = new AWSCred();
                 awsCred.setId(rs.getLong("id"));
                 awsCred.setAccessKey(rs.getString("access_key"));
                 awsCred.setSecretKey(EncryptionUtil.decrypt(rs.getString("secret_key")));
-
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
-
-
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
         //close db connection
         DBUtils.closeConn(con);
-
         return awsCred;
-
-
     }
 
     /**
@@ -184,38 +145,27 @@ public class AWSCredDB {
      */
     public static AWSCred getAWSCred(Long id) {
 
-
         AWSCred awsCred = null;
         Connection con = null;
         try {
             con = DBUtils.getConn();
-
             PreparedStatement stmt = con.prepareStatement("select * from aws_credentials where id=?");
             stmt.setLong(1, id);
             ResultSet rs = stmt.executeQuery();
-
             if (rs.next()) {
-
                 awsCred = new AWSCred();
                 awsCred.setId(rs.getLong("id"));
                 awsCred.setAccessKey(rs.getString("access_key"));
                 awsCred.setSecretKey(EncryptionUtil.decrypt(rs.getString("secret_key")));
-
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
-
-
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
         //close db connection
         DBUtils.closeConn(con);
-
         return awsCred;
-
-
     }
 
     /**
@@ -227,7 +177,6 @@ public class AWSCredDB {
 
         //get db connection
         Connection con = DBUtils.getConn();
-
         try {
             //update
             PreparedStatement stmt = con.prepareStatement("update aws_credentials set access_key=?, secret_key=? where id=?");
@@ -235,17 +184,12 @@ public class AWSCredDB {
             stmt.setString(2, EncryptionUtil.encrypt(awsCred.getSecretKey().trim()));
             stmt.setLong(3, awsCred.getId());
             stmt.execute();
-
             DBUtils.closeStmt(stmt);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         //close db connection
         DBUtils.closeConn(con);
-
-
     }
 
     /**
@@ -257,23 +201,17 @@ public class AWSCredDB {
 
         //get db connection
         Connection con = DBUtils.getConn();
-
         try {
             //delete
             PreparedStatement stmt = con.prepareStatement("delete from aws_credentials where id=?");
             stmt.setLong(1, id);
             stmt.execute();
-
             DBUtils.closeStmt(stmt);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         //close db connection
         DBUtils.closeConn(con);
-
-
     }
 
     /**
@@ -285,24 +223,18 @@ public class AWSCredDB {
 
         //get db connection
         Connection con = DBUtils.getConn();
-
         try {
             //insert
             PreparedStatement stmt = con.prepareStatement("insert into aws_credentials (access_key, secret_key) values(?,?)");
             stmt.setString(1, awsCred.getAccessKey().trim());
             stmt.setString(2, EncryptionUtil.encrypt(awsCred.getSecretKey().trim()));
             stmt.execute();
-
             DBUtils.closeStmt(stmt);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         //close db connection
         DBUtils.closeConn(con);
-
-
     }
 
     /**
@@ -319,8 +251,5 @@ public class AWSCredDB {
         } else {
             insertAWSCred(awsCred);
         }
-
     }
-
-
 }

@@ -22,7 +22,6 @@
 
     <jsp:include page="../_res/inc/header.jsp"/>
 
-
     <title>KeyBox - Upload &amp; Push</title>
 
     <script type="text/javascript">
@@ -80,7 +79,6 @@
         <thead>
 
         <tr>
-
             <th>Display Name</th>
             <th>User</th>
             <th>Host</th>
@@ -91,14 +89,12 @@
 
         <s:iterator value="hostSystemList" status="stat">
             <tr>
-
                 <td>
                     <div id="status_<s:property value="id"/>"><s:property
                             value="displayNm"/></div>
                 </td>
                 <td><s:property value="user"/></td>
                 <td><s:property value="host"/>:<s:property value="port"/></td>
-
                 <td>
                    <s:if test="statusCd=='INITIAL'">
                     <div class="warning">Not Started</div>
@@ -119,9 +115,7 @@
                     <div class="success">Success</div>
                    </s:elseif>
                 </td>
-
             </tr>
-
         </s:iterator>
         </tbody>
     </table>

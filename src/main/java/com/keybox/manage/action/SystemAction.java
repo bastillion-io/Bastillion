@@ -50,15 +50,22 @@ import com.amazonaws.services.ec2.model.Tag;
 
 /**
  * Action to manage systems
+ * @author Sean Kavanagh, Robert Vorkoeper
+ * 
  */
 public class SystemAction extends ActionSupport implements ServletRequestAware, ServletResponseAware {
 
+	/*
+	 * INFO: to understand:
+	 * (KeyBoy)Systems 	--> Systems that are created by add system
+	 * EC2 Systems		--> Amazons Elastic Compute Cloud, which are read by AWS credentials and EC2 Key on Amazon
+	 */
 
 	HttpServletRequest servletRequest;
 	HttpServletResponse servletResponse;
     SortedSet sortedSet = new SortedSet();
     HostSystem hostSystem = new HostSystem();
-    List<ApplicationKey> initAppList;
+    List<ApplicationKey> initAppList;	//List for Inital System Keys 
 	Script script = null;
     String password;
     String passphrase;
@@ -66,11 +73,17 @@ public class SystemAction extends ActionSupport implements ServletRequestAware, 
     boolean ismanager;
     boolean downloadKey = !RefreshApplicationKeyUtil.getDynamicKeyRotation();
     
-    String infoAWS = "You are about to create an Amazon EC2 server."+
-    		"Better use the AWS Credentials and EC2 Keys, so as not to inadvertently shut out at Amazon."+
-    		"If they do want to create the system over here again press Submit.";
+    String infoAWS = "You're about to manually set up an EC2 connection."+ ""
+    		+ "You rather use the EC2 settings. "
+    		+ "By a manual setup Keybox is going to change the default key."
+    		+ "You can't access the server with the default AWS key then. "
+    		+ "Press okay to go ahead, or cancel the setup.";
     
-    
+    /**
+     * Show System List for SSH Terminals and Scripts
+     * Show (KeyBoy)Systems and EC2 Systems
+     * @return System List
+     */
     @Action(value = "/admin/viewSystems",
             results = {
                     @Result(name = "success", location = "/admin/view_systems.jsp")
@@ -91,10 +104,14 @@ public class SystemAction extends ActionSupport implements ServletRequestAware, 
         if (script != null && script.getId() != null) {
             script = ScriptDB.getScript(script.getId(), userId);
         }
-
         return SUCCESS;
     }
 
+    /**
+     * Show System List for Manage Systems
+     * Show (KeyBoy)Systems (without EC2 Systems)
+     * @return Manage System List
+     */
     @Action(value = "/manage/viewSystems",
             results = {
                     @Result(name = "success", location = "/manage/view_systems.jsp")
@@ -103,12 +120,16 @@ public class SystemAction extends ActionSupport implements ServletRequestAware, 
     public String viewManageSystems() {
 
     	initAppList = PrivateKeyDB.getInitialApplicationKey();
-    	sortedSet.getFilterMap().put("region", "---");
+    	sortedSet.getFilterMap().put("region", "---"); //Filter for no EC2 Systems
         sortedSet = SystemDB.getSystemSet(sortedSet); 
-
         return SUCCESS;
     }
 
+    /**
+     * Test and Save (KeyBoy)Systems
+     * On Test Change System Key, if dynamic Key enabled
+     * @return 
+     */
     @Action(value = "/manage/saveSystem",
             results = {
                     @Result(name = "input", location = "/manage/view_systems.jsp"),
@@ -146,6 +167,11 @@ public class SystemAction extends ActionSupport implements ServletRequestAware, 
         return retVal;
     }
     
+    /**
+     * Creates a new system key for the (KeyBoy)System
+     * @return
+     * @author Robert Vorkoeper
+     */
     @Action(value = "/manage/genNewKeyOnSystem",
             results = {
                     @Result(name = "success", location = "/manage/viewSystems.action?sortedSet.orderByDirection=${sortedSet.orderByDirection}&sortedSet.orderByField=${sortedSet.orderByField}", type = "redirect")
@@ -169,6 +195,10 @@ public class SystemAction extends ActionSupport implements ServletRequestAware, 
         return retVal;
     }
 
+    /**
+     * Remove (KeyBoy)System
+     * @return
+     */
     @Action(value = "/manage/deleteSystem",
             results = {
                     @Result(name = "success", location = "/manage/viewSystems.action?sortedSet.orderByDirection=${sortedSet.orderByDirection}&sortedSet.orderByField=${sortedSet.orderByField}", type = "redirect")
@@ -182,9 +212,8 @@ public class SystemAction extends ActionSupport implements ServletRequestAware, 
     }
     
     /**
-     * Action to Disable System
+     * Action to Disable (KeyBoy) System
      * @return
-     * 
      * @author Robert Vorkoeper
      */
     @Action(value = "/manage/disableSystem",
@@ -200,9 +229,8 @@ public class SystemAction extends ActionSupport implements ServletRequestAware, 
     }
     
     /**
-     * Action to Enable System
+     * Action to Enable (KeyBoy) System
      * @return
-     * 
      * @author Robert Vorkoeper
      */
     @Action(value = "/manage/enableSystem",
@@ -217,6 +245,12 @@ public class SystemAction extends ActionSupport implements ServletRequestAware, 
     	return SUCCESS;
     }
     
+    /**
+     * Download System Key
+     * (clean-up part)
+     * @return
+     * @author Robert Vorkoeper
+     */
     @Action(value = "/manage/downloadSystemKey",
     		results = {
     			@Result(name = "input", location = "/manage/view_systems.jsp"),
@@ -236,9 +270,10 @@ public class SystemAction extends ActionSupport implements ServletRequestAware, 
     public static final String PVT_KEY_Name="privateKeyName";
     
     /**
-     * Generated Download Key-File 
+     * Generated Download System Key-File 
      * 
      * @return null
+     * @author Robert Vorkoeper
      */
     @Action(value = "/manage/downloadPvtKey")
 	public String downloadPvtKey() {
@@ -344,11 +379,9 @@ public class SystemAction extends ActionSupport implements ServletRequestAware, 
         		KeyPair keyPair = KeyPair.load(jsch,hostSystem.getApplicationKey().getPrivateKey().getBytes(),hostSystem.getApplicationKey().getPublicKey().getBytes());
         		
         		ByteArrayOutputStream out = new ByteArrayOutputStream();
-    			if(passphrase == null || passphrase.equals(""))
-    			{
+    			if(passphrase == null || passphrase.equals("")){
     				keyPair.writePrivateKey(out);
-    			}
-    			else{
+    			}else{
     				keyPair.writePrivateKey(out, passphrase.getBytes());
     			}
     			

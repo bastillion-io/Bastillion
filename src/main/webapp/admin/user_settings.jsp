@@ -61,8 +61,6 @@
         </s:form>
     </s:if>
 
-
-
         <h3>Set Terminal Theme</h3>
 
         <p>Change the theme for your terminals below</p>
@@ -82,17 +80,11 @@
                               }" label="Foreground / Background" headerKey=""
                       headerValue="- Select FG / BG -"/>
 
-
-            
-
             <tr> <td>&nbsp;</td>
                 <td align="right">  <div id="theme_btn" class="btn btn-default submit_btn" >Update Theme</div></td>
             </tr>
         </s:form>
-
     </div>
-
-
 
 </body>
 </html>
