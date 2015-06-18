@@ -78,7 +78,6 @@ public class SystemStatusDB {
     private static void deleteAllSystemStatus(Connection con, Long userId) {
 
         try {
-
             PreparedStatement stmt = con.prepareStatement("delete from status where user_id=?");
             stmt.setLong(1,userId);
             stmt.execute();
@@ -87,7 +86,6 @@ public class SystemStatusDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
 
@@ -101,7 +99,6 @@ public class SystemStatusDB {
     private static void insertSystemStatus(Connection con, HostSystem hostSystem, Long userId) {
 
         try {
-
             PreparedStatement stmt = con.prepareStatement("insert into status (id, status_cd, user_id) values (?,?,?)");
             stmt.setLong(1, hostSystem.getId());
             stmt.setString(2, hostSystem.getStatusCd());
@@ -112,8 +109,6 @@ public class SystemStatusDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
     }
 
     /**
@@ -127,14 +122,11 @@ public class SystemStatusDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-
             updateSystemStatus(con, hostSystem, userId);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-
     }
 
 
@@ -148,19 +140,15 @@ public class SystemStatusDB {
     public static void updateSystemStatus(Connection con, HostSystem hostSystem, Long userId) {
 
         try {
-
             PreparedStatement stmt = con.prepareStatement("update status set status_cd=? where id=? and user_id=?");
             stmt.setString(1, hostSystem.getStatusCd());
             stmt.setLong(2, hostSystem.getId());
             stmt.setLong(3, userId);
             stmt.execute();
             DBUtils.closeStmt(stmt);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
     }
 
 
@@ -174,8 +162,9 @@ public class SystemStatusDB {
 
         sortedSet.setItemList(getAllSystemStatus(userId));
         return sortedSet;
-
     }
+    
+    
     /**
      * returns all key placement statuses
      * @param userId user id
@@ -187,13 +176,11 @@ public class SystemStatusDB {
         try {
             con = DBUtils.getConn();
             hostSystemList = getAllSystemStatus(con, userId);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
         return hostSystemList;
-
     }
 
     /**
@@ -223,7 +210,6 @@ public class SystemStatusDB {
             e.printStackTrace();
         }
         return hostSystemList;
-
     }
 
 
@@ -251,14 +237,11 @@ public class SystemStatusDB {
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
         return hostSystem;
-
-
     }
 
 
@@ -293,16 +276,7 @@ public class SystemStatusDB {
         }
         DBUtils.closeConn(con);
         return hostSystem;
-
     }
-
-
-
-
-
-
-
-
 }
 
 

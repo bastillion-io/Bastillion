@@ -55,13 +55,8 @@ public class SessionAuditAction extends ActionSupport implements ServletResponse
             sortedSet.setOrderByField(SessionAuditDB.SORT_BY_SESSION_TM);
             sortedSet.setOrderByDirection("desc");
         }
-
-
         sortedSet= SessionAuditDB.getSessions(sortedSet);
-
-
         return SUCCESS;
-
     }
 
 
@@ -74,7 +69,6 @@ public class SessionAuditAction extends ActionSupport implements ServletResponse
 
         sessionAudit=SessionAuditDB.getSessionsTerminals(sessionId);
         return SUCCESS;
-
     }
 
     @Action(value = "/manage/getJSONTermOutputForSession")
@@ -86,9 +80,7 @@ public class SessionAuditAction extends ActionSupport implements ServletResponse
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
         return null;
-
     }
 
     public List<HostSystem> getSystemList() {

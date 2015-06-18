@@ -25,9 +25,6 @@ import java.sql.Statement;
  */
 public class DBUtils {
 
-
-
-
     /**
      * returns DB connection
      *
@@ -42,7 +39,6 @@ public class DBUtils {
             ex.printStackTrace();
         }
         return con;
-
     }
 
     /**
@@ -59,8 +55,6 @@ public class DBUtils {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
-
     }
 
     /**
@@ -77,8 +71,6 @@ public class DBUtils {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
-
     }
 
     /**
@@ -95,8 +87,5 @@ public class DBUtils {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
-
     }
-
 }

@@ -56,7 +56,6 @@ public class OTPUtil {
         byte[] secret = Arrays.copyOf(buffer, SECRET_SIZE);
 
         return new String(new Base32().encode(secret));
-
     }
 
     /**
@@ -71,16 +70,12 @@ public class OTPUtil {
         //check token in near future or past
         int window = TOKEN_WINDOW;
         for (int i = window; i >= -window; i--) {
-
             long time = (new Date().getTime() / TimeUnit.SECONDS.toMillis(CHANGE_INTERVAL)) + i;
-
             if (verifyToken(secret, token, time)) {
                 return true;
             }
         }
-
         return false;
-
     }
 
     /**
@@ -94,11 +89,8 @@ public class OTPUtil {
     private static boolean verifyToken(String secret, long token, long time) {
 
         long calculated = -1;
-
         byte[] key = new Base32().decode(secret);
-
         SecretKeySpec secretKey = new SecretKeySpec(key, "HmacSHA1");
-
         try {
             Mac mac = Mac.getInstance("HmacSHA1");
             mac.init(secretKey);
@@ -115,11 +107,6 @@ public class OTPUtil {
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-
-
         return (calculated != -1 && calculated == token);
-
-
     }
-
 }

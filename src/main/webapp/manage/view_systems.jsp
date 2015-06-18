@@ -341,10 +341,6 @@
             </div>
        </s:iterator>
 
-
-
-
-
         <div id="set_password_dialog" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">

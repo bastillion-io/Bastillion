@@ -69,7 +69,6 @@ public class ProfileSystemsAction extends ActionSupport {
         return SUCCESS;
     }
 
-
     public Profile getProfile() {
         return profile;
     }

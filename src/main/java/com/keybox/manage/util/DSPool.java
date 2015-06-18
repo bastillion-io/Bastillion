@@ -36,14 +36,11 @@ public class DSPool {
      *
      * @return data source pool
      */
-
     public static org.apache.commons.dbcp.PoolingDataSource getDataSource() {
         if (dsPool == null) {
-
             dsPool = registerDataSource();
         }
         return dsPool;
-
     }
 
     /**
@@ -51,9 +48,7 @@ public class DSPool {
      *
      * @return pooling database object
      */
-
     private static PoolingDataSource registerDataSource() {
-
 
         // create a database connection
         String user = "keybox";
@@ -61,13 +56,11 @@ public class DSPool {
         String connectionURI = "jdbc:h2:" + DB_PATH + "/keybox;CIPHER=AES";
 
         String validationQuery = "select 1";
-
         try {
             Class.forName("org.h2.Driver");
         } catch (ClassNotFoundException ex) {
             ex.printStackTrace();
         }
-
 
         GenericObjectPool connectionPool = new GenericObjectPool(null);
 
@@ -77,16 +70,10 @@ public class DSPool {
         connectionPool.setMaxWait(15000);
         connectionPool.setWhenExhaustedAction(GenericObjectPool.WHEN_EXHAUSTED_BLOCK);
 
-
         ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(connectionURI, user, password);
 
-
         new PoolableConnectionFactory(connectionFactory, connectionPool, null, validationQuery, false, true);
-
         return new PoolingDataSource(connectionPool);
-
     }
-
-
 }
 

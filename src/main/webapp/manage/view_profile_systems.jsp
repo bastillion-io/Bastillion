@@ -111,9 +111,6 @@
                     </thead>
                     <tbody>
 
-
-
-
                     <s:iterator var="system" value="sortedSet.itemList" status="stat">
                         <tr>
                             <td>
@@ -138,9 +135,6 @@
         <s:else>
             <div class="error">There are no systems defined (<a href="viewSystems.action">Manage Systems</a>).</div>
         </s:else>
-
-
-
 
     </div>
 

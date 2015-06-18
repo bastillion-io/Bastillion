@@ -76,7 +76,6 @@ public class RefreshAuthKeyUtil {
 		Runnable run = new RefreshUserSystemsTask(userId);
 		Thread thread = new Thread(run);
 		thread.start();
-
 	}
 
 
@@ -97,7 +96,6 @@ public class RefreshAuthKeyUtil {
 			timer.schedule(new RefreshAllSystemsTimerTask(), minute * 60 * 1000);
 		}
 	}
-
 }
 
 
@@ -146,6 +144,5 @@ class RefreshAllSystemsTask implements Runnable {
 	public void run() {
 		//distribute all public keys
 		SSHUtil.distributePubKeysToAllSystems();
-
 	}
 }

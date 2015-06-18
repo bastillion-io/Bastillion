@@ -54,8 +54,6 @@ public class UserDB {
     public static SortedSet getUserSet(SortedSet sortedSet) {
 
         ArrayList<User> userList = new ArrayList<User>();
-
-
         String orderBy = "";
         if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
             orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
@@ -105,13 +103,10 @@ public class UserDB {
         try {
             con = DBUtils.getConn();
             user = getUser(con, userId);
-
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-
         return user;
     }
 
@@ -149,7 +144,6 @@ public class UserDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return user;
     }
 
@@ -169,9 +163,7 @@ public class UserDB {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-
         return userId;
-
     }
 
     /**
@@ -183,7 +175,6 @@ public class UserDB {
     public static Long insertUser(Connection con, User user) {
 
         Long userId=null;
-        
         try {
             PreparedStatement stmt = con.prepareStatement("insert into users (first_nm, last_nm, email, username, auth_type, user_type, password, salt) values (?,?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
             stmt.setString(1, user.getFirstNm());
@@ -210,9 +201,7 @@ public class UserDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
         return userId;
-
     }
 
     /**
@@ -220,7 +209,6 @@ public class UserDB {
      * @param user user object
      */
     public static void updateUserNoCredentials(User user) {
-
 
         Connection con = null;
         try {
@@ -234,12 +222,10 @@ public class UserDB {
             stmt.setLong(6, user.getId());
             stmt.execute();
             DBUtils.closeStmt(stmt);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-
     }
 
     /**
@@ -247,7 +233,6 @@ public class UserDB {
      * @param user user object
      */
     public static void updateUserCredentials(User user) {
-
 
         Connection con = null;
         try {
@@ -269,7 +254,6 @@ public class UserDB {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-
     }
 
     /**
@@ -277,7 +261,6 @@ public class UserDB {
      * @param userId user id
      */
     public static void disableUser(Long userId) {
-
 
         Connection con = null;
         try {
@@ -291,7 +274,6 @@ public class UserDB {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-
     }
 
     /**
@@ -299,7 +281,6 @@ public class UserDB {
      * @param userId user id
      */
     public static void resetSharedSecret(Long userId) {
-
 
         Connection con = null;
         try {
@@ -313,7 +294,6 @@ public class UserDB {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-
     }
 
     /**
@@ -346,16 +326,14 @@ public class UserDB {
             ex.printStackTrace();
         }
         DBUtils.closeConn(con);
-
         return isUnique;
-
     }
 
     /**
-     * Methode to Password reset and Mail send
+     * Method to Password reset and Mail send
      * 
      * @param email EMail address from User
-     * @return <strong>true:</strong> Password reset OK <p>
+     * @return <strong>true:</strong> Password reset OK <br>
      * 			<strong>false:</strong> EMail address not available, Error with Mail send or DB Update
      */
 	public static boolean resetPWMail(String email) {
@@ -414,7 +392,4 @@ public class UserDB {
         DBUtils.closeConn(con);
         return PW_reset_OK;
 	}
-
-
-
 }

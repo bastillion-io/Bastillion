@@ -37,20 +37,15 @@ import java.util.UUID;
  */
 public class ExternalAuthUtil {
 
-
-
     public static final boolean externalAuthEnabled = StringUtils.isNotEmpty(AppConfig.getProperty("jaasModule"));
     private static final String JAAS_CONF = "jaas.conf";
     private static final String JAAS_MODULE = AppConfig.getProperty("jaasModule");
-
 
     static {
         if(externalAuthEnabled) {
             System.setProperty("java.security.auth.login.config", ExternalAuthUtil.class.getClassLoader().getResource(".").getPath() + JAAS_CONF);
         }
     }
-    
-   
 
     /**
      * external auth login method
@@ -62,11 +57,10 @@ public class ExternalAuthUtil {
 
         String authToken = null;
         if (externalAuthEnabled && auth != null && StringUtils.isNotEmpty(auth.getUsername()) && StringUtils.isNotEmpty(auth.getPassword())) {
-
             Connection con = null;
             try {
                 CallbackHandler handler = new CallbackHandler() {
-
+                	
                     @Override
                     public void handle(Callback[] callbacks) throws IOException,
                             UnsupportedCallbackException {
@@ -121,8 +115,6 @@ public class ExternalAuthUtil {
                     user.setAuthType(Auth.AUTH_EXTERNAL);
                     //set auth token
                     AuthDB.updateLogin(con, user);
-
-
                 } catch (LoginException e) {
                     //auth failed return empty
                     authToken = null;
@@ -130,14 +122,8 @@ public class ExternalAuthUtil {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
             DBUtils.closeConn(con);
         }
-
-       
-
-
-
         return authToken;
     }
 }

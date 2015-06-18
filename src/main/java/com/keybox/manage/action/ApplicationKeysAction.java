@@ -47,11 +47,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Action to generate and distribute auth keys for systems or users
+ * Action to generate and distribute System and EC2 keys
  */
 @SuppressWarnings("unchecked")
 public class ApplicationKeysAction extends ActionSupport implements ServletRequestAware, ServletResponseAware {
 
+	/**
+	 * INFO:
+	 * here are the applicationKey the Initial System Key for KeyBoxes "Add System" - Systems
+	 * EC2Key, are the Keys for Amazon EC2 Systems 
+	 */
 
 	HttpServletRequest servletRequest;
 	HttpServletResponse servletResponse;
@@ -68,6 +73,10 @@ public class ApplicationKeysAction extends ActionSupport implements ServletReque
 	
 	Long existingKeyId;
 
+	/**
+	 * Show (KeyBox)Initial System Keys and EC2 Keys
+	 * @return
+	 */
 	@Action(value = "/manage/ViewApplicationKeys",
 			results = {
 					@Result(name = "success", location = "/manage/view_application_keys.jsp")
@@ -119,7 +128,10 @@ public class ApplicationKeysAction extends ActionSupport implements ServletReque
     }
 	
 
-	
+	/**
+	 * Save (KeyBox)Initial System Key
+	 * @return
+	 */
 	@Action(value = "/manage/saveApplicationKey",
 			results = {
 					@Result(name = "input", location = "/manage/view_application_keys.jsp"),
@@ -132,6 +144,10 @@ public class ApplicationKeysAction extends ActionSupport implements ServletReque
 		return SUCCESS;
 	}
 	
+	/**
+	 * Save EC2 Key
+	 * @return
+	 */
 	@Action(value = "/manage/saveEC2Key",
 			results = {
 					@Result(name = "input", location = "/manage/view_application_keys.jsp"),
@@ -144,6 +160,10 @@ public class ApplicationKeysAction extends ActionSupport implements ServletReque
 		return SUCCESS;
 	}
 	
+	/**
+	 * Enable Key
+	 * @return
+	 */
 	@Action(value = "/manage/enableApplicationKey",
 		results = {
 				@Result(name = "success", location = "/manage/view_application_keys.jsp")
@@ -161,6 +181,10 @@ public class ApplicationKeysAction extends ActionSupport implements ServletReque
 		return SUCCESS;
 	}
 	
+	/**
+	 * Disable Key
+	 * @return
+	 */
 	@Action(value = "/manage/disableApplicationKey",
 		results = {
 				@Result(name = "success", location = "/manage/view_application_keys.jsp")
@@ -178,6 +202,10 @@ public class ApplicationKeysAction extends ActionSupport implements ServletReque
 		return SUCCESS;
 	}
 	
+	/**
+	 * Delete (KeyBox)Initial System Key
+	 * @return
+	 */
 	@Action(value = "/manage/deleteApplicationKey",
             results = {
 			@Result(name = "success", location = "/manage/view_application_keys.jsp")
@@ -195,7 +223,7 @@ public class ApplicationKeysAction extends ActionSupport implements ServletReque
     }
 	
 	/**
-	 * Validates all fields for adding a public key
+	 * Validates all fields for adding a (KeyBox)Initial System Key
 	 */
 	public void validateSaveApplicationKeys() {
 		
@@ -259,7 +287,7 @@ public class ApplicationKeysAction extends ActionSupport implements ServletReque
 	}
 	
 	/**
-	 * Validates all fields for adding a public key
+	 * Validates all fields for adding a EC2 Key
 	 */
 	public void validateSaveEC2Key() {
 		Long userId = AuthUtil.getUserId(servletRequest.getSession());

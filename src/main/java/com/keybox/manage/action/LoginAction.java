@@ -51,7 +51,6 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
             }
     )
     public String login() {
-
         return SUCCESS;
     }
 
@@ -61,7 +60,6 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
             }
     )
     public String menu() {
-
         return SUCCESS;
     }
 
@@ -109,14 +107,10 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
                     retVal = "change_password";
                 }
             }
-
         } else {
             addActionError(AUTH_ERROR);
             retVal = INPUT;
         }
-
-
-
         return retVal;
     }
 
@@ -142,8 +136,6 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
                 auth.getPassword().trim().equals("")) {
             addFieldError("auth.password", "Required");
         }
-
-
     }
 
 

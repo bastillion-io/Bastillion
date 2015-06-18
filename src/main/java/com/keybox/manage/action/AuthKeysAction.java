@@ -62,7 +62,10 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 	Long existingKeyId;	
 
 
-
+	/**
+	 * Enable PublicKey
+	 * @return
+	 */
 	@Action(value = "/manage/enablePublicKey",
 			results = {
 					@Result(name = "success", location = "/manage/view_keys.jsp")
@@ -84,6 +87,10 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 		return SUCCESS;
 	}
 
+	/**
+	 * Disable PublicKey
+	 * @return
+	 */
 	@Action(value = "/manage/disablePublicKey",
 			results = {
 					@Result(name = "success", location = "/manage/view_keys.jsp")
@@ -105,6 +112,10 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 		return SUCCESS;
 	}
 
+	/**
+	 * Show PublicKeys List to Manage(Filter, Disable/Enable)
+	 * @return
+	 */
 	@Action(value = "/manage/viewKeys",
 			results = {
 					@Result(name = "success", location = "/manage/view_keys.jsp")
@@ -126,7 +137,10 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 	}
 
 	
-
+	/**
+	 * Show PublicKeys List to administration(Add and Delete)
+	 * @return
+	 */
 	@Action(value = "/admin/viewKeys",
 			results = {
 					@Result(name = "success", location = "/admin/view_keys.jsp")
@@ -149,6 +163,10 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 		return SUCCESS;
 	}
 	
+	/**
+	 * Save PublicKey
+	 * @return
+	 */
 	@Action(value = "/admin/savePublicKey",
 			results = {
 					@Result(name = "input", location = "/admin/view_keys.jsp"),
@@ -176,6 +194,10 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 		return SUCCESS;
 	}
 
+	/**
+	 * Delete PublicKey
+	 * @return
+	 */
 	@Action(value = "/admin/deletePublicKey",
 			results = {
 					@Result(name = "input", location = "/admin/view_keys.jsp"),
@@ -196,8 +218,12 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 		return SUCCESS;
 	}
 
-	public static final String PVT_KEY="privateKey";
 	
+	public static final String PVT_KEY="privateKey";
+	/**
+	 * Download Privat Key-File 
+	 * @return
+	 */
 	@Action(value = "/admin/downloadPvtKey")
 	public String downloadPvtKey() {
 		
@@ -249,9 +275,6 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 			os = new ByteArrayOutputStream();
 			keyPair.writePublicKey(os, username + "@" + keyname);
 			pubKey = os.toString();
-
-
-			
 			
 			keyPair.dispose();
 		} catch (Exception e) {
@@ -339,8 +362,6 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 
 	}
 
-
-
 	/**
 	 * distribute public keys to all systems or to profile
 	 *
@@ -355,7 +376,6 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 		}
 		
 	}
-
 
 	public HttpServletRequest getServletRequest() {
 		return servletRequest;

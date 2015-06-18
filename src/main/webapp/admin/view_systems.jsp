@@ -59,11 +59,9 @@
     });
     </script>
 
-
     <title>KeyBox - Manage Systems</title>
 </head>
 <body>
-
 
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
@@ -155,7 +153,6 @@
 
                     <s:iterator var="system" value="sortedSet.itemList" status="stat">
                         <tr>
-
                             <td>
                             	<s:if test="enabled || ismanager">
                             		<s:checkboxlist name="systemSelectId" list="#{id:''}" cssClass="systemSelect"
@@ -203,10 +200,8 @@
                         	</td>
                             <td>
                                 <button type="button" class="btn btn-default ssh_btn" data-toggle="modal" data-target="#ssh_access_<s:property value="id"/>">Your SSH Access</button>
-                            </td>
-                            
+                            </td>   
                         </tr>
-
                     </s:iterator>
                     </tbody>
                 </table>
@@ -256,8 +251,8 @@
                                                 <pre>chmod 400 excample.key</pre>
                                             </s:else>
                                             
-                                            Ensure that  ~./.ssh folder is set to 600                
-                                        
+                                            Ensure that  ~./.ssh folder is set to 600
+                                                            
                                         <li>Example:<br>
                                             <s:if test="publicKeyList!= null && !publicKeyList.isEmpty()">
                                                 <s:iterator var="system" value="publicKeyList" status="stat">
@@ -271,8 +266,6 @@
                                                     <br>
                                                     <pre>ssh -i <s:property value="keyNm"/>.key <s:property value="user"/>@<s:property value="host"/></pre>
                                                 </s:iterator>
-                                                
-                                                 
                                             </s:if>
                                             <s:else>
                                                 <pre>ssh -i excample.key <s:property value="user"/>@<s:property value="host"/></pre>
@@ -290,7 +283,5 @@
             </div>
        </s:iterator>
     </div>
-
-
 </body>
 </html>

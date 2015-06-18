@@ -82,8 +82,6 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
         } else {
             UserDB.insertUser(user);
         }
-
-
         return SUCCESS;
     }
 
@@ -143,7 +141,6 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
             sortedSet = UserDB.getUserSet(sortedSet);
         }
     }
-
 
     public SortedSet getSortedSet() {
         return sortedSet;

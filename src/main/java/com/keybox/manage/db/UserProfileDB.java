@@ -37,7 +37,6 @@ public class UserProfileDB {
      */
     public static void addProfileToUser(Long profileId, Long userId) {
 
-
         Connection con = null;
         PreparedStatement stmt = null;
 
@@ -60,8 +59,6 @@ public class UserProfileDB {
         }
         DBUtils.closeStmt(stmt);
         DBUtils.closeConn(con);
-
-
     }
 
     /**
@@ -71,9 +68,7 @@ public class UserProfileDB {
      */
     public static void deleteProfileFromUser(Long profileId, Long userId) {
 
-
         Connection con = null;
-
         try {
             con = DBUtils.getConn();
             PreparedStatement stmt = con.prepareStatement("delete from user_map where profile_id=? and user_id=?");
@@ -87,8 +82,6 @@ public class UserProfileDB {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-
-
     }
 
 
@@ -98,7 +91,6 @@ public class UserProfileDB {
      * @return profile list
      */
     public static List<Profile> getProfilesByUser(Long userId) {
-
 
         Connection con = null;
         List<Profile> profileList = new ArrayList<Profile>();
@@ -111,8 +103,6 @@ public class UserProfileDB {
         }
         DBUtils.closeConn(con);
         return profileList;
-
-
     }
 
     /**
@@ -123,8 +113,6 @@ public class UserProfileDB {
     public static List<Profile> getProfilesByUser(Connection con, Long userId) {
 
         ArrayList<Profile> profileList = new ArrayList<Profile>();
-
-
         try {
             PreparedStatement stmt = con.prepareStatement("select * from  profiles g, user_map m where g.id=m.profile_id and m.user_id=? order by nm asc");
             stmt.setLong(1, userId);
@@ -143,7 +131,6 @@ public class UserProfileDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return profileList;
     }
 
@@ -153,7 +140,6 @@ public class UserProfileDB {
      * @return user list
      */
     public static List<User> getUsersByProfile(Long profileId) {
-
 
         Connection con = null;
         List<User> userList = new ArrayList<User>();
@@ -166,8 +152,6 @@ public class UserProfileDB {
         }
         DBUtils.closeConn(con);
         return userList;
-
-
     }
 
     /**
@@ -179,8 +163,6 @@ public class UserProfileDB {
     public static List<User> getUsersByProfile(Connection con, Long profileId) {
 
         ArrayList<User> userList = new ArrayList<User>();
-
-
         try {
             PreparedStatement stmt = con.prepareStatement("select * from  users u, user_map m where u.id=m.user_id and m.profile_id=? order by last_nm asc");
             stmt.setLong(1, profileId);
@@ -198,11 +180,9 @@ public class UserProfileDB {
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return userList;
     }
 
@@ -216,17 +196,13 @@ public class UserProfileDB {
      */
     public static boolean checkIsUsersProfile(Long userId, Long profileId){
         boolean isUsersProfile=false;
-
         Connection con = null;
-
         try {
             con = DBUtils.getConn();
             PreparedStatement stmt = con.prepareStatement("select * from user_map where profile_id=? and user_id=?");
             stmt.setLong(1, profileId);
             stmt.setLong(2, userId);
-
             ResultSet rs = stmt.executeQuery();
-
             while (rs.next()) {
                isUsersProfile=true;
             }
@@ -238,9 +214,6 @@ public class UserProfileDB {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-
         return isUsersProfile;
-
     }
-
 }

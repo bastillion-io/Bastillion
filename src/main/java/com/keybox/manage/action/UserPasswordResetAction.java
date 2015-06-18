@@ -41,6 +41,11 @@ public class UserPasswordResetAction extends ActionSupport{
     boolean pwMailResetEnabled="true".equals(AppConfig.getProperty("pwMailReset"));
 	
 
+    /**
+     * Show PW Reset Page, if PW Reset Enable 
+     * @return <strong>PW Reset Page</strong>, if PW Reset enabled <br>
+     * 			<strong>Error Page</strong>, if PW Reset disabled
+     */
 	@Action(value = "/pwReset",
             results = {
                     @Result(name = "success", location = "/pw_reset.jsp"),
@@ -55,7 +60,11 @@ public class UserPasswordResetAction extends ActionSupport{
 		}
     }
 
-	
+	/**
+	 * PW Reset Submit
+	 * @return <strong>PW Reset Page</strong>, if PW Reset enabled <br>
+     * 			<strong>Error Page</strong>, if PW Reset disabled or Email empty
+	 */
 	@Action(value = "/pwResetSubmit",
             results = {
                     @Result(name = "input", location = "/pw_reset.jsp"),
@@ -90,7 +99,6 @@ public class UserPasswordResetAction extends ActionSupport{
     public String getEmail() {
 		return email;
 	}
-
 
 	public void setEmail(String email) {
 		this.email = email;
