@@ -50,7 +50,7 @@ public class PrivateKeyDB {
     		fingerprintID = FingerprintDB.insertFingerprint(applicarionKey.getFingerprint());
     		
     		con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("insert into application_key (keyname, public_key, private_key, passphrase, initialKey, user_id, type, fingerprint_id, enabled, ec2_region, aws_cred_id) values(?,?,?,?,?,?,?,?,?,?,?)");
+            PreparedStatement stmt = con.prepareStatement("insert into application_key (keyname, public_key, private_key, passphrase, initialKey, user_id, type, fingerprint_id, enabled, ec2_region) values(?,?,?,?,?,?,?,?,?,?)");
             stmt.setString(1, applicarionKey.getKeyname());
             stmt.setString(2, applicarionKey.getPublicKey());
             stmt.setString(3, EncryptionUtil.encrypt(applicarionKey.getPrivateKey()));
@@ -65,11 +65,6 @@ public class PrivateKeyDB {
             stmt.setLong(8, fingerprintID);
             stmt.setBoolean(9, applicarionKey.isEnabled());
             stmt.setString(10, applicarionKey.getEc2Region());
-            if(applicarionKey.getAwsCredentials() == null){
-            	stmt.setNull(11, Types.INTEGER);		
-            }else {
-            	stmt.setLong(11, applicarionKey.getAwsCredentials().getId());
-            }
             stmt.execute();
             DBUtils.closeStmt(stmt);
 		} catch (SQLException e) {
@@ -210,12 +205,6 @@ public class PrivateKeyDB {
 				applicationKey.setEnabled(rs.getBoolean("enabled"));
 				applicationKey.setCreateDt(rs.getTimestamp("create_dt"));
 				applicationKey.setEc2Region(rs.getString("ec2_region"));
-				Long awsCredID = rs.getLong("aws_cred_id");
-				if(awsCredID == null || userID == 0){
-					applicationKey.setAwsCredentials(null);
-				}else{
-					applicationKey.setAwsCredentials(AWSCredDB.getAWSCred(awsCredID));
-				}
 			}
 			DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
@@ -556,21 +545,19 @@ public class PrivateKeyDB {
 	}
 
 	/**
-     * returns private keys information for region and AWS Credential
+     * returns private keys information for region
      *
      * @param ec2Region ec2 region
-     * @param awsCredId aws cred id
      * @return key information
      */
-	public static List<ApplicationKey> getEC2KeyByRegion(String ec2Region, Long awsCredId) {
+	public static List<ApplicationKey> getEC2KeyByRegion(String ec2Region) {
 		List<ApplicationKey> ec2KeyList = new ArrayList<ApplicationKey>();
 
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("select * from APPLICATION_KEY where ec2_region like ? and aws_cred_id=?");
+            PreparedStatement stmt = con.prepareStatement("select * from APPLICATION_KEY where ec2_region like ?");
             stmt.setString(1, ec2Region);
-            stmt.setLong(2, awsCredId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
             	ec2KeyList.add(getApplicationKeyByID(rs.getLong("id")));
@@ -588,19 +575,17 @@ public class PrivateKeyDB {
      * 
      * @param keyName 
      * @param ec2Region ec2 region
-     * @param awsCredId aws cred id
      * @return key information
      */
-	public static ApplicationKey getEC2KeyByNmRegion(String keyName, String ec2Region, Long awsCredId) {
+	public static ApplicationKey getEC2KeyByNmRegion(String keyName, String ec2Region) {
 		ApplicationKey ec2Key=null;
 
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("select * from APPLICATION_KEY where KEYNAME like ? and ec2_region like ? and aws_cred_id=?");
+            PreparedStatement stmt = con.prepareStatement("select * from APPLICATION_KEY where KEYNAME like ? and ec2_region like ?");
             stmt.setString(1, keyName);
             stmt.setString(2, ec2Region);
-            stmt.setLong(3, awsCredId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 ec2Key = getApplicationKeyByID(rs.getLong("id")); 

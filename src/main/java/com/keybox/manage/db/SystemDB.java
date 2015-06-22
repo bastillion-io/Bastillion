@@ -679,7 +679,7 @@ public class SystemDB {
 	
 	                    //only return systems that have keys set
 	                    List<String> keyValueList = new ArrayList<String>();
-	                    for (ApplicationKey ec2Key : PrivateKeyDB.getEC2KeyByRegion(ec2Region, awsCred.getId())) {
+	                    for (ApplicationKey ec2Key : PrivateKeyDB.getEC2KeyByRegion(ec2Region)) {
 	                    	if(ec2Key.isEnabled())
 	                    	{
 	                    		keyValueList.add(ec2Key.getKeyname());
@@ -696,7 +696,7 @@ public class SystemDB {
 	                    
 	                    for (Reservation res : describeInstancesResult.getReservations()) {
 	                        for (Instance instance : res.getInstances()) {
-	                            HostSystem hostSystem = transformerEC2InstanzToHostSystem(instance, ec2Region, awsCred);
+	                            HostSystem hostSystem = transformerEC2InstanzToHostSystem(instance, ec2Region);
 	                            
 	                            setEC2System(hostSystem);
 	                        }
@@ -765,7 +765,7 @@ public class SystemDB {
      * @param awsCrde AWS Credential
      * @return hostSystem
      */
-    private static HostSystem transformerEC2InstanzToHostSystem(Instance instance, String ec2Region, AWSCred awsCrde) {
+    private static HostSystem transformerEC2InstanzToHostSystem(Instance instance, String ec2Region) {
     	HostSystem hostSystem = new HostSystem();
         hostSystem.setInstance(instance.getInstanceId());
 
@@ -780,7 +780,7 @@ public class SystemDB {
             hostSystem.setHost(instance.getPrivateIpAddress());
         }
 
-        hostSystem.setApplicationKey(PrivateKeyDB.getEC2KeyByNmRegion(instance.getKeyName(), ec2Region, awsCrde.getId()));
+        hostSystem.setApplicationKey(PrivateKeyDB.getEC2KeyByNmRegion(instance.getKeyName(), ec2Region));
         hostSystem.setEc2Region(ec2Region);
         hostSystem.setStatusCd(instance.getState().getName().toUpperCase());
         hostSystem.setUser(AppConfig.getProperty("defaultEC2User"));

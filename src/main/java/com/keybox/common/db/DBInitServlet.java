@@ -136,10 +136,8 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 						+ "enabled boolean not null default true, "
 						+ "create_dt timestamp not null default CURRENT_TIMESTAMP(),"
 						+ "ec2_region varchar DEFAULT 'NO_EC2_REGION', "
-						+ "aws_cred_id INTEGER DEFAULT null,"
 								+ "foreign key (user_id) references users(id), "
-								+ "foreign key (fingerprint_id) references fingerprint(id), "
-								+ "foreign key (aws_cred_id) references aws_credentials(id) on delete set null)");
+								+ "foreign key (fingerprint_id) references fingerprint(id))");
 				
 				statement.executeUpdate("create table if not exists application_key_system ("
 						+ "system_id INTEGER, "

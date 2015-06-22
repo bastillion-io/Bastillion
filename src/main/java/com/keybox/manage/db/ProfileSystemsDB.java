@@ -302,7 +302,7 @@ public class ProfileSystemsDB {
 
                             //only return systems that have keys set
                             List<String> keyValueList = new ArrayList<String>();
-                            for (ApplicationKey ec2Key : PrivateKeyDB.getEC2KeyByRegion(ec2Region, awsCred.getId())) {
+                            for (ApplicationKey ec2Key : PrivateKeyDB.getEC2KeyByRegion(ec2Region)) {
                             	if(ec2Key.isEnabled())
     	                    	{
     	                    		keyValueList.add(ec2Key.getKeyname());

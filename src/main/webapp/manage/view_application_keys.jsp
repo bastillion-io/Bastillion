@@ -94,7 +94,7 @@
 <div class="container">
 
     <h3>View / Create System SSH Keys</h3>
-    <p>Mange Keys used for initial server connection. When disabling / deleting a key please ensure to update all systems you have assigned the disabled key to.</p>
+    <p>Mange Keys used for initial server connection. When disabling / deleting a key please ensure to update all systems you have assigned the disabled key to.(Manage Systems)</p>
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
             <div class="scrollWrapper">
             <table class="table-striped scrollableTable" >
@@ -155,7 +155,7 @@
             </div>
         </s:if>
         
-        <button class="btn btn-default add_btn spacer spacer-bottom" data-toggle="modal" data-target="#add_dialog">Add System Key</button>
+        <button class="btn btn-default add_btn spacer spacer-bottom" data-toggle="modal" data-target="#add_dialog" style="min-width:120px">Add System Key</button>
         <div id="add_dialog" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -224,7 +224,7 @@
 	        </div>
 	    </s:if>
 	    <s:else>
-			<p>Import and register EC2 keys below. An EC2 server will only show after its private key has been imported</p>
+			<p>Import and register EC2 keys below. An EC2 server will only show up after its private key has been imported</p>
 			<s:if test="sortedEC2Set.itemList!= null && !sortedEC2Set.itemList.isEmpty()">
 	            <div class="scrollWrapper">
 	            <table class="table-striped scrollableTable" >
@@ -292,7 +292,7 @@
 	            </table>
 	            </div>
 	        </s:if>
-			<button class="btn btn-default add_btn spacer spacer-bottom" data-toggle="modal" data-target="#add_EC2dialog">Add EC2 Key</button>
+			<button class="btn btn-default add_btn spacer spacer-bottom" data-toggle="modal" data-target="#add_EC2dialog" style="min-width:120px">Add EC2 Key</button>
 	        <div id="add_EC2dialog" class="modal fade">
 	            <div class="modal-dialog">
 	                <div class="modal-content">
