@@ -65,7 +65,6 @@ public class UserProfileAction extends ActionSupport {
             UserProfileDB.addProfileToUser(profileId, user.getId());
             RefreshAuthKeyUtil.refreshProfileSystems(profileId);
         }
-
         return SUCCESS;
     }
 
@@ -79,7 +78,6 @@ public class UserProfileAction extends ActionSupport {
         UserProfileDB.deleteProfileFromUser(profileId, user.getId());
         PublicKeyDB.deleteProfilePublicKeys(profileId);
         RefreshAuthKeyUtil.refreshProfileSystems(profileId);
-
         return SUCCESS;
     }
 

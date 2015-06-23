@@ -55,7 +55,6 @@ public class AWSClientConfig {
         if (StringUtils.isNotEmpty(awsProxyPassword)) {
             config.setProxyPassword(awsProxyPassword);
         }
-
     }
 
     /**
@@ -63,8 +62,6 @@ public class AWSClientConfig {
      * @return client configuration information
      */
     public static ClientConfiguration getClientConfig() {
-
         return config;
-
     }
 }

@@ -36,10 +36,11 @@ public class HostSystem {
     Integer instanceId;
     ApplicationKey applicationKey;
     
+    //Default Value for (KeyBox)System
     String instance = "---";
     String ec2Region = "---";
     
-    //KeyBox Status
+    //(KeyBox) Status
     public static final String INITIAL_STATUS="INITIAL";
     public static final String AUTH_FAIL_STATUS="AUTHFAIL";
     public static final String PUBLIC_KEY_FAIL_STATUS="KEYAUTHFAIL";
@@ -48,7 +49,7 @@ public class HostSystem {
     public static final String HOST_FAIL_STATUS="HOSTFAIL";
 	public static final String PRIVAT_KEY_FAIL_STATUS = "PRIVATKEYFAIL";
 	
-	//EC2Box Status
+	//EC2 Status
 	public static final String PENDING_STATUS="PENDING";
 	public static final String RUNNING_STATUS="RUNNING";
 	public static final String SHUTTING_DOWN_STATUS="SHUTTING-DOWN";

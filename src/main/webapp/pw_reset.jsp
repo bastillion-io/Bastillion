@@ -50,8 +50,6 @@
         </div>
     </div>
 
-	
-	
     <div class="container">
         <p>
         <s:actionmessage/>
@@ -66,9 +64,6 @@
 	    	</tr>
         </s:form>
         </p>
-
-
-
     </div>
 
 </body>

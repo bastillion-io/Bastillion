@@ -44,7 +44,6 @@ public class ScriptAction extends ActionSupport implements ServletRequestAware {
     public String viewScripts() {
         Long userId= AuthUtil.getUserId(servletRequest.getSession());
         sortedSet = ScriptDB.getScriptSet(sortedSet, userId);
-
         return SUCCESS;
     }
 
@@ -102,7 +101,6 @@ public class ScriptAction extends ActionSupport implements ServletRequestAware {
             Long userId= AuthUtil.getUserId(servletRequest.getSession());
             sortedSet = ScriptDB.getScriptSet(sortedSet, userId);
         }
-
     }
 
     public SortedSet getSortedSet() {

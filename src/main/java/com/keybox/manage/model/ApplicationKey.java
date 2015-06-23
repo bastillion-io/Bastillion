@@ -38,6 +38,7 @@ public class ApplicationKey {
     Date createDt;
     String passphraseConfirm;
     
+    //Default Value for (KeyBox) System Keys
     String ec2Region = "NO_EC2_REGION";
     AWSCred awsCredentials = null;
 

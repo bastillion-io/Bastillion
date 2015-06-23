@@ -115,10 +115,7 @@ public class EncryptionUtil {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-
         }
         return retVal;
     }
-
-
 }

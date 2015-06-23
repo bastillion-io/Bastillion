@@ -60,8 +60,7 @@ public class RefreshApplicationKeyUtil {
 		if(days>0)
 		{
 			return true;
-		}else
-		{
+		}else{
 			return false;
 		}
 	}

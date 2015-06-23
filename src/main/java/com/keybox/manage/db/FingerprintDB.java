@@ -57,7 +57,6 @@ public class FingerprintDB {
             ex.printStackTrace();
         }
         DBUtils.closeConn(con);
-		
 		return isexisted;
 	}
 	
@@ -89,12 +88,11 @@ public class FingerprintDB {
             ex.printStackTrace();
         }
         DBUtils.closeConn(con);
-		
 		return isexisted;
 	}
 	
 	/**
-	 * Insert new fingerprint
+	 * Insert new fingerprint or get existing fingerprint
 	 * 
 	 * @param fingerprint Fingerprint
 	 * @return <strong>fingerprintID</strong><br>or<br> <strong>0</strong>, if not successfully insert

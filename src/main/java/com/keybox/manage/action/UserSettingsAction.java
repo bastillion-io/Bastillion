@@ -71,8 +71,6 @@ public class UserSettingsAction extends ActionSupport implements ServletRequestA
                 addActionError("Current password is invalid");
             }
         }
-
-
         return retVal;
     }
 
@@ -85,7 +83,6 @@ public class UserSettingsAction extends ActionSupport implements ServletRequestA
     public String themeSubmit() {
 
         UserThemeDB.saveTheme(AuthUtil.getUserId(servletRequest.getSession()), userSettings);
-
         return SUCCESS;
     }
 
@@ -105,9 +102,7 @@ public class UserSettingsAction extends ActionSupport implements ServletRequestA
                 auth.getPrevPassword().trim().equals("")) {
             addFieldError("auth.prevPassword", "Required");
         }
-
     }
-
 
     public HttpServletRequest getServletRequest() {
         return servletRequest;

@@ -26,7 +26,6 @@ public class SessionOutput {
     String output;
 
 
-
     public Long getHostSystemId() {
         return hostSystemId;
     }

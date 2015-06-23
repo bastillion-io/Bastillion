@@ -215,7 +215,7 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 				//generate new key and insert passphrase
 				System.out.println("Setting KeyBox SSH public/private key pair");
 
-				//generate application pub/pvt key and get values
+				//generate application pub/pvt key and get values (KeyBoxInitialKey)
 				ApplicationKey firstAppKey = new ApplicationKey();
 				String passphrase = SSHUtil.keyGen();
 				String publicKey = SSHUtil.getPublicKey();

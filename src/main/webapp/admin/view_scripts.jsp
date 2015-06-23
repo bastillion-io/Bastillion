@@ -25,7 +25,6 @@
     <script type="text/javascript">
         $(document).ready(function() {
 
-
             //call delete action
             $(".del_btn").button().click(function() {
                 var id = $(this).attr('id').replace("del_btn_", "");
@@ -93,9 +92,7 @@
             <div class="scrollWrapper">
                 <table class="table-striped scrollableTable">
                     <thead>
-
                     <tr>
-
                         <th id="<s:property value="@com.keybox.manage.db.ScriptDB@SORT_BY_DISPLAY_NM"/>" class="sort">Script Name</th>
                         <th>&nbsp;</th>
                     </tr>
@@ -117,7 +114,6 @@
 
                                 </div>
                             </td>
-
                     </tr>
                     </s:iterator>
                     </tbody>
@@ -178,9 +174,6 @@
                     </div>
                 </div>
             </s:iterator>
-
-
     </div>
-
 </body>
 </html>

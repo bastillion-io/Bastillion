@@ -41,7 +41,6 @@
 </head>
 <body>
 
-
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
     <div class="container">
@@ -59,8 +58,6 @@
             </tr>
         </s:form>
     </div>
-
-
 
 </body>
 </html>

@@ -19,6 +19,7 @@ public class MassageParamter {
 
 	private String pattern;
 	private String value;
+	
 	/**
 	 * Constructor for MassageParamter
 	 * 
@@ -29,6 +30,7 @@ public class MassageParamter {
 		this.pattern = pattern;
 		this.value = value;
 	}
+	
 	/**
 	 * Getter for Pattern
 	 * 
@@ -46,6 +48,7 @@ public class MassageParamter {
 	public void setPattern(String pattern) {
 		this.pattern = pattern;
 	}
+	
 	/**
 	 * Getter for Value
 	 * @return
@@ -53,6 +56,7 @@ public class MassageParamter {
 	public String getValue() {
 		return value;
 	}
+	
 	/**
 	 * Setter for Value
 	 * @param value value variable

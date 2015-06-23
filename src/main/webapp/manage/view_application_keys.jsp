@@ -47,7 +47,6 @@
                 $(this).parents('.modal').find('form').submit();
             });
         	
-        	
           	//delete action for System Key
             $(".del_btn").button().click(function () {
                 var id = $(this).attr('id').replace("del_btn_", "");
@@ -324,8 +323,6 @@
 	            </div>
 	        </div>
        	</s:else>
-	        
-
 </div>
 
 </body>

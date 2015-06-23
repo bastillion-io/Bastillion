@@ -244,7 +244,6 @@ public class PrivateKeyDB {
 	 */
 	private static void disableEnabeleApplicationKey(Long id, boolean enable) {
 		Connection con = null;
-		
 		try{
 			con = DBUtils.getConn();
 			PreparedStatement stmt = con.prepareStatement("update application_key set enabled=? where id=?");
@@ -257,7 +256,6 @@ public class PrivateKeyDB {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-		
 	}
 
 
@@ -590,14 +588,11 @@ public class PrivateKeyDB {
             if (rs.next()) {
                 ec2Key = getApplicationKeyByID(rs.getLong("id")); 
             }
-
             DBUtils.closeStmt(stmt);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-        
         return ec2Key;
 	}
 }

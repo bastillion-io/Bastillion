@@ -29,7 +29,7 @@ public class AppConfig {
 
     static {
         try {
-            prop = new PropertiesConfiguration(AppConfig.class.getClassLoader().getResource(".").getPath() + "/KeyBoxConfig.properties");
+        	prop = new PropertiesConfiguration(AppConfig.class.getClassLoader().getResource("KeyBoxConfig.properties").getPath());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -105,7 +105,7 @@ public class AppConfig {
      * gets the property from config and returns map of name / value pairs
      *
      * @param name property name
-     * @return configuration property
+     * @return configuration property map
      */
     public static Map<String,String> getMapProperties(String name) {
 

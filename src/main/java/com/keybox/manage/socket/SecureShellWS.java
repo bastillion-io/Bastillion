@@ -43,11 +43,8 @@ public class SecureShellWS {
     private Session session;
     private Long sessionId = null;
 
-
-
     @OnOpen
     public void onOpen(Session session, EndpointConfig config) {
-
 
         //set websocket timeout
         if(StringUtils.isNotEmpty(AppConfig.getProperty("websocketTimeout"))){
@@ -55,7 +52,7 @@ public class SecureShellWS {
         } else {
             session.setMaxIdleTimeout(0);
         }
-
+        
         this.httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
         this.sessionId = AuthUtil.getSessionId(httpSession);
         this.session = session;
@@ -63,17 +60,13 @@ public class SecureShellWS {
         Runnable run=new SentOutputTask(sessionId, session);
         Thread thread = new Thread(run);
         thread.start();
-
     }
 
     @OnMessage
     public void onMessage(String message) {
 
         if (session.isOpen()) {
-
             if (StringUtils.isNotEmpty(message)) {
-
-
                 Map jsonRoot = new Gson().fromJson(message, Map.class);
 
                 String command = (String) jsonRoot.get("command");
@@ -107,12 +100,8 @@ public class SecureShellWS {
                 }
                 //update timeout
                 AuthUtil.setTimeout(httpSession);
-
-
             }
         }
-
-
     }
 
     @OnClose
@@ -126,7 +115,6 @@ public class SecureShellWS {
                 for (Integer sessionKey : schSessionMap.keySet()) {
 
                     SchSession schSession = schSessionMap.get(sessionKey);
-
                     //disconnect ssh session
                     schSession.getChannel().disconnect();
                     schSession.getSession().disconnect();
@@ -140,15 +128,12 @@ public class SecureShellWS {
                     schSessionMap.remove(sessionKey);
                 }
 
-
                 //clear and remove session map for user
                 schSessionMap.clear();
                 SecureShellAction.getUserSchSessionMap().remove(sessionId);
                 SessionOutputUtil.removeUserSession(sessionId);
             }
         }
-
-
     }
 
 
@@ -244,7 +229,5 @@ public class SecureShellWS {
         keyMap.put(35, "\033[4~".getBytes());
         //HOME
         keyMap.put(36, "\033[1~".getBytes());
-
     }
-
 }

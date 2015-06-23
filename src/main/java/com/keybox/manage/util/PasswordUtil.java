@@ -25,8 +25,6 @@ import java.util.regex.Pattern;
  */
 public class PasswordUtil {
 
-
-
         public static final String PASSWORD_REGEX= AppConfig.getProperty("passwordComplexityRegEx");
         public static final String PASSWORD_REQ_ERROR_MSG=AppConfig.getProperty("passwordComplexityMsg");
 
@@ -41,8 +39,6 @@ public class PasswordUtil {
         public static boolean isValid(final String password){
 
             Matcher matcher = pattern.matcher(password);
-            
             return matcher.matches();
-
         }
 }

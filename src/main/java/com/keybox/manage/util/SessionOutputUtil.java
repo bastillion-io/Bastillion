@@ -47,7 +47,6 @@ public class SessionOutputUtil {
             userSessionsOutput.getSessionOutputMap().clear();
         }
         userSessionsOutputMap.remove(sessionId);
-
     }
 
     /**
@@ -79,8 +78,6 @@ public class SessionOutputUtil {
             userSessionsOutput = userSessionsOutputMap.get(sessionId);
         }
         userSessionsOutput.getSessionOutputMap().put(sessionOutput.getInstanceId(), new SessionHostOutput(hostId, new StringBuilder()));
-
-
     }
 
 
@@ -95,12 +92,10 @@ public class SessionOutputUtil {
      */
     public static void addToOutput(Long sessionId, Integer instanceId, char value[], int offset, int count) {
 
-
         UserSessionsOutput userSessionsOutput = userSessionsOutputMap.get(sessionId);
         if (userSessionsOutput != null) {
             userSessionsOutput.getSessionOutputMap().get(instanceId).getOutput().append(value, offset, count);
         }
-
     }
 
 
@@ -113,12 +108,8 @@ public class SessionOutputUtil {
     public static List<SessionOutput> getOutput(Connection con, Long sessionId) {
         List<SessionOutput> outputList = new ArrayList<SessionOutput>();
 
-
         UserSessionsOutput userSessionsOutput = userSessionsOutputMap.get(sessionId);
         if (userSessionsOutput != null) {
-
-
-
             for (Integer key : userSessionsOutput.getSessionOutputMap().keySet()) {
 
                 //get output chars and set to output
@@ -131,30 +122,21 @@ public class SessionOutputUtil {
                         sessionOutput.setSessionId(sessionId);
                         sessionOutput.setHostSystemId(hostId);
                         sessionOutput.setInstanceId(key);
-
                         sessionOutput.setOutput(sb.toString());
 
                         if (StringUtils.isNotEmpty(sessionOutput.getOutput())) {
                             outputList.add(sessionOutput);
-
                             if (enableAudit) {
                                 SessionAuditDB.insertTerminalLog(con, sessionOutput);
                             }
-
                             userSessionsOutput.getSessionOutputMap().put(key, new SessionHostOutput(hostId, new StringBuilder()));
                         }
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
-
             }
-
         }
-
-
         return outputList;
     }
-
-
 }

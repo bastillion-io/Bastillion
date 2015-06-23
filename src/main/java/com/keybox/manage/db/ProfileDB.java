@@ -40,7 +40,6 @@ public class ProfileDB {
     public static SortedSet getProfileSet(SortedSet sortedSet) {
 
         ArrayList<Profile> profileList = new ArrayList<Profile>();
-
         String orderBy = "";
         if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
             orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
@@ -69,7 +68,6 @@ public class ProfileDB {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-
         sortedSet.setItemList(profileList);
         return sortedSet;
     }
@@ -96,7 +94,6 @@ public class ProfileDB {
                 profile.setDesc(rs.getString("desc"));
                 profile.setTag(rs.getString("tag"));
                 profileList.add(profile);
-
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
@@ -105,7 +102,6 @@ public class ProfileDB {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-
         return profileList;
     }
 
@@ -126,7 +122,6 @@ public class ProfileDB {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-
         return profile;
     }
 
@@ -152,7 +147,6 @@ public class ProfileDB {
                 profile.setDesc(rs.getString("desc"));
                 profile.setTag(rs.getString("tag"));
                 profile.setHostSystemList(ProfileSystemsDB.getSystemsByProfile(con, profileId));
-
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
@@ -160,7 +154,6 @@ public class ProfileDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return profile;
     }
 
@@ -185,7 +178,6 @@ public class ProfileDB {
             e.printStackTrace();
         }
         DBUtils.closeConn(con);
-
     }
 
     /**
@@ -218,7 +210,6 @@ public class ProfileDB {
      * @param profileId profile id
      */
     public static void deleteProfile(Long profileId) {
-
 
         Connection con = null;
         try {
@@ -263,11 +254,7 @@ public class ProfileDB {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
         DBUtils.closeConn(con);
-        
 		return isexisted;
 	}
-
-
 }

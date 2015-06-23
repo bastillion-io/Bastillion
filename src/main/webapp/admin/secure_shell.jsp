@@ -37,7 +37,6 @@
                 return ids;
             }
 
-
             $('#upload_push_dialog').on('hidden.bs.modal', function () {
                 $("#upload_push_frame").attr("src", "");
             });
@@ -75,17 +74,13 @@
                 
             });
             
-         
-
             //select all
             $('#select_all').click(function () {
                 $(".run_cmd").addClass('run_cmd_active');
             });
 
-
             //upload frame dialog
             $('#upload_push').click(function () {
-
 
                 var ids=[];
                 $(".run_cmd_active").each(function (index) {
@@ -102,10 +97,7 @@
 
                 $("#upload_push_frame").attr("src", "setUpload.action" + idListStr);
                 $("#upload_push_dialog").modal();
-
-
             });
-
 
             <s:if test="currentSystemStatus!=null && currentSystemStatus.statusCd=='GENERICFAIL'">
             $("#error_dialog").modal();
@@ -143,8 +135,6 @@
             $("#match").blur(function () {
                 termFocus = true;
             });
-
-           
 
             $(document).keypress(function (e) {
                 if (termFocus) {
