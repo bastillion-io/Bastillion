@@ -30,8 +30,8 @@ public class MailConfigLoader {
 	 */
 	public MailConfigLoader(String mailfile) {
 		try {
-			mailprop = new PropertiesConfiguration(MailConfigLoader.class.getClassLoader().getResource(".").getPath() + "/"+ mailfile);
-			default_mailprop = new PropertiesConfiguration(MailConfigLoader.class.getClassLoader().getResource(".").getPath() + "/mail.properties");
+			mailprop = new PropertiesConfiguration(MailConfigLoader.class.getClassLoader().getResource(mailfile).getPath());
+			default_mailprop = new PropertiesConfiguration(MailConfigLoader.class.getClassLoader().getResource("mail.properties").getPath());
 		} catch (ConfigurationException e) {
 			e.printStackTrace();
 		}
