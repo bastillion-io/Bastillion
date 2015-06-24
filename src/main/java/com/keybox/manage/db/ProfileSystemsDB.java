@@ -288,7 +288,7 @@ public class ProfileSystemsDB {
 	            //get AWS credentials from DB
                 for (AWSCred awsCred : AWSCredDB.getAWSCredList()) {
 
-                    if (awsCred != null) {
+                    if (awsCred != null && awsCred.isValid()) {
                         //set  AWS credentials for service
                         BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsCred.getAccessKey(), awsCred.getSecretKey());
 	            

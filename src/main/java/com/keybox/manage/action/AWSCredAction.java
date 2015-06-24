@@ -15,19 +15,12 @@
  */
 package com.keybox.manage.action;
 
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.services.ec2.AmazonEC2;
-import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.keybox.manage.db.AWSCredDB;
 import com.keybox.manage.model.AWSCred;
 import com.keybox.manage.model.SortedSet;
-import com.keybox.manage.util.AWSClientConfig;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
-import org.apache.struts2.interceptor.SessionAware;
-
-import java.util.Map;
 
 /**
  * Action to set aws credentials
@@ -95,14 +88,8 @@ public class AWSCredAction extends ActionSupport {
             addFieldError("awsCred.secretKey", "Required");
         }
         if (!this.hasErrors()) {
-            try {
-                //check if credential are valid
-                BasicAWSCredentials awsCredentials = new BasicAWSCredentials(awsCred.getAccessKey(), awsCred.getSecretKey());
-                AmazonEC2 service = new AmazonEC2Client(awsCredentials, AWSClientConfig.getClientConfig());
-
-                service.describeKeyPairs();
-            } catch (Exception ex) {
-                addActionError("Invalid Credentials");
+            if (awsCred.isValid()==false){
+            	addActionError("Invalid Credentials");
             }
         }
         if(this.hasActionErrors() || this.hasErrors()){

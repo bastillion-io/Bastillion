@@ -94,7 +94,7 @@
 
                     <th id="<s:property value="@com.ec2box.manage.db.AWSCredDB@SORT_BY_ACCESS_KEY"/>" class="sort">Access Key
                     </th>
-
+					<th>is Valid</th>
                     <th>&nbsp;</th>
                 </tr>
                 </thead>
@@ -102,6 +102,14 @@
                 <s:iterator value="sortedSet.itemList" status="stat">
                     <tr>
                         <td><s:property value="accessKey"/></td>
+                        <td>
+                        	<s:if test="valid">
+                        		<div class="success">Success</div>
+                        	</s:if>
+                        	<s:else>
+                        		<div class="error">Failed</div>
+                        	</s:else>
+                        </td>
                         <td>
                             <div id="del_btn_<s:property value="id"/>" class="btn btn-primary del_btn spacer spacer-left">
                                 Delete

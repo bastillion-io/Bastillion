@@ -19,6 +19,7 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.KeyPair;
 import com.keybox.common.util.AppConfig;
 import com.keybox.common.util.AuthUtil;
+import com.keybox.manage.db.AWSCredDB;
 import com.keybox.manage.db.PrivateKeyDB;
 import com.keybox.manage.db.ProfileDB;
 import com.keybox.manage.db.ProfileSystemsDB;
@@ -90,6 +91,23 @@ public class SystemAction extends ActionSupport implements ServletRequestAware, 
             }
     )
     public String viewAdminSystems() {
+    	
+    	//Test AWS Credentials are valid
+    	List<AWSCred> awsCredList = AWSCredDB.getAWSCredList();
+    	Integer awsCredErrorCount = 0;
+    	for (AWSCred awsCred : awsCredList) {
+    		if(!awsCred.isValid()) 
+    			{ awsCredErrorCount++; }
+    	}
+    	if(awsCredErrorCount>0)
+    	{
+    		if(awsCredList.size()==1){
+    			addActionError("The AWS Credential is invalid");
+    		}else{
+    			addActionError(awsCredErrorCount + " of " + awsCredList.size() + " AWS Credentials are invalid");
+    		}
+    	}
+    	
     	ProfileSystemsDB.updateProfileAWSSysteme();
     	
         Long userId = AuthUtil.getUserId(servletRequest.getSession());

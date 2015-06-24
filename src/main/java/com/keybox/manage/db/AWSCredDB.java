@@ -61,6 +61,7 @@ public class AWSCredDB {
                 AWSCred awsCred = new AWSCred();
                 awsCred.setId(rs.getLong("id"));
                 awsCred.setAccessKey(rs.getString("access_key"));
+                awsCred.setSecretKey(EncryptionUtil.decrypt(rs.getString("secret_key")));
                 //awsCred.setSecretKey(EncryptionUtil.decrypt(rs.getString("secret_key")));
                 awsCredList.add(awsCred);
             }

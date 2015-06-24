@@ -95,7 +95,7 @@
                 <h3>Composite SSH Terminals</h3>
                 <p>Select the systems below to generate composite SSH sessions in multiple terminals</p>
             </s:else>
-
+		<s:actionerror/>
         <s:form id="viewSystems" action="viewSystems" theme="simple">
         <s:hidden name="sortedSet.orderByDirection"/>
         <s:hidden name="sortedSet.orderByField"/>
