@@ -108,6 +108,38 @@ public class AWSCredDB {
     }
     
     /**
+     * returns list of all valid amazon credentials
+     *
+     * @return  valid aws credential list
+     */
+    public static List<AWSCred> getvalidAWSCredList() {
+
+        List<AWSCred> awsCredList = new ArrayList<AWSCred>();
+        Connection con = null;
+        try {
+            con = DBUtils.getConn();
+            PreparedStatement stmt = con.prepareStatement("select * from aws_credentials");
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                AWSCred awsCred = new AWSCred();
+                awsCred.setId(rs.getLong("id"));
+                awsCred.setAccessKey(rs.getString("access_key"));
+                awsCred.setSecretKey(EncryptionUtil.decrypt(rs.getString("secret_key")));
+                if(awsCred.isValid()){
+                	awsCredList.add(awsCred);
+                }
+            }
+            DBUtils.closeRs(rs);
+            DBUtils.closeStmt(stmt);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        //close db connection
+        DBUtils.closeConn(con);
+        return awsCredList;
+    }
+    
+    /**
      * returns amazon credentials
      *
      * @param accessKey aws cred access key

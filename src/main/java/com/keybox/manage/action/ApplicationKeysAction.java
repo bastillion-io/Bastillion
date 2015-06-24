@@ -69,7 +69,7 @@ public class ApplicationKeysAction extends ActionSupport implements ServletReque
 	File ec2KeyFile;
 	
 	static Map<String, String> ec2RegionMap = AppConfig.getMapProperties("ec2Regions");
-	List<AWSCred> awsCredList = AWSCredDB.getAWSCredList();
+	List<AWSCred> awsCredList = AWSCredDB.getvalidAWSCredList();
 	
 	Long existingKeyId;
 
