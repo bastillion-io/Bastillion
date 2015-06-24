@@ -223,6 +223,26 @@ public class ApplicationKeysAction extends ActionSupport implements ServletReque
     }
 	
 	/**
+	 * Delete EC2 Key
+	 * @return
+	 */
+	@Action(value = "/manage/deleteEC2Key",
+            results = {
+			@Result(name = "success", location = "/manage/view_application_keys.jsp")
+            }
+    )
+    public String deleteEC2Key() {
+
+		if (ec2Key.getId() != null) {
+            PrivateKeyDB.deleteEC2Key(ec2Key.getId());
+        }
+        sortedSet = PrivateKeyDB.getApplicationKeySet(sortedSet);
+        sortedEC2Set = PrivateKeyDB.getEC2KeySet(sortedEC2Set);
+        
+        return SUCCESS;
+    }
+	
+	/**
 	 * Validates all fields for adding a (KeyBox)Initial System Key
 	 */
 	public void validateSaveApplicationKeys() {
