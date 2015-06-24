@@ -53,6 +53,12 @@
                 window.location = 'deleteApplicationKey.action?applicationKey.id=' + id
             });
         	
+          	//delete action for EC2 Key
+            $(".del_EC2Key_btn").button().click(function () {
+                var id = $(this).attr('id').replace("del_EC2Key_btn_", "");
+                window.location = 'deleteEC2Key.action?ec2Key.id=' + id
+            });
+          	
         	//Disable System Key
             $(".disable_btn").button().click(function () {
                 var id = $(this).attr('id').replace("disable_btn_", "");
@@ -271,7 +277,7 @@
 	                        <td>
 	                        	<s:if test="userId>0">
 		                            <div>
-		                            	<button type="button" class="btn btn-default del_btn" data-toggle="modal" id="del_btn_<s:property value="id"/>">Delete</button>
+		                            	<button type="button" class="btn btn-default del_EC2Key_btn" data-toggle="modal" id="del_EC2Key_btn_<s:property value="id"/>">Delete</button>
 		                                <s:if test="%{enabled}">
 		                                     <button class="btn btn-default btn-danger btn-disable_enable spacer spacer-left disable_btn" data-toggle="modal"
 		                                            id="disable_btn_<s:property value="id"/>">Disable
