@@ -15,6 +15,11 @@
  */
 package com.keybox.manage.model;
 
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.ec2.AmazonEC2;
+import com.amazonaws.services.ec2.AmazonEC2Client;
+import com.keybox.manage.util.AWSClientConfig;
+
 /**
  * Value object that contains amazon credentials
  */
@@ -43,4 +48,22 @@ public class AWSCred {
     public void setSecretKey(String secretKey) {
         this.secretKey = secretKey;
     }
+    
+    /**
+     * Test if AWS Credentials are valid
+     * @return AWS Credentials valid
+     */
+    public boolean isValid() {
+    	boolean valid = true;
+    	
+    	try {
+            //check if credential are valid
+            BasicAWSCredentials awsCredentials = new BasicAWSCredentials(getAccessKey(), getSecretKey());
+            AmazonEC2 service = new AmazonEC2Client(awsCredentials, AWSClientConfig.getClientConfig());
+            service.describeKeyPairs();
+        } catch (Exception ex) {
+            valid = false;
+        }
+    	return valid;
+	}
 }
