@@ -272,7 +272,7 @@ public class PrivateKeyDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("select aks.* from application_key_system aks join application_key ak on aks.application_key_id = ak.id where aks.system_id = ? and aks.active = true and ak.enabled = true");
+            PreparedStatement stmt = con.prepareStatement("select aks.* from application_key_system aks join application_key ak on aks.application_key_id = ak.id where aks.system_id = ? and aks.active = true");
             stmt.setLong(1, systemId);
             ResultSet rs = stmt.executeQuery();
             if(rs.next()) {
@@ -595,4 +595,30 @@ public class PrivateKeyDB {
         DBUtils.closeConn(con);
         return ec2Key;
 	}
+
+
+	/**
+	 * Delete EC2 System Key with Fingerprint
+	 * 
+	 * @param ec2KeyID ApplicationKeyID
+	 */
+	public static void deleteEC2Key(Long ec2KeyID) {
+		Connection con = null;
+		
+		SystemDB.deleteSystemByApplicationKeyID(ec2KeyID);
+		
+		ApplicationKey ec2Key = getApplicationKeyByID(ec2KeyID);
+		try {
+			con = DBUtils.getConn();
+			PreparedStatement stmt = con.prepareStatement("DELETE FROM application_key WHERE id=?");
+			stmt.setLong(1, ec2KeyID);
+			stmt.execute();
+			DBUtils.closeStmt(stmt);
+			FingerprintDB.deleteFingerprint(ec2Key.getFingerprint().getId());
+		} catch (SQLException e) {
+		    e.printStackTrace();
+		}
+		DBUtils.closeConn(con);
+	}
+	
 }

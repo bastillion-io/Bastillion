@@ -731,4 +731,31 @@ public class SystemDB {
         }
         return hostSystem;
 	}
+    
+    /**
+     * Delete Systems by ApplicationKey ID
+     * 
+     * @param appKeyID ApplicationKey ID
+     */
+    public static void deleteSystemByApplicationKeyID(Long appKeyID) {
+    	Connection con = null;
+    	
+    	try {
+			con=DBUtils.getConn();
+			PreparedStatement stmt = con.prepareStatement("SELECT sys.ID FROM SYSTEM sys " +
+									"JOIN APPLICATION_KEY_SYSTEM appkey_sys on appkey_sys.system_id = sys.id " +
+									"WHERE appkey_sys.application_key_id = ?");
+			stmt.setLong(1, appKeyID);
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()) {
+				deleteSystem(rs.getLong("ID"));
+			}
+			DBUtils.closeRs(rs);
+			DBUtils.closeStmt(stmt);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		DBUtils.closeConn(con);
+	}
 }

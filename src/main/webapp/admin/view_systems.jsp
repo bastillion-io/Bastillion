@@ -154,7 +154,7 @@
                     <s:iterator var="system" value="sortedSet.itemList" status="stat">
                         <tr>
                             <td>
-                            	<s:if test="enabled || ismanager">
+                            	<s:if test="(enabled && applicationKey.enabled)|| ismanager">
                             		<s:checkboxlist name="systemSelectId" list="#{id:''}" cssClass="systemSelect"
                                                 theme="simple"/>
                             	</s:if>
@@ -166,7 +166,7 @@
                             <td><s:property value="user"/></td>
                             <td><s:property value="host"/>:<s:property value="port"/></td>
                             <td>
-                            	<s:if test="!enabled">
+                            	<s:if test="!(enabled && applicationKey.enabled)">
                             		<div class="error">Temporarily disabled</div>
                             	</s:if>
                             	

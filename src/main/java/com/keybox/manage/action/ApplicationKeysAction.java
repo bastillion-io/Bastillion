@@ -69,7 +69,7 @@ public class ApplicationKeysAction extends ActionSupport implements ServletReque
 	File ec2KeyFile;
 	
 	static Map<String, String> ec2RegionMap = AppConfig.getMapProperties("ec2Regions");
-	List<AWSCred> awsCredList = AWSCredDB.getAWSCredList();
+	List<AWSCred> awsCredList = AWSCredDB.getvalidAWSCredList();
 	
 	Long existingKeyId;
 
@@ -215,6 +215,26 @@ public class ApplicationKeysAction extends ActionSupport implements ServletReque
 
 		if (applicationKey.getId() != null) {
             PrivateKeyDB.deleteApplicationKey(applicationKey.getId());
+        }
+        sortedSet = PrivateKeyDB.getApplicationKeySet(sortedSet);
+        sortedEC2Set = PrivateKeyDB.getEC2KeySet(sortedEC2Set);
+        
+        return SUCCESS;
+    }
+	
+	/**
+	 * Delete EC2 Key
+	 * @return
+	 */
+	@Action(value = "/manage/deleteEC2Key",
+            results = {
+			@Result(name = "success", location = "/manage/view_application_keys.jsp")
+            }
+    )
+    public String deleteEC2Key() {
+
+		if (ec2Key.getId() != null) {
+            PrivateKeyDB.deleteEC2Key(ec2Key.getId());
         }
         sortedSet = PrivateKeyDB.getApplicationKeySet(sortedSet);
         sortedEC2Set = PrivateKeyDB.getEC2KeySet(sortedEC2Set);
