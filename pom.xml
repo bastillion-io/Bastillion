@@ -24,7 +24,7 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.4.187</version>
+            <version>1.4.188</version>
         </dependency>
         <dependency>
             <groupId>com.jcraft</groupId>
@@ -59,7 +59,7 @@
         <dependency>
             <groupId>com.google.zxing</groupId>
             <artifactId>core</artifactId>
-            <version>3.2.0</version>
+            <version>3.2.1</version>
         </dependency>
 
         <!-- provided dependencies-->
@@ -108,7 +108,7 @@
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-                <version>9.2.11.v20150529</version>
+                <version>9.2.13.v20150730</version>
                 <configuration>
                     <jettyXml>${basedir}/src/test/resources/jetty.xml,${basedir}/src/test/resources/jetty-ssl.xml,${basedir}/src/test/resources/jetty-https.xml</jettyXml>
                     <scanIntervalSeconds>-1</scanIntervalSeconds>
