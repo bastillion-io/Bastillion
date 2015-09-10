@@ -19,22 +19,21 @@ package com.keybox.manage.model;
 /**
  * Output from ssh session
  */
-public class SessionOutput {
+public class SessionOutput extends HostSystem {
     Long sessionId;
-    Long hostSystemId;
-    Integer instanceId;
-    String output;
+    StringBuilder output = new StringBuilder();
+
+    public SessionOutput() {
 
 
-
-    public Long getHostSystemId() {
-        return hostSystemId;
     }
+    public SessionOutput(Long id, Long sessionId, Integer instanceId) {
 
-    public void setHostSystemId(Long hostSystemId) {
-        this.hostSystemId = hostSystemId;
+        this.id=id;
+        this.sessionId=sessionId;
+        this.instanceId=instanceId;
+
     }
-
     public Long getSessionId() {
         return sessionId;
     }
@@ -43,20 +42,12 @@ public class SessionOutput {
         this.sessionId = sessionId;
     }
 
-
-    public String getOutput() {
+    public StringBuilder getOutput() {
         return output;
     }
 
-    public void setOutput(String output) {
+    public void setOutput(StringBuilder output) {
         this.output = output;
     }
 
-    public Integer getInstanceId() {
-        return instanceId;
-    }
-
-    public void setInstanceId(Integer instanceId) {
-        this.instanceId = instanceId;
-    }
 }

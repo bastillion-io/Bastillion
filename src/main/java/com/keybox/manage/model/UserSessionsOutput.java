@@ -21,14 +21,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class UserSessionsOutput {
 
     //instance id, host output
-    Map<Integer, SessionHostOutput> sessionOutputMap = new ConcurrentHashMap<Integer,SessionHostOutput>();
+    Map<Integer, SessionOutput> sessionOutputMap = new ConcurrentHashMap<Integer,SessionOutput>();
 
 
-    public Map<Integer, SessionHostOutput> getSessionOutputMap() {
+    public Map<Integer, SessionOutput> getSessionOutputMap() {
         return sessionOutputMap;
     }
 
-    public void setSessionOutputMap(Map<Integer, SessionHostOutput> sessionOutputMap) {
+    public void setSessionOutputMap(Map<Integer, SessionOutput> sessionOutputMap) {
         this.sessionOutputMap = sessionOutputMap;
     }
 }

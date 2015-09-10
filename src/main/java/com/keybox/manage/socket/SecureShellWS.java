@@ -19,6 +19,7 @@ import com.google.gson.Gson;
 import com.keybox.common.util.AppConfig;
 import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.action.SecureShellAction;
+import com.keybox.manage.db.AuthDB;
 import com.keybox.manage.model.SchSession;
 import com.keybox.manage.model.UserSchSessions;
 import com.keybox.manage.task.SentOutputTask;

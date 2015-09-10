@@ -16,6 +16,7 @@
 package com.keybox.manage.task;
 
 import com.google.gson.Gson;
+import com.keybox.manage.model.Auth;
 import com.keybox.manage.model.SessionOutput;
 import com.keybox.manage.util.DBUtils;
 import com.keybox.manage.util.SessionOutputUtil;
@@ -41,12 +42,14 @@ public class SentOutputTask implements Runnable {
 
     public void run() {
 
+        Gson gson = new Gson();
+
         Connection con = DBUtils.getConn();
         while (session.isOpen()) {
             List<SessionOutput> outputList = SessionOutputUtil.getOutput(con, sessionId);
             try {
                 if (outputList != null && !outputList.isEmpty()) {
-                    String json = new Gson().toJson(outputList);
+                    String json = gson.toJson(outputList);
                     //send json to session
                     this.session.getBasicRemote().sendText(json);
                 }

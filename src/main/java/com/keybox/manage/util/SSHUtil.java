@@ -465,10 +465,12 @@ public class SSHUtil {
 
 			//new session output
 			SessionOutput sessionOutput = new SessionOutput();
-			sessionOutput.setHostSystemId(hostSystem.getId());
-			sessionOutput.setInstanceId(instanceId);
+			sessionOutput.setId(hostSystem.getId());
+            sessionOutput.setInstanceId(instanceId);
 			sessionOutput.setSessionId(sessionId);
-
+            sessionOutput.setDisplayNm(hostSystem.getDisplayNm());
+            sessionOutput.setUser(hostSystem.getUser());
+            sessionOutput.setPort(hostSystem.getPort());
 
 			Runnable run = new SecureShellTask(sessionOutput, outFromChannel);
 			Thread thread = new Thread(run);

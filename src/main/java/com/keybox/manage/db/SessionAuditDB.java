@@ -233,13 +233,13 @@ public class SessionAuditDB {
 
         try {
 
-            if (sessionOutput != null && sessionOutput.getSessionId() != null && sessionOutput.getInstanceId() != null && sessionOutput.getOutput() != null && !sessionOutput.getOutput().equals("")) {
+            if (sessionOutput != null && sessionOutput.getSessionId() != null && sessionOutput.getInstanceId() != null && sessionOutput.getOutput() != null && !sessionOutput.getOutput().toString().equals("")) {
                 //insert
                 PreparedStatement stmt = con.prepareStatement("insert into terminal_log (session_id, instance_id, system_id, output) values(?,?,?,?)");
                 stmt.setLong(1, sessionOutput.getSessionId());
                 stmt.setLong(2, sessionOutput.getInstanceId());
-                stmt.setLong(3, sessionOutput.getHostSystemId());
-                stmt.setString(4, sessionOutput.getOutput());
+                stmt.setLong(3, sessionOutput.getId());
+                stmt.setString(4, sessionOutput.getOutput().toString());
                 stmt.execute();
                 DBUtils.closeStmt(stmt);
             }
@@ -307,8 +307,7 @@ public class SessionAuditDB {
             SessionOutput sessionOutput = new SessionOutput();
             sessionOutput.setSessionId(sessionId);
             sessionOutput.setInstanceId(instanceId);
-            sessionOutput.setOutput(output);
-
+            sessionOutput.getOutput().append(output);
 
             outputList.add(sessionOutput);
 
