@@ -22,12 +22,15 @@ import com.keybox.manage.util.EncryptionUtil;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO that returns public / private key for the system generated private key
  */
 public class PrivateKeyDB {
 
+    private static Logger log = LoggerFactory.getLogger(PrivateKeyDB.class);
 
     /**
      * returns public private key for application
@@ -59,7 +62,7 @@ public class PrivateKeyDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
 

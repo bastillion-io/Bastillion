@@ -29,12 +29,15 @@ import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletResponseAware;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Action to audit sessions and terminal history
  */
 public class SessionAuditAction extends ActionSupport implements ServletResponseAware {
 
+    private static Logger log = LoggerFactory.getLogger(SessionAuditAction.class);
 
     SortedSet sortedSet=new SortedSet();
     Long sessionId;
@@ -84,7 +87,7 @@ public class SessionAuditAction extends ActionSupport implements ServletResponse
         try {
             servletResponse.getOutputStream().write(json.getBytes());
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error(ex.toString(), ex);
         }
 
         return null;

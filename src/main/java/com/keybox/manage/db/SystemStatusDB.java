@@ -28,12 +28,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO used to generate a list of public keys and systems associated
  * with them based on system profiles and users assigned to the profiles.
  */
 public class SystemStatusDB {
+
+    private static Logger log = LoggerFactory.getLogger(SystemStatusDB.class);
 
 
     /**
@@ -66,7 +70,7 @@ public class SystemStatusDB {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
     }
@@ -87,7 +91,7 @@ public class SystemStatusDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
 
     }
@@ -112,7 +116,7 @@ public class SystemStatusDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
 
 
@@ -133,7 +137,7 @@ public class SystemStatusDB {
             updateSystemStatus(con, hostSystem, userId);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
 
@@ -159,7 +163,7 @@ public class SystemStatusDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
 
 
@@ -191,7 +195,7 @@ public class SystemStatusDB {
             hostSystemList = getAllSystemStatus(con, userId);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
         return hostSystemList;
@@ -222,7 +226,7 @@ public class SystemStatusDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         return hostSystemList;
 
@@ -255,7 +259,7 @@ public class SystemStatusDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
         return hostSystem;
@@ -291,7 +295,7 @@ public class SystemStatusDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
         return hostSystem;

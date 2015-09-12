@@ -35,8 +35,12 @@ import org.apache.struts2.interceptor.ServletRequestAware;
 import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UploadAndPushAction extends ActionSupport implements ServletRequestAware {
+
+    private static Logger log = LoggerFactory.getLogger(UploadAndPushAction.class);
 
 
     File upload;
@@ -86,7 +90,7 @@ public class UploadAndPushAction extends ActionSupport implements ServletRequest
 
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
             return INPUT;
         }
 
@@ -157,7 +161,7 @@ public class UploadAndPushAction extends ActionSupport implements ServletRequest
 
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
 
         return SUCCESS;

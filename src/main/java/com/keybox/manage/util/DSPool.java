@@ -17,12 +17,16 @@ package com.keybox.manage.util;
 
 import org.apache.commons.dbcp.*;
 import org.apache.commons.pool.impl.GenericObjectPool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Class to create a pooling data source object using commons DBCP
  *
  */
 public class DSPool {
+
+    private static Logger log = LoggerFactory.getLogger(DSPool.class);
 
     //system path to the H2 DB
     private static String DB_PATH = DBUtils.class.getClassLoader().getResource("keydb").getPath();
@@ -65,7 +69,7 @@ public class DSPool {
         try {
             Class.forName("org.h2.Driver");
         } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
+            log.error(ex.toString(), ex);
         }
 
 

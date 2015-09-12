@@ -31,13 +31,15 @@ import java.io.IOException;
 import java.security.Principal;
 import java.sql.Connection;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * External authentication utility for JAAS
  */
 public class ExternalAuthUtil {
 
-
+    private static Logger log = LoggerFactory.getLogger(ExternalAuthUtil.class);
 
     public static final boolean externalAuthEnabled = StringUtils.isNotEmpty(AppConfig.getProperty("jaasModule"));
     private static final String JAAS_CONF = "jaas.conf";
@@ -128,7 +130,7 @@ public class ExternalAuthUtil {
                     authToken = null;
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error(e.toString(), e);
             }
 
             DBUtils.closeConn(con);

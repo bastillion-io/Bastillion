@@ -23,12 +23,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO to manage profile information
  */
 public class ProfileSystemsDB {
 
+    private static Logger log = LoggerFactory.getLogger(ProfileSystemsDB.class);
 	/**
 	 * adds a host system to profile
 	 *
@@ -52,7 +55,7 @@ public class ProfileSystemsDB {
 			DBUtils.closeStmt(stmt);
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.toString(), e);
 		}
 		DBUtils.closeConn(con);
 
@@ -79,7 +82,7 @@ public class ProfileSystemsDB {
 			DBUtils.closeStmt(stmt);
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.toString(), e);
 		}
 		DBUtils.closeConn(con);
 
@@ -118,7 +121,7 @@ public class ProfileSystemsDB {
 			DBUtils.closeStmt(stmt);
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.toString(), e);
 		}
 
 		return hostSystemList;
@@ -141,7 +144,7 @@ public class ProfileSystemsDB {
 			hostSystemList=getSystemsByProfile(con,profileId);
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.toString(), e);
 		}
 		DBUtils.closeConn(con);
 
@@ -172,7 +175,7 @@ public class ProfileSystemsDB {
 			DBUtils.closeStmt(stmt);
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.toString(), e);
 		}
 
 		return systemIdList;
@@ -195,7 +198,7 @@ public class ProfileSystemsDB {
 			systemIdList = getSystemIdsByProfile(con, profileId);
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.toString(), e);
 		}
 		DBUtils.closeConn(con);
 
@@ -228,7 +231,7 @@ public class ProfileSystemsDB {
 			DBUtils.closeStmt(stmt);
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.toString(), e);
 		}
 
 		return systemIdList;
@@ -252,7 +255,7 @@ public class ProfileSystemsDB {
 			systemIdList = getSystemIdsByProfile(con, profileId, userId);
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.toString(), e);
 		}
 		DBUtils.closeConn(con);
 

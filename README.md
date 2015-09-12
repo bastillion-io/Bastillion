@@ -148,7 +148,7 @@ Auditing
 Auditing is disabled by default and is only a proof of concept.  Can be enabled in the KeyBoxConfig.properties.
 
 	#enable audit  --set to true to enable
-	enableAudit=true
+	enableInternalAudit=true
 
 Using KeyBox
 ------

@@ -37,9 +37,12 @@ import java.awt.image.BufferedImage;
 import java.net.URLEncoder;
 import java.util.Date;
 import java.util.Hashtable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OTPAction extends ActionSupport implements ServletRequestAware, ServletResponseAware {
 
+    private static Logger log = LoggerFactory.getLogger(OTPAction.class);
 
     //QR image size
     private static final int QR_IMAGE_WIDTH = 325;
@@ -124,7 +127,7 @@ public class OTPAction extends ActionSupport implements ServletRequestAware, Ser
             servletResponse.getOutputStream().close();
             
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error(ex.toString(), ex);
         }
 
 

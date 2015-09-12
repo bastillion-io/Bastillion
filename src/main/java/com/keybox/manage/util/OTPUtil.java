@@ -25,12 +25,16 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * Time-based One-Time Password Utility
  */
 public class OTPUtil {
+
+    private static Logger log = LoggerFactory.getLogger(OTPUtil.class);
 
     //sizes to generate OTP secret
     private static final int SECRET_SIZE = 10;
@@ -113,7 +117,7 @@ public class OTPUtil {
             calculated &= 0x7FFFFFFF;
             calculated %= 1000000;
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error(ex.toString(), ex);
         }
 
 

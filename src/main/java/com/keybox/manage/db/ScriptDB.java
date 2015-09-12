@@ -24,12 +24,15 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO to manage scripts
  */
 public class ScriptDB {
 
+    private static Logger log = LoggerFactory.getLogger(ScriptDB.class);
 
     public static final String SORT_BY_DISPLAY_NM="display_nm";
 
@@ -71,7 +74,7 @@ public class ScriptDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
 
@@ -96,7 +99,7 @@ public class ScriptDB {
 
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
 
@@ -129,7 +132,7 @@ public class ScriptDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
 
         return script;
@@ -154,7 +157,7 @@ public class ScriptDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
 
@@ -180,7 +183,7 @@ public class ScriptDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
 
@@ -204,7 +207,7 @@ public class ScriptDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
 

@@ -18,20 +18,22 @@ package com.keybox.common.util;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility to look up configurable commands and resources
  */
 public class AppConfig {
 
-
+    private static Logger log = LoggerFactory.getLogger(AppConfig.class);
     private static PropertiesConfiguration prop;
 
     static {
         try {
             prop = new PropertiesConfiguration(AppConfig.class.getClassLoader().getResource(".").getPath() + "/KeyBoxConfig.properties");
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error(ex.toString(), ex);
         }
     }
 
@@ -80,7 +82,7 @@ public class AppConfig {
             prop.clearProperty(name);
             prop.save();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error(ex.toString(), ex);
         }
     }
 
@@ -97,7 +99,7 @@ public class AppConfig {
             prop.setProperty(name, value);
             prop.save();
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error(ex.toString(), ex);
         }
     }
 

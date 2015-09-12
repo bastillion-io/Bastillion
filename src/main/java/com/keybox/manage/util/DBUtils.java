@@ -18,6 +18,8 @@ package com.keybox.manage.util;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -25,8 +27,7 @@ import java.sql.Statement;
  */
 public class DBUtils {
 
-
-
+    private static Logger log = LoggerFactory.getLogger(DBUtils.class);
 
     /**
      * returns DB connection
@@ -39,7 +40,7 @@ public class DBUtils {
             con=DSPool.getDataSource().getConnection();
 
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error(ex.toString(), ex);
         }
         return con;
 
@@ -57,7 +58,7 @@ public class DBUtils {
             }
             con = null;
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error(ex.toString(), ex);
         }
 
 
@@ -75,7 +76,7 @@ public class DBUtils {
             }
             stmt = null;
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error(ex.toString(), ex);
         }
 
 
@@ -93,7 +94,7 @@ public class DBUtils {
             }
             rs = null;
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error(ex.toString(), ex);
         }
 
 

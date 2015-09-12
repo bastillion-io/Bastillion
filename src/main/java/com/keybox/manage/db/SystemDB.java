@@ -25,12 +25,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
  * DAO used to manage systems
  */
 public class SystemDB {
+
+    private static Logger log = LoggerFactory.getLogger(SystemDB.class);
 
 	public static final String FILTER_BY_PROFILE_ID = "profile_id";
 
@@ -87,7 +91,7 @@ public class SystemDB {
 			DBUtils.closeStmt(stmt);
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.toString(), e);
 		}
 		DBUtils.closeConn(con);
 
@@ -140,7 +144,7 @@ public class SystemDB {
 			DBUtils.closeStmt(stmt);
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.toString(), e);
 		}
 		DBUtils.closeConn(con);
 
@@ -170,7 +174,7 @@ public class SystemDB {
 
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.toString(), e);
 		}
 		DBUtils.closeConn(con);
 
@@ -211,7 +215,7 @@ public class SystemDB {
 			DBUtils.closeStmt(stmt);
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.toString(), e);
 		}
 
 
@@ -249,7 +253,7 @@ public class SystemDB {
 			DBUtils.closeStmt(stmt);
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.toString(), e);
 		}
 		DBUtils.closeConn(con);
 		return userId;
@@ -281,7 +285,7 @@ public class SystemDB {
 			DBUtils.closeStmt(stmt);
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.toString(), e);
 		}
 		DBUtils.closeConn(con);
 
@@ -306,7 +310,7 @@ public class SystemDB {
 			DBUtils.closeStmt(stmt);
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.toString(), e);
 		}
 		DBUtils.closeConn(con);
 
@@ -332,7 +336,7 @@ public class SystemDB {
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.toString(), e);
 		}
 		DBUtils.closeConn(con);
 
@@ -374,7 +378,7 @@ public class SystemDB {
 			DBUtils.closeStmt(stmt);
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.toString(), e);
 		}
 
 		DBUtils.closeConn(con);
@@ -406,7 +410,7 @@ public class SystemDB {
 			DBUtils.closeStmt(stmt);
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.toString(), e);
 		}
 
 
@@ -438,7 +442,7 @@ public class SystemDB {
 			DBUtils.closeStmt(stmt);
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error(e.toString(), e);
 		}
 
 		return systemIdList;
@@ -459,7 +463,7 @@ public class SystemDB {
 			systemIdList = getAllSystemIdsForUser(con, userId);
 
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			log.error(ex.toString(), ex);
 		}
 		DBUtils.closeConn(con);
 		return systemIdList;
@@ -478,7 +482,7 @@ public class SystemDB {
 			systemIdList = getAllSystemIds(con);
 
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			log.error(ex.toString(), ex);
 		}
 		DBUtils.closeConn(con);
 		return systemIdList;

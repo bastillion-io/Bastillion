@@ -16,28 +16,32 @@
 package com.keybox.manage.task;
 
 import com.google.gson.Gson;
-import com.keybox.manage.model.Auth;
 import com.keybox.manage.model.SessionOutput;
+import com.keybox.manage.model.User;
 import com.keybox.manage.util.DBUtils;
 import com.keybox.manage.util.SessionOutputUtil;
 
 import javax.websocket.Session;
 import java.sql.Connection;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * class to send output to web socket client
  */
 public class SentOutputTask implements Runnable {
 
+    private static Logger log = LoggerFactory.getLogger(SentOutputTask.class);
 
     Session session;
     Long sessionId;
+    User user;
 
-    public SentOutputTask(Long sessionId, Session session) {
+    public SentOutputTask(Long sessionId, Session session, User user) {
         this.sessionId = sessionId;
         this.session = session;
-
+        this.user = user;
     }
 
     public void run() {
@@ -46,7 +50,7 @@ public class SentOutputTask implements Runnable {
 
         Connection con = DBUtils.getConn();
         while (session.isOpen()) {
-            List<SessionOutput> outputList = SessionOutputUtil.getOutput(con, sessionId);
+            List<SessionOutput> outputList = SessionOutputUtil.getOutput(con, sessionId, user);
             try {
                 if (outputList != null && !outputList.isEmpty()) {
                     String json = gson.toJson(outputList);
@@ -55,7 +59,7 @@ public class SentOutputTask implements Runnable {
                 }
                 Thread.sleep(50);
             } catch (Exception ex) {
-                ex.printStackTrace();
+                log.error(ex.toString(), ex);
             }
 
 

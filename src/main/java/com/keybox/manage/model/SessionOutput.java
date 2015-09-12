@@ -27,11 +27,15 @@ public class SessionOutput extends HostSystem {
 
 
     }
-    public SessionOutput(Long id, Long sessionId, Integer instanceId) {
-
-        this.id=id;
+    public SessionOutput(Long sessionId, HostSystem hostSystem) {
         this.sessionId=sessionId;
-        this.instanceId=instanceId;
+        this.setId(hostSystem.getId());
+        this.setInstanceId(hostSystem.getInstanceId());
+        this.setUser(hostSystem.getUser());
+        this.setHost(hostSystem.getHost());
+        this.setPort(hostSystem.getPort());
+        this.setDisplayNm(hostSystem.getDisplayNm());
+        this.setAuthorizedKeys(hostSystem.getAuthorizedKeys());
 
     }
     public Long getSessionId() {

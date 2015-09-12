@@ -29,11 +29,15 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO to manage public keys
  */
 public class PublicKeyDB {
+
+    private static Logger log = LoggerFactory.getLogger(PublicKeyDB.class);
 
     public static final String FILTER_BY_USER_ID = "user_id";
     public static final String FILTER_BY_PROFILE_ID = "profile_id";
@@ -63,7 +67,7 @@ public class PublicKeyDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
         
@@ -86,7 +90,7 @@ public class PublicKeyDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
 
@@ -115,7 +119,7 @@ public class PublicKeyDB {
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
         
@@ -183,7 +187,7 @@ public class PublicKeyDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
 
@@ -232,7 +236,7 @@ public class PublicKeyDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
 
@@ -257,7 +261,7 @@ public class PublicKeyDB {
 
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
 
@@ -293,7 +297,7 @@ public class PublicKeyDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
 
         return publicKey;
@@ -325,7 +329,7 @@ public class PublicKeyDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
 
@@ -359,7 +363,7 @@ public class PublicKeyDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
 
@@ -386,7 +390,7 @@ public class PublicKeyDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
 
@@ -409,7 +413,7 @@ public class PublicKeyDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
 
@@ -432,7 +436,7 @@ public class PublicKeyDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
 
@@ -449,7 +453,7 @@ public class PublicKeyDB {
             publicKeyList = getPublicKeysForSystem(con, systemId);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
 
@@ -474,7 +478,7 @@ public class PublicKeyDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
 
         return publicKeyList;
@@ -518,7 +522,7 @@ public class PublicKeyDB {
           DBUtils.closeStmt(stmt);
 
         } catch (Exception ex) {
-            ex.printStackTrace();
+            log.error(ex.toString(), ex);
         }
         
         DBUtils.closeConn(con);
@@ -559,7 +563,7 @@ public class PublicKeyDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
         

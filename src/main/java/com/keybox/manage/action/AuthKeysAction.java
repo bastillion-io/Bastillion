@@ -37,6 +37,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Action to generate and distribute auth keys for systems or users
@@ -44,6 +46,7 @@ import java.util.List;
 @SuppressWarnings("unchecked")
 public class AuthKeysAction extends ActionSupport implements ServletRequestAware, ServletResponseAware {
 
+    private static Logger log = LoggerFactory.getLogger(AuthKeysAction.class);
 
 	HttpServletRequest servletRequest;
 	HttpServletResponse servletResponse;
@@ -205,7 +208,7 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 				servletResponse.getOutputStream().flush();
 				servletResponse.getOutputStream().close();
 			} catch (Exception ex) {
-				ex.printStackTrace();
+                log.error(ex.toString(), ex);
 			}
 		}
 		//remove pvt key
@@ -247,8 +250,8 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 			
 			
 			keyPair.dispose();
-		} catch (Exception e) {
-			e.printStackTrace();
+		} catch (Exception ex) {
+            log.error(ex.toString(), ex);
 		}
 
 		return pubKey;

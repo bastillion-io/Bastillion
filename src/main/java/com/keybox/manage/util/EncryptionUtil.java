@@ -22,11 +22,15 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility to encrypt, decrypt, and hash
  */
 public class EncryptionUtil {
+
+    private static Logger log = LoggerFactory.getLogger(EncryptionUtil.class);
 
     //secret key
     private static final byte[] key = new byte[]{'d', '3', '2', 't', 'p', 'd', 'M', 'o', 'I', '8', 'x', 'z', 'a', 'P', 'o', 'd'};
@@ -60,7 +64,7 @@ public class EncryptionUtil {
             md.update(str.getBytes("UTF-8"));
             hash = new String(Base64.encodeBase64(md.digest()));
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         return hash;
     }
@@ -91,7 +95,7 @@ public class EncryptionUtil {
                 byte[] encVal = c.doFinal(str.getBytes());
                 retVal = new String(Base64.encodeBase64(encVal));
             } catch (Exception ex) {
-                ex.printStackTrace();
+                log.error(ex.toString(), ex);
             }
 
         }
@@ -113,7 +117,7 @@ public class EncryptionUtil {
                 byte[] decodedVal = Base64.decodeBase64(str.getBytes());
                 retVal = new String(c.doFinal(decodedVal));
             } catch (Exception ex) {
-                ex.printStackTrace();
+                log.error(ex.toString(), ex);
             }
 
         }

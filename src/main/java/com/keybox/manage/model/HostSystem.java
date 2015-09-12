@@ -42,7 +42,6 @@ public class HostSystem {
     public static final String HOST_FAIL_STATUS="HOSTFAIL";
 
 
-
     public Long getId() {
         return id;
 
@@ -75,8 +74,6 @@ public class HostSystem {
     public void setHost(String host){
         this.host = host;
     }
-
-
 
     public String getDisplayLabel() {
         return getDisplayNm() +" - ( " +getUser() +"@"+getHost()+":"+getPort()+" )";

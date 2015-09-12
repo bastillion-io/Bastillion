@@ -22,11 +22,15 @@ import org.apache.commons.lang3.StringUtils;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO to manage user themes 
  */
 public class UserThemeDB {
+
+    private static Logger log = LoggerFactory.getLogger(UserThemeDB.class);
 
     /**
      * get user theme
@@ -73,7 +77,7 @@ public class UserThemeDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
         
@@ -120,7 +124,7 @@ public class UserThemeDB {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
 

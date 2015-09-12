@@ -15,7 +15,6 @@
  */
 package com.keybox.manage.action;
 
-import com.google.gson.Gson;
 import com.jcraft.jsch.ChannelShell;
 import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.db.*;
@@ -34,11 +33,15 @@ import java.io.BufferedReader;
 import java.io.StringReader;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This action will create composite ssh terminals to be used
  */
 public class SecureShellAction extends ActionSupport implements ServletRequestAware, ServletResponseAware {
+
+    private static Logger log = LoggerFactory.getLogger(SecureShellAction.class);
 
     List<SessionOutput> outputList;
     String command;
@@ -217,7 +220,7 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
                     //remove from map
                     userSchSessions.getSchSessionMap().remove(id);
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                    log.error(ex.toString(), ex);
                 }
             }
 
@@ -301,7 +304,7 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
                             schSession.getCommander().println(line);
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        log.error(e.toString(), e);
 
                     }
                 }

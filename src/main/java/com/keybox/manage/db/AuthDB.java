@@ -26,11 +26,15 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO to login administrative users
  */
 public class AuthDB {
+
+    private static Logger log = LoggerFactory.getLogger(AuthDB.class);
 
     /**
      * auth user and return auth token if valid auth
@@ -72,7 +76,7 @@ public class AuthDB {
 
 
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error(e.toString(), e);
             }
 
             DBUtils.closeConn(con);
@@ -113,7 +117,7 @@ public class AuthDB {
                 DBUtils.closeStmt(stmt);
 
             } catch (Exception e) {
-                e.printStackTrace();
+                log.error(e.toString(), e);
             }
         }
         DBUtils.closeConn(con);
@@ -150,7 +154,7 @@ public class AuthDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
 
 
@@ -187,7 +191,7 @@ public class AuthDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
         return success;
@@ -217,7 +221,7 @@ public class AuthDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
 
 
@@ -239,7 +243,7 @@ public class AuthDB {
             con = DBUtils.getConn();
             user = getUserByAuthToken(con, authToken);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
 
@@ -269,7 +273,7 @@ public class AuthDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
 
@@ -295,7 +299,7 @@ public class AuthDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
 
@@ -323,7 +327,7 @@ public class AuthDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         return salt;
     }
@@ -350,7 +354,7 @@ public class AuthDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
         return salt;
     }
@@ -385,7 +389,7 @@ public class AuthDB {
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.toString(), e);
         }
 
         return user;
