@@ -154,6 +154,8 @@ Using KeyBox
 ------
 Open browser to https://\<whatever ip\>:8443
 
+You can use your browser font size change methods to resize terminals. If using CTRL+Scrollwheel, make sure you do it outside the terminal applet area. 
+
 Login with
 
 	username:admin
