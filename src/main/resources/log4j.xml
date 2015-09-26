@@ -11,6 +11,20 @@
         </layout>
     </appender>
 
+    <!--
+    <appender name="logstash-socket-appender" class="org.apache.log4j.net.SocketAppender">
+        <param name="RemoteHost" value="127.0.0.1"/>
+        <param name="Port" value="5300"/>
+        <param name="ReconnectionDelay" value="50000"/>
+        <param name="Threshold" value="INFO"/>
+    </appender>
+
+    <logger name="logstash">
+        <level value="info"/>
+        <appender-ref ref="logstash-socket-appender"/>
+    </logger>
+    -->
+
     <root>
         <level value="warn"/>
         <appender-ref ref="console"/>

@@ -19,6 +19,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.keybox.common.util.AppConfig;
 import com.keybox.manage.db.SessionAuditDB;
+import com.keybox.manage.model.AuditWrapper;
 import com.keybox.manage.model.SessionOutput;
 import com.keybox.manage.model.User;
 import com.keybox.manage.model.UserSessionsOutput;
@@ -39,7 +40,15 @@ public class SessionOutputUtil {
 
     private static Map<Long, UserSessionsOutput> userSessionsOutputMap = new ConcurrentHashMap<Long, UserSessionsOutput>();
     public static boolean enableInternalAudit = "true".equals(AppConfig.getProperty("enableInternalAudit"));
+    private static String auditLogAppender = StringUtils.isNotEmpty(AppConfig.getProperty("auditLogAppender")) ? AppConfig.getProperty("auditLogAppender") : null;
+    private static Gson gson = new GsonBuilder().registerTypeAdapter(AuditWrapper.class, new SessionOutputSerializer()).create();
+    private static Logger auditLogger = null;
 
+    static {
+        if (StringUtils.isNotEmpty(auditLogAppender)) {
+            auditLogger = LoggerFactory.getLogger(auditLogAppender);
+        }
+    }
 
     /**
      * removes session for user session
@@ -128,6 +137,10 @@ public class SessionOutputUtil {
 
                         if (StringUtils.isNotEmpty(sessionOutput.getOutput())) {
                             outputList.add(sessionOutput);
+                            //send to audit logger if set
+                            if(auditLogger!=null) {
+                                auditLogger.info(gson.toJson(new AuditWrapper(user, sessionOutput)));
+                            }
                             if(enableInternalAudit) {
                                 SessionAuditDB.insertTerminalLog(con, sessionOutput);
                             }
