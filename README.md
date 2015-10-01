@@ -168,7 +168,7 @@ Steps:
 5. Users can login to create sessions on assigned systems
 6. Start a composite SSH session or create and execute a script across multiple sessions
 7. Add additional public keys to systems
-8. Disable any adminstrative public key forcing key rotation.
+8. Disable any administrative public key forcing key rotation.
 9. Audit session history
 
 Screenshots
