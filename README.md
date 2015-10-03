@@ -10,8 +10,8 @@ KeyBox layers TLS/SSL on top of SSH and acts as a bastion host for administratio
 
 Prerequisites
 -------------
-* Java JDK 1.7 or greater
-http://www.oracle.com/technetwork/java/javase/overview/index.html
+* Java JDK 1.8 or greater
+http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
 * Browser with Web Socket support
 http://caniuse.com/websockets *Note: In Safari if using a self-signed certificate you must import the certificate into your Keychain.
