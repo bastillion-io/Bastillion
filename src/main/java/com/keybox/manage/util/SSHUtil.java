@@ -15,14 +15,7 @@
  */
 package com.keybox.manage.util;
 
-import com.jcraft.jsch.Channel;
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.ChannelShell;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.KeyPair;
-import com.jcraft.jsch.Session;
-import com.jcraft.jsch.SftpException;
+import com.jcraft.jsch.*;
 import com.keybox.common.util.AppConfig;
 import com.keybox.manage.db.*;
 import com.keybox.manage.model.*;
@@ -327,71 +320,65 @@ public class SSHUtil {
 	 */
 	public static HostSystem addPubKey(HostSystem hostSystem, Session session, String appPublicKey) {
 
-
-		Channel channel = null;
-		ChannelSftp c = null;
-
 		try {
-
-			channel = session.openChannel("sftp");
-			channel.setInputStream(System.in);
-			channel.setOutputStream(System.out);
-			channel.connect(CHANNEL_TIMEOUT);
-
-			c = (ChannelSftp) channel;
-
-			//return public key list into a input stream
 			String authorizedKeys = hostSystem.getAuthorizedKeys().replaceAll("~\\/|~", "");
 
-			String appPubKey = appPublicKey.replace("\n", "").trim();
+			Channel channel = session.openChannel("exec");
+			((ChannelExec) channel).setCommand("cat " + authorizedKeys);
+			((ChannelExec) channel).setErrStream(System.err);
+			channel.setInputStream(null);
 
-			String keyValue = "";
-			//if no overwrite then append to previous auth keys file
+			InputStream in = channel.getInputStream();
+			InputStreamReader is = new InputStreamReader(in);
+			BufferedReader reader = new BufferedReader(is);
+
+			channel.connect(CHANNEL_TIMEOUT);
+
+			String appPubKey = appPublicKey.replace("\n", "").trim();
+			String existingKeys="";
+			
+			String currentKey;
+			while ((currentKey = reader.readLine()) != null) {
+				existingKeys = existingKeys + currentKey +"\n";
+			}
+			existingKeys = existingKeys.replaceAll("\\n$","");
+			reader.close();
+			//disconnect
+			channel.disconnect();
+			
+			String newKeys="";
 			if (keyManagementEnabled) {
 				//get keys assigned to system
 				List<String> assignedKeys = PublicKeyDB.getPublicKeysForSystem(hostSystem.getId());
-				for (String existingKey : assignedKeys) {
-					keyValue = keyValue + existingKey.replace("\n", "").trim() + "\n";
+				for (String key: assignedKeys) {
+					newKeys = newKeys + key.replace("\n", "").trim() + "\n";
 				}
+				newKeys = newKeys + appPubKey;
 			} else {
-				try {
-					InputStream is = c.get(authorizedKeys);
-					BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-					String existingKey;
-					while ((existingKey = reader.readLine()) != null) {
-						existingKey = existingKey.replace("\n", "").trim();
-						if (!appPubKey.equals(existingKey)) {
-							keyValue = keyValue + existingKey + "\n";
-						}
-					}
-					is.close();
-					reader.close();
-				} catch (SftpException ex) {
-					//ignore exception if file doesn't exist
+				if (existingKeys.indexOf(appPubKey) < 0) {
+					newKeys = existingKeys + "\n" + appPubKey;
+				}
+				else {
+					newKeys = existingKeys;
 				}
 			}
-			keyValue = keyValue + appPubKey + "\n";
 
-			InputStream inputStreamAuthKeyVal = new ByteArrayInputStream(keyValue.getBytes());
-			c.put(inputStreamAuthKeyVal, authorizedKeys);
-			c.chmod(Integer.parseInt("600",8), authorizedKeys);
+			if(!newKeys.equals(existingKeys)) {
+				log.info("Update Public Keys  ==> " + newKeys);
+				channel = session.openChannel("exec");
+				((ChannelExec) channel).setCommand("echo '" + newKeys + "' > " + authorizedKeys + " && chmod 600 " + authorizedKeys);
+				((ChannelExec) channel).setErrStream(System.err);
+				channel.setInputStream(null);
+				channel.connect(CHANNEL_TIMEOUT);
+				//disconnect
+				channel.disconnect();
+			}
 
 		} catch (Exception e) {
 			hostSystem.setErrorMsg(e.getMessage());
 			hostSystem.setStatusCd(HostSystem.GENERIC_FAIL_STATUS);
 		}
-		//exit
-		if (c != null) {
-			c.exit();
-		}
-		//disconnect
-		if (channel != null) {
-			channel.disconnect();
-		}
-
 		return hostSystem;
-
-
 	}
 
 	/**
