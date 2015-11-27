@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
+ * Copyright 2015 Sean Kavanagh - sean.p.kavanagh6@gmail.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,11 @@ package com.keybox.manage.action;
 
 
 import com.keybox.manage.db.ProfileDB;
-import com.keybox.manage.db.ProfileSystemsDB;
-import com.keybox.manage.db.SystemDB;
+import com.keybox.manage.db.UserDB;
+import com.keybox.manage.db.UserProfileDB;
 import com.keybox.manage.model.Profile;
 import com.keybox.manage.model.SortedSet;
+import com.keybox.manage.model.User;
 import com.keybox.manage.util.RefreshAuthKeyUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
@@ -28,46 +29,54 @@ import org.apache.struts2.convention.annotation.Result;
 import java.util.List;
 
 /**
- * Action to assign systems to profiles
+ * Action to assign users to profiles
  */
-public class ProfileSystemsAction extends ActionSupport {
+public class ProfileUsersAction extends ActionSupport {
 
     Profile profile;
     SortedSet sortedSet=new SortedSet();
-    List<Long> systemSelectId;
+    List<User> userList;
+    List<Long> userSelectId;
 
 
-    @Action(value = "/manage/viewProfileSystems",
+    @Action(value = "/manage/viewProfileUsers",
             results = {
-                    @Result(name = "success", location = "/manage/view_profile_systems.jsp")
+                    @Result(name = "success", location = "/manage/view_profile_users.jsp")
             }
     )
-    public String viewProfileSystems() {
+    public String viewProfileUsers() {
         if (profile != null && profile.getId() != null) {
             profile = ProfileDB.getProfile(profile.getId());
-            sortedSet = SystemDB.getSystemSet(sortedSet);
+            sortedSet = UserDB.getAdminUserSet(sortedSet);
+            userList = UserProfileDB.getUsersByProfile(profile.getId());
         }
         return SUCCESS;
     }
 
-
-    @Action(value = "/manage/assignSystemsToProfile",
+    @Action(value = "/manage/assignUsersToProfile",
             results = {
                     @Result(name = "success", location = "/manage/viewProfiles.action", type = "redirect")
             }
     )
     public String assignSystemsToProfile() {
 
-        if (systemSelectId != null) {
-            ProfileSystemsDB.setSystemsForProfile(profile.getId(), systemSelectId);
+        if (userSelectId!=null) {
+            UserProfileDB.setUsersForProfile(profile.getId(), userSelectId);
         }
         RefreshAuthKeyUtil.refreshProfileSystems(profile.getId());
         return SUCCESS;
     }
 
-
     public Profile getProfile() {
         return profile;
+    }
+
+    public List<Long> getUserSelectId() {
+        return userSelectId;
+    }
+
+    public void setUserSelectId(List<Long> userSelectId) {
+        this.userSelectId = userSelectId;
     }
 
     public void setProfile(Profile profile) {
@@ -81,12 +90,12 @@ public class ProfileSystemsAction extends ActionSupport {
     public void setSortedSet(SortedSet sortedSet) {
         this.sortedSet = sortedSet;
     }
-
-    public List<Long> getSystemSelectId() {
-        return systemSelectId;
+    public List<User> getUserList() {
+        return userList;
     }
 
-    public void setSystemSelectId(List<Long> systemSelectId) {
-        this.systemSelectId = systemSelectId;
+    public void setUserList(List<User> userList) {
+        this.userList = userList;
     }
+    
 }

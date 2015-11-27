@@ -107,16 +107,15 @@
                 <s:iterator var="profile" value="sortedSet.itemList" status="stat">
                     <tr>
                         <td>
-                            <a href="viewProfileSystems.action?profile.id=<s:property value="id"/>"
-                               title="Manage Systems in Profile">
-                                <s:property value="nm"/>
-                            </a>
+                            <s:property value="nm"/>
                         </td>
 
                         <td>
                             <div>
+                                <a href="viewProfileUsers.action?profile.id=<s:property value="id"/>">
+                                    <button id="user_assign_btn_<s:property value="id"/>" class="btn btn-default edit_btn spacer spacer-left">Assign Users</button></a>
                                 <a href="viewProfileSystems.action?profile.id=<s:property value="id"/>">
-                                    <button id="assign_btn_<s:property value="id"/>" class="btn btn-default edit_btn spacer spacer-left">Assign Systems</button></a>
+                                    <button id="system_assign_btn_<s:property value="id"/>" class="btn btn-default edit_btn spacer spacer-left">Assign Systems</button></a>
                                     <button class="btn btn-default spacer spacer-middle" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>">Edit</button>
                                     <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn spacer spacer-right">Delete</button>
                                 <div style="clear:both"/>

@@ -51,6 +51,7 @@ public class UserProfileDB {
             stmt.setLong(1, profileId);
             stmt.setLong(2, userId);
             stmt.execute();
+            DBUtils.closeStmt(stmt);
 
             stmt = con.prepareStatement("insert into user_map (profile_id, user_id) values (?,?)");
             stmt.setLong(1, profileId);
@@ -62,7 +63,42 @@ public class UserProfileDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeStmt(stmt);
+        DBUtils.closeConn(con);
+
+
+    }
+
+    /**
+     * sets users for profile
+     * 
+     * @param profileId profile id
+     * @param userIdList list of user ids
+     */
+    public static void setUsersForProfile(Long profileId, List<Long> userIdList) {
+        
+        Connection con = null;
+        PreparedStatement stmt = null;
+
+        try {
+            con = DBUtils.getConn();
+            stmt = con.prepareStatement("delete from user_map where profile_id=?");
+            stmt.setLong(1, profileId);
+            stmt.execute();
+            DBUtils.closeStmt(stmt);
+
+            for(Long userId : userIdList) {
+                stmt = con.prepareStatement("insert into user_map (profile_id, user_id) values (?,?)");
+                stmt.setLong(1, profileId);
+                stmt.setLong(2, userId);
+                stmt.execute();
+                DBUtils.closeStmt(stmt);
+            }
+            //delete all unassigned keys by profile
+            PublicKeyDB.deleteUnassignedKeysByProfile(con, profileId);
+
+        } catch (Exception e) {
+            log.error(e.toString(), e);
+        }
         DBUtils.closeConn(con);
 
 
@@ -87,11 +123,13 @@ public class UserProfileDB {
             stmt.execute();
             DBUtils.closeStmt(stmt);
 
+            //delete all unassigned keys by profile
+            PublicKeyDB.deleteUnassignedKeysByProfile(con, profileId);
+
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
         DBUtils.closeConn(con);
-
 
     }
 

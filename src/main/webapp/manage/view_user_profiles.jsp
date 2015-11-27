@@ -73,38 +73,23 @@
             </tr>
             </thead>
             <tbody>
-
-
             <s:iterator var="profile" value="user.profileList" status="stat">
                 <tr>
-
-
                     <td>
-                        <a href="viewProfileSystems.action?profile.id=<s:property value="id"/>"
-                           title="Manage Systems in Profile">
-                            <s:property value="nm"/>
-                        </a>
+                        <s:property value="nm"/>
                     </td>
 
                     <td>
-
+                        <a href="viewProfileUsers.action?profile.id=<s:property value="id"/>">
+                            <button id="user_assign_btn_<s:property value="id"/>" class="btn btn-default edit_btn spacer spacer-left">Assign Users</button></a>
                         <a href="viewProfileSystems.action?profile.id=<s:property value="id"/>">
-                            <div id="assign_btn_<s:property value="id"/>" class="btn btn-default edit_btn spacer spacer-left"
-                                 style="float:left">Assign Systems
-                            </div>
-                        </a>
-
+                            <button id="assign_btn_<s:property value="id"/>" class="btn btn-default edit_btn spacer spacer-left">Assign Systems</button></a>
                         <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn spacer spacer-right">Delete</button>
 
                     </td>
-
-
                 </tr>
-
             </s:iterator>
-
             </tbody>
-
 
         </table>
         </div>

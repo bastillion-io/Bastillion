@@ -136,10 +136,7 @@
                             <s:property value="username"/>
                          </s:if>
                          <s:else>
-                            <a href="viewUserProfiles.action?user.id=<s:property value="id"/>"
-                            title="Manage Profiles for User">
-                                <s:property value="username"/>
-                            </a>
+                            <s:property value="username"/>
                          </s:else>
                         </td>
                         <td>

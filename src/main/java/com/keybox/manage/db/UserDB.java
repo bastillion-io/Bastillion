@@ -90,6 +90,52 @@ public class UserDB {
         return sortedSet;
     }
 
+    /**
+     * returns all admin users based on sort order defined
+     * @param sortedSet object that defines sort order
+     * @return sorted user list
+     */
+    public static SortedSet getAdminUserSet(SortedSet sortedSet) {
+
+        ArrayList<User> userList = new ArrayList<User>();
+
+
+        String orderBy = "";
+        if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
+            orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
+        }
+        String sql = "select * from  users where enabled=true and user_type like '" + User.ADMINISTRATOR + "' " + orderBy;
+
+        Connection con = null;
+        try {
+            con = DBUtils.getConn();
+            PreparedStatement stmt = con.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                User user = new User();
+                user.setId(rs.getLong("id"));
+                user.setFirstNm(rs.getString("first_nm"));
+                user.setLastNm(rs.getString("last_nm"));
+                user.setEmail(rs.getString("email"));
+                user.setUsername(rs.getString("username"));
+                user.setPassword(rs.getString("password"));
+                user.setAuthType(rs.getString("auth_type"));
+                user.setUserType(rs.getString("user_type"));
+                userList.add(user);
+
+            }
+            DBUtils.closeRs(rs);
+            DBUtils.closeStmt(stmt);
+
+        } catch (Exception e) {
+            log.error(e.toString(), e);
+        }
+        DBUtils.closeConn(con);
+
+        sortedSet.setItemList(userList);
+        return sortedSet;
+    }
+
 
     /**
      * returns user base on id

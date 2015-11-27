@@ -32,54 +32,35 @@ import org.slf4j.LoggerFactory;
 public class ProfileSystemsDB {
 
     private static Logger log = LoggerFactory.getLogger(ProfileSystemsDB.class);
+	
+	
 	/**
-	 * adds a host system to profile
-	 *
+	 * sets host systems for profile
+	 * 
 	 * @param profileId profile id
-	 * @param systemId  host system id
+	 * @param systemIdList list of host system ids
 	 */
-	public static void addSystemToProfile(Long profileId, Long systemId) {
+	public static void setSystemsForProfile(Long profileId, List<Long> systemIdList) {
 
 
 		Connection con = null;
 
 		try {
-			con = DBUtils.getConn();
 
-
-			PreparedStatement stmt = con.prepareStatement("insert into system_map (profile_id, system_id) values (?,?)");
-			stmt.setLong(1, profileId);
-			stmt.setLong(2, systemId);
-
-			stmt.execute();
-			DBUtils.closeStmt(stmt);
-
-		} catch (Exception e) {
-			log.error(e.toString(), e);
-		}
-		DBUtils.closeConn(con);
-
-
-	}
-
-	/**
-	 * deletes all systems for a given profile
-	 *
-	 * @param profileId profile id
-	 */
-	public static void deleteAllSystemsFromProfile(Long profileId) {
-
-
-		Connection con = null;
-
-
-		try {
 			con = DBUtils.getConn();
 			PreparedStatement stmt = con.prepareStatement("delete from system_map where profile_id=?");
 			stmt.setLong(1, profileId);
-
 			stmt.execute();
 			DBUtils.closeStmt(stmt);
+
+
+			for(Long systemId : systemIdList) {
+				stmt = con.prepareStatement("insert into system_map (profile_id, system_id) values (?,?)");
+				stmt.setLong(1, profileId);
+				stmt.setLong(2, systemId);
+				stmt.execute();
+				DBUtils.closeStmt(stmt);
+			}
 
 		} catch (Exception e) {
 			log.error(e.toString(), e);
@@ -88,7 +69,6 @@ public class ProfileSystemsDB {
 
 
 	}
-
 
 	/**
 	 * returns a list of systems for a given profile

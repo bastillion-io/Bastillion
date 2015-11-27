@@ -50,7 +50,46 @@ public class PublicKeyDB {
     public static final String SORT_BY_CREATE_DT= "create_dt";
     public static final String SORT_BY_USERNAME= "username";
 
+    /**
+     * Deletes all SSH keys for users that are not assigned in a profile
+     *
+     * @param con DB connection
+     * @param userId user id
+     */
+    public static void deleteUnassignedKeysByUser(Connection con, Long userId){
 
+        try {
+            PreparedStatement stmt = con.prepareStatement("delete from public_keys where (profile_id is null or profile_id not in (select profile_id from user_map where user_id=?)) and user_id=?");
+            stmt.setLong(1, userId);
+            stmt.setLong(2, userId);
+            stmt.execute();
+            DBUtils.closeStmt(stmt);
+
+        } catch (Exception e) {
+            log.error(e.toString(), e);
+        }
+    }
+
+    /**
+     * Deletes all SSH keys for users that are not assigned in a profile
+     *
+     * @param con DB connection
+     * @param profileId profile id
+     */
+    public static void deleteUnassignedKeysByProfile(Connection con, Long profileId){
+
+        try {
+            PreparedStatement stmt = con.prepareStatement("delete from public_keys where profile_id=? and user_id not in (select user_id from user_map where profile_id=?)");
+            stmt.setLong(1, profileId);
+            stmt.setLong(2, profileId);
+            stmt.execute();
+            DBUtils.closeStmt(stmt);
+
+        } catch (Exception e) {
+            log.error(e.toString(), e);
+        }
+    }
+    
     /**
      * disables SSH key
      *
@@ -430,7 +469,7 @@ public class PublicKeyDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("delete from public_keys where profile_id=? and enabled=true");
+            PreparedStatement stmt = con.prepareStatement("delete from public_keys where profile_id=?");
             stmt.setLong(1, profileId);
             stmt.execute();
             DBUtils.closeStmt(stmt);

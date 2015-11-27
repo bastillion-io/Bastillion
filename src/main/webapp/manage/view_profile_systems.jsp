@@ -25,14 +25,12 @@
     <script type="text/javascript">
         $(document).ready(function() {
 
-
-
             //open add dialog
             $("#assign_sys").button().click(function() {
                 $('#assignSystemsToProfile').submit();
             });
 
-            //select all check boxs
+            //select all check boxes
             $("#assignSystemsToProfile_systemSelectAll").click(function() {
 
                 if ($(this).is(':checked')) {
@@ -42,7 +40,7 @@
                 }
             });
 
-               $(".sort,.sortAsc,.sortDesc").click(function() {
+            $(".sort,.sortAsc,.sortDesc").click(function() {
                 var id = $(this).attr('id')
 
                 if ($('#viewProfileSystems_sortedSet_orderByDirection').attr('value') == 'asc') {
@@ -138,9 +136,6 @@
         <s:else>
             <div class="error">There are no systems defined (<a href="viewSystems.action">Manage Systems</a>).</div>
         </s:else>
-
-
-
 
     </div>
 
