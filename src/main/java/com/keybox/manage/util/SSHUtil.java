@@ -167,7 +167,12 @@ public class SSHUtil {
 		if (StringUtils.isEmpty(AppConfig.getProperty("privateKey")) || StringUtils.isEmpty(AppConfig.getProperty("publicKey"))) {
 
 			//set key type
-			int type = KEY_TYPE.equals("rsa") ? KeyPair.RSA : KeyPair.DSA;
+			int type = KeyPair.RSA;
+			if(SSHUtil.KEY_TYPE.equals("dsa")) {
+				type = KeyPair.DSA;
+			} else if(SSHUtil.KEY_TYPE.equals("ecdsa")) {
+				type = KeyPair.ECDSA;
+			}
 			String comment = "keybox@global_key";
 
 			JSch jsch = new JSch();
@@ -623,6 +628,8 @@ public class SSHUtil {
 						keyType="DSA";
 					} else if (KeyPair.RSA == type){
 						keyType="RSA";
+					} else if (KeyPair.ECDSA == type){
+						keyType="ECDSA";
 					} else if(KeyPair.UNKNOWN ==type){
 						keyType="UNKNOWN";
 					} else if(KeyPair.ERROR == type){

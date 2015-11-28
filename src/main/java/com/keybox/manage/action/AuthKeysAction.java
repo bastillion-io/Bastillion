@@ -228,7 +228,12 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 	public String generateUserKey(String username, String keyname) {
 
 		//set key type
-		int type = SSHUtil.KEY_TYPE.equals("rsa") ? KeyPair.RSA : KeyPair.DSA;
+		int type = KeyPair.RSA;
+		if(SSHUtil.KEY_TYPE.equals("dsa")) {
+			type = KeyPair.DSA;
+		} else if(SSHUtil.KEY_TYPE.equals("ecdsa")) {
+			type = KeyPair.ECDSA;
+		}
 
 		JSch jsch = new JSch();
 				
