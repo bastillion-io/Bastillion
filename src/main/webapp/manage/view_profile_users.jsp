@@ -106,8 +106,6 @@
                         <th><s:checkbox name="userSelectAll" cssClass="userSelect" theme="simple"/></th>
                         <th id="<s:property value="@com.keybox.manage.db.UserDB@SORT_BY_USERNAME"/>" class="sort">Username
                         </th>
-                        <th id="<s:property value="@com.keybox.manage.db.UserDB@SORT_BY_USER_TYPE"/>" class="sort">User Type
-                        </th>
                         <s:if test="%{@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}">
                             <th id="<s:property value="@com.keybox.manage.db.UserDB@SORT_BY_AUTH_TYPE"/>" class="sort">Auth Type
                             </th>
@@ -136,14 +134,6 @@
                                 </s:if>
                                 <s:else>
                                     <s:property value="username"/>
-                                </s:else>
-                            </td>
-                            <td>
-                                <s:if test="userType==\"A\"">
-                                    Administrative Only
-                                </s:if>
-                                <s:else>
-                                    Full Access
                                 </s:else>
                             </td>
                             <s:if test="%{@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}">

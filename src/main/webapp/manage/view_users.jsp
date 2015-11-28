@@ -168,11 +168,6 @@
                                         <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn spacer spacer-middle">Delete</button>
                                     </s:if>
 
-                                <s:if test="userType==\"A\"">
-                                    <a href="viewUserProfiles.action?user.id=<s:property value="id"/>">
-                                        <button id="profile_btn_<s:property value="id"/>" class="btn btn-default edit_btn spacer spacer-right">Assign Profiles</button>
-                                    </a>
-                                </s:if>
                                 <div style="clear:both"></div>
                                 </div>
                             </td>
