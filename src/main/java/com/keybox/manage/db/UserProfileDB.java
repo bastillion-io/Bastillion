@@ -35,40 +35,6 @@ public class UserProfileDB {
     private static Logger log = LoggerFactory.getLogger(UserProfileDB.class);
 
     /**
-     * add profile for given user
-     * @param profileId profile id
-     * @param userId user id
-     */
-    public static void addProfileToUser(Long profileId, Long userId) {
-
-
-        Connection con = null;
-        PreparedStatement stmt = null;
-
-        try {
-            con = DBUtils.getConn();
-            stmt = con.prepareStatement("delete from user_map where profile_id=? and user_id=?");
-            stmt.setLong(1, profileId);
-            stmt.setLong(2, userId);
-            stmt.execute();
-            DBUtils.closeStmt(stmt);
-
-            stmt = con.prepareStatement("insert into user_map (profile_id, user_id) values (?,?)");
-            stmt.setLong(1, profileId);
-            stmt.setLong(2, userId);
-            stmt.execute();
-
-            DBUtils.closeStmt(stmt);
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
-        }
-        DBUtils.closeConn(con);
-
-
-    }
-
-    /**
      * sets users for profile
      * 
      * @param profileId profile id
@@ -103,36 +69,6 @@ public class UserProfileDB {
 
 
     }
-
-    /**
-     * delete profile for given user
-     * @param profileId profile id
-     * @param userId  user id
-     */
-    public static void deleteProfileFromUser(Long profileId, Long userId) {
-
-
-        Connection con = null;
-
-        try {
-            con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("delete from user_map where profile_id=? and user_id=?");
-            stmt.setLong(1, profileId);
-            stmt.setLong(2, userId);
-
-            stmt.execute();
-            DBUtils.closeStmt(stmt);
-
-            //delete all unassigned keys by profile
-            PublicKeyDB.deleteUnassignedKeysByProfile(con, profileId);
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
-        }
-        DBUtils.closeConn(con);
-
-    }
-
 
     /**
      * return a list of profiles for user
