@@ -86,7 +86,7 @@
 
         <h3>Manage System Profiles</h3>
 
-        <p>Add / Delete profiles or select a profile below to assign systems to that profile.</p>
+        <p>Add / Delete profiles or assign users and systems to that profile.</p>
 
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">

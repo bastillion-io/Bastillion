@@ -100,7 +100,7 @@
 
         <h3>Manage Users</h3>
 
-        <p>Add / Delete users or select a user below to assign profile</p>
+        <p>Add / Delete users below so that system profiles may be set for users (<a href="viewProfiles.action">Manage Profiles</a>).</p>
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
             <div class="scrollWrapper">
