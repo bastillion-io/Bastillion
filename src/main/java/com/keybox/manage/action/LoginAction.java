@@ -98,14 +98,14 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
                 if (otpEnabled) {
                     sharedSecret = AuthDB.getSharedSecret(user.getId());
                     if (StringUtils.isNotEmpty(sharedSecret) && (auth.getOtpToken() == null || !OTPUtil.verifyToken(sharedSecret, auth.getOtpToken()))) {
-                        loginAuditLogger.info(clientIP + " " + AUTH_ERROR);
+                        loginAuditLogger.info(auth.getUsername() + " (" + clientIP + ") - "  + AUTH_ERROR);
                         addActionError(AUTH_ERROR);
                         return INPUT;
                     }
                 }
                 //check to see if admin has any assigned profiles
                 if(!User.MANAGER.equals(user.getUserType()) && (user.getProfileList()==null || user.getProfileList().size()<=0)){
-                    loginAuditLogger.info(clientIP + " " + AUTH_ERROR_NO_PROFILE);
+                    loginAuditLogger.info(auth.getUsername() + " (" + clientIP + ") - " + AUTH_ERROR_NO_PROFILE);
                     addActionError(AUTH_ERROR_NO_PROFILE);
                     return INPUT;
                 }
@@ -121,11 +121,11 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
                 } else if ("changeme".equals(auth.getPassword())  && Auth.AUTH_BASIC.equals(user.getAuthType())) {
                     retVal = "change_password";
                 }
-                loginAuditLogger.info(clientIP + " Authentication Success");
+                loginAuditLogger.info(auth.getUsername() + " (" + clientIP + ") - Authentication Success");
             }
 
         } else {
-            loginAuditLogger.info(clientIP + " " + AUTH_ERROR);
+            loginAuditLogger.info(auth.getUsername() + " (" + clientIP + ") - " + AUTH_ERROR);
             addActionError(AUTH_ERROR);
             retVal = INPUT;
         }
