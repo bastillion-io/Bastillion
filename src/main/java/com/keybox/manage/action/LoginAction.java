@@ -82,7 +82,11 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 
         String authToken = AuthDB.login(auth);
 
-        String clientIP = servletRequest.getHeader("X-FORWARDED-FOR");
+        //get client IP
+        String clientIP = null;
+        if (StringUtils.isNotEmpty(AppConfig.getProperty("clientIPHeader"))) {
+            clientIP = servletRequest.getHeader(AppConfig.getProperty("clientIPHeader"));
+        }
         if (StringUtils.isEmpty(clientIP)) {
             clientIP = servletRequest.getRemoteAddr();
         }
