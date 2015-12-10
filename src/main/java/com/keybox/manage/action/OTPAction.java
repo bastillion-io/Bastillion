@@ -82,6 +82,10 @@ public class OTPAction extends ActionSupport implements ServletRequestAware, Ser
     public String otpSubmit() {
 
         AuthDB.updateSharedSecret(sharedSecret, AuthUtil.getAuthToken(servletRequest.getSession()));
+
+        if (requireOTP) {
+            AuthUtil.deleteAllSession(servletRequest.getSession());
+        }
         return SUCCESS;
 
     }
@@ -130,10 +134,6 @@ public class OTPAction extends ActionSupport implements ServletRequestAware, Ser
             
         } catch (Exception ex) {
             log.error(ex.toString(), ex);
-        }
-
-        if (requireOTP) {
-            AuthUtil.deleteAllSession(servletRequest.getSession());
         }
 
         return null;
