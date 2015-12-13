@@ -210,6 +210,5 @@ Donate
 Dontations are always welcome!
 
 <span class="badge-paypal"><a href="https://www.paypal.me/SKavanagh" title="Donate to this project using Paypal"><img src="https://img.shields.io/badge/paypal-donate-yellow.svg" alt="PayPal donate button" /></a></span>
-
 <span class="badge-bitcoin"><a href="https://www.coinbase.com/checkouts/e188c5eab8f5f0ed955cf4ecb0c4b569" title="Donate once-off to this project using Bitcoin"><img src="https://img.shields.io/badge/bitcoin-donate-yellow.svg" alt="Bitcoin donate button" /></a></span>
 
