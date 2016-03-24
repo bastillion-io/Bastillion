@@ -231,6 +231,7 @@ public class SSHUtil {
 				session.setPassword(password);
 			}
 			session.setConfig("StrictHostKeyChecking", "no");
+			session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
 			session.setServerAliveInterval(SERVER_ALIVE_INTERVAL);
 			session.connect(SESSION_TIMEOUT);
 
@@ -459,6 +460,7 @@ public class SSHUtil {
 				session.setPassword(password);
 			}
 			session.setConfig("StrictHostKeyChecking", "no");
+			session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
 			session.setServerAliveInterval(SERVER_ALIVE_INTERVAL);
 			session.connect(SESSION_TIMEOUT);
 			Channel channel = session.openChannel("shell");
