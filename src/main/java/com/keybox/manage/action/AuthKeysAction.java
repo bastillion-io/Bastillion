@@ -229,9 +229,9 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 
 		//set key type
 		int type = KeyPair.RSA;
-		if(SSHUtil.KEY_TYPE.equals("dsa")) {
+		if("dsa".equals(SSHUtil.KEY_TYPE)) {
 			type = KeyPair.DSA;
-		} else if(SSHUtil.KEY_TYPE.equals("ecdsa")) {
+		} else if("ecdsa".equals(SSHUtil.KEY_TYPE)) {
 			type = KeyPair.ECDSA;
 		}
 
