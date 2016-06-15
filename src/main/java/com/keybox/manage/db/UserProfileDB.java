@@ -34,6 +34,9 @@ public class UserProfileDB {
 
     private static Logger log = LoggerFactory.getLogger(UserProfileDB.class);
 
+    private UserProfileDB() {
+    }
+
     /**
      * sets users for profile
      * 

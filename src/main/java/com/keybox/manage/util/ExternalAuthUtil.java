@@ -51,8 +51,10 @@ public class ExternalAuthUtil {
             System.setProperty("java.security.auth.login.config", ExternalAuthUtil.class.getClassLoader().getResource(".").getPath() + JAAS_CONF);
         }
     }
-    
-   
+
+    private ExternalAuthUtil() {
+    }
+
 
     /**
      * external auth login method

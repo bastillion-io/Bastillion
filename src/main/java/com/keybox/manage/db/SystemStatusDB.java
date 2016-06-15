@@ -39,6 +39,9 @@ public class SystemStatusDB {
 
     private static Logger log = LoggerFactory.getLogger(SystemStatusDB.class);
 
+    private SystemStatusDB() {
+    }
+
 
     /**
      * set the initial status for selected systems

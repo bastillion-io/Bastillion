@@ -50,6 +50,9 @@ public class PublicKeyDB {
     public static final String SORT_BY_CREATE_DT= "create_dt";
     public static final String SORT_BY_USERNAME= "username";
 
+    private PublicKeyDB() {
+    }
+
     /**
      * Deletes all SSH keys for users that are not assigned in a profile
      *

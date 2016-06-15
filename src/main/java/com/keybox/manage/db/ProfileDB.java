@@ -37,6 +37,9 @@ public class ProfileDB {
 
     public static final String SORT_BY_PROFILE_NM="nm";
 
+    private ProfileDB() {
+    }
+
     /**
      * method to do order by based on the sorted set object for profiles
      * @return list of profiles

@@ -43,6 +43,9 @@ public class SystemDB {
 	public static final String SORT_BY_HOST = "host";
 	public static final String SORT_BY_STATUS = "status_cd";
 
+	private SystemDB() {
+	}
+
 
 	/**
 	 * method to do order by based on the sorted set object for systems for user

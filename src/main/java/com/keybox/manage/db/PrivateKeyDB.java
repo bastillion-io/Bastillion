@@ -32,6 +32,9 @@ public class PrivateKeyDB {
 
     private static Logger log = LoggerFactory.getLogger(PrivateKeyDB.class);
 
+    private PrivateKeyDB() {
+    }
+
     /**
      * returns public private key for application
      * @return app key values

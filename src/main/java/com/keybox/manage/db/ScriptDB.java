@@ -36,6 +36,9 @@ public class ScriptDB {
 
     public static final String SORT_BY_DISPLAY_NM="display_nm";
 
+    private ScriptDB() {
+    }
+
 
     /**
      * returns scripts based on sort order defined
