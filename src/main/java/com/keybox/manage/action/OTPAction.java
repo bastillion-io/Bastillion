@@ -106,7 +106,7 @@ public class OTPAction extends ActionSupport implements ServletRequestAware, Ser
 
             QRCodeWriter qrWriter = new QRCodeWriter();
 
-            Hashtable<EncodeHintType, String> hints = new Hashtable<EncodeHintType, String>();
+            Hashtable<EncodeHintType, String> hints = new Hashtable<>();
             hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
 
 

@@ -43,7 +43,7 @@ public class ProfileDB {
      */
     public static SortedSet getProfileSet(SortedSet sortedSet) {
 
-        ArrayList<Profile> profileList = new ArrayList<Profile>();
+        ArrayList<Profile> profileList = new ArrayList<>();
 
         String orderBy = "";
         if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
@@ -85,7 +85,7 @@ public class ProfileDB {
      */
     public static List<Profile> getAllProfiles() {
 
-        ArrayList<Profile> profileList = new ArrayList<Profile>();
+        ArrayList<Profile> profileList = new ArrayList<>();
         Connection con = null;
         try {
             con = DBUtils.getConn();

@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class UserSchSessions {
 
-    Map<Integer, SchSession> schSessionMap = new ConcurrentHashMap<Integer, SchSession>();
+    Map<Integer, SchSession> schSessionMap = new ConcurrentHashMap<>();
 
 
     public Map<Integer, SchSession> getSchSessionMap() {

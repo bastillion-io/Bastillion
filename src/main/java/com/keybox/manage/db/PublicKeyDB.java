@@ -176,7 +176,7 @@ public class PublicKeyDB {
      */
     public static SortedSet getPublicKeySet(SortedSet sortedSet) {
 
-        ArrayList<PublicKey> publicKeysList = new ArrayList<PublicKey>();
+        ArrayList<PublicKey> publicKeysList = new ArrayList<>();
 
 
         String orderBy = "";
@@ -243,7 +243,7 @@ public class PublicKeyDB {
      */
     public static SortedSet getPublicKeySet(SortedSet sortedSet, Long userId) {
 
-        ArrayList<PublicKey> publicKeysList = new ArrayList<PublicKey>();
+        ArrayList<PublicKey> publicKeysList = new ArrayList<>();
 
 
         String orderBy = "";
@@ -485,7 +485,7 @@ public class PublicKeyDB {
     public static List<String> getPublicKeysForSystem(Long systemId) {
 
         Connection con = null;
-        List<String> publicKeyList = new ArrayList<String>();
+        List<String> publicKeyList = new ArrayList<>();
         try {
             con = DBUtils.getConn();
 
@@ -502,7 +502,7 @@ public class PublicKeyDB {
     }
 
     public static List<String> getPublicKeysForSystem(Connection con, Long systemId) {
-        List<String> publicKeyList = new ArrayList<String>();
+        List<String> publicKeyList = new ArrayList<>();
 
         if(systemId==null){
             systemId=-99L;

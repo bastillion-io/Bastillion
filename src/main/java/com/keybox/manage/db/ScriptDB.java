@@ -45,7 +45,7 @@ public class ScriptDB {
      */
     public static SortedSet getScriptSet(SortedSet sortedSet, Long userId) {
 
-        ArrayList<Script> scriptList = new ArrayList<Script>();
+        ArrayList<Script> scriptList = new ArrayList<>();
 
 
         String orderBy = "";
