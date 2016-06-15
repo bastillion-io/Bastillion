@@ -106,7 +106,7 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 				DBUtils.closeStmt(pStmt);
 
 				//generate new key and insert passphrase
-				System.out.println("Setting KeyBox SSH public/private key pair");
+				log.info("Setting KeyBox SSH public/private key pair");
 
 				//generate application pub/pvt key and get values
 				String passphrase = SSHUtil.keyGen();
@@ -121,8 +121,8 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 				pStmt.execute();
 				DBUtils.closeStmt(pStmt);
 
-				System.out.println("KeyBox Generated Global Public Key:");
-				System.out.println(publicKey);
+				log.info("KeyBox Generated Global Public Key:");
+				log.info(publicKey);
 
 				passphrase = null;
 				publicKey = null;
