@@ -38,7 +38,7 @@ public class SessionOutputUtil {
 
     private static Logger log = LoggerFactory.getLogger(SessionOutputUtil.class);
 
-    private static Map<Long, UserSessionsOutput> userSessionsOutputMap = new ConcurrentHashMap<Long, UserSessionsOutput>();
+    private static Map<Long, UserSessionsOutput> userSessionsOutputMap = new ConcurrentHashMap<>();
     public static boolean enableInternalAudit = "true".equals(AppConfig.getProperty("enableInternalAudit"));
     private static Gson gson = new GsonBuilder().registerTypeAdapter(AuditWrapper.class, new SessionOutputSerializer()).create();
     private static Logger systemAuditLogger = LoggerFactory.getLogger("com.keybox.manage.util.SystemAudit");
@@ -116,7 +116,7 @@ public class SessionOutputUtil {
      * @return session output list
      */
     public static List<SessionOutput> getOutput(Connection con, Long sessionId, User user) {
-        List<SessionOutput> outputList = new ArrayList<SessionOutput>();
+        List<SessionOutput> outputList = new ArrayList<>();
 
         UserSessionsOutput userSessionsOutput = userSessionsOutputMap.get(sessionId);
         if (userSessionsOutput != null) {

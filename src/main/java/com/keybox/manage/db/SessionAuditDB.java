@@ -94,7 +94,7 @@ public class SessionAuditDB {
     public static SortedSet getSessions(SortedSet sortedSet) {
         //get db connection
         Connection con = null;
-        List<SessionAudit> outputList = new LinkedList<SessionAudit>();
+        List<SessionAudit> outputList = new LinkedList<>();
 
         String orderBy = "";
         if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
@@ -290,7 +290,7 @@ public class SessionAuditDB {
      */
     public static List<SessionOutput> getTerminalLogsForSession(Connection con, Long sessionId, Integer instanceId) {
 
-        List<SessionOutput> outputList = new LinkedList<SessionOutput>();
+        List<SessionOutput> outputList = new LinkedList<>();
         try {
             PreparedStatement stmt = con.prepareStatement("select * from terminal_log where instance_id=? and session_id=? order by log_tm asc");
             stmt.setLong(1, instanceId);
@@ -336,7 +336,7 @@ public class SessionAuditDB {
      */
     public static List<HostSystem> getHostSystemsForSession(Connection con, Long sessionId) {
 
-        List<HostSystem> hostSystemList = new ArrayList<HostSystem>();
+        List<HostSystem> hostSystemList = new ArrayList<>();
         try {
             PreparedStatement stmt = con.prepareStatement("select distinct instance_id, system_id from terminal_log where session_id=?");
             stmt.setLong(1, sessionId);

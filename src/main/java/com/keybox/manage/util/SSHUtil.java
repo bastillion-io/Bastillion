@@ -114,7 +114,7 @@ public class SSHUtil {
 
 
 		//get passphrase cmd from properties file
-		Map<String, String> replaceMap = new HashMap<String, String>();
+		Map<String, String> replaceMap = new HashMap<>();
 		replaceMap.put("randomPassphrase", UUID.randomUUID().toString());
 
 		String passphrase = AppConfig.getProperty("defaultSSHPassphrase", replaceMap);
