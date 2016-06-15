@@ -215,7 +215,6 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
                         schSession.setInputToChannel(null);
                         schSession.setCommander(null);
                         schSession.setOutFromChannel(null);
-                        schSession = null;
                     }
                     //remove from map
                     userSchSessions.getSchSessionMap().remove(id);

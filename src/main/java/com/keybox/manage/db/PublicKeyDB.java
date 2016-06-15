@@ -206,7 +206,7 @@ public class PublicKeyDB {
                 stmt.setLong(i++, Long.valueOf(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID)));
             }
             if(StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_ENABLED))){
-                stmt.setBoolean(i++, Boolean.valueOf(sortedSet.getFilterMap().get(FILTER_BY_ENABLED)));
+                stmt.setBoolean(i, Boolean.valueOf(sortedSet.getFilterMap().get(FILTER_BY_ENABLED)));
             }
             ResultSet rs = stmt.executeQuery();
 

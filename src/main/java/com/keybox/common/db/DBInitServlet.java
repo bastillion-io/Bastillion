@@ -124,10 +124,6 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 				System.out.println("KeyBox Generated Global Public Key:");
 				System.out.println(publicKey);
 
-				passphrase = null;
-				publicKey = null;
-				privateKey = null;
-
 				//set config to default
 				AppConfig.updateProperty("publicKey", "");
 				AppConfig.updateProperty("privateKey", "");
