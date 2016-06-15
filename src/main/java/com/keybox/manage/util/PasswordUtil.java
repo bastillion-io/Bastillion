@@ -32,7 +32,10 @@ public class PasswordUtil {
 
         private static Pattern pattern = Pattern.compile(PASSWORD_REGEX);
 
-        /**
+    private PasswordUtil() {
+    }
+
+    /**
          * Validation to ensure strong password
          *
          * @param password password 

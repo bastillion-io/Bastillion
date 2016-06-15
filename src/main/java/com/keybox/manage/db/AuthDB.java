@@ -36,6 +36,9 @@ public class AuthDB {
 
     private static Logger log = LoggerFactory.getLogger(AuthDB.class);
 
+    private AuthDB() {
+    }
+
     /**
      * auth user and return auth token if valid auth
      *

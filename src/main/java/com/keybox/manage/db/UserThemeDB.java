@@ -32,6 +32,9 @@ public class UserThemeDB {
 
     private static Logger log = LoggerFactory.getLogger(UserThemeDB.class);
 
+    private UserThemeDB() {
+    }
+
     /**
      * get user theme
      *

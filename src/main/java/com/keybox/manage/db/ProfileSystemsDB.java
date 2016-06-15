@@ -32,8 +32,11 @@ import org.slf4j.LoggerFactory;
 public class ProfileSystemsDB {
 
     private static Logger log = LoggerFactory.getLogger(ProfileSystemsDB.class);
-	
-	
+
+	private ProfileSystemsDB() {
+	}
+
+
 	/**
 	 * sets host systems for profile
 	 * 

@@ -29,6 +29,9 @@ public class DBUtils {
 
     private static Logger log = LoggerFactory.getLogger(DBUtils.class);
 
+    private DBUtils() {
+    }
+
     /**
      * returns DB connection
      *

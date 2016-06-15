@@ -51,6 +51,9 @@ public class SessionAuditDB {
     public static final String SORT_BY_USERNAME = "username";
     public static final String SORT_BY_SESSION_TM = "session_tm";
 
+    private SessionAuditDB() {
+    }
+
 
     /**
      * deletes audit history for users if after time set in properties file

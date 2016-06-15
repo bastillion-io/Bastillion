@@ -57,6 +57,9 @@ public class SSHUtil {
 	public static final int SESSION_TIMEOUT = 60000;
 	public static final int CHANNEL_TIMEOUT = 60000;
 
+	private SSHUtil() {
+	}
+
 	/**
 	 * returns the system's public key
 	 *

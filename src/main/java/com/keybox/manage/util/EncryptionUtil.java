@@ -35,6 +35,9 @@ public class EncryptionUtil {
     //secret key
     private static final byte[] key = new byte[]{'d', '3', '2', 't', 'p', 'd', 'M', 'o', 'I', '8', 'x', 'z', 'a', 'P', 'o', 'd'};
 
+    private EncryptionUtil() {
+    }
+
     /**
      * generate salt for hash
      *
