@@ -42,14 +42,16 @@ public class SessionAuditDB {
 
     private static Logger log = LoggerFactory.getLogger(SessionAuditDB.class);
 
-    public static final String FILTER_BY_USER_ID = "user_id";
+    public static final String USER_ID = "user_id";
+    public static final String FILTER_BY_USER_ID = USER_ID;
     public static final String FILTER_BY_SYSTEM_ID = "system_id";
     
     public static final String SORT_BY_FIRST_NM = "first_nm";
     public static final String SORT_BY_LAST_NM = "last_nm";
     public static final String SORT_BY_EMAIL = "email";
     public static final String SORT_BY_USERNAME = "username";
-    public static final String SORT_BY_SESSION_TM = "session_tm";
+    public static final String SESSION_TM = "session_tm";
+    public static final String SORT_BY_SESSION_TM = SESSION_TM;
 
 
     /**
@@ -126,8 +128,8 @@ public class SessionAuditDB {
             while (rs.next()) {
                 SessionAudit sessionAudit = new SessionAudit();
                 sessionAudit.setId(rs.getLong("session_log.id"));
-                sessionAudit.setSessionTm(rs.getTimestamp("session_tm"));
-                sessionAudit.setUser(UserDB.getUser(con, rs.getLong("user_id")));
+                sessionAudit.setSessionTm(rs.getTimestamp(SESSION_TM));
+                sessionAudit.setUser(UserDB.getUser(con, rs.getLong(USER_ID)));
                 outputList.add(sessionAudit);
 
 
@@ -379,8 +381,8 @@ public class SessionAuditDB {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 sessionAudit.setId(rs.getLong("session_log.id"));
-                sessionAudit.setSessionTm(rs.getTimestamp("session_tm"));
-                sessionAudit.setUser(UserDB.getUser(con, rs.getLong("user_id")));
+                sessionAudit.setSessionTm(rs.getTimestamp(SESSION_TM));
+                sessionAudit.setUser(UserDB.getUser(con, rs.getLong(USER_ID)));
                 sessionAudit.setHostSystemList(getHostSystemsForSession(con, sessionId));
 
 

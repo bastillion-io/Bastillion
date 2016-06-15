@@ -46,7 +46,10 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("unchecked")
 public class AuthKeysAction extends ActionSupport implements ServletRequestAware, ServletResponseAware {
 
-    private static Logger log = LoggerFactory.getLogger(AuthKeysAction.class);
+	public static final String REQUIRED = "Required";
+	public static final String INVALID = "Invalid";
+	public static final String PUBLIC_KEY_PUBLIC_KEY = "publicKey.publicKey";
+	private static Logger log = LoggerFactory.getLogger(AuthKeysAction.class);
 
 	HttpServletRequest servletRequest;
 	HttpServletResponse servletResponse;
@@ -272,7 +275,7 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 		if (publicKey == null
 				|| publicKey.getKeyNm() == null
 				|| publicKey.getKeyNm().trim().equals("")) {
-			addFieldError("publicKey.keyNm", "Required");
+			addFieldError("publicKey.keyNm", REQUIRED);
 			
 		} 
 		
@@ -286,11 +289,11 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 				
 				if (publicKey.getPassphrase() == null ||
 						publicKey.getPassphrase().trim().equals("")) {
-					addFieldError("publicKey.passphrase", "Required");
+					addFieldError("publicKey.passphrase", REQUIRED);
 				}
 				else if (publicKey.getPassphraseConfirm() == null ||
 						publicKey.getPassphraseConfirm().trim().equals("")) {
-					addFieldError("publicKey.passphraseConfirm", "Required");
+					addFieldError("publicKey.passphraseConfirm", REQUIRED);
 				}
 				else if(!publicKey.getPassphrase().equals(publicKey.getPassphraseConfirm())) {
 					addActionError("Passphrases do not match");
@@ -304,18 +307,18 @@ public class AuthKeysAction extends ActionSupport implements ServletRequestAware
 			}
 			
 			if( publicKey.getPublicKey() == null || publicKey.getPublicKey().trim().equals("")) {
-				addFieldError("publicKey.publicKey", "Required");
+				addFieldError(PUBLIC_KEY_PUBLIC_KEY, REQUIRED);
 			
 			} else if (SSHUtil.getFingerprint(publicKey.getPublicKey()) == null || SSHUtil.getKeyType(publicKey.getPublicKey()) == null) {
-				addFieldError("publicKey.publicKey", "Invalid");
+				addFieldError(PUBLIC_KEY_PUBLIC_KEY, INVALID);
 
 			} else if (PublicKeyDB.isKeyDisabled(SSHUtil.getFingerprint(publicKey.getPublicKey()))) {
 				addActionError("This key has been disabled. Please generate and set a new public key.");
-				addFieldError("publicKey.publicKey", "Invalid");
+				addFieldError(PUBLIC_KEY_PUBLIC_KEY, INVALID);
 
 			} else if (PublicKeyDB.isKeyRegistered(userId, publicKey)) {
 				addActionError("This key has already been registered under selected profile.");
-				addFieldError("publicKey.publicKey", "Invalid");
+				addFieldError(PUBLIC_KEY_PUBLIC_KEY, INVALID);
 
 			}
 		}

@@ -36,6 +36,7 @@ import java.util.List;
  */
 public class SystemAction extends ActionSupport implements ServletRequestAware {
 
+    public static final String REQUIRED = "Required";
     SortedSet sortedSet = new SortedSet();
     HostSystem hostSystem = new HostSystem();
     Script script = null;
@@ -123,21 +124,21 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
         if (hostSystem == null
                 || hostSystem.getDisplayNm() == null
                 || hostSystem.getDisplayNm().trim().equals("")) {
-            addFieldError("hostSystem.displayNm", "Required");
+            addFieldError("hostSystem.displayNm", REQUIRED);
         }
         if (hostSystem == null
                 || hostSystem.getUser() == null
                 || hostSystem.getUser().trim().equals("")) {
-            addFieldError("hostSystem.user", "Required");
+            addFieldError("hostSystem.user", REQUIRED);
         }
         if (hostSystem == null
                 || hostSystem.getHost() == null
                 || hostSystem.getHost().trim().equals("")) {
-            addFieldError("hostSystem.host", "Required");
+            addFieldError("hostSystem.host", REQUIRED);
         }
         if (hostSystem == null
                 || hostSystem.getPort() == null) {
-            addFieldError("hostSystem.port", "Required");
+            addFieldError("hostSystem.port", REQUIRED);
         } else if (!(hostSystem.getPort() > 0)) {
             addFieldError("hostSystem.port", "Invalid");
         }
@@ -145,7 +146,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
         if (hostSystem == null
                 || hostSystem.getAuthorizedKeys() == null
                 || hostSystem.getAuthorizedKeys().trim().equals("") || hostSystem.getAuthorizedKeys().trim().equals("~")) {
-            addFieldError("hostSystem.authorizedKeys", "Required");
+            addFieldError("hostSystem.authorizedKeys", REQUIRED);
         }
 
         if (!this.getFieldErrors().isEmpty()) {

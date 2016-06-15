@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SystemStatusDB {
 
+    public static final String STATUS_CD = "status_cd";
     private static Logger log = LoggerFactory.getLogger(SystemStatusDB.class);
 
 
@@ -219,7 +220,7 @@ public class SystemStatusDB {
 
             while (rs.next()) {
                 HostSystem hostSystem = SystemDB.getSystem(con, rs.getLong("id"));
-                hostSystem.setStatusCd(rs.getString("status_cd"));
+                hostSystem.setStatusCd(rs.getString(STATUS_CD));
                 hostSystemList.add(hostSystem);
             }
             DBUtils.closeRs(rs);
@@ -253,7 +254,7 @@ public class SystemStatusDB {
 
             while (rs.next()) {
                 hostSystem = SystemDB.getSystem(con, rs.getLong("id"));
-                hostSystem.setStatusCd(rs.getString("status_cd"));
+                hostSystem.setStatusCd(rs.getString(STATUS_CD));
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
@@ -289,7 +290,7 @@ public class SystemStatusDB {
 
             if (rs.next()) {
                 hostSystem = SystemDB.getSystem(con, rs.getLong("id"));
-                hostSystem.setStatusCd(rs.getString("status_cd"));
+                hostSystem.setStatusCd(rs.getString(STATUS_CD));
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);

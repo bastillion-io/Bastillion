@@ -37,17 +37,21 @@ import org.slf4j.LoggerFactory;
  */
 public class PublicKeyDB {
 
+    public static final String PUBLIC_KEY = "public_key";
     private static Logger log = LoggerFactory.getLogger(PublicKeyDB.class);
 
     public static final String FILTER_BY_USER_ID = "user_id";
-    public static final String FILTER_BY_PROFILE_ID = "profile_id";
+    public static final String PROFILE_ID = "profile_id";
+    public static final String FILTER_BY_PROFILE_ID = PROFILE_ID;
     public static final String FILTER_BY_ENABLED= "enabled";
 
-    public static final String SORT_BY_KEY_NM = "key_nm";
-    public static final String SORT_BY_PROFILE = "profile_id";
+    public static final String KEY_NM = "key_nm";
+    public static final String SORT_BY_KEY_NM = KEY_NM;
+    public static final String SORT_BY_PROFILE = PROFILE_ID;
     public static final String SORT_BY_TYPE= "type";
     public static final String SORT_BY_FINGERPRINT= "fingerprint";
-    public static final String SORT_BY_CREATE_DT= "create_dt";
+    public static final String CREATE_DT = "create_dt";
+    public static final String SORT_BY_CREATE_DT= CREATE_DT;
     public static final String SORT_BY_USERNAME= "username";
 
     /**
@@ -210,12 +214,12 @@ public class PublicKeyDB {
             while (rs.next()) {
                 PublicKey publicKey = new PublicKey();
                 publicKey.setId(rs.getLong("id"));
-                publicKey.setKeyNm(rs.getString("key_nm"));
-                publicKey.setPublicKey(rs.getString("public_key"));
-                publicKey.setProfile(ProfileDB.getProfile(con, rs.getLong("profile_id")));
+                publicKey.setKeyNm(rs.getString(KEY_NM));
+                publicKey.setPublicKey(rs.getString(PUBLIC_KEY));
+                publicKey.setProfile(ProfileDB.getProfile(con, rs.getLong(PROFILE_ID)));
                 publicKey.setType(SSHUtil.getKeyType(publicKey.getPublicKey()));
                 publicKey.setFingerprint(SSHUtil.getFingerprint(publicKey.getPublicKey()));
-                publicKey.setCreateDt(rs.getTimestamp("create_dt"));
+                publicKey.setCreateDt(rs.getTimestamp(CREATE_DT));
                 publicKey.setUsername(rs.getString("username"));
                 publicKey.setUserId(rs.getLong("user_id"));
                 publicKey.setEnabled(rs.getBoolean("enabled"));
@@ -262,12 +266,12 @@ public class PublicKeyDB {
             while (rs.next()) {
                 PublicKey publicKey = new PublicKey();
                 publicKey.setId(rs.getLong("id"));
-                publicKey.setKeyNm(rs.getString("key_nm"));
-                publicKey.setPublicKey(rs.getString("public_key"));
-                publicKey.setProfile(ProfileDB.getProfile(con, rs.getLong("profile_id")));
+                publicKey.setKeyNm(rs.getString(KEY_NM));
+                publicKey.setPublicKey(rs.getString(PUBLIC_KEY));
+                publicKey.setProfile(ProfileDB.getProfile(con, rs.getLong(PROFILE_ID)));
                 publicKey.setType(SSHUtil.getKeyType(publicKey.getPublicKey()));
                 publicKey.setFingerprint(SSHUtil.getFingerprint(publicKey.getPublicKey()));
-                publicKey.setCreateDt(rs.getTimestamp("create_dt"));
+                publicKey.setCreateDt(rs.getTimestamp(CREATE_DT));
                 publicKeysList.add(publicKey);
 
             }
@@ -325,12 +329,12 @@ public class PublicKeyDB {
             while (rs.next()) {
                 publicKey = new PublicKey();
                 publicKey.setId(rs.getLong("id"));
-                publicKey.setKeyNm(rs.getString("key_nm"));
-                publicKey.setPublicKey(rs.getString("public_key"));
-                publicKey.setProfile(ProfileDB.getProfile(con, rs.getLong("profile_id")));
+                publicKey.setKeyNm(rs.getString(KEY_NM));
+                publicKey.setPublicKey(rs.getString(PUBLIC_KEY));
+                publicKey.setProfile(ProfileDB.getProfile(con, rs.getLong(PROFILE_ID)));
                 publicKey.setType(rs.getString("type"));
                 publicKey.setFingerprint(rs.getString("fingerprint"));
-                publicKey.setCreateDt(rs.getTimestamp("create_dt"));
+                publicKey.setCreateDt(rs.getTimestamp(CREATE_DT));
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
@@ -512,7 +516,7 @@ public class PublicKeyDB {
             stmt.setLong(1, systemId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                publicKeyList.add(rs.getString("public_key"));
+                publicKeyList.add(rs.getString(PUBLIC_KEY));
             }
             DBUtils.closeStmt(stmt);
 
@@ -589,12 +593,12 @@ public class PublicKeyDB {
 
                 PublicKey publicKey = new PublicKey();
                 publicKey.setId(rs.getLong("id"));
-                publicKey.setKeyNm(rs.getString("key_nm"));
-                publicKey.setPublicKey(rs.getString("public_key"));
-                publicKey.setProfile(ProfileDB.getProfile(con, rs.getLong("profile_id")));
+                publicKey.setKeyNm(rs.getString(KEY_NM));
+                publicKey.setPublicKey(rs.getString(PUBLIC_KEY));
+                publicKey.setProfile(ProfileDB.getProfile(con, rs.getLong(PROFILE_ID)));
                 publicKey.setType(SSHUtil.getKeyType(publicKey.getPublicKey()));
                 publicKey.setFingerprint(SSHUtil.getFingerprint(publicKey.getPublicKey()));
-                publicKey.setCreateDt(rs.getTimestamp("create_dt"));
+                publicKey.setCreateDt(rs.getTimestamp(CREATE_DT));
                 keyMap.put(publicKey.getKeyNm() + " (" + publicKey.getFingerprint() + ")", publicKey);
                 
             }
