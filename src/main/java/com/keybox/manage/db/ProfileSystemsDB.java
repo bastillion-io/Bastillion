@@ -32,8 +32,11 @@ import org.slf4j.LoggerFactory;
 public class ProfileSystemsDB {
 
     private static Logger log = LoggerFactory.getLogger(ProfileSystemsDB.class);
-	
-	
+
+	private ProfileSystemsDB() {
+	}
+
+
 	/**
 	 * sets host systems for profile
 	 * 
@@ -79,7 +82,7 @@ public class ProfileSystemsDB {
 	 */
 	public static List<HostSystem> getSystemsByProfile(Connection con, Long profileId) {
 
-		List<HostSystem> hostSystemList = new ArrayList<HostSystem>();
+		List<HostSystem> hostSystemList = new ArrayList<>();
 
 
 		try {
@@ -115,7 +118,7 @@ public class ProfileSystemsDB {
 	 */
 	public static List<HostSystem> getSystemsByProfile(Long profileId) {
 
-		List<HostSystem> hostSystemList = new ArrayList<HostSystem>();
+		List<HostSystem> hostSystemList = new ArrayList<>();
 
 		Connection con = null;
 
@@ -140,7 +143,7 @@ public class ProfileSystemsDB {
 	 */
 	public static List<Long> getSystemIdsByProfile(Connection con, Long profileId) {
 
-		List<Long> systemIdList = new ArrayList<Long>();
+		List<Long> systemIdList = new ArrayList<>();
 
 
 		try {
@@ -169,7 +172,7 @@ public class ProfileSystemsDB {
 	 */
 	public static List<Long> getSystemIdsByProfile(Long profileId) {
 
-		List<Long> systemIdList = new ArrayList<Long>();
+		List<Long> systemIdList = new ArrayList<>();
 
 		Connection con = null;
 
@@ -195,7 +198,7 @@ public class ProfileSystemsDB {
 	 */
 	public static List<Long> getSystemIdsByProfile(Connection con, Long profileId, Long userId) {
 
-		List<Long> systemIdList = new ArrayList<Long>();
+		List<Long> systemIdList = new ArrayList<>();
 
 
 		try {
@@ -226,7 +229,7 @@ public class ProfileSystemsDB {
 	 */
 	public static List<Long> getSystemIdsByProfile(Long profileId, Long userId) {
 
-		List<Long> systemIdList = new ArrayList<Long>();
+		List<Long> systemIdList = new ArrayList<>();
 
 		Connection con = null;
 

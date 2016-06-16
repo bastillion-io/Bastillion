@@ -59,6 +59,9 @@ public class SSHUtil {
 	public static final int SESSION_TIMEOUT = 60000;
 	public static final int CHANNEL_TIMEOUT = 60000;
 
+	private SSHUtil() {
+	}
+
 	/**
 	 * returns the system's public key
 	 *
@@ -116,7 +119,7 @@ public class SSHUtil {
 
 
 		//get passphrase cmd from properties file
-		Map<String, String> replaceMap = new HashMap<String, String>();
+		Map<String, String> replaceMap = new HashMap<>();
 		replaceMap.put("randomPassphrase", UUID.randomUUID().toString());
 
 		String passphrase = AppConfig.getProperty("defaultSSHPassphrase", replaceMap);
@@ -170,9 +173,9 @@ public class SSHUtil {
 
 			//set key type
 			int type = KeyPair.RSA;
-			if(SSHUtil.KEY_TYPE.equals("dsa")) {
+			if("dsa".equals(SSHUtil.KEY_TYPE)) {
 				type = KeyPair.DSA;
-			} else if(SSHUtil.KEY_TYPE.equals("ecdsa")) {
+			} else if("ecdsa".equals(SSHUtil.KEY_TYPE)) {
 				type = KeyPair.ECDSA;
 			}
 			String comment = "keybox@global_key";

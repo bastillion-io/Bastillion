@@ -46,6 +46,9 @@ public class SystemDB {
 	public static final String STATUS_CD = "status_cd";
 	public static final String SORT_BY_STATUS = STATUS_CD;
 
+	private SystemDB() {
+	}
+
 
 	/**
 	 * method to do order by based on the sorted set object for systems for user
@@ -55,7 +58,7 @@ public class SystemDB {
 	 * @return sortedSet with list of host systems
 	 */
 	public static SortedSet getUserSystemSet(SortedSet sortedSet, Long userId) {
-		List<HostSystem> hostSystemList = new ArrayList<HostSystem>();
+		List<HostSystem> hostSystemList = new ArrayList<>();
 
 		String orderBy = "";
 		if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
@@ -112,7 +115,7 @@ public class SystemDB {
 	 * @return sortedSet with list of host systems
 	 */
 	public static SortedSet getSystemSet(SortedSet sortedSet) {
-		List<HostSystem> hostSystemList = new ArrayList<HostSystem>();
+		List<HostSystem> hostSystemList = new ArrayList<>();
 
 		String orderBy = "";
 		if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
@@ -329,7 +332,7 @@ public class SystemDB {
 
 
 		Connection con = null;
-		List<HostSystem> hostSystemListReturn = new ArrayList<HostSystem>();
+		List<HostSystem> hostSystemListReturn = new ArrayList<>();
 
 		try {
 			con = DBUtils.getConn();
@@ -357,7 +360,7 @@ public class SystemDB {
 	 */
 	public static List<HostSystem> getAllSystems() {
 
-		List<HostSystem> hostSystemList = new ArrayList<HostSystem>();
+		List<HostSystem> hostSystemList = new ArrayList<>();
 
 		Connection con = null;
 
@@ -399,7 +402,7 @@ public class SystemDB {
 	 */
 	public static List<Long> getAllSystemIds(Connection con) {
 
-		List<Long> systemIdList = new ArrayList<Long>();
+		List<Long> systemIdList = new ArrayList<>();
 
 
 		try {
@@ -430,7 +433,7 @@ public class SystemDB {
 	 */
 	public static List<Long> getAllSystemIdsForUser(Connection con, Long userId) {
 
-		List<Long> systemIdList = new ArrayList<Long>();
+		List<Long> systemIdList = new ArrayList<>();
 
 
 		try {
@@ -460,7 +463,7 @@ public class SystemDB {
 	 */
 	public static List<Long> getAllSystemIdsForUser(Long userId) {
 		Connection con = null;
-		List<Long> systemIdList = new ArrayList<Long>();
+		List<Long> systemIdList = new ArrayList<>();
 		try {
 			con = DBUtils.getConn();
 			systemIdList = getAllSystemIdsForUser(con, userId);
@@ -479,7 +482,7 @@ public class SystemDB {
 	 */
 	public static List<Long> getAllSystemIds() {
 		Connection con = null;
-		List<Long> systemIdList = new ArrayList<Long>();
+		List<Long> systemIdList = new ArrayList<>();
 		try {
 			con = DBUtils.getConn();
 			systemIdList = getAllSystemIds(con);
@@ -502,7 +505,7 @@ public class SystemDB {
 	 */
 	public static List<Long> checkSystemPerms(Connection con, List<Long> systemSelectIdList, Long userId) {
 
-		List<Long> systemIdList = new ArrayList<Long>();
+		List<Long> systemIdList = new ArrayList<>();
 		List<Long> userSystemIdList = getAllSystemIdsForUser(con, userId);
 
 		for (Long systemId : userSystemIdList) {

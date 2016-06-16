@@ -47,6 +47,9 @@ public class OTPUtil {
     //interval for validation token change
     private static final int CHANGE_INTERVAL = 30;
 
+    private OTPUtil() {
+    }
+
 
     /**
      * generates OPT secret

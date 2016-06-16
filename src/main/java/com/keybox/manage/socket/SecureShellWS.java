@@ -161,7 +161,7 @@ public class SecureShellWS {
     /**
      * Maps key press events to the ascii values
      */
-    static Map<Integer, byte[]> keyMap = new HashMap<Integer, byte[]>();
+    static Map<Integer, byte[]> keyMap = new HashMap<>();
 
     static {
         //ESC

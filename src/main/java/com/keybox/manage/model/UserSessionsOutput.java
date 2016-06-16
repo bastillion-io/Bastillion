@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class UserSessionsOutput {
 
     //instance id, host output
-    Map<Integer, SessionOutput> sessionOutputMap = new ConcurrentHashMap<Integer,SessionOutput>();
+    Map<Integer, SessionOutput> sessionOutputMap = new ConcurrentHashMap<>();
 
 
     public Map<Integer, SessionOutput> getSessionOutputMap() {

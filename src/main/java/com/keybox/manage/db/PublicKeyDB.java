@@ -54,6 +54,9 @@ public class PublicKeyDB {
     public static final String SORT_BY_CREATE_DT= CREATE_DT;
     public static final String SORT_BY_USERNAME= "username";
 
+    private PublicKeyDB() {
+    }
+
     /**
      * Deletes all SSH keys for users that are not assigned in a profile
      *
@@ -180,7 +183,7 @@ public class PublicKeyDB {
      */
     public static SortedSet getPublicKeySet(SortedSet sortedSet) {
 
-        ArrayList<PublicKey> publicKeysList = new ArrayList<PublicKey>();
+        ArrayList<PublicKey> publicKeysList = new ArrayList<>();
 
 
         String orderBy = "";
@@ -207,7 +210,7 @@ public class PublicKeyDB {
                 stmt.setLong(i++, Long.valueOf(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID)));
             }
             if(StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_ENABLED))){
-                stmt.setBoolean(i++, Boolean.valueOf(sortedSet.getFilterMap().get(FILTER_BY_ENABLED)));
+                stmt.setBoolean(i, Boolean.valueOf(sortedSet.getFilterMap().get(FILTER_BY_ENABLED)));
             }
             ResultSet rs = stmt.executeQuery();
 
@@ -247,7 +250,7 @@ public class PublicKeyDB {
      */
     public static SortedSet getPublicKeySet(SortedSet sortedSet, Long userId) {
 
-        ArrayList<PublicKey> publicKeysList = new ArrayList<PublicKey>();
+        ArrayList<PublicKey> publicKeysList = new ArrayList<>();
 
 
         String orderBy = "";
@@ -489,7 +492,7 @@ public class PublicKeyDB {
     public static List<String> getPublicKeysForSystem(Long systemId) {
 
         Connection con = null;
-        List<String> publicKeyList = new ArrayList<String>();
+        List<String> publicKeyList = new ArrayList<>();
         try {
             con = DBUtils.getConn();
 
@@ -506,7 +509,7 @@ public class PublicKeyDB {
     }
 
     public static List<String> getPublicKeysForSystem(Connection con, Long systemId) {
-        List<String> publicKeyList = new ArrayList<String>();
+        List<String> publicKeyList = new ArrayList<>();
 
         if(systemId==null){
             systemId=-99L;

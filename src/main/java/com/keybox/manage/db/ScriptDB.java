@@ -37,6 +37,9 @@ public class ScriptDB {
     public static final String DISPLAY_NM = "display_nm";
     public static final String SORT_BY_DISPLAY_NM= DISPLAY_NM;
 
+    private ScriptDB() {
+    }
+
 
     /**
      * returns scripts based on sort order defined
@@ -46,7 +49,7 @@ public class ScriptDB {
      */
     public static SortedSet getScriptSet(SortedSet sortedSet, Long userId) {
 
-        ArrayList<Script> scriptList = new ArrayList<Script>();
+        ArrayList<Script> scriptList = new ArrayList<>();
 
 
         String orderBy = "";

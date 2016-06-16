@@ -46,7 +46,7 @@ public class UploadAndPushAction extends ActionSupport implements ServletRequest
     File upload;
     String uploadContentType;
     String uploadFileName;
-    List<Long> idList = new ArrayList<Long>();
+    List<Long> idList = new ArrayList<>();
     String pushDir = "~";
     List<HostSystem> hostSystemList;
     HostSystem pendingSystemStatus;

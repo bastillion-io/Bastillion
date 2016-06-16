@@ -53,11 +53,11 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
     String password;
     String passphrase;
     Integer id;
-    List<HostSystem> systemList = new ArrayList<HostSystem>();
-    List<HostSystem> allocatedSystemList = new ArrayList<HostSystem>();
+    List<HostSystem> systemList = new ArrayList<>();
+    List<HostSystem> allocatedSystemList = new ArrayList<>();
     UserSettings userSettings;
 
-    static Map<Long, UserSchSessions> userSchSessionMap = new ConcurrentHashMap<Long, UserSchSessions>();
+    static Map<Long, UserSchSessions> userSchSessionMap = new ConcurrentHashMap<>();
 
 
     Script script = new Script();
@@ -215,7 +215,6 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
                         schSession.setInputToChannel(null);
                         schSession.setCommander(null);
                         schSession.setOutFromChannel(null);
-                        schSession = null;
                     }
                     //remove from map
                     userSchSessions.getSchSessionMap().remove(id);

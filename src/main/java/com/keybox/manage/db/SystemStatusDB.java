@@ -40,6 +40,9 @@ public class SystemStatusDB {
     public static final String STATUS_CD = "status_cd";
     private static Logger log = LoggerFactory.getLogger(SystemStatusDB.class);
 
+    private SystemStatusDB() {
+    }
+
 
     /**
      * set the initial status for selected systems
@@ -189,7 +192,7 @@ public class SystemStatusDB {
      */
     public static List<HostSystem> getAllSystemStatus(Long userId) {
 
-        List<HostSystem> hostSystemList = new ArrayList<HostSystem>();
+        List<HostSystem> hostSystemList = new ArrayList<>();
         Connection con = null;
         try {
             con = DBUtils.getConn();
@@ -211,7 +214,7 @@ public class SystemStatusDB {
      */
     private static List<HostSystem> getAllSystemStatus(Connection con, Long userId) {
 
-        List<HostSystem> hostSystemList = new ArrayList<HostSystem>();
+        List<HostSystem> hostSystemList = new ArrayList<>();
         try {
 
             PreparedStatement stmt = con.prepareStatement("select * from status where user_id=? order by id asc");

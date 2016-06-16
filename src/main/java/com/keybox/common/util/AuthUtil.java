@@ -32,6 +32,9 @@ public class AuthUtil {
     public static final String AUTH_TOKEN = "authToken";
     public static final String TIMEOUT = "timeout";
 
+    private AuthUtil() {
+    }
+
     /**
      * query session for OTP shared secret
      *

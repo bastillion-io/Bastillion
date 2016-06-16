@@ -45,6 +45,9 @@ public class UserDB {
     public static final String USER_TYPE = "user_type";
     public static final String AUTH_TYPE = "auth_type";
 
+    private UserDB() {
+    }
+
     /**
      * returns users based on sort order defined
      * @param sortedSet object that defines sort order
@@ -52,7 +55,7 @@ public class UserDB {
      */
     public static SortedSet getUserSet(SortedSet sortedSet) {
 
-        ArrayList<User> userList = new ArrayList<User>();
+        ArrayList<User> userList = new ArrayList<>();
 
 
         String orderBy = "";
@@ -98,7 +101,7 @@ public class UserDB {
      */
     public static SortedSet getAdminUserSet(SortedSet sortedSet) {
 
-        ArrayList<User> userList = new ArrayList<User>();
+        ArrayList<User> userList = new ArrayList<>();
 
 
         String orderBy = "";

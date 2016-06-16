@@ -37,6 +37,9 @@ public class AppConfig {
         }
     }
 
+    private AppConfig() {
+    }
+
     /**
      * gets the property from config
      *

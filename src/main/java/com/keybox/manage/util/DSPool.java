@@ -38,6 +38,9 @@ public class DSPool {
     private static  int MIN_IDLE = Integer.parseInt(AppConfig.getProperty("minIdle"));
     private static int MAX_WAIT = Integer.parseInt(AppConfig.getProperty("maxWait"));
 
+    private DSPool() {
+    }
+
 
     /**
      * fetches the data source for H2 db
