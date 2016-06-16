@@ -37,7 +37,9 @@ import org.slf4j.LoggerFactory;
 public class SSHUtil {
 
 
-    private static Logger log = LoggerFactory.getLogger(SSHUtil.class);
+	public static final String PRIVATE_KEY = "privateKey";
+	public static final String PUBLIC_KEY = "publicKey";
+	private static Logger log = LoggerFactory.getLogger(SSHUtil.class);
     public static final boolean keyManagementEnabled = "true".equals(AppConfig.getProperty("keyManagementEnabled"));
 
 	//system path to public/private key
@@ -69,8 +71,8 @@ public class SSHUtil {
 
 		String publicKey = PUB_KEY;
 		//check to see if pub/pvt are defined in properties
-		if (StringUtils.isNotEmpty(AppConfig.getProperty("privateKey")) && StringUtils.isNotEmpty(AppConfig.getProperty("publicKey"))) {
-			publicKey = AppConfig.getProperty("publicKey");
+		if (StringUtils.isNotEmpty(AppConfig.getProperty(PRIVATE_KEY)) && StringUtils.isNotEmpty(AppConfig.getProperty(PUBLIC_KEY))) {
+			publicKey = AppConfig.getProperty(PUBLIC_KEY);
 		}
 		//read pvt ssh key
 		File file = new File(publicKey);
@@ -93,8 +95,8 @@ public class SSHUtil {
 
 		String privateKey = PVT_KEY;
 		//check to see if pub/pvt are defined in properties
-		if (StringUtils.isNotEmpty(AppConfig.getProperty("privateKey")) && StringUtils.isNotEmpty(AppConfig.getProperty("publicKey"))) {
-			privateKey = AppConfig.getProperty("privateKey");
+		if (StringUtils.isNotEmpty(AppConfig.getProperty(PRIVATE_KEY)) && StringUtils.isNotEmpty(AppConfig.getProperty(PUBLIC_KEY))) {
+			privateKey = AppConfig.getProperty(PRIVATE_KEY);
 		}
 
 		//read pvt ssh key
@@ -167,7 +169,7 @@ public class SSHUtil {
 
 		deleteGenSSHKeys();
 
-		if (StringUtils.isEmpty(AppConfig.getProperty("privateKey")) || StringUtils.isEmpty(AppConfig.getProperty("publicKey"))) {
+		if (StringUtils.isEmpty(AppConfig.getProperty(PRIVATE_KEY)) || StringUtils.isEmpty(AppConfig.getProperty(PUBLIC_KEY))) {
 
 			//set key type
 			int type = KeyPair.RSA;

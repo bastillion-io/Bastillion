@@ -34,14 +34,17 @@ import org.slf4j.LoggerFactory;
  */
 public class SystemDB {
 
-    private static Logger log = LoggerFactory.getLogger(SystemDB.class);
+	public static final String AUTHORIZED_KEYS = "authorized_keys";
+	private static Logger log = LoggerFactory.getLogger(SystemDB.class);
 
 	public static final String FILTER_BY_PROFILE_ID = "profile_id";
 
-	public static final String SORT_BY_NAME = "display_nm";
+	public static final String DISPLAY_NM = "display_nm";
+	public static final String SORT_BY_NAME = DISPLAY_NM;
 	public static final String SORT_BY_USER = "user";
 	public static final String SORT_BY_HOST = "host";
-	public static final String SORT_BY_STATUS = "status_cd";
+	public static final String STATUS_CD = "status_cd";
+	public static final String SORT_BY_STATUS = STATUS_CD;
 
 	private SystemDB() {
 	}
@@ -82,12 +85,12 @@ public class SystemDB {
 			while (rs.next()) {
 				HostSystem hostSystem = new HostSystem();
 				hostSystem.setId(rs.getLong("id"));
-				hostSystem.setDisplayNm(rs.getString("display_nm"));
+				hostSystem.setDisplayNm(rs.getString(DISPLAY_NM));
 				hostSystem.setUser(rs.getString("user"));
 				hostSystem.setHost(rs.getString("host"));
 				hostSystem.setPort(rs.getInt("port"));
-				hostSystem.setAuthorizedKeys(rs.getString("authorized_keys"));
-				hostSystem.setStatusCd(rs.getString("status_cd"));
+				hostSystem.setAuthorizedKeys(rs.getString(AUTHORIZED_KEYS));
+				hostSystem.setStatusCd(rs.getString(STATUS_CD));
 				hostSystemList.add(hostSystem);
 			}
 			DBUtils.closeRs(rs);
@@ -135,12 +138,12 @@ public class SystemDB {
 			while (rs.next()) {
 				HostSystem hostSystem = new HostSystem();
 				hostSystem.setId(rs.getLong("id"));
-				hostSystem.setDisplayNm(rs.getString("display_nm"));
+				hostSystem.setDisplayNm(rs.getString(DISPLAY_NM));
 				hostSystem.setUser(rs.getString("user"));
 				hostSystem.setHost(rs.getString("host"));
 				hostSystem.setPort(rs.getInt("port"));
-				hostSystem.setAuthorizedKeys(rs.getString("authorized_keys"));
-				hostSystem.setStatusCd(rs.getString("status_cd"));
+				hostSystem.setAuthorizedKeys(rs.getString(AUTHORIZED_KEYS));
+				hostSystem.setStatusCd(rs.getString(STATUS_CD));
 				hostSystemList.add(hostSystem);
 			}
 			DBUtils.closeRs(rs);
@@ -207,12 +210,12 @@ public class SystemDB {
 			while (rs.next()) {
 				hostSystem = new HostSystem();
 				hostSystem.setId(rs.getLong("id"));
-				hostSystem.setDisplayNm(rs.getString("display_nm"));
+				hostSystem.setDisplayNm(rs.getString(DISPLAY_NM));
 				hostSystem.setUser(rs.getString("user"));
 				hostSystem.setHost(rs.getString("host"));
 				hostSystem.setPort(rs.getInt("port"));
-				hostSystem.setAuthorizedKeys(rs.getString("authorized_keys"));
-				hostSystem.setStatusCd(rs.getString("status_cd"));
+				hostSystem.setAuthorizedKeys(rs.getString(AUTHORIZED_KEYS));
+				hostSystem.setStatusCd(rs.getString(STATUS_CD));
 			}
 			DBUtils.closeRs(rs);
 			DBUtils.closeStmt(stmt);
@@ -369,12 +372,12 @@ public class SystemDB {
 			while (rs.next()) {
 				HostSystem hostSystem = new HostSystem();
 				hostSystem.setId(rs.getLong("id"));
-				hostSystem.setDisplayNm(rs.getString("display_nm"));
+				hostSystem.setDisplayNm(rs.getString(DISPLAY_NM));
 				hostSystem.setUser(rs.getString("user"));
 				hostSystem.setHost(rs.getString("host"));
 				hostSystem.setPort(rs.getInt("port"));
-				hostSystem.setAuthorizedKeys(rs.getString("authorized_keys"));
-				hostSystem.setStatusCd(rs.getString("status_cd"));
+				hostSystem.setAuthorizedKeys(rs.getString(AUTHORIZED_KEYS));
+				hostSystem.setStatusCd(rs.getString(STATUS_CD));
 				hostSystemList.add(hostSystem);
 			}
 			DBUtils.closeRs(rs);

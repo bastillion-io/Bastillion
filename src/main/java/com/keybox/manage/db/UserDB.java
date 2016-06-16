@@ -37,12 +37,13 @@ public class UserDB {
 
     private static Logger log = LoggerFactory.getLogger(UserDB.class);
 
-    public static final String SORT_BY_FIRST_NM="first_nm";
-    public static final String SORT_BY_LAST_NM="last_nm";
-    public static final String SORT_BY_EMAIL="email";
-    public static final String SORT_BY_USERNAME="username";
-    public static final String SORT_BY_USER_TYPE="user_type";
-    public static final String SORT_BY_AUTH_TYPE="auth_type";
+    public static final String PASSWORD = "password";
+    public static final String FIRST_NM = "first_nm";
+    public static final String LAST_NM = "last_nm";
+    public static final String EMAIL = "email";
+    public static final String USERNAME = "username";
+    public static final String USER_TYPE = "user_type";
+    public static final String AUTH_TYPE = "auth_type";
 
     private UserDB() {
     }
@@ -71,13 +72,13 @@ public class UserDB {
             while (rs.next()) {
                 User user = new User();
                 user.setId(rs.getLong("id"));
-                user.setFirstNm(rs.getString("first_nm"));
-                user.setLastNm(rs.getString("last_nm"));
-                user.setEmail(rs.getString("email"));
-                user.setUsername(rs.getString("username"));
-                user.setPassword(rs.getString("password"));
-                user.setAuthType(rs.getString("auth_type"));
-                user.setUserType(rs.getString("user_type"));
+                user.setFirstNm(rs.getString(FIRST_NM));
+                user.setLastNm(rs.getString(LAST_NM));
+                user.setEmail(rs.getString(EMAIL));
+                user.setUsername(rs.getString(USERNAME));
+                user.setPassword(rs.getString(PASSWORD));
+                user.setAuthType(rs.getString(AUTH_TYPE));
+                user.setUserType(rs.getString(USER_TYPE));
                 userList.add(user);
 
             }
@@ -117,13 +118,13 @@ public class UserDB {
             while (rs.next()) {
                 User user = new User();
                 user.setId(rs.getLong("id"));
-                user.setFirstNm(rs.getString("first_nm"));
-                user.setLastNm(rs.getString("last_nm"));
-                user.setEmail(rs.getString("email"));
-                user.setUsername(rs.getString("username"));
-                user.setPassword(rs.getString("password"));
-                user.setAuthType(rs.getString("auth_type"));
-                user.setUserType(rs.getString("user_type"));
+                user.setFirstNm(rs.getString(FIRST_NM));
+                user.setLastNm(rs.getString(LAST_NM));
+                user.setEmail(rs.getString(EMAIL));
+                user.setUsername(rs.getString(USERNAME));
+                user.setPassword(rs.getString(PASSWORD));
+                user.setAuthType(rs.getString(AUTH_TYPE));
+                user.setUserType(rs.getString(USER_TYPE));
                 userList.add(user);
 
             }
@@ -179,13 +180,13 @@ public class UserDB {
             while (rs.next()) {
                 user = new User();
                 user.setId(rs.getLong("id"));
-                user.setFirstNm(rs.getString("first_nm"));
-                user.setLastNm(rs.getString("last_nm"));
-                user.setEmail(rs.getString("email"));
-                user.setUsername(rs.getString("username"));
-                user.setPassword(rs.getString("password"));
-                user.setAuthType(rs.getString("auth_type"));
-                user.setUserType(rs.getString("user_type"));
+                user.setFirstNm(rs.getString(FIRST_NM));
+                user.setLastNm(rs.getString(LAST_NM));
+                user.setEmail(rs.getString(EMAIL));
+                user.setUsername(rs.getString(USERNAME));
+                user.setPassword(rs.getString(PASSWORD));
+                user.setAuthType(rs.getString(AUTH_TYPE));
+                user.setUserType(rs.getString(USER_TYPE));
                 user.setSalt(rs.getString("salt"));
                 user.setProfileList(UserProfileDB.getProfilesByUser(con, userId));
             }

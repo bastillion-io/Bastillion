@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class UserSettingsAction extends ActionSupport implements ServletRequestAware {
 
+    public static final String REQUIRED = "Required";
     HttpServletRequest servletRequest;
     Auth auth;
     UserSettings userSettings;
@@ -95,15 +96,15 @@ public class UserSettingsAction extends ActionSupport implements ServletRequestA
     public void validatePasswordSubmit() {
         if (auth.getPassword() == null ||
                 auth.getPassword().trim().equals("")) {
-            addFieldError("auth.password", "Required");
+            addFieldError("auth.password", REQUIRED);
         }
         if (auth.getPasswordConfirm() == null ||
                 auth.getPasswordConfirm().trim().equals("")) {
-            addFieldError("auth.passwordConfirm", "Required");
+            addFieldError("auth.passwordConfirm", REQUIRED);
         }
         if (auth.getPrevPassword() == null ||
                 auth.getPrevPassword().trim().equals("")) {
-            addFieldError("auth.prevPassword", "Required");
+            addFieldError("auth.prevPassword", REQUIRED);
         }
 
     }
