@@ -348,34 +348,36 @@ public class SSHUtil {
 			channel.connect(CHANNEL_TIMEOUT);
 
 			String appPubKey = appPublicKey.replace("\n", "").trim();
-			String existingKeys="";
-			
+			StringBuilder existingKeysBuilder = new StringBuilder("");
+
 			String currentKey;
 			while ((currentKey = reader.readLine()) != null) {
-				existingKeys = existingKeys + currentKey +"\n";
+				existingKeysBuilder.append(currentKey).append("\n");
 			}
+			String existingKeys=existingKeysBuilder.toString();
 			existingKeys = existingKeys.replaceAll("\\n$","");
 			reader.close();
 			//disconnect
 			channel.disconnect();
 			
-			String newKeys="";
+			StringBuilder newKeysBuilder = new StringBuilder("");
 			if (keyManagementEnabled) {
 				//get keys assigned to system
 				List<String> assignedKeys = PublicKeyDB.getPublicKeysForSystem(hostSystem.getId());
 				for (String key: assignedKeys) {
-					newKeys = newKeys + key.replace("\n", "").trim() + "\n";
+					newKeysBuilder.append(key.replace("\n", "").trim()).append("\n");
 				}
-				newKeys = newKeys + appPubKey;
+				newKeysBuilder.append(appPubKey);
 			} else {
 				if (existingKeys.indexOf(appPubKey) < 0) {
-					newKeys = existingKeys + "\n" + appPubKey;
+					newKeysBuilder.append(existingKeys).append("\n").append(appPubKey);
 				}
 				else {
-					newKeys = existingKeys;
+					newKeysBuilder.append(existingKeys);
 				}
 			}
 
+			String newKeys=newKeysBuilder.toString();
 			if(!newKeys.equals(existingKeys)) {
 				log.info("Update Public Keys  ==> " + newKeys);
 				channel = session.openChannel("exec");
