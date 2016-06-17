@@ -39,7 +39,7 @@ public class SessionOutputUtil {
     private static Logger log = LoggerFactory.getLogger(SessionOutputUtil.class);
 
     private static Map<Long, UserSessionsOutput> userSessionsOutputMap = new ConcurrentHashMap<>();
-    public static boolean enableInternalAudit = "true".equals(AppConfig.getProperty("enableInternalAudit"));
+    public final static boolean enableInternalAudit = "true".equals(AppConfig.getProperty("enableInternalAudit"));
     private static Gson gson = new GsonBuilder().registerTypeAdapter(AuditWrapper.class, new SessionOutputSerializer()).create();
     private static Logger systemAuditLogger = LoggerFactory.getLogger("com.keybox.manage.util.SystemAudit");
 
@@ -129,20 +129,19 @@ public class SessionOutputUtil {
                 //get output chars and set to output
                 try {
                     SessionOutput sessionOutput = userSessionsOutput.getSessionOutputMap().get(key);
-                    if (sessionOutput!=null && sessionOutput.getOutput() != null) {
+                    if (sessionOutput!=null && sessionOutput.getOutput() != null
+                            && StringUtils.isNotEmpty(sessionOutput.getOutput())) {
 
-                        if (StringUtils.isNotEmpty(sessionOutput.getOutput())) {
-                            outputList.add(sessionOutput);
+                        outputList.add(sessionOutput);
 
-                            //send to audit logger
-                            systemAuditLogger.info(gson.toJson(new AuditWrapper(user, sessionOutput)));
+                        //send to audit logger
+                        systemAuditLogger.info(gson.toJson(new AuditWrapper(user, sessionOutput)));
 
-                            if(enableInternalAudit) {
-                                SessionAuditDB.insertTerminalLog(con, sessionOutput);
-                            }
-
-                            userSessionsOutput.getSessionOutputMap().put(key, new SessionOutput(sessionId, sessionOutput));
+                        if(enableInternalAudit) {
+                            SessionAuditDB.insertTerminalLog(con, sessionOutput);
                         }
+
+                        userSessionsOutput.getSessionOutputMap().put(key, new SessionOutput(sessionId, sessionOutput));
                     }
                 } catch (Exception ex) {
                     log.error(ex.toString(), ex);

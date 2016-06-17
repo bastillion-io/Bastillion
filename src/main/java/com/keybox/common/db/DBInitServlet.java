@@ -63,7 +63,7 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 			statement = connection.createStatement();
 
 			ResultSet rs = statement.executeQuery("select * from information_schema.tables where upper(table_name) = 'USERS' and table_schema='PUBLIC'");
-			if (rs == null || !rs.next()) {
+			if (!rs.next()) {
 				resetSSHKey = true;
 				statement.executeUpdate("create table if not exists users (id INTEGER PRIMARY KEY AUTO_INCREMENT, first_nm varchar, last_nm varchar, email varchar, username varchar not null, password varchar, auth_token varchar, enabled boolean not null default true, auth_type varchar not null default '" + Auth.AUTH_BASIC+ "', user_type varchar not null default '" + Auth.ADMINISTRATOR + "', salt varchar, otp_secret varchar)");
 				
