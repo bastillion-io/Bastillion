@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
 public class OTPAction extends ActionSupport implements ServletRequestAware, ServletResponseAware {
 
     private static Logger log = LoggerFactory.getLogger(OTPAction.class);
-    public static boolean requireOTP = "required".equals(AppConfig.getProperty("oneTimePassword"));
+    public final static boolean requireOTP = "required".equals(AppConfig.getProperty("oneTimePassword"));
 
     //QR image size
     private static final int QR_IMAGE_WIDTH = 325;

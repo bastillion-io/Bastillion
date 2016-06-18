@@ -410,11 +410,8 @@ public class SSHUtil {
 		if(userSessionMap.get(sessionId)!=null){
 
 			for(Integer id :userSessionMap.get(sessionId).getSchSessionMap().keySet()) {
-				if (!id.equals(instanceId) ) {
-
-					if(userSessionMap.get(sessionId).getSchSessionMap().get(instanceId) == null) {
-						return instanceId;
-					}
+				if (!id.equals(instanceId) && userSessionMap.get(sessionId).getSchSessionMap().get(instanceId) == null) {
+					return instanceId;
 				}
 				instanceId = instanceId + 1;
 			}
