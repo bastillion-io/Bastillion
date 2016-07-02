@@ -26,6 +26,7 @@ import com.keybox.manage.db.UserDB;
 import com.keybox.manage.util.OTPUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.apache.struts2.interceptor.ServletResponseAware;
@@ -41,6 +42,7 @@ import java.util.Hashtable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@InterceptorRef("keyboxStack")
 public class OTPAction extends ActionSupport implements ServletRequestAware, ServletResponseAware {
 
     private static Logger log = LoggerFactory.getLogger(OTPAction.class);

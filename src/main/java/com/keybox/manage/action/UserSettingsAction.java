@@ -23,6 +23,7 @@ import com.keybox.manage.model.UserSettings;
 import com.keybox.manage.util.PasswordUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
@@ -31,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * Action for user settings
  */
+@InterceptorRef("keyboxStack")
 public class UserSettingsAction extends ActionSupport implements ServletRequestAware {
 
     public static final String REQUIRED = "Required";

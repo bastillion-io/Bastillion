@@ -24,6 +24,7 @@ import com.keybox.manage.util.OTPUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.apache.struts2.interceptor.ServletResponseAware;
@@ -37,6 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Action to auth to keybox
  */
+@InterceptorRef("keyboxStack")
 public class LoginAction extends ActionSupport implements ServletRequestAware, ServletResponseAware {
 
     private static Logger loginAuditLogger = LoggerFactory.getLogger("com.keybox.manage.action.LoginAudit");

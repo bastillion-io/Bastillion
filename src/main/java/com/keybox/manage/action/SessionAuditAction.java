@@ -25,6 +25,7 @@ import com.google.gson.Gson;
 import com.keybox.manage.model.User;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletResponseAware;
 import javax.servlet.http.HttpServletResponse;
@@ -35,6 +36,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Action to audit sessions and terminal history
  */
+@InterceptorRef("keyboxStack")
 public class SessionAuditAction extends ActionSupport implements ServletResponseAware {
 
     private static Logger log = LoggerFactory.getLogger(SessionAuditAction.class);

@@ -21,12 +21,14 @@ import com.keybox.manage.model.Script;
 import com.keybox.manage.model.SortedSet;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Result;
 
 
 /**
  * Action to manage profiles
  */
+@InterceptorRef("keyboxStack")
 public class ProfileAction extends ActionSupport {
 
     SortedSet sortedSet = new SortedSet();

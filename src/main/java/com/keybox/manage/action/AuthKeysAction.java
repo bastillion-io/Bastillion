@@ -28,6 +28,7 @@ import com.keybox.manage.util.SSHUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
 import org.apache.struts2.interceptor.ServletResponseAware;
@@ -44,6 +45,7 @@ import org.slf4j.LoggerFactory;
  * Action to generate and distribute auth keys for systems or users
  */
 @SuppressWarnings("unchecked")
+@InterceptorRef("keyboxStack")
 public class AuthKeysAction extends ActionSupport implements ServletRequestAware, ServletResponseAware {
 
 	public static final String REQUIRED = "Required";

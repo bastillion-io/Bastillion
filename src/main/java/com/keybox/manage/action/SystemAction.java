@@ -24,6 +24,7 @@ import com.keybox.manage.model.*;
 import com.keybox.manage.util.SSHUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
@@ -34,6 +35,7 @@ import java.util.List;
 /**
  * Action to manage systems
  */
+@InterceptorRef("keyboxStack")
 public class SystemAction extends ActionSupport implements ServletRequestAware {
 
     public static final String REQUIRED = "Required";

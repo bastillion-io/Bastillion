@@ -16,12 +16,9 @@
 package com.keybox.manage.action;
 
 import com.keybox.common.util.AuthUtil;
-import com.keybox.manage.db.SystemDB;
 import com.keybox.manage.db.SystemStatusDB;
-import com.keybox.manage.model.Auth;
 import com.keybox.manage.model.SchSession;
 import com.keybox.manage.model.HostSystem;
-import com.keybox.manage.model.UserSchSessions;
 import com.keybox.manage.util.DBUtils;
 import com.keybox.manage.util.SSHUtil;
 import com.opensymphony.xwork2.ActionSupport;
@@ -29,6 +26,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.AgeFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
@@ -38,6 +36,7 @@ import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@InterceptorRef("keyboxStack")
 public class UploadAndPushAction extends ActionSupport implements ServletRequestAware {
 
     private static Logger log = LoggerFactory.getLogger(UploadAndPushAction.class);

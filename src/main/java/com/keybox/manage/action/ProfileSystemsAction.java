@@ -15,7 +15,6 @@
  */
 package com.keybox.manage.action;
 
-
 import com.keybox.manage.db.ProfileDB;
 import com.keybox.manage.db.ProfileSystemsDB;
 import com.keybox.manage.db.SystemDB;
@@ -24,12 +23,14 @@ import com.keybox.manage.model.SortedSet;
 import com.keybox.manage.util.RefreshAuthKeyUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Result;
 import java.util.List;
 
 /**
  * Action to assign systems to profiles
  */
+@InterceptorRef("keyboxStack")
 public class ProfileSystemsAction extends ActionSupport {
 
     Profile profile;

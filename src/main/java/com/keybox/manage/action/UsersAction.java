@@ -15,7 +15,6 @@
  */
 package com.keybox.manage.action;
 
-
 import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.db.PublicKeyDB;
 import com.keybox.manage.db.ScriptDB;
@@ -28,6 +27,7 @@ import com.keybox.manage.util.PasswordUtil;
 import com.keybox.manage.util.RefreshAuthKeyUtil;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.interceptor.ServletRequestAware;
 
@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * Action to manage users
  */
+@InterceptorRef("keyboxStack")
 public class UsersAction extends ActionSupport  implements ServletRequestAware {
 
     public static final String REQUIRED = "Required";
