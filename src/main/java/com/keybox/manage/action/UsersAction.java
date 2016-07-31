@@ -96,7 +96,7 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
     )
     public String deleteUser() {
 
-        if (user.getId() != null && user.getId()!=AuthUtil.getUserId(servletRequest.getSession())) {
+        if (user.getId() != null && !user.getId().equals(AuthUtil.getUserId(servletRequest.getSession()))) {
             UserDB.disableUser(user.getId());
             PublicKeyDB.deleteUserPublicKeys(user.getId());
             RefreshAuthKeyUtil.refreshAllSystems();
