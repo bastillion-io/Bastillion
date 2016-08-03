@@ -286,9 +286,7 @@ public class SSHUtil {
 		Channel channel = null;
 		ChannelSftp c = null;
 
-		try {
-
-
+		try (FileInputStream file = new FileInputStream(source)) {
 			channel = session.openChannel("sftp");
 			channel.setInputStream(System.in);
 			channel.setOutputStream(System.out);
@@ -297,11 +295,7 @@ public class SSHUtil {
 			c = (ChannelSftp) channel;
 			destination = destination.replaceAll("~\\/|~", "");
 
-
-			//get file input stream
-			FileInputStream file = new FileInputStream(source);
 			c.put(file, destination);
-			file.close();
 
 		} catch (Exception e) {
 			log.info(e.toString(), e);
