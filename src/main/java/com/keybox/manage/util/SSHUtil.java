@@ -141,6 +141,7 @@ public class SSHUtil {
 			File file = new File(PUB_KEY);
 			FileUtils.forceDelete(file);
 		} catch (Exception ex) {
+			log.error(ex.toString(), ex);
 		}
 	}
 
@@ -155,6 +156,7 @@ public class SSHUtil {
 			File file = new File(PVT_KEY);
 			FileUtils.forceDelete(file);
 		} catch (Exception ex) {
+			log.error(ex.toString(), ex);
 		}
 
 
