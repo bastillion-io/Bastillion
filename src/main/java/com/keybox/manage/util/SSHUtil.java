@@ -139,7 +139,9 @@ public class SSHUtil {
 		//delete public key
 		try {
 			File file = new File(PUB_KEY);
-			FileUtils.forceDelete(file);
+			if (file.exists()) {
+				FileUtils.forceDelete(file);
+			}
 		} catch (Exception ex) {
 			log.error(ex.toString(), ex);
 		}
@@ -154,7 +156,9 @@ public class SSHUtil {
 		//delete private key
 		try {
 			File file = new File(PVT_KEY);
-			FileUtils.forceDelete(file);
+			if (file.exists()) {
+				FileUtils.forceDelete(file);
+			}
 		} catch (Exception ex) {
 			log.error(ex.toString(), ex);
 		}
