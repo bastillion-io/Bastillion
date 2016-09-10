@@ -77,7 +77,7 @@ public class SystemDB {
 			stmt.setLong(1, userId);
 			//filter by profile id if exists
 			if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID))) {
-				stmt.setLong(2, Long.valueOf(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID)));
+				stmt.setLong(2, Long.parseLong(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID)));
 			}
 
 			ResultSet rs = stmt.executeQuery();
@@ -131,7 +131,7 @@ public class SystemDB {
 			con = DBUtils.getConn();
 			PreparedStatement stmt = con.prepareStatement(sql);
 			if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID))) {
-				stmt.setLong(1, Long.valueOf(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID)));
+				stmt.setLong(1, Long.parseLong(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID)));
 			}
 			ResultSet rs = stmt.executeQuery();
 
