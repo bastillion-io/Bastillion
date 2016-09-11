@@ -121,10 +121,10 @@ public class SessionAuditDB {
             int i=1;
             //set filters in prepared statement
             if(StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_USER_ID))){
-                stmt.setLong(i++, Long.valueOf(sortedSet.getFilterMap().get(FILTER_BY_USER_ID)));
+                stmt.setLong(i++, Long.parseLong(sortedSet.getFilterMap().get(FILTER_BY_USER_ID)));
             }
             if(StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_ID))){
-                stmt.setLong(i, Long.valueOf(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_ID)));
+                stmt.setLong(i, Long.parseLong(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM_ID)));
             }
 
             ResultSet rs = stmt.executeQuery();
