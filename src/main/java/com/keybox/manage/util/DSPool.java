@@ -35,8 +35,9 @@ public class DSPool {
     private static String DB_PATH = AppConfig.getProperty("dbPath");
     private static int MAX_ACTIVE = Integer.parseInt(AppConfig.getProperty("maxActive"));
     private static boolean TEST_ON_BORROW = Boolean.valueOf(AppConfig.getProperty("testOnBorrow"));
-    private static  int MIN_IDLE = Integer.parseInt(AppConfig.getProperty("minIdle"));
+    private static int MIN_IDLE = Integer.parseInt(AppConfig.getProperty("minIdle"));
     private static int MAX_WAIT = Integer.parseInt(AppConfig.getProperty("maxWait"));
+    private static String DB_OPTIONS = AppConfig.getProperty("dbOptions");
 
     private DSPool() {
     }
@@ -69,7 +70,11 @@ public class DSPool {
         // create a database connection
         String user = "keybox";
         String password = "filepwd 45WJLnwhpA47EepT162hrVnDn3vYRvJhpZi0sVdvN9Sdsf";
-        String connectionURI = "jdbc:h2:" + getDBPath() + "/keybox;CIPHER=AES";
+        String connectionURI = "jdbc:h2:" + getDBPath() + "/keybox;CIPHER=AES;";
+
+        if (StringUtils.isNotEmpty(DB_OPTIONS)) {
+           connectionURI = connectionURI + DB_OPTIONS;
+        }
 
         String validationQuery = "select 1";
 
