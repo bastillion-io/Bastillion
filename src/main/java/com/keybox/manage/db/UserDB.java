@@ -252,6 +252,7 @@ public class UserDB {
             if (rs != null && rs.next()) {
                 userId = rs.getLong(1);
             }
+            DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
 
         } catch (Exception e) {
