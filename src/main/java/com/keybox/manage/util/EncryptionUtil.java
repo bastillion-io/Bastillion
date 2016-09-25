@@ -33,7 +33,7 @@ public class EncryptionUtil {
     private static Logger log = LoggerFactory.getLogger(EncryptionUtil.class);
 
     //secret key
-    private static final byte[] key = new byte[]{'d', '3', '2', 't', 'p', 'd', 'M', 'o', 'I', '8', 'x', 'z', 'a', 'P', 'o', 'd'};
+    private static final byte[] key = KeyStoreUtil.getSecretBytes(KeyStoreUtil.ENCRYPTION_KEY_ALIAS);
 
     private EncryptionUtil() {
     }

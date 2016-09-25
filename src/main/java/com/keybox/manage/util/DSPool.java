@@ -32,12 +32,14 @@ public class DSPool {
 
     private static PoolingDataSource dsPool;
 
-    private static String DB_PATH = AppConfig.getProperty("dbPath");
-    private static int MAX_ACTIVE = Integer.parseInt(AppConfig.getProperty("maxActive"));
-    private static boolean TEST_ON_BORROW = Boolean.valueOf(AppConfig.getProperty("testOnBorrow"));
-    private static int MIN_IDLE = Integer.parseInt(AppConfig.getProperty("minIdle"));
-    private static int MAX_WAIT = Integer.parseInt(AppConfig.getProperty("maxWait"));
-    private static String DB_OPTIONS = AppConfig.getProperty("dbOptions");
+    public static final String DB_USER = "keybox";
+
+    private static final String DB_PATH = AppConfig.getProperty("dbPath");
+    private static final int MAX_ACTIVE = Integer.parseInt(AppConfig.getProperty("maxActive"));
+    private static final boolean TEST_ON_BORROW = Boolean.valueOf(AppConfig.getProperty("testOnBorrow"));
+    private static final int MIN_IDLE = Integer.parseInt(AppConfig.getProperty("minIdle"));
+    private static final int MAX_WAIT = Integer.parseInt(AppConfig.getProperty("maxWait"));
+    private static final String DB_OPTIONS = AppConfig.getProperty("dbOptions");
 
     private DSPool() {
     }
@@ -51,7 +53,6 @@ public class DSPool {
 
     public static org.apache.commons.dbcp.PoolingDataSource getDataSource() {
         if (dsPool == null) {
-
             dsPool = registerDataSource();
         }
         return dsPool;
@@ -66,10 +67,8 @@ public class DSPool {
 
     private static PoolingDataSource registerDataSource() {
 
-
         // create a database connection
-        String user = "keybox";
-        String password = "filepwd 45WJLnwhpA47EepT162hrVnDn3vYRvJhpZi0sVdvN9Sdsf";
+        String password = "filepwd " + KeyStoreUtil.getSecretString(KeyStoreUtil.DB_PASS_ALIAS);
         String connectionURI = "jdbc:h2:" + getDBPath() + "/keybox;CIPHER=AES;";
 
         if (StringUtils.isNotEmpty(DB_OPTIONS)) {
@@ -84,7 +83,6 @@ public class DSPool {
             log.error(ex.toString(), ex);
         }
 
-
         GenericObjectPool connectionPool = new GenericObjectPool(null);
 
         connectionPool.setMaxActive(MAX_ACTIVE);
@@ -93,9 +91,7 @@ public class DSPool {
         connectionPool.setMaxWait(MAX_WAIT);
         connectionPool.setWhenExhaustedAction(GenericObjectPool.WHEN_EXHAUSTED_BLOCK);
 
-
-        ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(connectionURI, user, password);
-
+        ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(connectionURI, DB_USER, password);
 
         new PoolableConnectionFactory(connectionFactory, connectionPool, null, validationQuery, false, true);
 

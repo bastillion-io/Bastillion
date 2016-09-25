@@ -1,12 +1,12 @@
 /**
  * Copyright 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
- *
+ * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,9 +17,10 @@ package com.keybox.common.db;
 
 import com.keybox.common.util.AppConfig;
 import com.keybox.manage.model.Auth;
-import com.keybox.manage.model.SessionOutput;
 import com.keybox.manage.util.DBUtils;
+import com.keybox.manage.util.DSPool;
 import com.keybox.manage.util.EncryptionUtil;
+import com.keybox.manage.util.KeyStoreUtil;
 import com.keybox.manage.util.RefreshAuthKeyUtil;
 import com.keybox.manage.util.SSHUtil;
 
@@ -30,6 +31,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +44,7 @@ import org.slf4j.LoggerFactory;
 		loadOnStartup = 1)
 public class DBInitServlet extends javax.servlet.http.HttpServlet {
 
-    private static Logger log = LoggerFactory.getLogger(DBInitServlet.class);
+	private static Logger log = LoggerFactory.getLogger(DBInitServlet.class);
 
 	/**
 	 * task init method that created DB and generated public/private keys
@@ -65,10 +67,19 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 			ResultSet rs = statement.executeQuery("select * from information_schema.tables where upper(table_name) = 'USERS' and table_schema='PUBLIC'");
 			if (!rs.next()) {
 				resetSSHKey = true;
-				statement.executeUpdate("create table if not exists users (id INTEGER PRIMARY KEY AUTO_INCREMENT, first_nm varchar, last_nm varchar, email varchar, username varchar not null, password varchar, auth_token varchar, enabled boolean not null default true, auth_type varchar not null default '" + Auth.AUTH_BASIC+ "', user_type varchar not null default '" + Auth.ADMINISTRATOR + "', salt varchar, otp_secret varchar)");
-				
-				statement.executeUpdate("create table if not exists user_theme (user_id INTEGER PRIMARY KEY, bg varchar(7), fg varchar(7), d1 varchar(7), d2 varchar(7), d3 varchar(7), d4 varchar(7), d5 varchar(7), d6 varchar(7), d7 varchar(7), d8 varchar(7), b1 varchar(7), b2 varchar(7), b3 varchar(7), b4 varchar(7), b5 varchar(7), b6 varchar(7), b7 varchar(7), b8 varchar(7), foreign key (user_id) references users(id) on delete cascade) ");
 
+				//reset keystore
+				KeyStoreUtil.resetKeyStore();
+
+				//update H2 password
+				PreparedStatement preparedStatement = connection.prepareStatement("alter user "+ DSPool.DB_USER+" SET PASSWORD ?");
+				preparedStatement.setString(1, KeyStoreUtil.getSecretString(KeyStoreUtil.DB_PASS_ALIAS));
+				preparedStatement.execute();
+				preparedStatement.close();
+
+				//create DB objects
+				statement.executeUpdate("create table if not exists users (id INTEGER PRIMARY KEY AUTO_INCREMENT, first_nm varchar, last_nm varchar, email varchar, username varchar not null, password varchar, auth_token varchar, enabled boolean not null default true, auth_type varchar not null default '" + Auth.AUTH_BASIC+ "', user_type varchar not null default '" + Auth.ADMINISTRATOR + "', salt varchar, otp_secret varchar)");
+				statement.executeUpdate("create table if not exists user_theme (user_id INTEGER PRIMARY KEY, bg varchar(7), fg varchar(7), d1 varchar(7), d2 varchar(7), d3 varchar(7), d4 varchar(7), d5 varchar(7), d6 varchar(7), d7 varchar(7), d8 varchar(7), b1 varchar(7), b2 varchar(7), b3 varchar(7), b4 varchar(7), b5 varchar(7), b6 varchar(7), b7 varchar(7), b8 varchar(7), foreign key (user_id) references users(id) on delete cascade) ");
 				statement.executeUpdate("create table if not exists system (id INTEGER PRIMARY KEY AUTO_INCREMENT, display_nm varchar not null, user varchar not null, host varchar not null, port INTEGER not null, authorized_keys varchar not null, status_cd varchar not null default 'INITIAL')");
 				statement.executeUpdate("create table if not exists profiles (id INTEGER PRIMARY KEY AUTO_INCREMENT, nm varchar not null, desc varchar not null)");
 				statement.executeUpdate("create table if not exists system_map (profile_id INTEGER, system_id INTEGER, foreign key (profile_id) references profiles(id) on delete cascade , foreign key (system_id) references system(id) on delete cascade, primary key (profile_id, system_id))");
@@ -128,7 +139,7 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 				AppConfig.updateProperty("publicKey", "");
 				AppConfig.updateProperty("privateKey", "");
 				AppConfig.updateProperty("defaultSSHPassphrase", "${randomPassphrase}");
-				
+
 				//set to false
 				AppConfig.updateProperty("resetApplicationSSHKey", "false");
 
@@ -139,7 +150,7 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 
 
 		} catch (Exception ex) {
-            log.error(ex.toString(), ex);
+			log.error(ex.toString(), ex);
 		}
 
 		DBUtils.closeStmt(statement);
