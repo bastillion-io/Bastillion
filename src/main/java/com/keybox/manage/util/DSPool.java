@@ -32,8 +32,6 @@ public class DSPool {
 
     private static PoolingDataSource dsPool;
 
-    public static final String DB_USER = "keybox";
-
     private static final String DB_PATH = AppConfig.getProperty("dbPath");
     private static final int MAX_ACTIVE = Integer.parseInt(AppConfig.getProperty("maxActive"));
     private static final boolean TEST_ON_BORROW = Boolean.valueOf(AppConfig.getProperty("testOnBorrow"));
@@ -68,7 +66,8 @@ public class DSPool {
     private static PoolingDataSource registerDataSource() {
 
         // create a database connection
-        String password = "filepwd " + KeyStoreUtil.getSecretString(KeyStoreUtil.DB_PASS_ALIAS);
+        String user = AppConfig.getProperty("dbUser");
+        String password = "filepwd " + AppConfig.decryptProperty("dbPassword");
         String connectionURI = "jdbc:h2:" + getDBPath() + "/keybox;CIPHER=AES;";
 
         if (StringUtils.isNotEmpty(DB_OPTIONS)) {
@@ -91,7 +90,7 @@ public class DSPool {
         connectionPool.setMaxWait(MAX_WAIT);
         connectionPool.setWhenExhaustedAction(GenericObjectPool.WHEN_EXHAUSTED_BLOCK);
 
-        ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(connectionURI, DB_USER, password);
+        ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(connectionURI, user, password);
 
         new PoolableConnectionFactory(connectionFactory, connectionPool, null, validationQuery, false, true);
 

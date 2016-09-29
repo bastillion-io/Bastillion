@@ -51,8 +51,7 @@ public class KeyStoreUtil {
 			'G', '[', 'l', 'h', '$', 'U', 's', '_', 'D', 'f', 'X', '~', '.', '7', 'B', 'A', 'E', '(', '#', ']', ':',
 			'`', ',', 'k', 'y'};
 
-	//Random values for DB and encryption
-	public static final String DB_PASS_ALIAS = "KEYBOX-DB_PASS";
+	//Alias for encryption keystore
 	public static final String ENCRYPTION_KEY_ALIAS = "KEYBOX-ENCRYPTION_KEY";
 
 	static {
@@ -161,13 +160,8 @@ public class KeyStoreUtil {
 			//create keystore
 			keyStore.load(null, KEYSTORE_PASS);
 
-			//set database password
-			KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
-			keyGenerator.init(128);
-			KeyStoreUtil.setSecret(KeyStoreUtil.DB_PASS_ALIAS, keyGenerator.generateKey().getEncoded());
-
 			//set encryption key
-			keyGenerator = KeyGenerator.getInstance("AES");
+			KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
 			keyGenerator.init(128);
 			KeyStoreUtil.setSecret(KeyStoreUtil.ENCRYPTION_KEY_ALIAS, keyGenerator.generateKey().getEncoded());
 

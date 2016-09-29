@@ -81,19 +81,7 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
-    <build> <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>KeyBoxConfig.properties</include>
-                </includes>
-                <filtering>true</filtering>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-           </resource>
-        </resources>
+    <build>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>

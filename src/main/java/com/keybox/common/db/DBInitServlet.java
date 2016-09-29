@@ -32,6 +32,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
+import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +62,15 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 		Statement statement = null;
 		//check if reset ssh application key is set
 		boolean resetSSHKey = "true".equals(AppConfig.getProperty("resetApplicationSSHKey"));
+
+		//if DB password is empty generate a random
+		if(StringUtils.isEmpty(AppConfig.getProperty("dbPassword"))) {
+			AppConfig.encryptProperty("dbPassword", RandomStringUtils.randomAscii(32));
+		//else encrypt password if plain-text
+		} else if (!AppConfig.isPropertyEncrypted("dbPassword")) {
+			AppConfig.encryptProperty("dbPassword", AppConfig.getProperty("dbPassword"));
+		}
+
 		try {
 			connection = DBUtils.getConn();
 			statement = connection.createStatement();
@@ -67,15 +78,6 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 			ResultSet rs = statement.executeQuery("select * from information_schema.tables where upper(table_name) = 'USERS' and table_schema='PUBLIC'");
 			if (!rs.next()) {
 				resetSSHKey = true;
-
-				//reset keystore
-				KeyStoreUtil.resetKeyStore();
-
-				//update H2 password
-				PreparedStatement preparedStatement = connection.prepareStatement("alter user "+ DSPool.DB_USER+" SET PASSWORD ?");
-				preparedStatement.setString(1, KeyStoreUtil.getSecretString(KeyStoreUtil.DB_PASS_ALIAS));
-				preparedStatement.execute();
-				preparedStatement.close();
 
 				//create DB objects
 				statement.executeUpdate("create table if not exists users (id INTEGER PRIMARY KEY AUTO_INCREMENT, first_nm varchar, last_nm varchar, email varchar, username varchar not null, password varchar, auth_token varchar, enabled boolean not null default true, auth_type varchar not null default '" + Auth.AUTH_BASIC+ "', user_type varchar not null default '" + Auth.ADMINISTRATOR + "', salt varchar, otp_secret varchar)");

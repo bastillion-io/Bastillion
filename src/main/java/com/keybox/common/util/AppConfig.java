@@ -15,6 +15,7 @@
  */
 package com.keybox.common.util;
 
+import com.keybox.manage.util.EncryptionUtil;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang3.StringUtils;
 import java.util.*;
@@ -98,11 +99,62 @@ public class AppConfig {
     public static void updateProperty(String name, String value) {
 
         //remove property
-        try {
-            prop.setProperty(name, value);
-            prop.save();
-        } catch (Exception ex) {
-            log.error(ex.toString(), ex);
+        if(StringUtils.isNotEmpty(value)) {
+            try {
+                prop.setProperty(name, value);
+                prop.save();
+            } catch (Exception ex) {
+                log.error(ex.toString(), ex);
+            }
+        }
+    }
+
+
+    /**
+     * checks if property is encrypted
+     *
+     * @param name property name
+     * @return true if property is encrypted
+     */
+    public static boolean isPropertyEncrypted(String name) {
+        String property = prop.getString(name);
+        if(StringUtils.isNotEmpty(property)) {
+            return property.matches("^" +  EncryptionUtil.CRYPT_ALGORITHM + "\\{.*\\}$");
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * decrypts and returns the property from config
+     *
+     * @param name property name
+     * @return configuration property
+     */
+    public static String decryptProperty(String name) {
+        String retVal = prop.getString(name);
+        if(StringUtils.isNotEmpty(retVal)) {
+            retVal = retVal.replaceAll("^" +  EncryptionUtil.CRYPT_ALGORITHM + "\\{", "").replaceAll("\\}$","");
+            retVal = EncryptionUtil.decrypt(retVal);
+        }
+        return  retVal;
+    }
+
+    /**
+     * encrypts and updates the property in the config
+     *
+     * @param name property name
+     * @param value property value
+     */
+    public static void encryptProperty(String name, String value) {
+        //remove property
+        if(StringUtils.isNotEmpty(value)) {
+            try {
+                prop.setProperty(name, EncryptionUtil.CRYPT_ALGORITHM + "{" + EncryptionUtil.encrypt(value) + "}");
+                prop.save();
+            } catch (Exception ex) {
+                log.error(ex.toString(), ex);
+            }
         }
     }
 

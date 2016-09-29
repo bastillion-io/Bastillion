@@ -35,6 +35,9 @@ public class EncryptionUtil {
     //secret key
     private static final byte[] key = KeyStoreUtil.getSecretBytes(KeyStoreUtil.ENCRYPTION_KEY_ALIAS);
 
+    public static final String CRYPT_ALGORITHM = "AES";
+    public static final String HASH_ALGORITHM = "SHA-256";
+
     private EncryptionUtil() {
     }
 
@@ -60,7 +63,7 @@ public class EncryptionUtil {
     public static String hash(String str, String salt) {
         String hash = null;
         try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            MessageDigest md = MessageDigest.getInstance(HASH_ALGORITHM);
             if (StringUtils.isNotEmpty(salt)) {
                 md.update(Base64.decodeBase64(salt.getBytes()));
             }
@@ -93,8 +96,8 @@ public class EncryptionUtil {
         String retVal = null;
         if (str != null && str.length() > 0) {
             try {
-                Cipher c = Cipher.getInstance("AES");
-                c.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, "AES"));
+                Cipher c = Cipher.getInstance(CRYPT_ALGORITHM);
+                c.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, CRYPT_ALGORITHM));
                 byte[] encVal = c.doFinal(str.getBytes());
                 retVal = new String(Base64.encodeBase64(encVal));
             } catch (Exception ex) {
@@ -115,8 +118,8 @@ public class EncryptionUtil {
         String retVal = null;
         if (str != null && str.length() > 0) {
             try {
-                Cipher c = Cipher.getInstance("AES");
-                c.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, "AES"));
+                Cipher c = Cipher.getInstance(CRYPT_ALGORITHM);
+                c.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, CRYPT_ALGORITHM));
                 byte[] decodedVal = Base64.decodeBase64(str.getBytes());
                 retVal = new String(c.doFinal(decodedVal));
             } catch (Exception ex) {
