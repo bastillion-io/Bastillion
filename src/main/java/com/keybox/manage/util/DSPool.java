@@ -67,9 +67,12 @@ public class DSPool {
 
         // create a database connection
         String user = AppConfig.getProperty("dbUser");
-        String password = "filepwd " + AppConfig.decryptProperty("dbPassword");
+        String password = AppConfig.decryptProperty("dbPassword");
         String connectionURL = AppConfig.getProperty("dbConnectionURL");
 
+        if(connectionURL != null && connectionURL.contains("CIPHER=")) {
+           password = "filepwd " + password;
+        }
 
         String validationQuery = "select 1";
 
