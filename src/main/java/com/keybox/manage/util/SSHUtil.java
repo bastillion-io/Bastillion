@@ -1,12 +1,12 @@
 /**
  * Copyright 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
- *
+ * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -40,14 +40,14 @@ public class SSHUtil {
 	public static final String PRIVATE_KEY = "privateKey";
 	public static final String PUBLIC_KEY = "publicKey";
 	private static Logger log = LoggerFactory.getLogger(SSHUtil.class);
-    public static final boolean keyManagementEnabled = "true".equals(AppConfig.getProperty("keyManagementEnabled"));
+	public static final boolean keyManagementEnabled = "true".equals(AppConfig.getProperty("keyManagementEnabled"));
 
 	//system path to public/private key
-	public static final String KEY_PATH = DBUtils.class.getClassLoader().getResource("keydb").getPath();
+	public static final String KEY_PATH = SSHUtil.class.getClassLoader().getResource(".").getPath() + "keydb";
 
 	//key type - rsa or dsa
 	public static final String KEY_TYPE = AppConfig.getProperty("sshKeyType");
-	public static final int KEY_LENGTH= StringUtils.isNumeric(AppConfig.getProperty("sshKeyLength")) ? Integer.parseInt(AppConfig.getProperty("sshKeyLength")) : 2048;
+	public static final int KEY_LENGTH = StringUtils.isNumeric(AppConfig.getProperty("sshKeyLength")) ? Integer.parseInt(AppConfig.getProperty("sshKeyLength")) : 2048;
 
 	//private key name
 	public static final String PVT_KEY = KEY_PATH + "/id_" + KEY_TYPE;
@@ -117,7 +117,6 @@ public class SSHUtil {
 	 */
 	public static String keyGen() {
 
-
 		//get passphrase cmd from properties file
 		Map<String, String> replaceMap = new HashMap<>();
 		replaceMap.put("randomPassphrase", UUID.randomUUID().toString());
@@ -173,38 +172,37 @@ public class SSHUtil {
 	 */
 	public static String keyGen(String passphrase) {
 
-		deleteGenSSHKeys();
+		try {
+			FileUtils.forceMkdir(new File(KEY_PATH));
+			deleteGenSSHKeys();
 
-		if (StringUtils.isEmpty(AppConfig.getProperty(PRIVATE_KEY)) || StringUtils.isEmpty(AppConfig.getProperty(PUBLIC_KEY))) {
+			if (StringUtils.isEmpty(AppConfig.getProperty(PRIVATE_KEY)) || StringUtils.isEmpty(AppConfig.getProperty(PUBLIC_KEY))) {
 
-			//set key type
-			int type = KeyPair.RSA;
-			if("dsa".equals(SSHUtil.KEY_TYPE)) {
-				type = KeyPair.DSA;
-			} else if("ecdsa".equals(SSHUtil.KEY_TYPE)) {
-				type = KeyPair.ECDSA;
-			}
-			String comment = "keybox@global_key";
+				//set key type
+				int type = KeyPair.RSA;
+				if ("dsa".equals(SSHUtil.KEY_TYPE)) {
+					type = KeyPair.DSA;
+				} else if ("ecdsa".equals(SSHUtil.KEY_TYPE)) {
+					type = KeyPair.ECDSA;
+				}
+				String comment = "keybox@global_key";
 
-			JSch jsch = new JSch();
+				JSch jsch = new JSch();
 
-			try {
 
 				KeyPair keyPair = KeyPair.genKeyPair(jsch, type, KEY_LENGTH);
 
 				keyPair.writePrivateKey(PVT_KEY, passphrase.getBytes());
 				keyPair.writePublicKey(PUB_KEY, comment);
-                System.out.println("Finger print: " + keyPair.getFingerPrint());
+				System.out.println("Finger print: " + keyPair.getFingerPrint());
 				keyPair.dispose();
-			} catch (Exception e) {
-				log.error(e.toString(), e);
 			}
+
+		} catch (Exception e) {
+			log.error(e.toString(), e);
 		}
 
-
 		return passphrase;
-
-
 	}
 
 	/**
@@ -256,7 +254,7 @@ public class SSHUtil {
 				hostSystem.setStatusCd(HostSystem.PUBLIC_KEY_FAIL_STATUS);
 			} else if (e.getMessage().toLowerCase().contains("auth fail") || e.getMessage().toLowerCase().contains("auth cancel")) {
 				hostSystem.setStatusCd(HostSystem.AUTH_FAIL_STATUS);
-			} else if (e.getMessage().toLowerCase().contains("unknownhostexception")){
+			} else if (e.getMessage().toLowerCase().contains("unknownhostexception")) {
 				hostSystem.setErrorMsg("DNS Lookup Failed");
 				hostSystem.setStatusCd(HostSystem.HOST_FAIL_STATUS);
 			} else {
@@ -354,31 +352,30 @@ public class SSHUtil {
 			while ((currentKey = reader.readLine()) != null) {
 				existingKeysBuilder.append(currentKey).append("\n");
 			}
-			String existingKeys=existingKeysBuilder.toString();
-			existingKeys = existingKeys.replaceAll("\\n$","");
+			String existingKeys = existingKeysBuilder.toString();
+			existingKeys = existingKeys.replaceAll("\\n$", "");
 			reader.close();
 			//disconnect
 			channel.disconnect();
-			
+
 			StringBuilder newKeysBuilder = new StringBuilder("");
 			if (keyManagementEnabled) {
 				//get keys assigned to system
 				List<String> assignedKeys = PublicKeyDB.getPublicKeysForSystem(hostSystem.getId());
-				for (String key: assignedKeys) {
+				for (String key : assignedKeys) {
 					newKeysBuilder.append(key.replace("\n", "").trim()).append("\n");
 				}
 				newKeysBuilder.append(appPubKey);
 			} else {
 				if (existingKeys.indexOf(appPubKey) < 0) {
 					newKeysBuilder.append(existingKeys).append("\n").append(appPubKey);
-				}
-				else {
+				} else {
 					newKeysBuilder.append(existingKeys);
 				}
 			}
 
-			String newKeys=newKeysBuilder.toString();
-			if(!newKeys.equals(existingKeys)) {
+			String newKeys = newKeysBuilder.toString();
+			if (!newKeys.equals(existingKeys)) {
 				log.info("Update Public Keys  ==> " + newKeys);
 				channel = session.openChannel("exec");
 				((ChannelExec) channel).setCommand("echo '" + newKeys + "' > " + authorizedKeys + "; chmod 600 " + authorizedKeys);
@@ -404,12 +401,12 @@ public class SSHUtil {
 	 * @param userSessionMap user session map
 	 * @return
 	 */
-	private static int getNextInstanceId(Long sessionId, Map<Long, UserSchSessions> userSessionMap ){
+	private static int getNextInstanceId(Long sessionId, Map<Long, UserSchSessions> userSessionMap) {
 
-		Integer instanceId=1;
-		if(userSessionMap.get(sessionId)!=null){
+		Integer instanceId = 1;
+		if (userSessionMap.get(sessionId) != null) {
 
-			for(Integer id :userSessionMap.get(sessionId).getSchSessionMap().keySet()) {
+			for (Integer id : userSessionMap.get(sessionId).getSchSessionMap().keySet()) {
 				if (!id.equals(instanceId) && userSessionMap.get(sessionId).getSchSessionMap().get(instanceId) == null) {
 					return instanceId;
 				}
@@ -419,8 +416,8 @@ public class SSHUtil {
 		return instanceId;
 
 	}
-	
-	
+
+
 	/**
 	 * open new ssh session on host system
 	 *
@@ -436,7 +433,7 @@ public class SSHUtil {
 
 		JSch jsch = new JSch();
 
-		int instanceId = getNextInstanceId(sessionId,userSessionMap);
+		int instanceId = getNextInstanceId(sessionId, userSessionMap);
 		hostSystem.setStatusCd(HostSystem.SUCCESS_STATUS);
 		hostSystem.setInstanceId(instanceId);
 
@@ -510,9 +507,9 @@ public class SSHUtil {
 				hostSystem.setStatusCd(HostSystem.PUBLIC_KEY_FAIL_STATUS);
 			} else if (e.getMessage().toLowerCase().contains("auth fail") || e.getMessage().toLowerCase().contains("auth cancel")) {
 				hostSystem.setStatusCd(HostSystem.AUTH_FAIL_STATUS);
-			} else if (e.getMessage().toLowerCase().contains("unknownhostexception")){
+			} else if (e.getMessage().toLowerCase().contains("unknownhostexception")) {
 				hostSystem.setErrorMsg("DNS Lookup Failed");
-				hostSystem.setStatusCd(HostSystem.HOST_FAIL_STATUS);	
+				hostSystem.setStatusCd(HostSystem.HOST_FAIL_STATUS);
 			} else {
 				hostSystem.setStatusCd(HostSystem.GENERIC_FAIL_STATUS);
 			}
@@ -600,18 +597,18 @@ public class SSHUtil {
 	 * @param publicKey public key 
 	 * @return fingerprint of public key                     
 	 */
-	public static String getFingerprint(String publicKey){
-		String fingerprint=null;
-		if(StringUtils.isNotEmpty(publicKey)){
+	public static String getFingerprint(String publicKey) {
+		String fingerprint = null;
+		if (StringUtils.isNotEmpty(publicKey)) {
 			try {
- 				KeyPair keyPair = KeyPair.load(new JSch(), null, publicKey.getBytes());
-				if(keyPair != null){
-					fingerprint=keyPair.getFingerPrint();
+				KeyPair keyPair = KeyPair.load(new JSch(), null, publicKey.getBytes());
+				if (keyPair != null) {
+					fingerprint = keyPair.getFingerPrint();
 				}
-			} catch (JSchException ex){
+			} catch (JSchException ex) {
 				log.error(ex.toString(), ex);
 			}
-			
+
 		}
 		return fingerprint;
 
@@ -623,36 +620,33 @@ public class SSHUtil {
 	 * @param publicKey public key 
 	 * @return fingerprint of public key                     
 	 */
-	public static String getKeyType(String publicKey){
-		String keyType=null;
-		if(StringUtils.isNotEmpty(publicKey)){
+	public static String getKeyType(String publicKey) {
+		String keyType = null;
+		if (StringUtils.isNotEmpty(publicKey)) {
 			try {
 				KeyPair keyPair = KeyPair.load(new JSch(), null, publicKey.getBytes());
-				if(keyPair != null) {
-					int type =keyPair.getKeyType();
-					if(KeyPair.DSA == type){
-						keyType="DSA";
-					} else if (KeyPair.RSA == type){
-						keyType="RSA";
-					} else if (KeyPair.ECDSA == type){
-						keyType="ECDSA";
-					} else if(KeyPair.UNKNOWN ==type){
-						keyType="UNKNOWN";
-					} else if(KeyPair.ERROR == type){
-						keyType="ERROR";
+				if (keyPair != null) {
+					int type = keyPair.getKeyType();
+					if (KeyPair.DSA == type) {
+						keyType = "DSA";
+					} else if (KeyPair.RSA == type) {
+						keyType = "RSA";
+					} else if (KeyPair.ECDSA == type) {
+						keyType = "ECDSA";
+					} else if (KeyPair.UNKNOWN == type) {
+						keyType = "UNKNOWN";
+					} else if (KeyPair.ERROR == type) {
+						keyType = "ERROR";
 					}
 				}
 
-			} catch (JSchException ex){
+			} catch (JSchException ex) {
 				log.error(ex.toString(), ex);
 			}
 		}
 		return keyType;
 
 	}
-
-	
-
 
 
 }
