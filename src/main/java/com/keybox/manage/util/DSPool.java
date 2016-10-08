@@ -32,12 +32,11 @@ public class DSPool {
 
     private static PoolingDataSource dsPool;
 
-    private static final String DB_PATH = AppConfig.getProperty("dbPath");
+    private static final String BASE_DIR = DBUtils.class.getClassLoader().getResource(".").getPath();
     private static final int MAX_ACTIVE = Integer.parseInt(AppConfig.getProperty("maxActive"));
     private static final boolean TEST_ON_BORROW = Boolean.valueOf(AppConfig.getProperty("testOnBorrow"));
     private static final int MIN_IDLE = Integer.parseInt(AppConfig.getProperty("minIdle"));
     private static final int MAX_WAIT = Integer.parseInt(AppConfig.getProperty("maxWait"));
-    private static final String DB_OPTIONS = AppConfig.getProperty("dbOptions");
 
     private DSPool() {
     }
@@ -64,15 +63,13 @@ public class DSPool {
      */
 
     private static PoolingDataSource registerDataSource() {
+        System.setProperty("h2.baseDir", BASE_DIR);
 
         // create a database connection
         String user = AppConfig.getProperty("dbUser");
         String password = "filepwd " + AppConfig.decryptProperty("dbPassword");
-        String connectionURI = "jdbc:h2:" + getDBPath() + "/keybox;CIPHER=AES;";
+        String connectionURL = AppConfig.getProperty("dbConnectionURL");
 
-        if (StringUtils.isNotEmpty(DB_OPTIONS)) {
-           connectionURI = connectionURI + DB_OPTIONS;
-        }
 
         String validationQuery = "select 1";
 
@@ -90,20 +87,12 @@ public class DSPool {
         connectionPool.setMaxWait(MAX_WAIT);
         connectionPool.setWhenExhaustedAction(GenericObjectPool.WHEN_EXHAUSTED_BLOCK);
 
-        ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(connectionURI, user, password);
+        ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(connectionURL, user, password);
 
         new PoolableConnectionFactory(connectionFactory, connectionPool, null, validationQuery, false, true);
 
         return new PoolingDataSource(connectionPool);
 
-    }
-
-    private static String getDBPath() {
-        if(StringUtils.isEmpty(DB_PATH)){
-            //system path to the H2 DB
-            return DBUtils.class.getClassLoader().getResource("keydb").getPath();
-        }
-        return DB_PATH;
     }
 
 }
