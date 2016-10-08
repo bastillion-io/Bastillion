@@ -194,7 +194,7 @@ public class SSHUtil {
 
 				keyPair.writePrivateKey(PVT_KEY, passphrase.getBytes());
 				keyPair.writePublicKey(PUB_KEY, comment);
-                System.out.println("Finger print: " + keyPair.getFingerPrint());
+                log.info("Finger print: " + keyPair.getFingerPrint());
 				keyPair.dispose();
 			} catch (Exception e) {
 				log.error(e.toString(), e);
