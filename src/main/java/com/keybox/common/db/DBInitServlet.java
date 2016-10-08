@@ -65,7 +65,24 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 
 		//if DB password is empty generate a random
 		if(StringUtils.isEmpty(AppConfig.getProperty("dbPassword"))) {
-			AppConfig.encryptProperty("dbPassword", RandomStringUtils.randomAscii(32));
+			String dbPassword = null;
+			String dbPasswordConfirm = null;
+			//prompt for password and confirmation
+			while (dbPassword == null || !dbPassword.equals(dbPasswordConfirm)) {
+				dbPassword = new String(System.console().readPassword("Please enter database password: "));
+				dbPasswordConfirm = new String(System.console().readPassword("Please confirm database password: "));
+				if(!dbPassword.equals(dbPasswordConfirm)) {
+					System.out.println("Passwords do not match");
+				}
+			}
+			//set password
+			if(StringUtils.isNotEmpty(dbPassword)) {
+				AppConfig.encryptProperty("dbPassword", dbPassword);
+			//if password not set generate a random
+			} else {
+				System.out.println("Generating random database password");
+				AppConfig.encryptProperty("dbPassword", RandomStringUtils.randomAscii(32));
+			}
 		//else encrypt password if plain-text
 		} else if (!AppConfig.isPropertyEncrypted("dbPassword")) {
 			AppConfig.encryptProperty("dbPassword", AppConfig.getProperty("dbPassword"));
