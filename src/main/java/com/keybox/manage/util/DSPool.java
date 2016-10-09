@@ -33,6 +33,7 @@ public class DSPool {
     private static PoolingDataSource dsPool;
 
     private static final String BASE_DIR = DBUtils.class.getClassLoader().getResource(".").getPath();
+    private static final String DB_DRIVER = AppConfig.getProperty("dbDriver");
     private static final int MAX_ACTIVE = Integer.parseInt(AppConfig.getProperty("maxActive"));
     private static final boolean TEST_ON_BORROW = Boolean.valueOf(AppConfig.getProperty("testOnBorrow"));
     private static final int MIN_IDLE = Integer.parseInt(AppConfig.getProperty("minIdle"));
@@ -77,7 +78,7 @@ public class DSPool {
         String validationQuery = "select 1";
 
         try {
-            Class.forName("org.h2.Driver");
+            Class.forName(DB_DRIVER);
         } catch (ClassNotFoundException ex) {
             log.error(ex.toString(), ex);
         }
