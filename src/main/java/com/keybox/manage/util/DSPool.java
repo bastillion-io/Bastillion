@@ -15,12 +15,10 @@
  */
 package com.keybox.manage.util;
 
-import org.apache.commons.dbcp.*;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.pool.impl.GenericObjectPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.keybox.common.util.AppConfig;
+import org.apache.commons.dbcp2.BasicDataSource;
 
 /**
  * Class to create a pooling data source object using commons DBCP
@@ -30,7 +28,7 @@ public class DSPool {
 
     private static Logger log = LoggerFactory.getLogger(DSPool.class);
 
-    private static PoolingDataSource dsPool;
+    private static BasicDataSource dsPool =  null;
 
     private static final String BASE_DIR = DBUtils.class.getClassLoader().getResource(".").getPath();
     private static final String DB_DRIVER = AppConfig.getProperty("dbDriver");
@@ -49,7 +47,7 @@ public class DSPool {
      * @return data source pool
      */
 
-    public static org.apache.commons.dbcp.PoolingDataSource getDataSource() {
+    public static BasicDataSource getDataSource() {
         if (dsPool == null) {
             dsPool = registerDataSource();
         }
@@ -63,7 +61,7 @@ public class DSPool {
      * @return pooling database object
      */
 
-    private static PoolingDataSource registerDataSource() {
+    private static BasicDataSource registerDataSource() {
         System.setProperty("h2.baseDir", BASE_DIR);
 
         // create a database connection
@@ -77,25 +75,18 @@ public class DSPool {
 
         String validationQuery = "select 1";
 
-        try {
-            Class.forName(DB_DRIVER);
-        } catch (ClassNotFoundException ex) {
-            log.error(ex.toString(), ex);
-        }
+        BasicDataSource dataSource = new BasicDataSource();
+        dataSource.setDriverClassName(DB_DRIVER);
+        dataSource.setMaxTotal(MAX_ACTIVE);
+        dataSource.setTestOnBorrow(TEST_ON_BORROW);
+        dataSource.setMinIdle(MIN_IDLE);
+        dataSource.setMaxWaitMillis(MAX_WAIT);
+        dataSource.setValidationQuery(validationQuery);
+        dataSource.setUsername(user);
+        dataSource.setPassword(password);
+        dataSource.setUrl(connectionURL);
 
-        GenericObjectPool connectionPool = new GenericObjectPool(null);
-
-        connectionPool.setMaxActive(MAX_ACTIVE);
-        connectionPool.setTestOnBorrow(TEST_ON_BORROW);
-        connectionPool.setMinIdle(MIN_IDLE);
-        connectionPool.setMaxWait(MAX_WAIT);
-        connectionPool.setWhenExhaustedAction(GenericObjectPool.WHEN_EXHAUSTED_BLOCK);
-
-        ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(connectionURL, user, password);
-
-        new PoolableConnectionFactory(connectionFactory, connectionPool, null, validationQuery, false, true);
-
-        return new PoolingDataSource(connectionPool);
+        return dataSource;
 
     }
 
