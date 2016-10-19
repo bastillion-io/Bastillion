@@ -22,11 +22,11 @@
 
     <Loggers>
         <!-- System audit example using logstash
-        <Logger name="com.keybox.manage.util.SystemAudit" level="info">
+        <Logger name="com.keybox.manage.util.SystemAudit" level="info" additivity="false">
             <AppenderRef ref="logstash-socket-appender"/>
         </Logger>
         -->
-        <Logger name="com.keybox.manage.action.LoginAudit" level="info">
+        <Logger name="com.keybox.manage.action.LoginAudit" level="info" additivity="false">
             <AppenderRef ref="login-appender"/>
         </Logger>
         <Root level="warn">
