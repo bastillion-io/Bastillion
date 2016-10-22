@@ -94,23 +94,6 @@ By default KeyBox will generated and distribute the SSH keys managed by administ
 	#set to true to generate keys when added/managed by users and enforce strong passphrases set to false to allow users to set their own public key
 	forceUserKeyGeneration=false
 
-Database settings can be adjusted in the configuration properties.
-
-    #Database user
-    dbUser=keybox
-    #Database password
-    dbPassword=p@$$w0rd!!
-    #Database JDBC driver
-    dbDriver=org.h2.Driver
-    #Connection URL to the DB
-    dbConnectionURL=jdbc:h2:keydb/keybox;CIPHER=AES;
-
-By default the datastore is set as embedded, but a remote H2 database can supported through adjusting the connection URL.
-
-    #Connection URL to the DB
-	dbConnectionURL=jdbc:h2:tcp://<host>:<port>/~/keybox;CIPHER=AES;
-
-
 Supplying a Custom SSH Key Pair
 ------
 KeyBox generates its own public/private SSH key upon initial startup for use when registering systems.  You can specify a custom SSH key pair in the KeyBoxConfig.properties file.
@@ -134,6 +117,23 @@ For example:
 	
 After startup and once the key has been registered it can then be removed from the system. The passphrase and the key paths will be removed from the configuration file.
 
+Adjusting Database Settings
+------
+Database settings can be adjusted in the configuration properties.
+
+    #Database user
+    dbUser=keybox
+    #Database password
+    dbPassword=p@$$w0rd!!
+    #Database JDBC driver
+    dbDriver=org.h2.Driver
+    #Connection URL to the DB
+    dbConnectionURL=jdbc:h2:keydb/keybox;CIPHER=AES;
+
+By default the datastore is set as embedded, but a remote H2 database can supported through adjusting the connection URL.
+
+    #Connection URL to the DB
+	dbConnectionURL=jdbc:h2:tcp://<host>:<port>/~/keybox;CIPHER=AES;
 
 External Authentication
 ------
