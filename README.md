@@ -94,6 +94,22 @@ By default KeyBox will generated and distribute the SSH keys managed by administ
 	#set to true to generate keys when added/managed by users and enforce strong passphrases set to false to allow users to set their own public key
 	forceUserKeyGeneration=false
 
+Database settings can be adjusted in the configuration properties.
+
+    #Database user
+    dbUser=keybox
+    #Database password
+    dbPassword=p@$$w0rd!!
+    #Database JDBC driver
+    dbDriver=org.h2.Driver
+    #Connection URL to the DB
+    dbConnectionURL=jdbc:h2:keydb/keybox;CIPHER=AES;
+
+By default the datastore is set as embedded, but a remote H2 database can supported through adjusting the connection URL.
+
+    #Connection URL to the DB
+	dbConnectionURL=jdbc:h2:tcp://<host>:<port>/~/keybox;CIPHER=AES;
+
 
 Supplying a Custom SSH Key Pair
 ------
