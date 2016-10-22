@@ -76,7 +76,9 @@ public class SystemStatusDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
     }
 
     /**
@@ -143,7 +145,9 @@ public class SystemStatusDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
     }
 
@@ -201,7 +205,9 @@ public class SystemStatusDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
         return hostSystemList;
 
     }
@@ -265,7 +271,9 @@ public class SystemStatusDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
         return hostSystem;
 
 
@@ -301,7 +309,9 @@ public class SystemStatusDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
         return hostSystem;
 
     }

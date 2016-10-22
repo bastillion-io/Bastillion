@@ -56,7 +56,6 @@ public class AuthDB {
             try {
                 con = DBUtils.getConn();
 
-
                 //get salt for user
                 String salt = getSaltByUsername(con, auth.getUsername());
                 //login
@@ -81,8 +80,9 @@ public class AuthDB {
             } catch (Exception e) {
                 log.error(e.toString(), e);
             }
-
-            DBUtils.closeConn(con);
+            finally {
+                DBUtils.closeConn(con);
+            }
         }
 
         return authToken;
@@ -101,9 +101,9 @@ public class AuthDB {
 
         String authorized = null;
 
-        Connection con = null;
         if (authToken != null && !authToken.trim().equals("")) {
 
+            Connection con = null;
             try {
                 con = DBUtils.getConn();
                 PreparedStatement stmt = con.prepareStatement("select * from users where enabled=true and id=? and auth_token=?");
@@ -122,8 +122,10 @@ public class AuthDB {
             } catch (Exception e) {
                 log.error(e.toString(), e);
             }
+            finally {
+                DBUtils.closeConn(con);
+            }
         }
-        DBUtils.closeConn(con);
         return authorized;
 
 
@@ -196,7 +198,9 @@ public class AuthDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
         return success;
     }
 
@@ -248,7 +252,9 @@ public class AuthDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         return user;
 
@@ -278,7 +284,9 @@ public class AuthDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         return sharedSecret;
 

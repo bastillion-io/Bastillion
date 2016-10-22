@@ -144,8 +144,9 @@ public class SessionAuditDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        //close db connection
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         sortedSet.setItemList(outputList);
 
@@ -172,9 +173,9 @@ public class SessionAuditDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-
-        //close db connection
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
         return sessionId;
     }
 
@@ -225,9 +226,9 @@ public class SessionAuditDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-
-        //close db connection
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
     }
 
     /**
@@ -278,9 +279,9 @@ public class SessionAuditDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-
-        //close db connection
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         return outputList;
     }
@@ -398,9 +399,9 @@ public class SessionAuditDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        //close db connection
-        DBUtils.closeConn(con);
-
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         return sessionAudit;
 

@@ -115,9 +115,9 @@ public class PublicKeyDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
-        
-         
+        finally {
+            DBUtils.closeConn(con);
+        }
     }
 
     /**
@@ -138,8 +138,9 @@ public class PublicKeyDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
-
+        finally {
+            DBUtils.closeConn(con);
+        }
     }
 
     /**
@@ -167,11 +168,11 @@ public class PublicKeyDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
-        
+        finally {
+            DBUtils.closeConn(con);
+        }
+
         return isDisabled;
-        
-        
     }
 
 
@@ -235,7 +236,9 @@ public class PublicKeyDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         sortedSet.setItemList(publicKeysList);
         return sortedSet;
@@ -284,7 +287,9 @@ public class PublicKeyDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         sortedSet.setItemList(publicKeysList);
         return sortedSet;
@@ -309,7 +314,9 @@ public class PublicKeyDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         return publicKey;
     }
@@ -377,7 +384,9 @@ public class PublicKeyDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
     }
 
@@ -411,10 +420,10 @@ public class PublicKeyDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
-
+        finally {
+            DBUtils.closeConn(con);
+        }
     }
-
 
 
     /**
@@ -438,8 +447,9 @@ public class PublicKeyDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
-
+        finally {
+            DBUtils.closeConn(con);
+        }
     }
 
     /**
@@ -461,8 +471,9 @@ public class PublicKeyDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
-
+        finally {
+            DBUtils.closeConn(con);
+        }
     }
 
     /**
@@ -484,8 +495,9 @@ public class PublicKeyDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
-
+        finally {
+            DBUtils.closeConn(con);
+        }
     }
 
 
@@ -501,7 +513,9 @@ public class PublicKeyDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         return publicKeyList;
 
@@ -570,8 +584,9 @@ public class PublicKeyDB {
         } catch (Exception ex) {
             log.error(ex.toString(), ex);
         }
-        
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         return isDuplicate;
     }
@@ -611,8 +626,10 @@ public class PublicKeyDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
-        
+        finally {
+            DBUtils.closeConn(con);
+        }
+
         return new ArrayList(keyMap.values());
 
     }

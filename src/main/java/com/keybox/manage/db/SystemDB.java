@@ -99,8 +99,9 @@ public class SystemDB {
 		} catch (Exception e) {
 			log.error(e.toString(), e);
 		}
-		DBUtils.closeConn(con);
-
+		finally {
+			DBUtils.closeConn(con);
+		}
 
 		sortedSet.setItemList(hostSystemList);
 		return sortedSet;
@@ -152,8 +153,9 @@ public class SystemDB {
 		} catch (Exception e) {
 			log.error(e.toString(), e);
 		}
-		DBUtils.closeConn(con);
-
+		finally {
+			DBUtils.closeConn(con);
+		}
 
 		sortedSet.setItemList(hostSystemList);
 		return sortedSet;
@@ -182,8 +184,9 @@ public class SystemDB {
 		} catch (Exception e) {
 			log.error(e.toString(), e);
 		}
-		DBUtils.closeConn(con);
-
+		finally {
+			DBUtils.closeConn(con);
+		}
 
 		return hostSystem;
 	}
@@ -261,9 +264,10 @@ public class SystemDB {
 		} catch (Exception e) {
 			log.error(e.toString(), e);
 		}
-		DBUtils.closeConn(con);
+		finally {
+			DBUtils.closeConn(con);
+		}
 		return userId;
-
 	}
 
 	/**
@@ -293,8 +297,9 @@ public class SystemDB {
 		} catch (Exception e) {
 			log.error(e.toString(), e);
 		}
-		DBUtils.closeConn(con);
-
+		finally {
+			DBUtils.closeConn(con);
+		}
 	}
 
 	/**
@@ -318,8 +323,9 @@ public class SystemDB {
 		} catch (Exception e) {
 			log.error(e.toString(), e);
 		}
-		DBUtils.closeConn(con);
-
+		finally {
+			DBUtils.closeConn(con);
+		}
 	}
 
 	/**
@@ -344,8 +350,9 @@ public class SystemDB {
 		} catch (Exception e) {
 			log.error(e.toString(), e);
 		}
-		DBUtils.closeConn(con);
-
+		finally {
+			DBUtils.closeConn(con);
+		}
 
 		return hostSystemListReturn;
 
@@ -386,11 +393,11 @@ public class SystemDB {
 		} catch (Exception e) {
 			log.error(e.toString(), e);
 		}
-
-		DBUtils.closeConn(con);
+		finally {
+			DBUtils.closeConn(con);
+		}
 
 		return hostSystemList;
-
 	}
 
 
@@ -471,7 +478,9 @@ public class SystemDB {
 		} catch (Exception ex) {
 			log.error(ex.toString(), ex);
 		}
-		DBUtils.closeConn(con);
+		finally {
+			DBUtils.closeConn(con);
+		}
 		return systemIdList;
 	}
 
@@ -490,7 +499,9 @@ public class SystemDB {
 		} catch (Exception ex) {
 			log.error(ex.toString(), ex);
 		}
-		DBUtils.closeConn(con);
+		finally {
+			DBUtils.closeConn(con);
+		}
 		return systemIdList;
 
 	}

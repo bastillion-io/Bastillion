@@ -68,9 +68,9 @@ public class UserProfileDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
-
-
+        finally {
+            DBUtils.closeConn(con);
+        }
     }
 
     /**
@@ -90,7 +90,9 @@ public class UserProfileDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
         return profileList;
 
 
@@ -145,7 +147,9 @@ public class UserProfileDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
         return userList;
 
 
@@ -218,7 +222,9 @@ public class UserProfileDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         return isUsersProfile;
 

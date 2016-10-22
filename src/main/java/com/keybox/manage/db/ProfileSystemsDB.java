@@ -68,9 +68,9 @@ public class ProfileSystemsDB {
 		} catch (Exception e) {
 			log.error(e.toString(), e);
 		}
-		DBUtils.closeConn(con);
-
-
+		finally {
+			DBUtils.closeConn(con);
+		}
 	}
 
 	/**
@@ -129,7 +129,9 @@ public class ProfileSystemsDB {
 		} catch (Exception e) {
 			log.error(e.toString(), e);
 		}
-		DBUtils.closeConn(con);
+		finally {
+			DBUtils.closeConn(con);
+		}
 
 		return hostSystemList;
 	}
@@ -183,7 +185,9 @@ public class ProfileSystemsDB {
 		} catch (Exception e) {
 			log.error(e.toString(), e);
 		}
-		DBUtils.closeConn(con);
+		finally {
+			DBUtils.closeConn(con);
+		}
 
 		return systemIdList;
 	}
@@ -240,7 +244,9 @@ public class ProfileSystemsDB {
 		} catch (Exception e) {
 			log.error(e.toString(), e);
 		}
-		DBUtils.closeConn(con);
+		finally {
+			DBUtils.closeConn(con);
+		}
 
 		return systemIdList;
 	}

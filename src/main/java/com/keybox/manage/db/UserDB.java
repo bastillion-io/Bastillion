@@ -88,7 +88,9 @@ public class UserDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         sortedSet.setItemList(userList);
         return sortedSet;
@@ -134,7 +136,9 @@ public class UserDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         sortedSet.setItemList(userList);
         return sortedSet;
@@ -158,7 +162,9 @@ public class UserDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         return user;
     }
@@ -215,7 +221,9 @@ public class UserDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         return userId;
 
@@ -289,8 +297,9 @@ public class UserDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
-
+        finally {
+            DBUtils.closeConn(con);
+        }
     }
 
     /**
@@ -322,8 +331,9 @@ public class UserDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
-
+        finally {
+            DBUtils.closeConn(con);
+        }
     }
 
     /**
@@ -344,8 +354,9 @@ public class UserDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
-
+        finally {
+            DBUtils.closeConn(con);
+        }
     }
 
     /**
@@ -366,8 +377,9 @@ public class UserDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
-
+        finally {
+            DBUtils.closeConn(con);
+        }
     }
 
     /**
@@ -399,7 +411,9 @@ public class UserDB {
         } catch(Exception ex){
             log.error(ex.toString(), ex);
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         return isUnique;
 

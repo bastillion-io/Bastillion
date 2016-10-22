@@ -80,7 +80,9 @@ public class ScriptDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         sortedSet.setItemList(scriptList);
         return sortedSet;
@@ -105,7 +107,9 @@ public class ScriptDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         return script;
     }
@@ -163,8 +167,9 @@ public class ScriptDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
-
+        finally {
+            DBUtils.closeConn(con);
+        }
     }
 
     /**
@@ -189,8 +194,9 @@ public class ScriptDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
-
+        finally {
+            DBUtils.closeConn(con);
+        }
     }
 
     /**
@@ -199,7 +205,6 @@ public class ScriptDB {
      * @param userId user id
      */
     public static void deleteScript(Long scriptId, Long userId) {
-
 
         Connection con = null;
         try {
@@ -213,9 +218,8 @@ public class ScriptDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
-
+        finally {
+            DBUtils.closeConn(con);
+        }
     }
-
-
 }

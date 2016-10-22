@@ -67,8 +67,9 @@ public class PrivateKeyDB {
         } catch (Exception e) {
             log.error(e.toString(), e);
         }
-        DBUtils.closeConn(con);
-
+        finally {
+            DBUtils.closeConn(con);
+        }
 
         return appKey;
     }
