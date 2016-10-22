@@ -57,7 +57,7 @@ public class SentOutputTask implements Runnable {
                     //send json to session
                     this.session.getBasicRemote().sendText(json);
                 }
-                Thread.sleep(50);
+                Thread.sleep(25);
             } catch (Exception ex) {
                 log.error(ex.toString(), ex);
             }
@@ -65,6 +65,5 @@ public class SentOutputTask implements Runnable {
                 DBUtils.closeConn(con);
             }
         }
-
     }
 }
