@@ -53,6 +53,21 @@ public class AppConfig {
     }
 
     /**
+     * gets the property from config
+     *
+     * @param name property name
+     * @param defaultValue default value if property is empty
+     * @return configuration property
+     */
+    public static String getProperty(String name, String defaultValue) {
+        String value = prop.getString(name);
+        if (StringUtils.isEmpty(value)) {
+            value = defaultValue;
+        }
+        return value;
+    }
+
+    /**
      * gets the property from config and replaces placeholders
      *
      * @param name           property name
