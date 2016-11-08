@@ -24,6 +24,25 @@
     <script type="text/javascript">
         $(document).ready(function () {
 
+            $("#filter_btn").button().click(function () {
+                if ($("#filterType").val() == 'U') {
+                    $("#userFilter").val($("#profileFilter").val());
+                    $("#systemFilter").val('');
+                }
+                else {
+                    $("#systemFilter").val($("#profileFilter").val());
+                    $("#userFilter").val('');
+                }
+                $("#viewSystemsFilter").submit();
+            });
+
+            $(".clear_btn").button().click(function() {
+                $("#userFilter").val('');
+                $("#systemFilter").val('');
+                $("#profileFilter").val('');
+                $("#viewSystemsFilter").submit();
+            });
+
             //call delete action
             $(".del_btn").button().click(function () {
                 var id = $(this).attr('id').replace("del_btn_", "");
@@ -86,7 +105,35 @@
 
         <h3>Manage System Profiles</h3>
 
-        <p>Add / Delete profiles or assign users and systems to that profile.</p>
+        Add / Delete profiles or assign users and systems to that profile.
+        <table>
+            <tr>
+                <td class="align_left">
+                    <s:form id="viewSystemsFilter" action="viewProfiles" theme="simple">
+                        <s:hidden name="sortedSet.orderByDirection"/>
+                        <s:hidden name="sortedSet.orderByField"/>
+                        <table>
+                            <tr>
+                                <td>
+                                    <s:textfield name="sortedSet.filterMap['profile']" id="profileFilter" placeholder="Find associated profiles"/>
+                                    <s:hidden  name="sortedSet.filterMap['%{@com.keybox.manage.db.ProfileDB@FILTER_BY_SYSTEM}']"
+                                              id="systemFilter"/>
+                                    <s:hidden name="sortedSet.filterMap['%{@com.keybox.manage.db.ProfileDB@FILTER_BY_USER}']"
+                                              id="userFilter"/>
+                                </td>
+                                <td>
+                                    <s:select list="#{'S':'By System','U':'By User'}" name="sortedSet.filterMap['filterType']" id="filterType"/>
+                                </td>
+                                <td>
+                                    <div id="filter_btn" class="btn btn-default">Filter</div>
+                                    <div class="btn btn-default clear_btn spacer spacer-right">Clear</div>
+                                </td>
+                            </tr>
+                        </table>
+                    </s:form>
+                </td>
+            </tr>
+        </table>
 
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">

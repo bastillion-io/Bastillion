@@ -24,6 +24,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +37,8 @@ public class ProfileDB {
 
     private static Logger log = LoggerFactory.getLogger(ProfileDB.class);
 
+    public static final String FILTER_BY_SYSTEM = "system";
+    public static final String FILTER_BY_USER = "user";
     public static final String SORT_BY_PROFILE_NM="nm";
 
     private ProfileDB() {
@@ -50,14 +54,32 @@ public class ProfileDB {
 
         String orderBy = "";
         if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
-            orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
+            orderBy = " order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
         }
-        String sql = "select * from  profiles " + orderBy;
+        String sql = "select distinct p.* from  profiles p ";
+        if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM))) {
+           sql = sql + ", system_map m, system s where m.profile_id = p.id and m.system_id = s.id" +
+                   " and (lower(s.display_nm) like ? or lower(s.host) like ?)";
+        } else if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_USER))) {
+            sql = sql + ", user_map m, users u where m.profile_id = p.id and m.user_id = u.id" +
+                    " and (lower(u.first_nm) like ? or lower(u.last_nm) like ?" +
+                    " or lower(u.email) like ? or lower(u.username) like ?)";
+        }
+        sql = sql + orderBy;
 
         Connection con = null;
         try {
             con = DBUtils.getConn();
             PreparedStatement stmt = con.prepareStatement(sql);
+            if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM))) {
+                stmt.setString(1, "%" + sortedSet.getFilterMap().get(FILTER_BY_SYSTEM).toLowerCase() + "%");
+                stmt.setString(2, "%" + sortedSet.getFilterMap().get(FILTER_BY_SYSTEM).toLowerCase() + "%");
+            } else if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_USER))) {
+                stmt.setString(1, "%" + sortedSet.getFilterMap().get(FILTER_BY_USER).toLowerCase() + "%");
+                stmt.setString(2, "%" + sortedSet.getFilterMap().get(FILTER_BY_USER).toLowerCase() + "%");
+                stmt.setString(3, "%" + sortedSet.getFilterMap().get(FILTER_BY_USER).toLowerCase() + "%");
+                stmt.setString(4, "%" + sortedSet.getFilterMap().get(FILTER_BY_USER).toLowerCase() + "%");
+            }
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
