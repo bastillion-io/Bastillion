@@ -79,6 +79,7 @@
     <div class="container">
 
        <s:form action="viewProfileSystems">
+           <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
             <s:hidden name="sortedSet.orderByDirection"/>
             <s:hidden name="sortedSet.orderByField"/>
             <s:hidden name="profile.id"/>
@@ -94,6 +95,7 @@
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
             <s:form action="assignSystemsToProfile" theme="simple">
+                <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                 <s:hidden name="profile.id"/>
 
            <div class="scrollWrapper">
@@ -134,7 +136,7 @@
             <div id="assign_sys" class="btn btn-default assign_sys_btn spacer spacer-bottom">Assign</div>
         </s:if>
         <s:else>
-            <div class="error">There are no systems defined (<a href="viewSystems.action">Manage Systems</a>).</div>
+            <div class="error">There are no systems defined (<a href="viewSystems.action?_csrf=<s:property value="#session['_csrf']"/>">Manage Systems</a>).</div>
         </s:else>
 
     </div>

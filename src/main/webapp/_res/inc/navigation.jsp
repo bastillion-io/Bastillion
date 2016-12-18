@@ -35,7 +35,7 @@
         </div>
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-                <li><a href="../admin/menu.action">Home</a></li>
+                <li><a href="../admin/menu.action?_csrf=<s:property value="#session['_csrf']"/>">Home</a></li>
 
 
                     <li class="dropdown">
@@ -44,21 +44,21 @@
                             <s:if test="%{#session.userType==\"M\"}">
 
 
-                            <li><a href="../manage/viewSystems.action">Systems</a></li>
+                            <li><a href="../manage/viewSystems.action?_csrf=<s:property value="#session['_csrf']"/>">Systems</a></li>
 
 
-                            <li><a href="../manage/viewProfiles.action">Profiles</a></li>
+                            <li><a href="../manage/viewProfiles.action?_csrf=<s:property value="#session['_csrf']"/>">Profiles</a></li>
 
 
-                            <li><a href="../manage/viewUsers.action">Users</a></li>
+                            <li><a href="../manage/viewUsers.action?_csrf=<s:property value="#session['_csrf']"/>">Users</a></li>
 
                             </s:if>
                             <s:if test="%{@com.keybox.manage.util.SSHUtil@keyManagementEnabled}">
                                 <s:if test="%{#session.userType==\"M\"}">
-                                    <li><a href="../manage/viewKeys.action">Manage SSH Keys</a></li>
+                                    <li><a href="../manage/viewKeys.action?_csrf=<s:property value="#session['_csrf']"/>">Manage SSH Keys</a></li>
                                 </s:if>
                                 <s:else>
-                                    <li><a href="../admin/viewKeys.action">Manage SSH Keys</a></li>
+                                    <li><a href="../admin/viewKeys.action?_csrf=<s:property value="#session['_csrf']"/>">Manage SSH Keys</a></li>
                                 </s:else>
                             </s:if>
                         </ul>
@@ -69,8 +69,8 @@
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Secure Shell <b class="caret"></b></a>
                     <ul class="dropdown-menu">
 
-                        <li><a href="../admin/viewSystems.action">Composite SSH Terms</a></li>
-                        <li><a href="../admin/viewScripts.action">Composite Scripts</a></li>
+                        <li><a href="../admin/viewSystems.action?_csrf=<s:property value="#session['_csrf']"/>">Composite SSH Terms</a></li>
+                        <li><a href="../admin/viewScripts.action?_csrf=<s:property value="#session['_csrf']"/>">Composite Scripts</a></li>
 
 
                     </ul>
@@ -79,11 +79,11 @@
 
                 <s:if test="%{@com.keybox.manage.util.SessionOutputUtil@enableInternalAudit && #session.userType==\"M\"}">
 
-                    <li><a href="../manage/viewSessions.action">Audit Sessions</a></li>
+                    <li><a href="../manage/viewSessions.action?_csrf=<s:property value="#session['_csrf']"/>">Audit Sessions</a></li>
 
                 </s:if>
 
-                <li><a href="../admin/userSettings.action">Settings</a></li>
+                <li><a href="../admin/userSettings.action?_csrf=<s:property value="#session['_csrf']"/>">Settings</a></li>
                 
                 <li><a href="../logout.action">Logout</a></li>
             </ul>

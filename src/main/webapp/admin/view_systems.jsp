@@ -99,6 +99,7 @@
             </s:else>
 
         <s:form id="viewSystems" action="viewSystems" theme="simple">
+        <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
         <s:hidden name="sortedSet.orderByDirection"/>
         <s:hidden name="sortedSet.orderByField"/>
         <s:if test="script!=null">
@@ -126,6 +127,7 @@
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
 
   	        <s:form action="selectSystemsForCompositeTerms" id="select_frm" theme="simple">
+                <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
   	             <s:if test="script!=null">
                         <s:hidden name="script.id"/>
                  </s:if>
@@ -177,7 +179,7 @@
             <div class="actionMessage">
                 <p class="error">Systems not available
                     <s:if test="%{#session.userType==\"M\"}">
-                    (<a href="../manage/viewSystems.action">Manage Systems</a>)
+                    (<a href="../manage/viewSystems.action?_csrf=<s:property value="#session['_csrf']"/>">Manage Systems</a>)
                     </s:if>.
                  </p>
                 </div>

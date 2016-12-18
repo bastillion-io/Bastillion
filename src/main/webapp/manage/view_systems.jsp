@@ -32,7 +32,7 @@
             //call delete action
             $(".del_btn").button().click(function () {
                 var id = $(this).attr('id').replace("del_btn_", "");
-                window.location = 'deleteSystem.action?hostSystem.id=' + id + '&sortedSet.orderByDirection=<s:property value="sortedSet.orderByDirection" />&sortedSet.orderByField=<s:property value="sortedSet.orderByField"/>';
+                window.location = 'deleteSystem.action?hostSystem.id=' + id + '&sortedSet.orderByDirection=<s:property value="sortedSet.orderByDirection" />&sortedSet.orderByField=<s:property value="sortedSet.orderByField"/>&_csrf=<s:property value="#session['_csrf']"/>';
             });
             //submit add or edit form
             $(".submit_btn").button().click(function () {
@@ -93,6 +93,7 @@
 
 
         <s:form action="viewSystems">
+            <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
             <s:hidden name="sortedSet.orderByDirection"/>
             <s:hidden name="sortedSet.orderByField"/>
         </s:form>
@@ -181,6 +182,7 @@
                     <div class="modal-body">
                         <div class="row">
                             <s:form action="saveSystem" class="save_sys_form_add">
+                                <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                                 <s:textfield name="hostSystem.displayNm" label="Display Name" size="10"/>
                                 <s:textfield name="hostSystem.user" label="System User" size="10"/>
                                 <s:textfield name="hostSystem.host" label="Host" size="18"/>
@@ -210,6 +212,7 @@
                         <div class="modal-body">
                             <div class="row">
                                 <s:form action="saveSystem" id="save_sys_form_edit_%{id}">
+                                    <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                                     <s:textfield name="hostSystem.displayNm" value="%{displayNm}" label="Display Name" size="10"/>
                                     <s:textfield name="hostSystem.user" value="%{user}" label="System User" size="10"/>
                                     <s:textfield name="hostSystem.host" value="%{host}" label="Host" size="18"/>
@@ -244,6 +247,7 @@
                         <div class="row">
                             <div class="error">Error: <s:property value="hostSystem.errorMsg"/></div>
                             <s:form id="password_frm" action="saveSystem">
+                                <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                                 <s:hidden name="hostSystem.id"/>
                                 <s:hidden name="hostSystem.displayNm"/>
                                 <s:hidden name="hostSystem.user"/>
@@ -278,6 +282,7 @@
                         <div class="row">
                             <div class="error">Error: <s:property value="hostSystem.errorMsg"/></div>
                             <s:form id="passphrase_frm" action="saveSystem">
+                                <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                                 <s:hidden name="hostSystem.id"/>
                                 <s:hidden name="hostSystem.displayNm"/>
                                 <s:hidden name="hostSystem.user"/>
@@ -310,6 +315,7 @@
                         <div class="row">
                             <div class="error">Error: <s:property value="hostSystem.errorMsg"/></div>
                             <s:form id="error_frm">
+                                <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                                 <s:hidden name="hostSystem.id"/>
                                 <s:hidden name="pendingSystem.id"/>
                             </s:form>

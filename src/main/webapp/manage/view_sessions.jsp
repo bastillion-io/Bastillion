@@ -26,7 +26,7 @@
 
             $(".terminals_btn").button().click(function () {
                 var id = $(this).attr('id').replace("terminals_btn_", "");
-                window.location = 'getTermsForSession.action?sessionId=' + id;
+                window.location = 'getTermsForSession.action?sessionId=' + id + '&_csrf=<s:property value="#session['_csrf']"/>';
             });
 
             $("#view_btn").button().click(function () {
@@ -79,6 +79,7 @@
                     <tr>
                         <td class="align_left">
                             <s:form id="viewSessions" action="viewSessions" theme="simple">
+                                <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                                 <s:hidden name="sortedSet.orderByDirection"/>
                                 <s:hidden name="sortedSet.orderByField"/>
                                 <table>

@@ -59,7 +59,7 @@
             
             //close all forms
             $(".cancel_btn").button().click(function () {
-                window.location = 'getNextPendingSystemForTerms.action?pendingSystemStatus.id=<s:property value="pendingSystemStatus.id"/>&script.id=<s:if test="script!=null"><s:property value="script.id"/></s:if>';
+                window.location = 'getNextPendingSystemForTerms.action?pendingSystemStatus.id=<s:property value="pendingSystemStatus.id"/>&script.id=<s:if test="script!=null"><s:property value="script.id"/></s:if>&_csrf=<s:property value="#session['_csrf']"/>';
             });
 
             //disconnect terminals and remove from view
@@ -67,7 +67,7 @@
                 var ids = getActiveTermsInstanceIds();
                 for(var i=0;i<ids.length;i++) {
                     var id=ids[i];
-                    $.ajax({url: '../admin/disconnectTerm.action?id=' + id, cache: false});
+                    $.ajax({url: '../admin/disconnectTerm.action?id=' + id + '&_csrf=<s:property value="#session['_csrf']"/>', cache: false});
                     $('#run_cmd_'+id).remove();
                     termMap[id].destroy();
                     delete termMap[id];
@@ -95,7 +95,7 @@
                     }
                 });
                 
-                var idListStr = '?action=upload';
+                var idListStr = '?action=upload&_csrf=<s:property value="#session['_csrf']"/>';
                 ids.forEach(function (entry) {
                     idListStr = idListStr + '&idList=' + entry;
                 });
@@ -246,7 +246,7 @@
                     termMap[id].resize(Math.floor(width / 7.2981), Math.floor(height / 14.4166));
 
                     $.ajax({
-                        url: '../admin/setPtyType.action?id=' + id + '&userSettings.ptyWidth=' + width + '&userSettings.ptyHeight=' + height,
+                        url: '../admin/setPtyType.action?id=' + id + '&userSettings.ptyWidth=' + width + '&userSettings.ptyHeight=' + height + '&_csrf=<s:property value="#session['_csrf']"/>',
                         cache: false
                     });
                 }
@@ -459,7 +459,7 @@
                     
                     
                     //call server to create instances - returned the new cloned instance id
-                    $.getJSON('../admin/createSession.action?systemSelectId=' + hostId);
+                    $.getJSON('../admin/createSession.action?systemSelectId=' + hostId + '&_csrf=<s:property value="#session['_csrf']"/>');
 
                    
                 }
@@ -478,7 +478,7 @@
                 setTerminalEvents($("#run_cmd_"+newInstanceId)); 
 
                 //call server to create instances - returned the new cloned instance id
-                $.getJSON('../admin/createSession.action?systemSelectId=' + hostId);
+                $.getJSON('../admin/createSession.action?systemSelectId=' + hostId + '&_csrf=<s:property value="#session['_csrf']"/>');
 
 
             });
@@ -570,10 +570,11 @@
                             <li><a id="disconnect" href="#">Disconnect</a></li>
                         </ul>
                     </li>
-                    <li><a href="exitTerms.action">Exit Terminals</a></li>
+                    <li><a href="exitTerms.action?_csrf=<s:property value="#session['_csrf']"/>">Exit Terminals</a></li>
                 </ul>
                 <div class="align-right">
                     <s:form id="match_frm" theme="simple">
+                        <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                         <label>Sort By</label>&nbsp;&nbsp;<s:textfield id="match" name="match"
                                                                        placeholder="Bring terminals to top that match RegExp"
                                                                        size="40"
@@ -652,6 +653,7 @@
                     <div class="row">
                         <div class="error">Error: <s:property value="pendingSystemStatus.errorMsg"/></div>
                         <s:form id="password_frm" action="createTerms">
+                            <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                             <s:hidden name="pendingSystemStatus.id"/>
                             <s:password name="password" label="Password" size="15" value="" autocomplete="off"/>
                             <s:if test="script!=null">
@@ -681,6 +683,7 @@
                     <div class="row">
                         <div class="error">Error: <s:property value="pendingSystemStatus.errorMsg"/></div>
                         <s:form id="passphrase_frm" action="createTerms">
+                            <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                             <s:hidden name="pendingSystemStatus.id"/>
                             <s:password name="passphrase" label="Passphrase" size="15" value="" autocomplete="off"/>
                             <s:if test="script!=null">
@@ -708,6 +711,7 @@
                     <div class="row">
                         <div class="error">Error: <s:property value="currentSystemStatus.errorMsg"/></div>
                         <s:form id="error_frm" action="createTerms">
+                            <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                             <s:hidden name="pendingSystemStatus.id"/>
                             <s:if test="script!=null">
                                 <s:hidden name="script.id"/>
@@ -738,6 +742,7 @@
     </div>
 
     <s:form id="composite_terms_frm" action="createTerms">
+        <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
         <s:hidden name="pendingSystemStatus.id"/>
     <s:if test="script!=null">
         <s:hidden name="script.id"/>

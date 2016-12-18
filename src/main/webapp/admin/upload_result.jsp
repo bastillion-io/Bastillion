@@ -131,7 +131,8 @@
     <p class="error">No systems associated with upload</p>
 </s:else>
 
-<s:form action="push" method="post">
+<s:form action="push" method="GET">
+    <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
     <s:hidden name="pushDir"/>
     <s:hidden name="uploadFileName"/>
 </s:form>

@@ -81,6 +81,7 @@
     <div class="container">
 
        <s:form action="viewProfileUsers">
+           <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
             <s:hidden name="sortedSet.orderByDirection"/>
             <s:hidden name="sortedSet.orderByField"/>
             <s:hidden name="profile.id"/>
@@ -96,6 +97,7 @@
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
             <s:form action="assignUsersToProfile" theme="simple">
+                <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                 <s:hidden name="profile.id"/>
 
            <div class="scrollWrapper">
@@ -158,7 +160,7 @@
             <div id="assign_users" class="btn btn-default assign_user_btn spacer spacer-bottom">Assign</div>
         </s:if>
         <s:else>
-            <div class="error">There are no users defined (<a href="viewUsers.action">Manage Users</a>).</div>
+            <div class="error">There are no users defined (<a href="viewUsers.action?_csrf=<s:property value="#session['_csrf']"/>">Manage Users</a>).</div>
         </s:else>
     </div>
 </body>

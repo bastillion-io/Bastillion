@@ -32,7 +32,7 @@
             //call delete action
             $(".disable_btn").button().click(function () {
                 var id = $(this).attr('id').replace("disable_btn_", "");
-                window.location = 'disablePublicKey.action?publicKey.id=' + id + '&sortedSet.orderByDirection=<s:property value="sortedSet.orderByDirection" />&sortedSet.orderByField=<s:property value="sortedSet.orderByField"/>'
+                window.location = 'disablePublicKey.action?publicKey.id=' + id + '&sortedSet.orderByDirection=<s:property value="sortedSet.orderByDirection" />&sortedSet.orderByField=<s:property value="sortedSet.orderByField"/>&_csrf=<s:property value="#session['_csrf']"/>'
                 +'&sortedSet.filterMap[\'user_id\']=<s:property value="sortedSet.filterMap['user_id']"/>'
                 +'&sortedSet.filterMap[\'profile_id\']=<s:property value="sortedSet.filterMap['profile_id']"/>'
                 +'&sortedSet.filterMap[\'enabled\']=<s:property value="sortedSet.filterMap['enabled']"/>';
@@ -42,7 +42,7 @@
             
             $(".enable_btn").button().click(function () {
                 var id = $(this).attr('id').replace("enable_btn_", "");
-                window.location = 'enablePublicKey.action?publicKey.id=' + id + '&sortedSet.orderByDirection=<s:property value="sortedSet.orderByDirection" />&sortedSet.orderByField=<s:property value="sortedSet.orderByField"/>'
+                window.location = 'enablePublicKey.action?publicKey.id=' + id + '&sortedSet.orderByDirection=<s:property value="sortedSet.orderByDirection" />&sortedSet.orderByField=<s:property value="sortedSet.orderByField"/>&_csrf=<s:property value="#session['_csrf']"/>'
                 +'&sortedSet.filterMap[\'user_id\']=<s:property value="sortedSet.filterMap['user_id']"/>'
                 +'&sortedSet.filterMap[\'profile_id\']=<s:property value="sortedSet.filterMap['profile_id']"/>'
                 +'&sortedSet.filterMap[\'enabled\']=<s:property value="sortedSet.filterMap['enabled']"/>';
@@ -91,12 +91,13 @@
         <tr>
             <td class="align_left">
                 <s:form id="viewKeys" action="viewKeys" theme="simple">
+                    <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                     <s:hidden name="sortedSet.orderByDirection"/>
                     <s:hidden name="sortedSet.orderByField"/>
 
                     <table>
                         <tr>
-                            <td class="align_left"><a href="../admin/viewKeys.action" class="btn btn-success">Add / Remove Keys</a></td>
+                            <td class="align_left"><a href="../admin/viewKeys.action?_csrf=<s:property value="#session['_csrf']"/>" class="btn btn-success">Add / Remove Keys</a></td>
                             <td>|</td>
                             <s:if test="userList!= null && !userList.isEmpty()">
                                 <td >

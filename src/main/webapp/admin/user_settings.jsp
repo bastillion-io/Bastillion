@@ -52,6 +52,7 @@
 
         <s:actionerror/>
         <s:form action="passwordSubmit" autocomplete="off">
+            <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
             <s:password name="auth.prevPassword" label="Current Password" />
             <s:password name="auth.password" label="New Password" />
             <s:password name="auth.passwordConfirm" label="Confirm New Password" />
@@ -67,7 +68,7 @@
 
         <p>Change the theme for your terminals below</p>
         <s:form action="themeSubmit">
-
+            <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
             <s:select name="userSettings.theme"
                       list="#{'#2e3436,#cc0000,#4e9a06,#c4a000,#3465a4,#75507b,#06989a,#d3d7cf,#555753,#ef2929,#8ae234,#fce94f,#729fcf,#ad7fa8,#34e2e2,#eeeeec':'Tango',
                               '#000000,#cd0000,#00cd00,#cdcd00,#0000ee,#cd00cd,#00cdcd,#e5e5e5,#7f7f7f,#ff0000,#00ff00,#ffff00,#5c5cff,#ff00ff,#00ffff,#ffffff':'XTerm'}" 

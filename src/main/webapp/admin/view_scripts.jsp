@@ -29,7 +29,7 @@
             //call delete action
             $(".del_btn").button().click(function() {
                 var id = $(this).attr('id').replace("del_btn_", "");
-                window.location = 'deleteScript.action?script.id='+ id +'&sortedSet.orderByDirection=<s:property value="sortedSet.orderByDirection" />&sortedSet.orderByField=<s:property value="sortedSet.orderByField"/>';
+                window.location = 'deleteScript.action?script.id='+ id +'&sortedSet.orderByDirection=<s:property value="sortedSet.orderByDirection" />&sortedSet.orderByField=<s:property value="sortedSet.orderByField"/>&_csrf=<s:property value="#session['_csrf']"/>';
             });
             //submit add or edit form
             $(".submit_btn").button().click(function() {
@@ -82,6 +82,7 @@
 
     <div class="container">
         <s:form action="viewScripts">
+            <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
             <s:hidden name="sortedSet.orderByDirection" />
             <s:hidden name="sortedSet.orderByField"/>
         </s:form>
@@ -105,12 +106,12 @@
                     <s:iterator var="script" value="sortedSet.itemList" status="stat">
                     <tr>
                         <td>
-                                <a href="viewSystems.action?script.id=<s:property value="id"/>"><s:property value="displayNm"/></a>
+                                <a href="viewSystems.action?script.id=<s:property value="id"/>&_csrf=<s:property value="#session['_csrf']"/>"><s:property value="displayNm"/></a>
                         </td>
                             <td>
                                 <div style="width:240px">
 
-                                    <a href="viewSystems.action?script.id=<s:property value="id"/>"><button id="exec_btn_<s:property value="id"/>" class="btn btn-default edit_btn spacer spacer-left">Execute Script</button></a>
+                                    <a href="viewSystems.action?script.id=<s:property value="id"/>&_csrf=<s:property value="#session['_csrf']"/>"><button id="exec_btn_<s:property value="id"/>" class="btn btn-default edit_btn spacer spacer-left">Execute Script</button></a>
                                     <button class="btn btn-default spacer spacer-middle" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>">Edit</button>
                                     <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn spacer spacer-right">Delete</button>
                                 <div style="clear:both"></div>
@@ -136,6 +137,7 @@
                     <div class="modal-body">
                         <div class="row">
                             <s:form action="saveScript" class="save_script_form_add">
+                                <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                                 <s:textfield name="script.displayNm" label="Script Name" size="15"/>
                                 <s:textarea name="script.script" label="Script" rows="15" cols="35" wrap="off"/>
                                 <s:hidden name="sortedSet.orderByDirection"/>
@@ -162,6 +164,7 @@
                             <div class="modal-body">
                                 <div class="row">
                                     <s:form action="saveScript" id="save_script_form_edit_%{id}">
+                                        <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                                         <s:textfield name="script.displayNm" value="%{displayNm}"  label="Script Name" size="15"/>
                                         <s:textarea name="script.script" value="%{script}" label="Script" rows="15" cols="35" wrap="off"/>
                                         <s:hidden name="script.id" value="%{id}"/>

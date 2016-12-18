@@ -46,7 +46,7 @@
             //call delete action
             $(".del_btn").button().click(function () {
                 var id = $(this).attr('id').replace("del_btn_", "");
-                window.location = 'deleteProfile.action?profile.id=' + id + '&sortedSet.orderByDirection=<s:property value="sortedSet.orderByDirection" />&sortedSet.orderByField=<s:property value="sortedSet.orderByField"/>';
+                window.location = 'deleteProfile.action?profile.id=' + id + '&sortedSet.orderByDirection=<s:property value="sortedSet.orderByDirection" />&sortedSet.orderByField=<s:property value="sortedSet.orderByField"/>&_csrf=<s:property value="#session['_csrf']"/>';
             });
             //submit add or edit form
             $(".submit_btn").button().click(function () {
@@ -95,6 +95,7 @@
 
     <div class="container">
         <s:form action="viewProfiles">
+            <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
             <s:hidden name="sortedSet.orderByDirection"/>
             <s:hidden name="sortedSet.orderByField"/>
             <s:if test="script!=null">
@@ -110,6 +111,7 @@
             <tr>
                 <td class="align_left">
                     <s:form id="viewSystemsFilter" action="viewProfiles" theme="simple">
+                        <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                         <s:hidden name="sortedSet.orderByDirection"/>
                         <s:hidden name="sortedSet.orderByField"/>
                         <table>
@@ -159,9 +161,9 @@
 
                         <td>
                             <div>
-                                <a href="viewProfileUsers.action?profile.id=<s:property value="id"/>">
+                                <a href="viewProfileUsers.action?profile.id=<s:property value="id"/>&_csrf=<s:property value="#session['_csrf']"/>">
                                     <button id="user_assign_btn_<s:property value="id"/>" class="btn btn-default edit_btn spacer spacer-left">Assign Users</button></a>
-                                <a href="viewProfileSystems.action?profile.id=<s:property value="id"/>">
+                                <a href="viewProfileSystems.action?profile.id=<s:property value="id"/>&_csrf=<s:property value="#session['_csrf']"/>">
                                     <button id="system_assign_btn_<s:property value="id"/>" class="btn btn-default edit_btn spacer spacer-left">Assign Systems</button></a>
                                     <button class="btn btn-default spacer spacer-middle" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>">Edit</button>
                                     <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn spacer spacer-right">Delete</button>
@@ -187,6 +189,7 @@
                     </div>
                     <div class="modal-body">
                         <s:form action="saveProfile" class="save_profile_form_add">
+                            <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                             <s:textfield name="profile.nm" label="Name" size="15"/>
                             <s:textarea name="profile.desc" label="Profile Description" rows="5" cols="25"/>
                             <s:hidden name="sortedSet.orderByDirection"/>
@@ -212,6 +215,7 @@
                         <div class="modal-body">
                             <div class="row">
                                 <s:form action="saveProfile" id="save_profile_form_edit_%{id}">
+                                    <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                                     <s:textfield name="profile.nm" value="%{nm}" label="Name" size="15"/>
                                     <s:textarea name="profile.desc" value="%{desc}" label="Profile Description" rows="5"
                                                 cols="25"/>

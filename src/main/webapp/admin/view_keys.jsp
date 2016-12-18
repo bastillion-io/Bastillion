@@ -28,7 +28,7 @@
             //call delete action
             $(".del_btn").button().click(function () {
                 var id = $(this).attr('id').replace("del_btn_", "");
-                window.location = 'deletePublicKey.action?publicKey.id=' + id + '&sortedSet.orderByDirection=<s:property value="sortedSet.orderByDirection" />&sortedSet.orderByField=<s:property value="sortedSet.orderByField"/>';
+                window.location = 'deletePublicKey.action?publicKey.id=' + id + '&sortedSet.orderByDirection=<s:property value="sortedSet.orderByDirection" />&sortedSet.orderByField=<s:property value="sortedSet.orderByField"/>&_csrf=<s:property value="#session['_csrf']"/>';
             });
             //submit add or edit form
             $(".submit_btn").button().click(function () {
@@ -60,7 +60,7 @@
             </s:if>
 
             <s:if test="#session['privateKey']!=null">
-                window.location='../admin/downloadPvtKey.action?publicKey.keyNm=<s:property value="%{#parameters.keyNm}" escapeJavaScript="true"/>';
+                window.location='../admin/downloadPvtKey.action?publicKey.keyNm=<s:property value="%{#parameters.keyNm}" escapeJavaScript="true"/>&_csrf=<s:property value="#session['_csrf']"/>';
             </s:if>
             
             $('.new_key_label a').click(function() {
@@ -126,6 +126,7 @@
 
 <div class="container">
     <s:form action="viewKeys">
+        <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
         <s:hidden name="sortedSet.orderByDirection"/>
         <s:hidden name="sortedSet.orderByField"/>
     </s:form>
@@ -140,7 +141,7 @@
             <table>
                 <tr>
                     <td class="align_left">
-                        <a href="../manage/viewKeys.action" class="btn btn-danger" >View / Disable SSH Keys</a>
+                        <a href="../manage/viewKeys.action?_csrf=<s:property value="#session['_csrf']"/>" class="btn btn-danger" >View / Disable SSH Keys</a>
                     </td>
                 </tr>
             </table>
@@ -237,6 +238,7 @@
                         <div class="row">
                             <s:actionerror/>
                             <s:form action="savePublicKey" class="save_public_key_form_add" autocomplete="off">
+                                <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                                 <s:textfield name="publicKey.keyNm" label="Key Name" size="15"/>
                                 <s:if test="%{#session.userType==\"M\"}">
                                     <s:select name="publicKey.profile.id" list="profileList" headerKey=""
@@ -296,6 +298,7 @@
                             <div class="row">
                                 <s:actionerror/>
                                 <s:form action="savePublicKey" id="save_public_key_form_edit_%{id}" autocomplete="off">
+                                    <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                                     <s:hidden name="publicKey.id" value="%{id}"/>
                                     <s:textfield name="publicKey.keyNm" value="%{keyNm}" label="Key Name" size="15"/>
                                     <s:if test="%{#session.userType==\"M\"}">

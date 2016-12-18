@@ -28,7 +28,7 @@
             //call delete action
             $(".del_btn").button().click(function() {
                 var id = $(this).attr('id').replace("del_btn_", "");
-                window.location = 'deleteUser.action?user.id='+ id +'&sortedSet.orderByDirection=<s:property value="sortedSet.orderByDirection" />&sortedSet.orderByField=<s:property value="sortedSet.orderByField"/>';
+                window.location = 'deleteUser.action?user.id='+ id +'&sortedSet.orderByDirection=<s:property value="sortedSet.orderByDirection" />&sortedSet.orderByField=<s:property value="sortedSet.orderByField"/>&_csrf=<s:property value="#session['_csrf']"/>';
             });
             //submit add or edit form
             $(".submit_btn").button().click(function() {
@@ -94,13 +94,14 @@
 
     <div class="container">
         <s:form action="viewUsers">
+            <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
             <s:hidden name="sortedSet.orderByDirection" />
             <s:hidden name="sortedSet.orderByField"/>
         </s:form>
 
         <h3>Manage Users</h3>
 
-        <p>Add / Delete users below so that system profiles may be set for users (<a href="viewProfiles.action">Manage Profiles</a>).</p>
+        <p>Add / Delete users below so that system profiles may be set for users (<a href="viewProfiles.action?_csrf=<s:property value="#session['_csrf']"/>">Manage Profiles</a>).</p>
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
             <div class="scrollWrapper">
@@ -231,6 +232,7 @@
                                 <div class="row">
                                     <s:actionerror/>
                                     <s:form action="saveUser" id="save_user_form_edit_%{id}" autocomplete="off">
+                                        <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                                         <s:textfield name="user.username" value="%{username}" label="Username" size="15"/>
                                         <s:select name="user.userType" value="%{userType}" list="#{'A':'Administrative Only','M':'Full Access'}" label="UserType"/>
                                         <s:if test="%{@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}">

@@ -1,12 +1,12 @@
 /**
  * Copyright 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
- *
+ * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +16,8 @@
 package com.keybox.common.util;
 
 import com.keybox.manage.util.EncryptionUtil;
-import javax.servlet.http.HttpServletRequest;
+import org.apache.struts2.util.TokenHelper;
+
 import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -31,6 +32,7 @@ public class AuthUtil {
     public static final String USER_ID = "userId";
     public static final String AUTH_TOKEN = "authToken";
     public static final String TIMEOUT = "timeout";
+    public static final String CSRF_TOKEN_NM = "_csrf";
 
     private AuthUtil() {
     }
@@ -41,7 +43,7 @@ public class AuthUtil {
      * @param session http session
      * @return shared secret
      */
-    public static String getOTPSecret( HttpSession session) {
+    public static String getOTPSecret(HttpSession session) {
         String secret = (String) session.getAttribute("otp_secret");
         secret = EncryptionUtil.decrypt(secret);
         return secret;
@@ -66,10 +68,10 @@ public class AuthUtil {
      * @return authentication type
      */
     public static String getAuthType(HttpSession session) {
-        String authType= (String)session.getAttribute("authType");
+        String authType = (String) session.getAttribute("authType");
         return authType;
     }
-    
+
     /**
      * set user type
      *
@@ -89,7 +91,7 @@ public class AuthUtil {
      * @return user type
      */
     public static String getUserType(HttpSession session) {
-        String userType= (String)session.getAttribute("userType");
+        String userType = (String) session.getAttribute("userType");
         return userType;
     }
 
@@ -112,10 +114,10 @@ public class AuthUtil {
      * @return session id
      */
     public static Long getSessionId(HttpSession session) {
-        Long sessionId=null;
-        String sessionIdStr = EncryptionUtil.decrypt((String)session.getAttribute(SESSION_ID));
-        if(sessionIdStr!=null && !sessionIdStr.trim().equals("")){
-            sessionId=Long.parseLong(sessionIdStr);
+        Long sessionId = null;
+        String sessionIdStr = EncryptionUtil.decrypt((String) session.getAttribute(SESSION_ID));
+        if (sessionIdStr != null && !sessionIdStr.trim().equals("")) {
+            sessionId = Long.parseLong(sessionIdStr);
         }
         return sessionId;
     }
@@ -127,10 +129,10 @@ public class AuthUtil {
      * @return user id
      */
     public static Long getUserId(HttpSession session) {
-        Long userId=null;
-        String userIdStr = EncryptionUtil.decrypt((String)session.getAttribute(USER_ID));
-        if(userIdStr!=null && !userIdStr.trim().equals("")){
-            userId=Long.parseLong(userIdStr);
+        Long userId = null;
+        String userIdStr = EncryptionUtil.decrypt((String) session.getAttribute(USER_ID));
+        if (userIdStr != null && !userIdStr.trim().equals("")) {
+            userId = Long.parseLong(userIdStr);
         }
         return userId;
     }
@@ -141,7 +143,7 @@ public class AuthUtil {
      * @param session http session
      * @return authentication token
      */
-    public static String getAuthToken( HttpSession session) {
+    public static String getAuthToken(HttpSession session) {
         String authToken = (String) session.getAttribute(AUTH_TOKEN);
         authToken = EncryptionUtil.decrypt(authToken);
         return authToken;
@@ -156,6 +158,17 @@ public class AuthUtil {
     public static String getTimeout(HttpSession session) {
         String timeout = (String) session.getAttribute(TIMEOUT);
         return timeout;
+    }
+
+    /**
+     * query csrf token for session
+     *
+     * @param session http session
+     * @return token string
+     */
+    public static String getCSRFToken(HttpSession session) {
+        String token = (String) session.getAttribute(CSRF_TOKEN_NM);
+        return token;
     }
 
     /**
@@ -209,16 +222,26 @@ public class AuthUtil {
     }
 
     /**
+     * generate csrf token for session
+     *
+     * @param session http session
+     */
+    public static void generateCSRFToken(HttpSession session) {
+        session.setAttribute(CSRF_TOKEN_NM, TokenHelper.generateGUID());
+    }
+
+    /**
      * delete all session information
      *
      * @param session
      */
     public static void deleteAllSession(HttpSession session) {
 
+        session.setAttribute(CSRF_TOKEN_NM, null);
         session.setAttribute(TIMEOUT, null);
         session.setAttribute(AUTH_TOKEN, null);
         session.setAttribute(USER_ID, null);
-        session.setAttribute(SESSION_ID,null);
+        session.setAttribute(SESSION_ID, null);
 
         session.invalidate();
     }
