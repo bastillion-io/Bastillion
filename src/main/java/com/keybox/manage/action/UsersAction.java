@@ -42,7 +42,6 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
     public static final String REQUIRED = "Required";
     SortedSet sortedSet=new SortedSet();
     User user = new User();
-    Script script=null;
     HttpServletRequest servletRequest;
     boolean resetSharedSecret=false;
 
@@ -55,9 +54,6 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
     public String viewUsers() {
         Long userId= AuthUtil.getUserId(servletRequest.getSession());
         sortedSet = UserDB.getUserSet(sortedSet);
-        if(script!=null && script.getId()!=null){
-            script=ScriptDB.getScript(script.getId(),userId);
-        }
         user.setId(userId);
         return SUCCESS;
     }
@@ -142,7 +138,9 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
             addActionError("Username has been taken");
         }
         if (!this.getFieldErrors().isEmpty()||!this.getActionErrors().isEmpty()) {
+            Long userId = AuthUtil.getUserId(servletRequest.getSession());
             sortedSet = UserDB.getUserSet(sortedSet);
+            user.setId(userId);
         }
     }
 
@@ -163,14 +161,6 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
         this.user = user;
     }
     
-    public Script getScript() {
-        return script;
-    }
-
-    public void setScript(Script script) {
-        this.script = script;
-    }
-
     public HttpServletRequest getServletRequest() {
         return servletRequest;
     }
