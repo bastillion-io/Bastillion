@@ -108,21 +108,21 @@
 
                     <thead>
                     <tr>
-                        <th id="<s:property value="@com.keybox.manage.db.UserDB@SORT_BY_USERNAME"/>" class="sort">Username
+                        <th id="<s:property value="@com.keybox.manage.db.UserDB@USERNAME"/>" class="sort">Username
                         </th>
-                        <th id="<s:property value="@com.keybox.manage.db.UserDB@SORT_BY_USER_TYPE"/>" class="sort">User Type
+                        <th id="<s:property value="@com.keybox.manage.db.UserDB@USER_TYPE"/>" class="sort">User Type
                         </th>
                         <s:if test="%{@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}">
-                            <th id="<s:property value="@com.keybox.manage.db.UserDB@SORT_BY_AUTH_TYPE"/>" class="sort">Auth Type
+                            <th id="<s:property value="@com.keybox.manage.db.UserDB@AUTH_TYPE"/>" class="sort">Auth Type
                             </th>
                         </s:if>
-                        <th id="<s:property value="@com.keybox.manage.db.UserDB@SORT_BY_LAST_NM"/>" class="sort">Last
+                        <th id="<s:property value="@com.keybox.manage.db.UserDB@LAST_NM"/>" class="sort">Last
                             Name
                         </th>
-                        <th id="<s:property value="@com.keybox.manage.db.UserDB@SORT_BY_FIRST_NM"/>" class="sort">First
+                        <th id="<s:property value="@com.keybox.manage.db.UserDB@FIRST_NM"/>" class="sort">First
                             Name
                         </th>
-                        <th id="<s:property value="@com.keybox.manage.db.UserDB@SORT_BY_EMAIL"/>" class="sort">Email
+                        <th id="<s:property value="@com.keybox.manage.db.UserDB@EMAIL"/>" class="sort">Email
                             Address
                         </th>
                         <th>&nbsp;</th>
@@ -193,6 +193,7 @@
                         <div class="row">
                             <s:actionerror/>
                             <s:form action="saveUser" class="save_user_form_add" autocomplete="off">
+                                <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                                 <s:textfield name="user.username" label="Username" size="15"/>
                                 <s:select name="user.userType" list="#{'A':'Administrative Only','M':'Full Access'}" label="UserType"/>
                                 <s:if test="%{@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}">
