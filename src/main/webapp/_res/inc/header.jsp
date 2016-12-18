@@ -79,6 +79,12 @@
             $('input:enabled:visible:first').focus();
         });
 
+        //disable double-click on btns
+        $("form").submit(function() {
+            $('.btn').attr('disabled', 'disabled');
+            return true;
+        });
+
     });
 </script>
 
