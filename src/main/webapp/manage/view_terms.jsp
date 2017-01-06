@@ -32,13 +32,13 @@ $(document).ready(function() {
     });
     //submit add or edit form
     $(".submit_btn").button().click(function() {
-        $(this).parents('form:first').submit();
+        filterTerms();
     });
 
 
     $(".clear_btn").button().click(function() {
         $('#filter_frm_filter').val('');
-        $(this).parents('form:first').submit();
+        filterTerms();
     });
 
     function filterTerms() {
@@ -93,14 +93,6 @@ $(document).ready(function() {
   }
 
   loadTerms();
-
-    $("#filter_frm").submit(function(){
-
-        filterTerms();
-
-        return false;
-
-        });
 
 });
 
