@@ -46,6 +46,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
     HttpServletRequest servletRequest;
     Auth auth;
     private final String AUTH_ERROR="Authentication Failed : Login credentials are invalid";
+    private final String AUTH_ERROR_PASSIVE="Authentication Failed : This account is not permitted to log in";
     private final String AUTH_ERROR_NO_PROFILE="Authentication Failed : There are no profiles assigned to this account";
     //check if otp is enabled
     boolean otpEnabled = ("required".equals(AppConfig.getProperty("oneTimePassword")) || "optional".equals(AppConfig.getProperty("oneTimePassword")));
@@ -98,6 +99,12 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
             User user = AuthDB.getUserByAuthToken(authToken);
             if(user!=null) {
                 String sharedSecret = null;
+                if (User.PASSIVE.equals(user.getUserType())) {
+                    loginAuditLogger.info(auth.getUsername() + " (" + clientIP + ") - " + AUTH_ERROR_PASSIVE);
+                    addActionError(AUTH_ERROR_PASSIVE);
+                    return INPUT;
+                }
+
                 if (otpEnabled) {
                     sharedSecret = AuthDB.getSharedSecret(user.getId());
                     if (StringUtils.isNotEmpty(sharedSecret) && (auth.getOtpToken() == null || !OTPUtil.verifyToken(sharedSecret, auth.getOtpToken()))) {
