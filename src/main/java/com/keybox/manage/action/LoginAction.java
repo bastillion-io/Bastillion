@@ -99,11 +99,6 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
             User user = AuthDB.getUserByAuthToken(authToken);
             if(user!=null) {
                 String sharedSecret = null;
-                if (User.PASSIVE.equals(user.getUserType())) {
-                    loginAuditLogger.info(auth.getUsername() + " (" + clientIP + ") - " + AUTH_ERROR_PASSIVE);
-                    addActionError(AUTH_ERROR_PASSIVE);
-                    return INPUT;
-                }
 
                 if (otpEnabled) {
                     sharedSecret = AuthDB.getSharedSecret(user.getId());
@@ -113,6 +108,13 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
                         return INPUT;
                     }
                 }
+
+                if (User.PASSIVE.equals(user.getUserType())) {
+                    loginAuditLogger.info(auth.getUsername() + " (" + clientIP + ") - " + AUTH_ERROR_PASSIVE);
+                    addActionError(AUTH_ERROR_PASSIVE);
+                    return INPUT;
+                }
+
                 //check to see if admin has any assigned profiles
                 if(!User.MANAGER.equals(user.getUserType()) && (user.getProfileList()==null || user.getProfileList().size()<=0)){
                     loginAuditLogger.info(auth.getUsername() + " (" + clientIP + ") - " + AUTH_ERROR_NO_PROFILE);
