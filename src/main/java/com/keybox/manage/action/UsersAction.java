@@ -124,7 +124,7 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
 
         // Password validation is only for users who are permitted to log in (ie non-passive ones)
         if (user != null && !User.PASSIVE.equals(user.getUserType())) {
-            if (user != null && user.getPassword() != null && !user.getPassword().trim().equals("")){
+            if (user.getPassword() != null && !user.getPassword().trim().equals("")){
 
                 if(!user.getPassword().equals(user.getPasswordConfirm())) {
                     addActionError("Passwords do not match");
