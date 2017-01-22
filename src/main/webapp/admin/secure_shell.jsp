@@ -19,10 +19,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-
     <jsp:include page="../_res/inc/header.jsp"/>
     <script src="<%= request.getContextPath() %>/_res/js/jquery-ui.js"></script>
+    <script src="<%= request.getContextPath() %>/_res/js/tty/scrollbar.js"></script>
     <link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/_res/css/jquery-ui/jquery-ui.css"/>
+    <link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/_res/css/font-awesome-4.7.0/css/font-awesome.min.css" />
 
     <script type="text/javascript">
         $(document).ready(function () {
@@ -69,8 +70,8 @@
                     var id=ids[i];
                     $.ajax({url: '../admin/disconnectTerm.action?id=' + id + '&_csrf=<s:property value="#session['_csrf']"/>', cache: false});
                     $('#run_cmd_'+id).remove();
-                    termMap[id].destroy();
-                    delete termMap[id];
+                    termMap[id].terminal.destroy();
+                    delete termMap[id].terminal;
                 }
                 
             });
@@ -243,7 +244,7 @@
                     var width = $('#run_cmd_'+id).find(".output:first").innerWidth() - 8;
                     var height = $('#run_cmd_'+id).innerHeight() - y_offset;
 
-                    termMap[id].resize(Math.floor(width / 7.2981), Math.floor(height / 14.4166));
+                    termMap[id].terminal.resize(Math.floor(width / 7.2981), Math.floor(height / 14.4166));
 
                     $.ajax({
                         url: '../admin/setPtyType.action?id=' + id + '&userSettings.ptyWidth=' + width + '&userSettings.ptyHeight=' + height + '&_csrf=<s:property value="#session['_csrf']"/>',
@@ -276,7 +277,8 @@
                         if(!termMap[val.instanceId]) {
                             createTermMap(val.instanceId, val.output);
                         }else {
-                            termMap[val.instanceId].write(val.output);
+                            termMap[val.instanceId].terminal.write(val.output);
+                            termMap[val.instanceId].scrollObj.setScrollBar.call();
                         }
                     }
                         
@@ -287,7 +289,8 @@
             
             function  createTermMap(id, output){
 
-                termMap[id] = new Terminal({
+                //{"id": terminalId, "terminal": terminal, "scrollObj": $('#run_cmd_' + terminalId).terminalScroll(terminal)};
+                var terminal = new Terminal({
                         cols: Math.floor($('.output:first').innerWidth() / 7.2981), rows: 24,
                     <s:if test="%{userSettings !=null && userSettings.colors!=null && userSettings.colors.length==16}">
                         colors: [
@@ -302,18 +305,21 @@
                     convertEol: true
                 });
                 <s:if test="%{userSettings !=null && userSettings.bg !=null}">
-                    termMap[id].colors[256] = '<s:property value="userSettings.bg"/>';
+                    terminal.colors[256] = '<s:property value="userSettings.bg"/>';
                 </s:if>
                 <s:if test="%{userSettings !=null && userSettings.fg!=null}">
-                    termMap[id].colors[257] = '<s:property value="userSettings.fg"/>';
+                    terminal.colors[257] = '<s:property value="userSettings.fg"/>';
                 </s:if>
-                termMap[id].open($("#run_cmd_" + id).find('.output'));
+                terminal.open($("#run_cmd_" + id).find('.output'));
                     
                 resize($("#run_cmd_" + id));
                     
-                termMap[id].write(output);
-
+                terminal.write(output);
                 
+                var scrollObj = $('#run_cmd_' + id).terminalScroll(terminal);
+                scrollObj.setScrollBar.call();
+
+                termMap[id] = {"terminal" : terminal, "scrollObj": scrollObj};
             }
           
 
