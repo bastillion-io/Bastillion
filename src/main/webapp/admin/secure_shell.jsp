@@ -23,7 +23,6 @@
     <script src="<%= request.getContextPath() %>/_res/js/jquery-ui.js"></script>
     <script src="<%= request.getContextPath() %>/_res/js/tty/scrollbar.js"></script>
     <link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/_res/css/jquery-ui/jquery-ui.css"/>
-    <link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/_res/css/font-awesome-4.7.0/css/font-awesome.min.css" />
 
     <script type="text/javascript">
         $(document).ready(function () {

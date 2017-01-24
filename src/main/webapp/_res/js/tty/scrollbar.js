@@ -64,7 +64,7 @@
 				cursor: 'default'
             });
             
-            var scrollUpButton = $('<div id="up"><i class="fa fa-sort-asc" style="padding: 8px 0 0 7px;"></i></div>').css({
+            var scrollUpButton = $('<div id="up"><span style="position:relative; top: 3px; left: 7px;">&#9650;</span></div>').css({
                 height: '20px',
                 width: '100%',
                 color: '#000',
@@ -78,7 +78,7 @@
                 'border-radius': '10px',
             });
             
-            var scrollDownButton = $('<div id="down"><i class="fa fa-sort-desc" style="padding: 2px 0 5px 7px;"></i></div>').css({
+            var scrollDownButton = $('<div id="down"><span style="position: relative; top: 2px; left: 7px;">&#9660;</span></div>').css({
                 height: '20px',
                 width: '100%',
                 color: '#000',
