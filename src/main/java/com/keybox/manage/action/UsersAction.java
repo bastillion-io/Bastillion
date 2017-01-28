@@ -17,10 +17,8 @@ package com.keybox.manage.action;
 
 import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.db.PublicKeyDB;
-import com.keybox.manage.db.ScriptDB;
 import com.keybox.manage.db.UserDB;
 import com.keybox.manage.model.Auth;
-import com.keybox.manage.model.Script;
 import com.keybox.manage.model.SortedSet;
 import com.keybox.manage.model.User;
 import com.keybox.manage.util.PasswordUtil;
@@ -44,6 +42,7 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
     User user = new User();
     HttpServletRequest servletRequest;
     boolean resetSharedSecret=false;
+    Long userId;
 
 
     @Action(value = "/manage/viewUsers",
@@ -52,9 +51,8 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
             }
     )
     public String viewUsers() {
-        Long userId= AuthUtil.getUserId(servletRequest.getSession());
+        userId = AuthUtil.getUserId(servletRequest.getSession());
         sortedSet = UserDB.getUserSet(sortedSet);
-        user.setId(userId);
         return SUCCESS;
     }
 
@@ -138,6 +136,7 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
             addActionError("Username has been taken");
         }
         if (!this.getFieldErrors().isEmpty()||!this.getActionErrors().isEmpty()) {
+            userId = AuthUtil.getUserId(servletRequest.getSession());
             sortedSet = UserDB.getUserSet(sortedSet);
         }
     }
@@ -173,5 +172,13 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
 
     public void setResetSharedSecret(boolean resetSharedSecret) {
         this.resetSharedSecret = resetSharedSecret;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

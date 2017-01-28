@@ -1,4 +1,4 @@
-<%
+<z%
 /**
  * Copyright 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
  *
@@ -165,7 +165,7 @@
                                 <div style="width:235px">
 
                                     <button class="btn btn-default spacer spacer-left" data-toggle="modal" data-target="#edit_dialog_<s:property value="id"/>">Edit</button>
-                                    <s:if test="%{user.id != id}">
+                                    <s:if test="%{userId != id}">
                                         <button id="del_btn_<s:property value="id"/>" class="btn btn-default del_btn spacer spacer-middle">Delete</button>
                                     </s:if>
 
