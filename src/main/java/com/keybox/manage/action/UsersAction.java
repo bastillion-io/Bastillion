@@ -138,9 +138,7 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
             addActionError("Username has been taken");
         }
         if (!this.getFieldErrors().isEmpty()||!this.getActionErrors().isEmpty()) {
-            Long userId = AuthUtil.getUserId(servletRequest.getSession());
             sortedSet = UserDB.getUserSet(sortedSet);
-            user.setId(userId);
         }
     }
 
