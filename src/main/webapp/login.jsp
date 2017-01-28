@@ -54,7 +54,12 @@
         <p>
         <s:actionerror/>
         <s:form action="loginSubmit"  autocomplete="off">
-            <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
+            <s:if test="%{#session['_csrf']}">
+                <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
+            </s:if>
+            <s:else>
+                <s:hidden name="_csrf"/>
+            </s:else>
             <s:textfield name="auth.username" label="Username"/>
             <s:password name="auth.password" label="Password" value="" />
             <s:if test="otpEnabled">

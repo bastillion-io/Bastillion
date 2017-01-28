@@ -225,9 +225,12 @@ public class AuthUtil {
      * generate csrf token for session
      *
      * @param session http session
+     * @return _csrf token
      */
-    public static void generateCSRFToken(HttpSession session) {
-        session.setAttribute(CSRF_TOKEN_NM, TokenHelper.generateGUID());
+    public static String generateCSRFToken(HttpSession session) {
+        String _csrf = TokenHelper.generateGUID();
+        session.setAttribute(CSRF_TOKEN_NM, _csrf);
+        return _csrf;
     }
 
     /**

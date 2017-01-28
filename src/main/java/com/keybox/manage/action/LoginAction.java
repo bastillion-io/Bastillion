@@ -49,6 +49,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
     private final String AUTH_ERROR_NO_PROFILE="Authentication Failed : There are no profiles assigned to this account";
     //check if otp is enabled
     boolean otpEnabled = ("required".equals(AppConfig.getProperty("oneTimePassword")) || "optional".equals(AppConfig.getProperty("oneTimePassword")));
+    String _csrf;
 
     @Action(value = "/login",
             results = {
@@ -56,8 +57,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
             }
     )
     public String login() {
-
-        AuthUtil.generateCSRFToken(servletRequest.getSession());
+        _csrf = AuthUtil.generateCSRFToken(servletRequest.getSession());
         return SUCCESS;
     }
 
@@ -193,5 +193,13 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
 
     public void setServletRequest(HttpServletRequest servletRequest) {
         this.servletRequest = servletRequest;
+    }
+
+    public String get_csrf() {
+        return _csrf;
+    }
+
+    public void set_csrf(String _csrf) {
+        this._csrf = _csrf;
     }
 }
