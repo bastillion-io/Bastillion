@@ -2,7 +2,7 @@ KeyBox
 ======
 KeyBox is a web-based SSH console that centrally manages administrative access to systems. Web-based administration is combined with management and distribution of user's public SSH keys. Key management and administration is based on profiles assigned to defined users.
 
-Administrators can login using two-factor authentication with [FreeOTP](https://fedorahosted.org/freeotp) or [Google Authenticator](https://github.com/google/google-authenticator). From there they can manage their public SSH keys or connect to their systems through a web-shell. Commands can be shared across shells to make patching easier and eliminate redundant command execution.
+Administrators can login using two-factor authentication with [FreeOTP](https://freeotp.github.io/) or [Google Authenticator](https://github.com/google/google-authenticator). From there they can manage their public SSH keys or connect to their systems through a web-shell. Commands can be shared across shells to make patching easier and eliminate redundant command execution.
 
 KeyBox layers TLS/SSL on top of SSH and acts as a bastion host for administration. Protocols are stacked (TLS/SSL + SSH) so infrastructure cannot be exposed through tunneling / port forwarding. More details can be found in the following whitepaper: [The Security Implications of SSH](http://www.sans.org/reading-room/whitepapers/vpns/security-implications-ssh-1180). Also, SSH key management is enabled by default to prevent unmanaged public keys and enforce best practices.
 
@@ -20,7 +20,7 @@ Select 'Show Certificate' -> 'Always Trust' when prompted in Safari*
 * Maven 3 or greater  ( Only needed if building from source )
 http://maven.apache.org
 
-* Install [FreeOTP](https://fedorahosted.org/freeotp) or [Google Authenticator](https://github.com/google/google-authenticator) to enable two-factor authentication with Android or iOS
+* Install [FreeOTP](https://freeotp.github.io/) or [Google Authenticator](https://github.com/google/google-authenticator) to enable two-factor authentication with Android or iOS
 
     | Application          | Android                                                                                             | iOS                                                                        |             
     |----------------------|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
