@@ -67,7 +67,7 @@ public class SystemDB {
 		String sql = "select * from system where id in (select distinct system_id from  system_map m, user_map um where m.profile_id=um.profile_id and um.user_id=? ";
 		//if profile id exists add to statement
 		sql += StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID)) ? " and um.profile_id=? " : "";
-		sql += ") " + orderBy;
+		sql += ") and system.enabled=true " + orderBy;
 
 		//get user for auth token
 		Connection con = null;
@@ -124,7 +124,7 @@ public class SystemDB {
 		}
 		String sql = "select * from  system s ";
 		//if profile id exists add to statement
-		sql += StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID)) ? ",system_map m where s.id=m.system_id and m.profile_id=?" : "";
+		sql += StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID)) ? ",system_map m where s.id=m.system_id and m.profile_id=? and enabled=true " : "where enabled=true ";
 		sql += orderBy;
 
 		Connection con = null;
@@ -246,7 +246,7 @@ public class SystemDB {
 		Long userId = null;
 		try {
 			con = DBUtils.getConn();
-			PreparedStatement stmt = con.prepareStatement("insert into system (display_nm, user, host, port, authorized_keys, status_cd) values (?,?,?,?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
+			PreparedStatement stmt = con.prepareStatement("insert into system (display_nm, user, host, port, authorized_keys, status_cd, enabled) values (?,?,?,?,?,?,true)", PreparedStatement.RETURN_GENERATED_KEYS);
 			stmt.setString(1, hostSystem.getDisplayNm());
 			stmt.setString(2, hostSystem.getUser());
 			stmt.setString(3, hostSystem.getHost());
@@ -307,7 +307,7 @@ public class SystemDB {
 	 *
 	 * @param hostSystemId host system id
 	 */
-	public static void deleteSystem(Long hostSystemId) {
+	public static void disableSystem(Long hostSystemId) {
 
 
 		Connection con = null;
@@ -315,7 +315,7 @@ public class SystemDB {
 		try {
 			con = DBUtils.getConn();
 
-			PreparedStatement stmt = con.prepareStatement("delete from system where id=?");
+			PreparedStatement stmt = con.prepareStatement("update system set enabled=false where id=?");
 			stmt.setLong(1, hostSystemId);
 			stmt.execute();
 			DBUtils.closeStmt(stmt);
@@ -373,7 +373,7 @@ public class SystemDB {
 
 		try {
 			con=DBUtils.getConn();
-			PreparedStatement stmt = con.prepareStatement("select * from  system");
+			PreparedStatement stmt = con.prepareStatement("select * from system where enabled=true");
 			ResultSet rs = stmt.executeQuery();
 
 			while (rs.next()) {
@@ -413,7 +413,7 @@ public class SystemDB {
 
 
 		try {
-			PreparedStatement stmt = con.prepareStatement("select * from  system");
+			PreparedStatement stmt = con.prepareStatement("select * from system where enabled=true");
 			ResultSet rs = stmt.executeQuery();
 
 			while (rs.next()) {
@@ -444,7 +444,7 @@ public class SystemDB {
 
 
 		try {
-			PreparedStatement stmt = con.prepareStatement("select distinct system_id from  system_map m, user_map um where m.profile_id=um.profile_id and um.user_id=?");
+			PreparedStatement stmt = con.prepareStatement("select distinct system_id from system_map m, user_map um, system s where m.profile_id=um.profile_id and um.user_id=? and s.enabled=true");
 			stmt.setLong(1, userId);
 			ResultSet rs = stmt.executeQuery();
 
