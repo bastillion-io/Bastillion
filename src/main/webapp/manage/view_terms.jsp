@@ -37,12 +37,12 @@ $(document).ready(function() {
 
 
     $(".clear_btn").button().click(function() {
-        $('#filter_frm_filter').val('');
+        $('#filter').val('');
         filterTerms();
     });
 
     function filterTerms() {
-        var filterVal=$('#filter_frm_filter').val();
+        var filterVal=$('#filter').val();
 
         if(filterVal!=null && filterVal!='') {
             $(".output > .terminal > pre").each(function (index, value){
@@ -150,11 +150,8 @@ $(document).ready(function() {
 
 
                 <div class="align-right">
-                    <s:form id="filter_frm" theme="simple">
-                        <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                         <s:label value=""/>
                         <s:textfield name="filter" type="text" class="spacer spacer-left"/><div class="btn btn-default submit_btn spacer spacer-middle">Filter</div><div class="btn btn-default clear_btn spacer spacer-right">Clear</div>
-                    </s:form>
                 </div>
                 <div class="align-right" style="padding-top: 15px">
                     <b>Audit  ( <s:property value="sessionAudit.username"/>
