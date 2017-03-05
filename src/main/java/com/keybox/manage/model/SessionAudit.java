@@ -22,20 +22,10 @@ import java.util.List;
 /**
  * value object for terminal logs and history
  */
-public class SessionAudit {
+public class SessionAudit extends User {
     Long id;
     List<HostSystem> hostSystemList;
-    User user;
     Date sessionTm;
-
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
 
     public Date getSessionTm() {
         return sessionTm;

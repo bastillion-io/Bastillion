@@ -62,7 +62,7 @@ public class UserDB {
         if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
             orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
         }
-        String sql = "select * from  users where enabled=true " + orderBy;
+        String sql = "select * from  users " + orderBy;
 
         Connection con = null;
         try {
@@ -110,7 +110,7 @@ public class UserDB {
         if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
             orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
         }
-        String sql = "select * from  users where enabled=true and user_type like '" + User.ADMINISTRATOR + "' " + orderBy;
+        String sql = "select * from  users where user_type like '" + User.ADMINISTRATOR + "' " + orderBy;
 
         Connection con = null;
         try {
@@ -340,13 +340,13 @@ public class UserDB {
      * deletes user
      * @param userId user id
      */
-    public static void disableUser(Long userId) {
+    public static void deleteUser(Long userId) {
 
 
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("update users set enabled=false where id=?");
+            PreparedStatement stmt = con.prepareStatement("delete from users where id=?");
             stmt.setLong(1, userId);
             stmt.execute();
             DBUtils.closeStmt(stmt);
@@ -399,7 +399,7 @@ public class UserDB {
         Connection con = null;
         try {
             con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("select * from users where enabled=true and lower(username) like lower(?) and id != ?");
+            PreparedStatement stmt = con.prepareStatement("select * from users where lower(username) like lower(?) and id != ?");
             stmt.setString(1,username);
             stmt.setLong(2, userId);
             ResultSet rs = stmt.executeQuery();

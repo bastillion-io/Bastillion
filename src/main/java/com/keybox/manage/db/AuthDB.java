@@ -59,7 +59,7 @@ public class AuthDB {
                 //get salt for user
                 String salt = getSaltByUsername(con, auth.getUsername());
                 //login
-                PreparedStatement stmt = con.prepareStatement("select * from users where enabled=true and username=? and password=?");
+                PreparedStatement stmt = con.prepareStatement("select * from users where username=? and password=?");
                 stmt.setString(1, auth.getUsername());
                 stmt.setString(2, EncryptionUtil.hash(auth.getPassword() + salt));
                 ResultSet rs = stmt.executeQuery();
@@ -106,7 +106,7 @@ public class AuthDB {
             Connection con = null;
             try {
                 con = DBUtils.getConn();
-                PreparedStatement stmt = con.prepareStatement("select * from users where enabled=true and id=? and auth_token=?");
+                PreparedStatement stmt = con.prepareStatement("select * from users where id=? and auth_token=?");
                 stmt.setLong(1, userId);
                 stmt.setString(2, authToken);
                 ResultSet rs = stmt.executeQuery();
@@ -216,7 +216,7 @@ public class AuthDB {
 
         User user = null;
         try {
-            PreparedStatement stmt = con.prepareStatement("select * from users where enabled=true and auth_token like ?");
+            PreparedStatement stmt = con.prepareStatement("select * from users where auth_token like ?");
             stmt.setString(1, authToken);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -328,7 +328,7 @@ public class AuthDB {
 
         String salt = "";
         try {
-            PreparedStatement stmt = con.prepareStatement("select salt from users where enabled=true and username=?");
+            PreparedStatement stmt = con.prepareStatement("select salt from users where username=?");
             stmt.setString(1, username);
             ResultSet rs = stmt.executeQuery();
             if (rs.next() && rs.getString("salt") != null) {
@@ -355,7 +355,7 @@ public class AuthDB {
 
         String salt = "";
         try {
-            PreparedStatement stmt = con.prepareStatement("select salt from users where enabled=true and auth_token=?");
+            PreparedStatement stmt = con.prepareStatement("select salt from users where auth_token=?");
             stmt.setString(1, authToken);
             ResultSet rs = stmt.executeQuery();
             if (rs.next() && rs.getString("salt") != null) {
@@ -382,7 +382,7 @@ public class AuthDB {
 
         User user = null;
         try {
-            PreparedStatement stmt = con.prepareStatement("select * from  users where lower(username) like lower(?) and enabled=true");
+            PreparedStatement stmt = con.prepareStatement("select * from  users where lower(username) like lower(?)");
             stmt.setString(1, uid);
             ResultSet rs = stmt.executeQuery();
 
