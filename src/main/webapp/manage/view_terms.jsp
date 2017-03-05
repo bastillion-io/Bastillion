@@ -60,12 +60,6 @@ $(document).ready(function() {
 
    }
 
-
-
-
-
-
-
   function loadTerms(){
 
         $(".output").each(function (index, value){
@@ -163,9 +157,9 @@ $(document).ready(function() {
                     </s:form>
                 </div>
                 <div class="align-right" style="padding-top: 15px">
-                    <b>Audit  ( <s:property value="sessionAudit.user.username"/>
-                    <s:if test="sessionAudit.user!=null && sessionAudit.user.lastNm!=null">
-                        - <s:property value="sessionAudit.user.lastNm"/>, <s:property value="sessionAudit.user.firstNm"/>
+                    <b>Audit  ( <s:property value="sessionAudit.username"/>
+                    <s:if test="sessionAudit.lastNm!=null">
+                        - <s:property value="sessionAudit.lastNm"/>, <s:property value="sessionAudit.firstNm"/>
                     </s:if> ) </b>
                 </div>
             <div class="clear"></div>

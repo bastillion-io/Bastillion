@@ -114,7 +114,7 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
     public String deleteSystem() {
 
         if (hostSystem.getId() != null) {
-            SystemDB.disableSystem(hostSystem.getId());
+            SystemDB.deleteSystem(hostSystem.getId());
         }
         return SUCCESS;
     }

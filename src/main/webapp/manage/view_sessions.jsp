@@ -86,7 +86,7 @@
                                 <tr>
                                     <s:if test="userList!= null && !userList.isEmpty()">
                                         <td class="align_left">
-                                           <s:select name="sortedSet.filterMap['%{@com.keybox.manage.db.SessionAuditDB@FILTER_BY_USER_ID}']" listKey="id" listValue="username"
+                                           <s:select name="sortedSet.filterMap['%{@com.keybox.manage.db.SessionAuditDB@FILTER_BY_USER}']" listKey="username" listValue="username"
                                            class="view_frm_select"
                                             list="userList"
                                             headerKey=""
@@ -95,7 +95,7 @@
                                      </s:if>
                                     <s:if test="systemList!= null && !systemList.isEmpty()">
                                             <td class="align_left">
-                                            <s:select name="sortedSet.filterMap['%{@com.keybox.manage.db.SessionAuditDB@FILTER_BY_SYSTEM_ID}']" listKey="id" listValue="displayLabel"
+                                            <s:select name="sortedSet.filterMap['%{@com.keybox.manage.db.SessionAuditDB@FILTER_BY_SYSTEM}']" listKey="displayNm" listValue="displayLabel"
                                             class="view_frm_select"
                                             list="systemList"
                                             headerKey=""
@@ -140,9 +140,9 @@
                 <s:iterator var="session" value="sortedSet.itemList" status="stat">
                     <tr>
 
-                        <td><s:property value="user.username"/></td>
-                        <td><s:property value="user.lastNm"/></td>
-                        <td><s:property value="user.firstNm"/></td>
+                        <td><s:property value="username"/></td>
+                        <td><s:property value="lastNm"/></td>
+                        <td><s:property value="firstNm"/></td>
                         <td><s:date name="sessionTm"/></td>
                         <td>
                             <div id="terminals_btn_<s:property value='id'/>" class="btn btn-default terminals_btn">
