@@ -22,7 +22,9 @@
     <jsp:include page="../_res/inc/header.jsp"/>
     <script type="text/javascript">
         $(document).ready(function () {
-
+            $("#view_btn").button().click(function () {
+                $("#viewSystems").submit();
+            });
             $(".refresh_btn").button().click(function () {
                 //get id to submit edit form
                 var id = $(this).attr('id').replace("refresh_btn_", "");
@@ -89,18 +91,34 @@
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
     <div class="container">
-
-
-
-        <s:form action="viewSystems">
+        <s:form action="viewSystems" theme="simple">
             <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
             <s:hidden name="sortedSet.orderByDirection"/>
             <s:hidden name="sortedSet.orderByField"/>
+
+            <h3>Manage Systems</h3>
+
+            <p>Add / Delete systems below or distribute SSH keys</p>
+
+            <s:if test="profileList!= null && !profileList.isEmpty()">
+               <div>
+                     <table>
+                        <tr>
+                            <td class="align_left">
+                                <s:select name="sortedSet.filterMap['%{@com.keybox.manage.db.SystemDB@FILTER_BY_PROFILE_ID}']" listKey="id" listValue="nm"
+                                class="view_frm_select"
+                                list="profileList"
+                                headerKey=""
+                                headerValue="-Select Profile-"/>
+                            </td>
+                            <td>
+                                <div id="view_btn" class="btn btn-default">Filter</div>
+                            </td>
+                        </tr>
+                     </table>
+               </div>
+            </s:if>
         </s:form>
-
-        <h3>Manage Systems</h3>
-
-        <p>Add / Delete systems below or distribute SSH keys</p>
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
 

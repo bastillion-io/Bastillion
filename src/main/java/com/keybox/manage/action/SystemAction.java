@@ -76,8 +76,8 @@ public class SystemAction extends ActionSupport implements ServletRequestAware {
             }
     )
     public String viewManageSystems() {
-
-        sortedSet = SystemDB.getSystemSet(sortedSet); 
+        sortedSet = SystemDB.getSystemSet(sortedSet);
+        profileList=ProfileDB.getAllProfiles();
 
         return SUCCESS;
     }
