@@ -52,7 +52,7 @@
                 $("#viewSessions").submit();
 
             });
-            <s:if test="sortedSet.orderByField!= null">
+            <s:if test="sortedSet.orderByField!=null && sortedSet.orderByField!=''">
             $('#<s:property value="sortedSet.orderByField"/>').attr('class', '<s:property value="sortedSet.orderByDirection"/>');
             </s:if>
 
