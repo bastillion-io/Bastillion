@@ -240,8 +240,8 @@
                 var id = element.attr("id").replace("run_cmd_", "");
 
                 if (termMap[id]) {
-                    var width = $('#run_cmd_'+id).find(".output:first").innerWidth() - 8;
-                    var height = $('#run_cmd_'+id).innerHeight() - y_offset;
+                    var width = Math.floor($('#run_cmd_'+id).find(".output:first").innerWidth() - 8);
+                    var height = Math.floor($('#run_cmd_'+id).innerHeight() - y_offset);
 
                     termMap[id].resize(Math.floor(width / 7.2981), Math.floor(height / 14.4166));
 
