@@ -487,7 +487,7 @@
             function getNextInstanceId() {
                 var newInstanceId=1;
 
-                for(var i=1;i<=$('.run_cmd').size();i++){
+                for(var i=1;i<=$('.run_cmd').length;i++){
 
                     if($("#run_cmd_" + i).length == 0) {
                         newInstanceId=i;
