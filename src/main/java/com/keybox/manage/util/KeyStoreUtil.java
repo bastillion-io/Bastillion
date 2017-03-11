@@ -15,7 +15,9 @@
  */
 package com.keybox.manage.util;
 
+import com.keybox.common.util.AppConfig;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +52,7 @@ public class KeyStoreUtil {
 			'-', '0', '^', 'Y', ')', '5', 'V', 'M', '7', 'S', 'a', 'c', 'D', 'C', 'w', 'A', 'o', 'n', 's', 'r', '*',
 			'G', '[', 'l', 'h', '$', 'U', 's', '_', 'D', 'f', 'X', '~', '.', '7', 'B', 'A', 'E', '(', '#', ']', ':',
 			'`', ',', 'k', 'y'};
+	private static int KEYLENGTH = AppConfig.getProperty("use256EncryptionKey").equals("true") ? 256 :128;
 
 	//Alias for encryption keystore
 	public static final String ENCRYPTION_KEY_ALIAS = "KEYBOX-ENCRYPTION_KEY";
@@ -162,7 +165,7 @@ public class KeyStoreUtil {
 
 			//set encryption key
 			KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
-			keyGenerator.init(128);
+			keyGenerator.init(KEYLENGTH);
 			KeyStoreUtil.setSecret(KeyStoreUtil.ENCRYPTION_KEY_ALIAS, keyGenerator.generateKey().getEncoded());
 
 			//write keystore
