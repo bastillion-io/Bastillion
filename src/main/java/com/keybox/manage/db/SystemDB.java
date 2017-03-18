@@ -124,12 +124,13 @@ public class SystemDB {
 		if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
 			orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
 		}
-		String sql = "select s.*, m.profile_id from  system s left join system_map  m on m.system_id = s.id " + orderBy;
+		String sql = "select s.*, m.profile_id from  system s left join system_map  m on m.system_id = s.id and m.profile_id = ? " + orderBy;
 
 		Connection con = null;
 		try {
 			con = DBUtils.getConn();
 			PreparedStatement stmt = con.prepareStatement(sql);
+			stmt.setLong(1, profileId);
 			ResultSet rs = stmt.executeQuery();
 
 			while (rs.next()) {

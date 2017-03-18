@@ -112,12 +112,13 @@ public class UserDB {
         if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
             orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
         }
-        String sql = " select u.*, m.profile_id from users u left join user_map  m on m.user_id = u.id where u.user_type like '" + User.ADMINISTRATOR + "' " + orderBy;
+        String sql = "select u.*, m.profile_id from users u left join user_map  m on m.user_id = u.id and m.profile_id = ? where u.user_type like '" + User.ADMINISTRATOR + "'" + orderBy;
 
         Connection con = null;
         try {
             con = DBUtils.getConn();
             PreparedStatement stmt = con.prepareStatement(sql);
+            stmt.setLong(1, profileId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 User user = new User();
