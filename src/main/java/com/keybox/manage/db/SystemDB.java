@@ -44,6 +44,7 @@ public class SystemDB {
 	public static final String SORT_BY_USER = "user";
 	public static final String SORT_BY_HOST = "host";
 	public static final String STATUS_CD = "status_cd";
+	public static final String PROFILE_ID = "profile_id";
 	public static final String SORT_BY_STATUS = STATUS_CD;
 
 	private SystemDB() {
@@ -108,6 +109,58 @@ public class SystemDB {
 
 	}
 
+
+	/**
+	 * method to do order by based on the sorted set object for systems
+	 *
+	 * @param sortedSet sorted set object
+	 * @profileId check if system is apart of given profile
+	 * @return sortedSet with list of host systems
+	 */
+	public static SortedSet getSystemSet(SortedSet sortedSet, Long profileId) {
+		List<HostSystem> hostSystemList = new ArrayList<>();
+
+		String orderBy = "";
+		if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
+			orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
+		}
+		String sql = "select s.*, m.profile_id from  system s left join system_map  m on m.system_id = s.id " + orderBy;
+
+		Connection con = null;
+		try {
+			con = DBUtils.getConn();
+			PreparedStatement stmt = con.prepareStatement(sql);
+			ResultSet rs = stmt.executeQuery();
+
+			while (rs.next()) {
+				HostSystem hostSystem = new HostSystem();
+				hostSystem.setId(rs.getLong("id"));
+				hostSystem.setDisplayNm(rs.getString(DISPLAY_NM));
+				hostSystem.setUser(rs.getString("user"));
+				hostSystem.setHost(rs.getString("host"));
+				hostSystem.setPort(rs.getInt("port"));
+				hostSystem.setAuthorizedKeys(rs.getString(AUTHORIZED_KEYS));
+				hostSystem.setStatusCd(rs.getString(STATUS_CD));
+				if (profileId !=null && profileId.equals(rs.getLong(PROFILE_ID))) {
+					hostSystem.setChecked(true);
+				} else {
+					hostSystem.setChecked(false);
+				}
+				hostSystemList.add(hostSystem);
+			}
+			DBUtils.closeRs(rs);
+			DBUtils.closeStmt(stmt);
+
+		} catch (Exception e) {
+			log.error(e.toString(), e);
+		}
+		finally {
+			DBUtils.closeConn(con);
+		}
+
+		sortedSet.setItemList(hostSystemList);
+		return sortedSet;
+	}
 
 	/**
 	 * method to do order by based on the sorted set object for systems

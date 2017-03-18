@@ -44,6 +44,7 @@ public class UserDB {
     public static final String USERNAME = "username";
     public static final String USER_TYPE = "user_type";
     public static final String AUTH_TYPE = "auth_type";
+    public static final String PROFILE_ID = "profile_id";
 
     private UserDB() {
     }
@@ -99,9 +100,10 @@ public class UserDB {
     /**
      * returns all admin users based on sort order defined
      * @param sortedSet object that defines sort order
+     * @profileId check if user is apart of given profile
      * @return sorted user list
      */
-    public static SortedSet getAdminUserSet(SortedSet sortedSet) {
+    public static SortedSet getAdminUserSet(SortedSet sortedSet, Long profileId) {
 
         ArrayList<User> userList = new ArrayList<>();
 
@@ -110,7 +112,7 @@ public class UserDB {
         if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
             orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
         }
-        String sql = "select * from  users where user_type like '" + User.ADMINISTRATOR + "' " + orderBy;
+        String sql = " select u.*, m.profile_id from users u left join user_map  m on m.user_id = u.id where u.user_type like '" + User.ADMINISTRATOR + "' " + orderBy;
 
         Connection con = null;
         try {
@@ -127,6 +129,11 @@ public class UserDB {
                 user.setPassword(rs.getString(PASSWORD));
                 user.setAuthType(rs.getString(AUTH_TYPE));
                 user.setUserType(rs.getString(USER_TYPE));
+                if (profileId != null && profileId.equals(rs.getLong(PROFILE_ID))) {
+                    user.setChecked(true);
+                } else {
+                    user.setChecked(false);
+                }
                 userList.add(user);
 
             }

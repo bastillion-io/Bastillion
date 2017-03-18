@@ -31,8 +31,8 @@
             });
 
             //select all check boxes
-            $("#assignSystemsToProfile_systemSelectAll").click(function() {
-
+            $("#assignSystemsToProfile_systemSelectAll").click(function(e) {
+                e.stopImmediatePropagation();
                 if ($(this).is(':checked')) {
                     $(".systemSelect").prop('checked', true);
                 } else {
@@ -58,13 +58,6 @@
             $('#<s:property value="sortedSet.orderByField"/>').attr('class', '<s:property value="sortedSet.orderByDirection"/>');
             </s:if>
 
-            <s:if test="profile.hostSystemList!= null && !profile.hostSystemList.isEmpty()">
-            <s:iterator var="system" value="profile.hostSystemList" status="stat">
-            $(':checkbox[value=<s:property value="id"/>]').prop('checked', true);
-            </s:iterator>
-            </s:if>
-
-
         });
     </script>
 
@@ -72,7 +65,6 @@
 
 </head>
 <body>
-
 
     <jsp:include page="../_res/inc/navigation.jsp"/>
 
@@ -103,7 +95,7 @@
                     <thead>
 
                     <tr>
-                        <th><s:checkbox name="systemSelectAll" cssClass="systemSelect" theme="simple"/></th>
+                        <th id="<s:property value="@com.keybox.manage.db.SystemDB@PROFILE_ID"/>" class="sort"><s:checkbox name="systemSelectAll" cssClass="systemSelect" theme="simple"/></th>
                         <th id="<s:property value="@com.keybox.manage.db.SystemDB@SORT_BY_NAME"/>" class="sort">Display Name</th>
                         <th id="<s:property value="@com.keybox.manage.db.SystemDB@SORT_BY_USER"/>" class="sort">User</th>
                         <th id="<s:property value="@com.keybox.manage.db.SystemDB@SORT_BY_HOST"/>" class="sort">Host</th>
@@ -117,8 +109,14 @@
                     <s:iterator var="system" value="sortedSet.itemList" status="stat">
                         <tr>
                             <td>
-                                <s:checkboxlist id="systemSelectId_%{id}" list="#{id:''}" name="systemSelectId" cssClass="systemSelect"
-                                            theme="simple"/>
+                                <s:if test="checked">
+                                    <s:checkboxlist id="systemSelectId_%{id}" list="#{id:''}" name="systemSelectId" cssClass="systemSelect"
+                                        theme="simple" checked="true"/>
+                                </s:if>
+                                <s:else>
+                                    <s:checkboxlist id="systemSelectId_%{id}" list="#{id:''}" name="systemSelectId" cssClass="systemSelect"
+                                        theme="simple"/>
+                                </s:else>
                             </td>
                             <td>
                                 <s:property value="displayNm"/>

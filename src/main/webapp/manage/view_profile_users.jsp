@@ -33,8 +33,8 @@
             });
 
             //select all check boxes
-            $("#assignUsersToProfile_userSelectAll").click(function() {
-
+            $("#assignUsersToProfile_userSelectAll").click(function(e) {
+                e.stopImmediatePropagation();
                 if ($(this).is(':checked')) {
                     $(".userSelect").prop('checked', true);
                 } else {
@@ -59,13 +59,6 @@
             <s:if test="sortedSet.orderByField!=null && sortedSet.orderByField!=''">
             $('#<s:property value="sortedSet.orderByField"/>').attr('class', '<s:property value="sortedSet.orderByDirection"/>');
             </s:if>
-
-            <s:if test="userList!= null && !userList.isEmpty()">
-            <s:iterator var="user" value="userList" status="stat">
-            $(':checkbox[value=<s:property value="id"/>]').prop('checked', true);
-            </s:iterator>
-            </s:if>
-
 
         });
     </script>
@@ -105,7 +98,7 @@
                     <thead>
 
                     <tr>
-                        <th><s:checkbox name="userSelectAll" cssClass="userSelect" theme="simple"/></th>
+                        <th id="<s:property value="@com.keybox.manage.db.UserDB@PROFILE_ID"/>" class="sort"><s:checkbox name="userSelectAll" cssClass="userSelect" theme="simple"/></th>
                         <th id="<s:property value="@com.keybox.manage.db.UserDB@USERNAME"/>" class="sort">Username
                         </th>
                         <s:if test="%{@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}">
@@ -127,8 +120,14 @@
                     <s:iterator var="user" value="sortedSet.itemList" status="stat">
                         <tr>
                             <td>
-                                <s:checkboxlist id="userSelectId_%{id}" list="#{id:''}" name="userSelectId" cssClass="userSelect"
-                                                theme="simple"/>
+                                <s:if test="checked">
+                                    <s:checkboxlist id="userSelectId_%{id}" list="#{id:''}" name="userSelectId" cssClass="userSelect"
+                                        theme="simple" checked="true" />
+                                </s:if>
+                                <s:else>
+                                    <s:checkboxlist id="userSelectId_%{id}" list="#{id:''}" name="userSelectId" cssClass="userSelect"
+                                        theme="simple"/>
+                                </s:else>
                             </td>
                             <td>
                                 <s:if test="userType==\"M\"">

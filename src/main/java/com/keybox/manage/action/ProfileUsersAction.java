@@ -36,7 +36,6 @@ public class ProfileUsersAction extends ActionSupport {
 
     Profile profile;
     SortedSet sortedSet=new SortedSet();
-    List<User> userList;
     List<Long> userSelectId;
 
 
@@ -48,8 +47,7 @@ public class ProfileUsersAction extends ActionSupport {
     public String viewProfileUsers() {
         if (profile != null && profile.getId() != null) {
             profile = ProfileDB.getProfile(profile.getId());
-            sortedSet = UserDB.getAdminUserSet(sortedSet);
-            userList = UserProfileDB.getUsersByProfile(profile.getId());
+            sortedSet = UserDB.getAdminUserSet(sortedSet, profile.getId());
         }
         return SUCCESS;
     }
@@ -88,15 +86,4 @@ public class ProfileUsersAction extends ActionSupport {
         return sortedSet;
     }
 
-    public void setSortedSet(SortedSet sortedSet) {
-        this.sortedSet = sortedSet;
-    }
-    public List<User> getUserList() {
-        return userList;
-    }
-
-    public void setUserList(List<User> userList) {
-        this.userList = userList;
-    }
-    
 }

@@ -131,68 +131,6 @@ public class UserProfileDB {
     }
 
     /**
-     * get users associated with profile
-     * @param profileId profile id
-     * @return user list
-     */
-    public static List<User> getUsersByProfile(Long profileId) {
-
-
-        Connection con = null;
-        List<User> userList = new ArrayList<>();
-        try {
-            con = DBUtils.getConn();
-            userList = getUsersByProfile(con, profileId);
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
-        }
-        finally {
-            DBUtils.closeConn(con);
-        }
-        return userList;
-
-
-    }
-
-    /**
-     * get users associated with profile
-     * @param con DB connection
-     * @param profileId profile id
-     * @return user list
-     */
-    public static List<User> getUsersByProfile(Connection con, Long profileId) {
-
-        ArrayList<User> userList = new ArrayList<>();
-
-
-        try {
-            PreparedStatement stmt = con.prepareStatement("select * from  users u, user_map m where u.id=m.user_id and m.profile_id=? order by last_nm asc");
-            stmt.setLong(1, profileId);
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                User user = new User();
-                user.setId(rs.getLong("id"));
-                user.setFirstNm(rs.getString("first_nm"));
-                user.setLastNm(rs.getString("last_nm"));
-                user.setEmail(rs.getString("email"));
-                user.setUsername(rs.getString("username"));
-                user.setPassword(rs.getString("password"));
-                userList.add(user);
-            }
-            DBUtils.closeRs(rs);
-            DBUtils.closeStmt(stmt);
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
-        }
-
-        return userList;
-    }
-
-
-    /**
      * checks to determine if user belongs to profile
      *
      * @param userId user id
