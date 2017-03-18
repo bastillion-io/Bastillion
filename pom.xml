@@ -101,7 +101,7 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <includes>
-                    <include>KeyBoxConfig.properties</include>
+                    <include>VERSION.txt</include>
                 </includes>
                 <filtering>true</filtering>
             </resource>
