@@ -20,6 +20,7 @@
 <html>
 <head>
     <jsp:include page="../_res/inc/header.jsp"/>
+    <script src="<%= request.getContextPath() %>/_res/js/liveFilter.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {
             $("#view_btn").button().click(function () {
@@ -56,6 +57,7 @@
             $('#<s:property value="sortedSet.orderByField"/>').attr('class', '<s:property value="sortedSet.orderByDirection"/>');
             </s:if>
 
+            liveFilter("systemsFilter", [2,3,4]);
     });
     </script>
 
@@ -106,22 +108,26 @@
             <s:hidden name="script.id"/>
         </s:if>
         <s:if test="profileList!= null && !profileList.isEmpty()">
-           <div>
-                     <table>
-                        <tr>
-                            <td class="align_left">
-                                <s:select name="sortedSet.filterMap['%{@com.keybox.manage.db.SystemDB@FILTER_BY_PROFILE_ID}']" listKey="id" listValue="nm"
-                                class="view_frm_select"
-                                list="profileList"
-                                headerKey=""
-                                headerValue="-Select Profile-"/>
-                            </td>
-                            <td>
-                                <div id="view_btn" class="btn btn-default">Filter</div>
-                            </td>
-                        </tr>
-                     </table>
-           </div>
+            <div class="liveFilter form-group has-feedback">
+                <input id="systemsFilter" class="form-control" placeholder="Search system by name, user, host" />
+                <i class="glyphicon glyphicon-search form-control-feedback"></i>
+            </div>
+            <div>
+                 <table>
+                    <tr>
+                        <td class="align_left">
+                            <s:select name="sortedSet.filterMap['%{@com.keybox.manage.db.SystemDB@FILTER_BY_PROFILE_ID}']" listKey="id" listValue="nm"
+                            class="view_frm_select"
+                            list="profileList"
+                            headerKey=""
+                            headerValue="-Select Profile-"/>
+                        </td>
+                        <td>
+                            <div id="view_btn" class="btn btn-default">Filter</div>
+                        </td>
+                    </tr>
+                 </table>
+            </div>
         </s:if>
         </s:form>
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">

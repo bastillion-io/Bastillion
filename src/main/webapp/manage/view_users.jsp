@@ -22,6 +22,7 @@
 
     <jsp:include page="../_res/inc/header.jsp"/>
 
+    <script src="<%= request.getContextPath() %>/_res/js/liveFilter.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {
 
@@ -55,6 +56,8 @@
             $('.auth_type').change(function() {
                 hideShowPassword($(this).val());
             });
+
+            liveFilter("usersFilter", [1,3,4,5]);
             
         });
         
@@ -67,7 +70,6 @@
             }
         }
     </script>
-
     <s:if test="fieldErrors.size > 0 || actionErrors.size > 0">
         <script type="text/javascript">
             $(document).ready(function() {
@@ -104,6 +106,12 @@
         <p>Add / Delete users below so that system profiles may be set for users (<a href="viewProfiles.action?_csrf=<s:property value="#session['_csrf']"/>">Manage Profiles</a>).</p>
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
+
+            <div class="liveFilter form-group has-feedback">
+                <input id="usersFilter" class="form-control" placeholder="Search user by username, last name, first name, email" />
+                <i class="glyphicon glyphicon-search form-control-feedback"></i>
+            </div>
+
             <div class="scrollWrapper">
                 <table class="table-striped  scrollableTable">
 

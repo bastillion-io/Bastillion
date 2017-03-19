@@ -21,7 +21,7 @@
 <head>
 
     <jsp:include page="../_res/inc/header.jsp"/>
-
+    <script src="<%= request.getContextPath() %>/_res/js/liveFilter.js"></script>
     <script type="text/javascript">
         $(document).ready(function() {
 
@@ -53,6 +53,8 @@
             <s:if test="sortedSet.orderByField!=null && sortedSet.orderByField!=''">
             $('#<s:property value="sortedSet.orderByField"/>').attr('class', '<s:property value="sortedSet.orderByDirection"/>');
             </s:if>
+
+            liveFilter("scriptsFilter", [1]);
 
         });
     </script>
@@ -86,11 +88,17 @@
             <s:hidden name="sortedSet.orderByDirection" />
             <s:hidden name="sortedSet.orderByField"/>
         </s:form>
-            <h3>Manage Scripts</h3>
+        <h3>Manage Scripts</h3>
 
-            <p>Add / Delete scripts or select a script below to execute</p>
+        <p>Add / Delete scripts or select a script below to execute</p>
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
+
+            <div class="liveFilter form-group has-feedback">
+                <input id="scriptsFilter" class="form-control" placeholder="Search by script name" />
+                <i class="glyphicon glyphicon-search form-control-feedback"></i>
+            </div>
+
             <div class="scrollWrapper">
                 <table class="table-striped scrollableTable">
                     <thead>

@@ -376,3 +376,7 @@ table.floatThead-table {
 .invisible {
     visibility: hidden;
 }
+
+.liveFilter {
+    width: 350px;
+}
