@@ -177,7 +177,10 @@ public class SecureShellAction extends ActionSupport implements ServletRequestAw
             SystemStatusDB.setInitialSystemStatus(systemSelectId, userId, AuthUtil.getUserType(servletRequest.getSession()));
             pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
 
-            AuthUtil.setSessionId(servletRequest.getSession(), SessionAuditDB.createSessionLog(userId));
+            User user = UserDB.getUser(userId);
+            user.setIpAddress(AuthUtil.getClientIPAddress(servletRequest));
+
+            AuthUtil.setSessionId(servletRequest.getSession(), SessionAuditDB.createSessionLog(user));
 
 
         }

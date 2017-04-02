@@ -24,6 +24,7 @@ public class User extends Auth {
     String firstNm;
     String lastNm;
     String email;
+    String ipAddress;
     boolean checked=false;
     List<Profile> profileList;
 
@@ -67,4 +68,11 @@ public class User extends Auth {
         this.profileList = profileList;
     }
 
+    public String getIpAddress() {
+        return ipAddress;
+    }
+
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
+    }
 }

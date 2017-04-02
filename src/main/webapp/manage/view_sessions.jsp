@@ -129,6 +129,9 @@
                     <th id="<s:property value="@com.keybox.manage.db.SessionAuditDB@SORT_BY_FIRST_NM"/>" class="sort">
                         First Name
                     </th>
+                    <th id="<s:property value="@com.keybox.manage.db.SessionAuditDB@SORT_BY_IP_ADDRESS"/>" class="sort">
+                       IP Address
+                    </th>
                     <th id="<s:property value="@com.keybox.manage.db.SessionAuditDB@SORT_BY_SESSION_TM"/>" class="sort">
                         Session Time
                     </th>
@@ -143,6 +146,7 @@
                         <td><s:property value="username"/></td>
                         <td><s:property value="lastNm"/></td>
                         <td><s:property value="firstNm"/></td>
+                        <td><s:property value="ipAddress"/></td>
                         <td><s:date name="sessionTm"/></td>
                         <td>
                             <div id="terminals_btn_<s:property value='id'/>" class="btn btn-default terminals_btn">

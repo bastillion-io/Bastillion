@@ -16,8 +16,10 @@
 package com.keybox.common.util;
 
 import com.keybox.manage.util.EncryptionUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.util.TokenHelper;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -247,6 +249,23 @@ public class AuthUtil {
         session.setAttribute(SESSION_ID, null);
 
         session.invalidate();
+    }
+
+    /**
+     * return client ip from servlet request
+     *
+     * @param servletRequest http servlet request
+     * @return client ip
+     */
+    public static String getClientIPAddress(HttpServletRequest servletRequest) {
+        String clientIP = null;
+        if (StringUtils.isNotEmpty(AppConfig.getProperty("clientIPHeader"))) {
+            clientIP = servletRequest.getHeader(AppConfig.getProperty("clientIPHeader"));
+        }
+        if (StringUtils.isEmpty(clientIP)) {
+            clientIP = servletRequest.getRemoteAddr();
+        }
+        return clientIP;
     }
 
 }

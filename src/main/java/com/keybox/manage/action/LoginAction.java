@@ -86,13 +86,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
         String authToken = AuthDB.login(auth);
 
         //get client IP
-        String clientIP = null;
-        if (StringUtils.isNotEmpty(AppConfig.getProperty("clientIPHeader"))) {
-            clientIP = servletRequest.getHeader(AppConfig.getProperty("clientIPHeader"));
-        }
-        if (StringUtils.isEmpty(clientIP)) {
-            clientIP = servletRequest.getRemoteAddr();
-        }
+        String clientIP = AuthUtil.getClientIPAddress(servletRequest);
         if (authToken != null) {
 
             User user = AuthDB.getUserByAuthToken(authToken);

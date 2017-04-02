@@ -45,9 +45,9 @@ public class SessionAuditDB {
     
     public static final String SORT_BY_FIRST_NM = "first_nm";
     public static final String SORT_BY_LAST_NM = "last_nm";
+    public static final String SORT_BY_IP_ADDRESS = "ip_address";
     public static final String SORT_BY_USERNAME = "username";
-    public static final String SESSION_TM = "session_tm";
-    public static final String SORT_BY_SESSION_TM = SESSION_TM;
+    public static final String SORT_BY_SESSION_TM = "session_tm";
 
     private SessionAuditDB() {
     }
@@ -127,9 +127,10 @@ public class SessionAuditDB {
             while (rs.next()) {
                 SessionAudit sessionAudit = new SessionAudit();
                 sessionAudit.setId(rs.getLong("session_log.id"));
-                sessionAudit.setSessionTm(rs.getTimestamp(SESSION_TM));
+                sessionAudit.setSessionTm(rs.getTimestamp("session_tm"));
                 sessionAudit.setFirstNm(rs.getString("first_nm"));
                 sessionAudit.setLastNm(rs.getString("last_nm"));
+                sessionAudit.setIpAddress(rs.getString("ip_address"));
                 sessionAudit.setUsername(rs.getString("username"));
                 outputList.add(sessionAudit);
             }
@@ -154,17 +155,17 @@ public class SessionAuditDB {
     /**
      * insert new session record for user
      *
-     * @param userId user id
+     * @param user session user
      * @return session id
      */
-    public static Long createSessionLog(Long userId) {
+    public static Long createSessionLog(User user) {
         //get db connection
         Connection con = DBUtils.getConn();
 
         Long sessionId = null;
         try {
 
-            sessionId = createSessionLog(con, userId);
+            sessionId = createSessionLog(con, user);
 
         } catch (Exception e) {
             log.error(e.toString(), e);
@@ -179,19 +180,19 @@ public class SessionAuditDB {
      * insert new session record for user
      *
      * @param con    DB connection
-     * @param userId user id
+     * @param user session user
      * @return session id
      */
-    public static Long createSessionLog(Connection con, Long userId) {
+    public static Long createSessionLog(Connection con, User user) {
         Long sessionId = null;
         try {
 
             //insert
-            User user = UserDB.getUser(con, userId);
-            PreparedStatement stmt = con.prepareStatement("insert into session_log (first_nm, last_nm, username) values(?,?,?)", Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement stmt = con.prepareStatement("insert into session_log (first_nm, last_nm, username, ip_address) values(?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
             stmt.setString(1, user.getFirstNm());
             stmt.setString(2, user.getLastNm());
             stmt.setString(3, user.getUsername());
+            stmt.setString(4, user.getIpAddress());
             stmt.execute();
             ResultSet rs = stmt.getGeneratedKeys();
             if (rs != null && rs.next()) {
@@ -390,10 +391,11 @@ public class SessionAuditDB {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 sessionAudit.setId(rs.getLong("session_log.id"));
-                sessionAudit.setSessionTm(rs.getTimestamp(SESSION_TM));
+                sessionAudit.setSessionTm(rs.getTimestamp("session_tm"));
                 sessionAudit.setUsername(rs.getString("username"));
                 sessionAudit.setFirstNm(rs.getString("first_nm"));
                 sessionAudit.setLastNm(rs.getString("last_nm"));
+                sessionAudit.setIpAddress(rs.getString("ip_address"));
                 sessionAudit.setHostSystemList(getHostSystemsForSession(con, sessionId));
             }
 
