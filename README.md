@@ -225,5 +225,5 @@ Donate
 ------
 Dontations are always welcome!
 
-<span class="badge-paypal"><a href="https://www.paypal.me/SKavanagh" title="Donate to this project using Paypal"><img src="https://img.shields.io/badge/paypal-donate-yellow.svg" alt="PayPal donate button" /></a></span>
+[![Donate](https://img.shields.io/badge/donorbox-donate-blue.svg)](https://donorbox.org/keybox?recurring=true) 
 
