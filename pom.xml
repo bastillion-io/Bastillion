@@ -84,6 +84,12 @@
 
         <!-- provided dependencies-->
         <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-jaas</artifactId>
+            <version>9.4.4.v20170414</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>javax.websocket</groupId>
             <artifactId>javax.websocket-api</artifactId>
             <version>1.1</version>
@@ -127,7 +133,7 @@
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-                <version>9.4.2.v20170220</version>
+                <version>9.4.4.v20170414</version>
                 <configuration>
                     <jettyXml>${basedir}/src/test/resources/jetty.xml,${basedir}/src/test/resources/jetty-ssl.xml,${basedir}/src/test/resources/jetty-https.xml</jettyXml>
                     <scanIntervalSeconds>-1</scanIntervalSeconds>

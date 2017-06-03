@@ -1,12 +1,12 @@
 /**
  * Copyright 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
- *
+ * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +16,6 @@
 package com.keybox.manage.db;
 
 import com.keybox.manage.model.Profile;
-import com.keybox.manage.model.User;
 import com.keybox.manage.util.DBUtils;
 
 import java.sql.Connection;
@@ -24,6 +23,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,12 +40,12 @@ public class UserProfileDB {
 
     /**
      * sets users for profile
-     * 
-     * @param profileId profile id
+     *
+     * @param profileId  profile id
      * @param userIdList list of user ids
      */
     public static void setUsersForProfile(Long profileId, List<Long> userIdList) {
-        
+
         Connection con = null;
         PreparedStatement stmt = null;
 
@@ -55,7 +56,7 @@ public class UserProfileDB {
             stmt.execute();
             DBUtils.closeStmt(stmt);
 
-            for(Long userId : userIdList) {
+            for (Long userId : userIdList) {
                 stmt = con.prepareStatement("insert into user_map (profile_id, user_id) values (?,?)");
                 stmt.setLong(1, profileId);
                 stmt.setLong(2, userId);
@@ -67,14 +68,14 @@ public class UserProfileDB {
 
         } catch (Exception e) {
             log.error(e.toString(), e);
-        }
-        finally {
+        } finally {
             DBUtils.closeConn(con);
         }
     }
 
     /**
      * return a list of profiles for user
+     *
      * @param userId user id
      * @return profile list
      */
@@ -89,8 +90,7 @@ public class UserProfileDB {
 
         } catch (Exception e) {
             log.error(e.toString(), e);
-        }
-        finally {
+        } finally {
             DBUtils.closeConn(con);
         }
         return profileList;
@@ -100,6 +100,7 @@ public class UserProfileDB {
 
     /**
      * return a list of profiles for user
+     *
      * @param userId user id
      * @return profile list
      */
@@ -133,12 +134,12 @@ public class UserProfileDB {
     /**
      * checks to determine if user belongs to profile
      *
-     * @param userId user id
+     * @param userId    user id
      * @param profileId profile id
      * @return true if user belongs to profile
      */
-    public static boolean checkIsUsersProfile(Long userId, Long profileId){
-        boolean isUsersProfile=false;
+    public static boolean checkIsUsersProfile(Long userId, Long profileId) {
+        boolean isUsersProfile = false;
 
         Connection con = null;
 
@@ -151,7 +152,7 @@ public class UserProfileDB {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-               isUsersProfile=true;
+                isUsersProfile = true;
             }
             DBUtils.closeRs(rs);
             DBUtils.closeStmt(stmt);
@@ -159,13 +160,64 @@ public class UserProfileDB {
 
         } catch (Exception e) {
             log.error(e.toString(), e);
-        }
-        finally {
+        } finally {
             DBUtils.closeConn(con);
         }
 
         return isUsersProfile;
 
+    }
+
+    /**
+     * assigns profiles to given user
+     *
+     * @param userId                 user id
+     * @param allProfilesNmList      list of all profiles
+     * @param assignedProfilesNmList list of assigned profiles
+     */
+    public static void assignProfilesToUser(Connection con, Long userId, List<String> allProfilesNmList, List<String> assignedProfilesNmList) {
+
+        PreparedStatement stmt = null;
+
+        try {
+
+            for (String profileNm : allProfilesNmList) {
+                if (StringUtils.isNotEmpty(profileNm)) {
+
+                    Long profileId = null;
+                    stmt = con.prepareStatement("select id from  profiles p where lower(p.nm) like ?");
+                    stmt.setString(1, profileNm.toLowerCase());
+                    ResultSet rs = stmt.executeQuery();
+                    while (rs.next()) {
+                        profileId = rs.getLong("id");
+                    }
+                    DBUtils.closeRs(rs);
+                    DBUtils.closeStmt(stmt);
+
+                    if (profileId != null) {
+                        stmt = con.prepareStatement("delete from user_map where profile_id=?");
+                        stmt.setLong(1, profileId);
+                        stmt.execute();
+                        DBUtils.closeStmt(stmt);
+
+                        if (assignedProfilesNmList.contains(profileNm)) {
+                            stmt = con.prepareStatement("insert into user_map (profile_id, user_id) values (?,?)");
+                            stmt.setLong(1, profileId);
+                            stmt.setLong(2, userId);
+                            stmt.execute();
+                            DBUtils.closeStmt(stmt);
+                        }
+
+                        //delete all unassigned keys by profile
+                        PublicKeyDB.deleteUnassignedKeysByProfile(con, profileId);
+                    }
+
+                }
+            }
+
+        } catch (Exception e) {
+            log.error(e.toString(), e);
+        }
     }
 
 }
