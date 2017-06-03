@@ -53,16 +53,18 @@
             </s:if>
 
             $('.auth_type').change(function() {
-                hideShowPassword($(this).val());
+                showPassword($(this).val() != 'EXTERNAL');
             });
-            
+            $('.user_type').change(function() {
+                showPassword($(this).val() != 'P');
+            });
         });
         
         //hide show passwords
-        function hideShowPassword(val){
-            if(val=='EXTERNAL'){
+        function showPassword(show){
+            if(!show){
                 $('.password').closest('tr').hide();
-            }else {
+            } else {
                 $('.password').closest('tr').show();
             }
         }
@@ -77,7 +79,7 @@
                 <s:else>
                 $("#add_dialog").modal();
                 <s:if test="%{@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}">
-                    hideShowPassword($('.auth_type:checked').val());
+                    showPassword($('.auth_type:checked').val() != 'EXTERNAL');
                 </s:if>
                 </s:else>
             });
@@ -144,6 +146,9 @@
                          <s:if test="userType==\"A\"">
                             Administrative Only
                          </s:if>
+                         <s:elseif test="userType==\"P\"">
+                            Passive (cannot log in)
+                         </s:elseif>
                          <s:else>
                             Full Access
                          </s:else>
@@ -196,7 +201,7 @@
                             <s:form action="saveUser" class="save_user_form_add" autocomplete="off">
                                 <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                                 <s:textfield name="user.username" label="Username" size="15"/>
-                                <s:select name="user.userType" list="#{'A':'Administrative Only','M':'Full Access'}" label="UserType"/>
+                                <s:select name="user.userType" list="#{'A':'Administrative Only','M':'Full Access','P':'Passive (cannot log in)'}" label="UserType" cssClass="user_type"/>
                                 <s:if test="%{@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}">
                                     <s:radio name="user.authType" label="Authentication Type" list="#{'BASIC':'Basic', 'EXTERNAL':'External'}" cssClass="auth_type"/>
                                 </s:if>
@@ -234,7 +239,7 @@
                                     <s:form action="saveUser" id="save_user_form_edit_%{id}" autocomplete="off">
                                         <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
                                         <s:textfield name="user.username" value="%{username}" label="Username" size="15"/>
-                                        <s:select name="user.userType" value="%{userType}" list="#{'A':'Administrative Only','M':'Full Access'}" label="UserType"/>
+                                        <s:select name="user.userType" value="%{userType}" list="#{'A':'Administrative Only','M':'Full Access','P':'Passive (cannot log in)'}" label="UserType" cssClass="user_type"/>
                                         <s:if test="%{@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}">
                                             <s:hidden name="user.authType" value="%{authType}"/>
                                             <tr>
@@ -253,8 +258,8 @@
                                         <s:textfield name="user.lastNm" value="%{lastNm}" label="Last Name" size="15"/>
                                         <s:textfield name="user.email" value="%{email}" label="Email Address" size="25"/>
                                         <s:if test="%{!@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled || #user.authType==\"BASIC\"}">
-                                            <s:password name="user.password" value="" label="Password" size="15"/>
-                                            <s:password name="user.passwordConfirm" value="" label="Confirm Password" size="15"/>
+                                            <s:password name="user.password" value="" label="Password" size="15" cssClass="password"/>
+                                            <s:password name="user.passwordConfirm" value="" label="Confirm Password" size="15" cssClass="password"/>
                                         </s:if>
                                         <s:checkbox name="resetSharedSecret" label="Reset OTP Code"/>
                                         <s:hidden name="user.id" value="%{id}"/>

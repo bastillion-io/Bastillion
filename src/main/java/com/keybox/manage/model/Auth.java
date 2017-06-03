@@ -23,7 +23,8 @@ public class Auth {
 
     public static final String ADMINISTRATOR="A";
     public static final String MANAGER="M";
-    
+    public static final String PASSIVE="P";
+
     public static final String AUTH_BASIC="BASIC";
     public static final String AUTH_EXTERNAL="EXTERNAL";
 

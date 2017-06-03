@@ -119,17 +119,21 @@ public class UsersAction extends ActionSupport  implements ServletRequestAware {
                 || user.getFirstNm().trim().equals("")) {
             addFieldError("user.firstNm", REQUIRED);
         }
-        
-        if (user != null && user.getPassword() != null && !user.getPassword().trim().equals("")){
-            
-            if(!user.getPassword().equals(user.getPasswordConfirm())) {
+
+        // Password validation is only for users who are permitted to log in (ie non-passive ones)
+        if (user != null && !User.PASSIVE.equals(user.getUserType())) {
+            if (user.getPassword() != null && !user.getPassword().trim().equals("")){
+
+                if(!user.getPassword().equals(user.getPasswordConfirm())) {
                     addActionError("Passwords do not match");
-            } else if(!PasswordUtil.isValid(user.getPassword())) {
+                } else if(!PasswordUtil.isValid(user.getPassword())) {
                     addActionError(PasswordUtil.PASSWORD_REQ_ERROR_MSG);
+                }
             }
-        }
-        if(user!=null && user.getId()==null && !Auth.AUTH_EXTERNAL.equals(user.getAuthType()) && (user.getPassword()==null || user.getPassword().trim().equals(""))){
-            addActionError("Password is required");
+
+            if(user!=null && user.getId()==null && !Auth.AUTH_EXTERNAL.equals(user.getAuthType()) && (user.getPassword()==null || user.getPassword().trim().equals(""))){
+                addActionError("Password is required");
+            }
         }
 
         if(user!=null && !UserDB.isUnique(user.getId(),user.getUsername())){
