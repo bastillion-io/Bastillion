@@ -158,6 +158,32 @@ Connection details need to be set in the jaas.conf file
 
 Administrators will be added as they are authenticated and profiles of systems may be assigned by full-privileged users.
 
+User LDAP roles can be mapped to profiles defined in KeyBox through the use of the org.eclipse.jetty.jaas.spi.LdapLoginModule.
+
+    ldap-ol-with-roles {
+        //openldap auth with roles that can map to profiles
+        org.eclipse.jetty.jaas.spi.LdapLoginModule required
+        debug="false"
+        useLdaps="false"
+        contextFactory="com.sun.jndi.ldap.LdapCtxFactory"
+        hostname="<SERVER>"
+        port="389"
+        bindDn="<BIND-DN>"
+        bindPassword="<BIND-DN PASSWORD>"
+        authenticationMethod="simple"
+        forceBindingLogin="true"
+        userBaseDn="ou=users,dc=keybox,dc=com"
+        userRdnAttribute="uid"
+        userIdAttribute="uid"
+        userPasswordAttribute="userPassword"
+        userObjectClass="inetOrgPerson"
+        roleBaseDn="ou=groups,dc=keybox,dc=com"
+        roleNameAttribute="cn"
+        roleMemberAttribute="member"
+        roleObjectClass="groupOfNames";
+    };
+
+Users will be added/removed from defined profiles as they login and when the role name matches the profile name.
 
 Auditing
 ------
