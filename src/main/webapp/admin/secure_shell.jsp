@@ -317,7 +317,7 @@
             }
           
 
-            $('#match_btn').unbind().click(function () {
+            $('#match_btn').off().click(function () {
                 $('#match_frm').submit();
             });
 
@@ -383,6 +383,7 @@
                     $('#match_btn').text("Start");
                     clearInterval(matchFunction)
                 }
+                $('#match_btn').removeAttr('disabled');
             }
 
 
