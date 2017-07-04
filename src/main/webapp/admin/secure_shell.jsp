@@ -383,7 +383,7 @@
                     $('#match_btn').text("Start");
                     clearInterval(matchFunction)
                 }
-                $('#match_btn').removeAttr('disabled');
+                $('.btn').removeAttr('disabled');
             }
 
 
