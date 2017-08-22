@@ -34,7 +34,7 @@ If you're not big on the idea of building from source...
 
 Download keybox-jetty-vXX.XX.tar.gz
 
-http://sshkeybox.com/latest-release.html#keybox
+https://github.com/skavanagh/KeyBox/releases
 
 Export environment variables
 
