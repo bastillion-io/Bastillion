@@ -58,10 +58,10 @@ for Windows
 
         startKeyBox.bat
 
-How to Configure SSL in Jetty
+How to [Configure SSL in Jetty](http://www.eclipse.org/jetty/documentation/current/configuring-ssl.html)
 (it is a good idea to add or generate your own unique certificate)
 
-http://wiki.eclipse.org/Jetty/Howto/Configure_SSL
+http://www.eclipse.org/jetty/documentation/current/configuring-ssl.html
 
 To Build from Source
 ------
