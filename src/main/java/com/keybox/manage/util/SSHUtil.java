@@ -77,7 +77,7 @@ public class SSHUtil {
 		//read pvt ssh key
 		File file = new File(publicKey);
 		try {
-			publicKey = FileUtils.readFileToString(file);
+			publicKey = FileUtils.readFileToString(file, "UTF-8");
 		} catch (Exception ex) {
 			log.error(ex.toString(), ex);
 		}
@@ -102,7 +102,7 @@ public class SSHUtil {
 		//read pvt ssh key
 		File file = new File(privateKey);
 		try {
-			privateKey = FileUtils.readFileToString(file);
+			privateKey = FileUtils.readFileToString(file, "UTF-8");
 		} catch (Exception ex) {
 			log.error(ex.toString(), ex);
 		}
