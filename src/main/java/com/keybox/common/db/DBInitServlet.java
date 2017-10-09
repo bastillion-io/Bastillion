@@ -18,9 +18,7 @@ package com.keybox.common.db;
 import com.keybox.common.util.AppConfig;
 import com.keybox.manage.model.Auth;
 import com.keybox.manage.util.DBUtils;
-import com.keybox.manage.util.DSPool;
 import com.keybox.manage.util.EncryptionUtil;
-import com.keybox.manage.util.KeyStoreUtil;
 import com.keybox.manage.util.RefreshAuthKeyUtil;
 import com.keybox.manage.util.SSHUtil;
 
@@ -31,6 +29,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Scanner;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -67,12 +66,22 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 		if(StringUtils.isEmpty(AppConfig.getProperty("dbPassword"))) {
 			String dbPassword = null;
 			String dbPasswordConfirm = null;
-			//prompt for password and confirmation
-			while (dbPassword == null || !dbPassword.equals(dbPasswordConfirm)) {
-				dbPassword = new String(System.console().readPassword("Please enter database password: "));
-				dbPasswordConfirm = new String(System.console().readPassword("Please confirm database password: "));
-				if (!dbPassword.equals(dbPasswordConfirm)) {
-					System.out.println("Passwords do not match");
+			if(!"true".equals(System.getProperty("GEN_DB_PASS"))) {
+				//prompt for password and confirmation
+				while (dbPassword == null || !dbPassword.equals(dbPasswordConfirm)) {
+					if (System.console() == null) {
+						Scanner in = new Scanner(System.in);
+						System.out.println("Please enter database password: ");
+						dbPassword = in.nextLine();
+						System.out.println("Please confirm database password: ");
+						dbPasswordConfirm = in.nextLine();
+					} else {
+						dbPassword = new String(System.console().readPassword("Please enter database password: "));
+						dbPasswordConfirm = new String(System.console().readPassword("Please confirm database password: "));
+					}
+					if (!dbPassword.equals(dbPasswordConfirm)) {
+						System.out.println("Passwords do not match");
+					}
 				}
 			}
 			//set password
