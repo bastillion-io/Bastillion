@@ -251,5 +251,5 @@ Donate
 ------
 Dontations are always welcome!
 
-[![Donate](https://img.shields.io/badge/donorbox-donate-blue.svg)](https://donorbox.org/keybox?recurring=true) 
-
+<span class="badge-paypal"><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=KKRTX5GB9GDF8" title="Donate to this project using Paypal"><img src="https://img.shields.io/badge/paypal-donate-yellow.svg" alt="PayPal donate button" /></a></span>
+ 
