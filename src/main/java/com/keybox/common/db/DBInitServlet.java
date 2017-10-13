@@ -90,7 +90,7 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 			//if password not set generate a random
 			} else {
 				System.out.println("Generating random database password");
-				AppConfig.encryptProperty("dbPassword", RandomStringUtils.randomAscii(32));
+				AppConfig.encryptProperty("dbPassword", RandomStringUtils.random(32, true, true));
 			}
 		//else encrypt password if plain-text
 		} else if (!AppConfig.isPropertyEncrypted("dbPassword")) {
