@@ -17,6 +17,7 @@ package com.keybox.manage.action;
 
 import com.keybox.common.util.AuthUtil;
 import com.keybox.manage.db.AuthDB;
+import com.keybox.manage.db.PrivateKeyDB;
 import com.keybox.manage.db.UserThemeDB;
 import com.keybox.manage.model.Auth;
 import com.keybox.manage.model.UserSettings;
@@ -39,6 +40,7 @@ public class UserSettingsAction extends ActionSupport implements ServletRequestA
     HttpServletRequest servletRequest;
     Auth auth;
     UserSettings userSettings;
+    String publicKey;
 
     @Action(value = "/admin/userSettings",
             results = {
@@ -47,6 +49,7 @@ public class UserSettingsAction extends ActionSupport implements ServletRequestA
     )
     public String userSettings() {
         userSettings = UserThemeDB.getTheme(AuthUtil.getUserId(servletRequest.getSession()));
+        publicKey = PrivateKeyDB.getApplicationKey().getPublicKey();
         return SUCCESS;
     }
 
@@ -135,5 +138,13 @@ public class UserSettingsAction extends ActionSupport implements ServletRequestA
 
     public void setUserSettings(UserSettings userSettings) {
         this.userSettings = userSettings;
+    }
+
+    public String getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
     }
 }

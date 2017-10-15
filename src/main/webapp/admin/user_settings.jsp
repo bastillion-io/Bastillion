@@ -91,6 +91,11 @@
             </tr>
         </s:form>
 
+
+         <h3>Public Key</h3>
+         <p>Public SSH Key used for application authentication when registering systems</p>
+         <pre style="white-space:pre-wrap;width:500px;"><s:property value="publicKey"/></pre>
+
     </div>
 
 
