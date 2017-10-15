@@ -30,7 +30,7 @@ public class DSPool {
 
     private static BasicDataSource dsPool =  null;
 
-    private static final String BASE_DIR = DBUtils.class.getClassLoader().getResource(".").getPath();
+    private static final String BASE_DIR = AppConfig.CONFIG_DIR;
     private static final String DB_DRIVER = AppConfig.getProperty("dbDriver");
     private static final int MAX_ACTIVE = Integer.parseInt(AppConfig.getProperty("maxActive"));
     private static final boolean TEST_ON_BORROW = Boolean.valueOf(AppConfig.getProperty("testOnBorrow"));

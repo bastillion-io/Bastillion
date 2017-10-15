@@ -43,7 +43,7 @@ public class SSHUtil {
 	public static final boolean keyManagementEnabled = "true".equals(AppConfig.getProperty("keyManagementEnabled"));
 
 	//system path to public/private key
-	public static final String KEY_PATH = SSHUtil.class.getClassLoader().getResource(".").getPath() + "keydb";
+	public static final String KEY_PATH = AppConfig.CONFIG_DIR + "/keydb";
 
 	//key type - rsa or dsa
 	public static final String KEY_TYPE = AppConfig.getProperty("sshKeyType");

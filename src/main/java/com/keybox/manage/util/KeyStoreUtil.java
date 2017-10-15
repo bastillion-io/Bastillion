@@ -36,7 +36,7 @@ public class KeyStoreUtil {
 	private static Logger log = LoggerFactory.getLogger(KeyStoreUtil.class);
 
 	private static KeyStore keyStore = null;
-	private static final String keyStoreFile = KeyStoreUtil.class.getClassLoader().getResource(".").getPath()
+	private static final String keyStoreFile = AppConfig.CONFIG_DIR
 			+ "/keybox.jceks";
 	private static final char[] KEYSTORE_PASS = new char[]{
 			'G', '~', 'r', 'x', 'Z', 'E', 'w', 'f', 'a', '[', '!', 'f', 'Z', 'd', '*', 'L', '8', 'm', 'h', 'u', '#',

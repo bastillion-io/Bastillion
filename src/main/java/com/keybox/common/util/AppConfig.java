@@ -1,12 +1,12 @@
 /**
  * Copyright 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,8 +17,12 @@ package com.keybox.common.util;
 
 import com.keybox.manage.util.EncryptionUtil;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+
+import java.io.File;
 import java.util.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,10 +33,24 @@ public class AppConfig {
 
     private static Logger log = LoggerFactory.getLogger(AppConfig.class);
     private static PropertiesConfiguration prop;
+    public static final String CONFIG_DIR = StringUtils.isNotEmpty(System.getProperty("CONFIG_DIR")) ? System.getProperty("CONFIG_DIR").trim() : AppConfig.class.getClassLoader().getResource(".").getPath();
 
     static {
         try {
-            prop = new PropertiesConfiguration(AppConfig.class.getClassLoader().getResource(".").getPath() + "/KeyBoxConfig.properties");
+            //move configuration to specified dir
+            if (StringUtils.isNotEmpty(System.getProperty("CONFIG_DIR"))) {
+                File configFile = new File(CONFIG_DIR + "/KeyBoxConfig.properties");
+                if (!configFile.exists()) {
+                    File oldConfig = new File(AppConfig.class.getClassLoader().getResource(".").getPath() + "/KeyBoxConfig.properties");
+                    FileUtils.moveFile(oldConfig, configFile);
+                }
+                configFile = new File(CONFIG_DIR + "/jaas.conf");
+                if (!configFile.exists()) {
+                    File oldConfig = new File(AppConfig.class.getClassLoader().getResource(".").getPath() + "/jaas.conf");
+                    FileUtils.moveFile(oldConfig, configFile);
+                }
+            }
+            prop = new PropertiesConfiguration(CONFIG_DIR + "/KeyBoxConfig.properties");
         } catch (Exception ex) {
             log.error(ex.toString(), ex);
         }
@@ -114,7 +132,7 @@ public class AppConfig {
     public static void updateProperty(String name, String value) {
 
         //remove property
-        if(StringUtils.isNotEmpty(value)) {
+        if (StringUtils.isNotEmpty(value)) {
             try {
                 prop.setProperty(name, value);
                 prop.save();
@@ -133,8 +151,8 @@ public class AppConfig {
      */
     public static boolean isPropertyEncrypted(String name) {
         String property = prop.getString(name);
-        if(StringUtils.isNotEmpty(property)) {
-            return property.matches("^" +  EncryptionUtil.CRYPT_ALGORITHM + "\\{.*\\}$");
+        if (StringUtils.isNotEmpty(property)) {
+            return property.matches("^" + EncryptionUtil.CRYPT_ALGORITHM + "\\{.*\\}$");
         } else {
             return false;
         }
@@ -148,11 +166,11 @@ public class AppConfig {
      */
     public static String decryptProperty(String name) {
         String retVal = prop.getString(name);
-        if(StringUtils.isNotEmpty(retVal)) {
-            retVal = retVal.replaceAll("^" +  EncryptionUtil.CRYPT_ALGORITHM + "\\{", "").replaceAll("\\}$","");
+        if (StringUtils.isNotEmpty(retVal)) {
+            retVal = retVal.replaceAll("^" + EncryptionUtil.CRYPT_ALGORITHM + "\\{", "").replaceAll("\\}$", "");
             retVal = EncryptionUtil.decrypt(retVal);
         }
-        return  retVal;
+        return retVal;
     }
 
     /**
@@ -163,7 +181,7 @@ public class AppConfig {
      */
     public static void encryptProperty(String name, String value) {
         //remove property
-        if(StringUtils.isNotEmpty(value)) {
+        if (StringUtils.isNotEmpty(value)) {
             try {
                 prop.setProperty(name, EncryptionUtil.CRYPT_ALGORITHM + "{" + EncryptionUtil.encrypt(value) + "}");
                 prop.save();
