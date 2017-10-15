@@ -25,12 +25,14 @@ import com.keybox.manage.util.SSHUtil;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
+import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Scanner;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -123,11 +125,20 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 				statement.executeUpdate("create table if not exists session_log (id BIGINT PRIMARY KEY AUTO_INCREMENT, session_tm timestamp default CURRENT_TIMESTAMP, first_nm varchar, last_nm varchar, username varchar not null, ip_address varchar)");
 				statement.executeUpdate("create table if not exists terminal_log (session_id BIGINT, instance_id INTEGER, output varchar not null, log_tm timestamp default CURRENT_TIMESTAMP, display_nm varchar not null, user varchar not null, host varchar not null, port INTEGER not null, foreign key (session_id) references session_log(id) on delete cascade)");
 
-				//insert default admin user
+				//if exists readfile to set default password
 				String salt = EncryptionUtil.generateSalt();
+				String defaultPassword = EncryptionUtil.hash("changeme" + salt);
+				File file = new File("/opt/keybox/instance_id");
+				if (file.exists()) {
+					String str = FileUtils.readFileToString(file, "UTF-8");
+					if(StringUtils.isNotEmpty(str)) {
+						defaultPassword = EncryptionUtil.hash(str.trim() + salt);
+					}
+				}
+				//insert default admin user
 				PreparedStatement pStmt = connection.prepareStatement("insert into users (username, password, user_type, salt) values(?,?,?,?)");
 				pStmt.setString(1, "admin");
-				pStmt.setString(2, EncryptionUtil.hash("changeme" + salt));
+				pStmt.setString(2, defaultPassword);
 				pStmt.setString(3, Auth.MANAGER);
 				pStmt.setString(4, salt);
 				pStmt.execute();
