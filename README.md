@@ -8,17 +8,32 @@ KeyBox layers TLS/SSL on top of SSH and acts as a bastion host for administratio
 
 ![Terminals](http://sshkeybox.com/img/screenshots/medium/terms.png)
 
+AMI in the AWS Marketplace
+------
+If you are using AWS, the simplest way to get started is to run the AMI from the AWS marketplace.
+
+http://aws.amazon.com/marketplace/pp/B076PNFPCL
+
+Once the KeyBox instance is up and running, open your browser to https://\<EC2 Instance IP\>:443
+
+Login with 
+
+	username:admin 
+	password:<Instance ID>
+	
+In order to help register new EC2 instances, the KeyBox public can be found under 'Settings -> Public Key' and should be imported as an EC2 Key Pair in the AWS console.
+
 Prerequisites
 -------------
 * Java JDK 1.8 or greater
 http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
 * Browser with Web Socket support
-http://caniuse.com/websockets *Note: In Safari if using a self-signed certificate you must import the certificate into your Keychain.
-Select 'Show Certificate' -> 'Always Trust' when prompted in Safari*
+http://caniuse.com/websockets  *(Note: In Safari if using a self-signed certificate you must import the certificate into your Keychain.
+Select 'Show Certificate' -> 'Always Trust' when prompted in Safari)*
 
-* Maven 3 or greater  ( Only needed if building from source )
-http://maven.apache.org
+* Maven 3 or greater
+http://maven.apache.org  *(Only needed if building from source)*
 
 * Install [FreeOTP](https://freeotp.github.io/) or [Google Authenticator](https://github.com/google/google-authenticator) to enable two-factor authentication with Android or iOS
 
@@ -30,8 +45,6 @@ http://maven.apache.org
 
 To Run Bundled with Jetty
 ------
-If you're not big on the idea of building from source...
-
 Download keybox-jetty-vXX.XX.tar.gz
 
 https://github.com/skavanagh/KeyBox/releases
@@ -75,7 +88,30 @@ In the directory that contains the pom.xml run
 
 	mvn package jetty:run
 
-**Note: Doing a mvn clean will delete the H2 DB and wipe out all the data.
+*Note: Doing a mvn clean will delete the H2 DB and wipe out all the data.*
+
+Using KeyBox
+------
+Open browser to https://\<whatever ip\>:8443
+
+Login with
+
+	username:admin
+	password:changeme
+	
+*Note: When using the AMI instance, the password is defaulted to the \<Instance ID\>. Also, the AMI uses port 443 as in https://\<Instance IP\>:443*
+
+Steps:
+
+1. Create systems
+2. Create profiles
+3. Assign systems to profile
+4. Assign profiles to users
+5. Users can login to create sessions on assigned systems
+6. Start a composite SSH session or create and execute a script across multiple sessions
+7. Add additional public keys to systems
+8. Disable any administrative public key forcing key rotation.
+9. Audit session history
 
 Managing SSH Keys
 ------
@@ -191,27 +227,6 @@ Auditing is disabled by default and is only a proof of concept.  Can be enabled 
 
 	#enable audit  --set to true to enable
 	enableInternalAudit=true
-
-Using KeyBox
-------
-Open browser to https://\<whatever ip\>:8443
-
-Login with
-
-	username:admin
-	password:changeme
-
-Steps:
-
-1. Create systems
-2. Create profiles
-3. Assign systems to profile
-4. Assign profiles to users
-5. Users can login to create sessions on assigned systems
-6. Start a composite SSH session or create and execute a script across multiple sessions
-7. Add additional public keys to systems
-8. Disable any administrative public key forcing key rotation.
-9. Audit session history
 
 Screenshots
 -----------
