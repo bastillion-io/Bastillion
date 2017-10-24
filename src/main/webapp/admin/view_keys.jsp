@@ -21,7 +21,7 @@
 <head>
 
     <jsp:include page="../_res/inc/header.jsp"/>
-
+    <script src="<%= request.getContextPath() %>/_res/js/liveFilter.js"></script>
     <script type="text/javascript">
         $(document).ready(function () {
 
@@ -97,7 +97,8 @@
             <s:else>
                 hideExistingKeyInputs();
             </s:else>
-            
+
+            liveFilter("keysFilter", [1,2,4]);
 
         });
     </script>
@@ -136,7 +137,7 @@
     <p>Add / Delete SSH keys for current user.</p>
 
     <s:if test="%{#session.userType==\"M\" || (profileList!= null && !profileList.isEmpty()) }">
-        
+
         <s:if test="%{#session.userType==\"M\"}">
             <table>
                 <tr>
@@ -148,6 +149,12 @@
         </s:if>
 
         <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
+
+        <div class="liveFilter form-group has-feedback">
+            <input id="keysFilter" class="form-control" placeholder="Search by key name, profile and fingerprint" />
+            <i class="glyphicon glyphicon-search form-control-feedback"></i>
+        </div>
+
         <div class="scrollWrapper">
             <table class="table-striped scrollableTable" >
                 <thead>

@@ -74,46 +74,48 @@
 
     <h3>Audit Sessions</h3>
 
-           Audit sessions below
-                <table>
-                    <tr>
-                        <td class="align_left">
-                            <s:form id="viewSessions" action="viewSessions" theme="simple">
-                                <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
-                                <s:hidden name="sortedSet.orderByDirection"/>
-                                <s:hidden name="sortedSet.orderByField"/>
-                                <table>
-                                <tr>
-                                    <s:if test="userList!= null && !userList.isEmpty()">
-                                        <td class="align_left">
-                                           <s:select name="sortedSet.filterMap['%{@com.keybox.manage.db.SessionAuditDB@FILTER_BY_USER}']" listKey="username" listValue="username"
-                                           class="view_frm_select"
-                                            list="userList"
-                                            headerKey=""
-                                            headerValue="-Select User-"/>
-                                        </td>
-                                     </s:if>
-                                    <s:if test="systemList!= null && !systemList.isEmpty()">
-                                            <td class="align_left">
-                                            <s:select name="sortedSet.filterMap['%{@com.keybox.manage.db.SessionAuditDB@FILTER_BY_SYSTEM}']" listKey="displayNm" listValue="displayLabel"
-                                            class="view_frm_select"
-                                            list="systemList"
-                                            headerKey=""
-                                            headerValue="-Select System-"/>
-                                        </td>
-                                    </s:if>
-                                    <td style="padding:5px 5px 0px 5px;">
-                                        <div id="view_btn" class="btn btn-default">Filter</div>
-                                    </td>
-                                </tr>
-                                </table>
-                            </s:form>
-                        </td>
-                    </tr>
-               </table>
-        <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
+    <p>Audit sessions below</p>
 
-    <div class="scrollWrapper">
+    <s:if test="sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()">
+
+        <table>
+            <tr>
+                <td class="align_left">
+                    <s:form id="viewSessions" action="viewSessions" theme="simple">
+                        <s:hidden name="_csrf" value="%{#session['_csrf']}"/>
+                        <s:hidden name="sortedSet.orderByDirection"/>
+                        <s:hidden name="sortedSet.orderByField"/>
+                        <table>
+                        <tr>
+                            <s:if test="userList!= null && !userList.isEmpty()">
+                                <td class="align_left">
+                                   <s:select name="sortedSet.filterMap['%{@com.keybox.manage.db.SessionAuditDB@FILTER_BY_USER}']" listKey="username" listValue="username"
+                                   class="view_frm_select"
+                                    list="userList"
+                                    headerKey=""
+                                    headerValue="-Select User-"/>
+                                </td>
+                             </s:if>
+                            <s:if test="systemList!= null && !systemList.isEmpty()">
+                                    <td class="align_left">
+                                    <s:select name="sortedSet.filterMap['%{@com.keybox.manage.db.SessionAuditDB@FILTER_BY_SYSTEM}']" listKey="displayNm" listValue="displayLabel"
+                                    class="view_frm_select"
+                                    list="systemList"
+                                    headerKey=""
+                                    headerValue="-Select System-"/>
+                                </td>
+                            </s:if>
+                            <td style="padding:5px 5px 0px 5px;">
+                                <div id="view_btn" class="btn btn-default">Filter</div>
+                            </td>
+                        </tr>
+                        </table>
+                    </s:form>
+                </td>
+            </tr>
+       </table>
+
+        <div class="scrollWrapper">
             <table class="table-striped scrollableTable" >
                 <thead>
                 <tr>
@@ -165,10 +167,6 @@
         <s:else>
             <p class="error">No session audits available</p>
         </s:else>
-
-
 </div>
-
-
 </body>
 </html>
