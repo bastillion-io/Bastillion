@@ -16,7 +16,7 @@
      */
 %>
 <%@ taglib prefix="s" uri="/struts-tags" %>
-
+<%@ page import="com.keybox.common.util.AuthUtil" %>
 
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container">
@@ -87,6 +87,14 @@
                 
                 <li><a href="../logout.action">Logout</a></li>
             </ul>
+
+
+            <ul class="nav navbar-nav navbar-right">
+                <li class="navbar-text">
+                    <% out.println(AuthUtil.getUsername(session)); %>
+                </li>
+            </ul>
+
         </div>
         <!--/.nav-collapse -->
     </div>
