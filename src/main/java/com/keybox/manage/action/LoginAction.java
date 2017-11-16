@@ -111,6 +111,7 @@ public class LoginAction extends ActionSupport implements ServletRequestAware, S
                 AuthUtil.setUserId(servletRequest.getSession(), user.getId());
                 AuthUtil.setAuthType(servletRequest.getSession(), user.getAuthType());
                 AuthUtil.setTimeout(servletRequest.getSession());
+                AuthUtil.setUsername(servletRequest.getSession(), user.getUsername());
 
                 //for first time login redirect to set OTP
                 if (otpEnabled && StringUtils.isEmpty(sharedSecret)) {
