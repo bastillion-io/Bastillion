@@ -68,11 +68,8 @@
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Secure Shell <b class="caret"></b></a>
                     <ul class="dropdown-menu">
-
                         <li><a href="../admin/viewSystems.action?_csrf=<s:property value="#session['_csrf']"/>">Composite SSH Terms</a></li>
                         <li><a href="../admin/viewScripts.action?_csrf=<s:property value="#session['_csrf']"/>">Composite Scripts</a></li>
-
-
                     </ul>
                 </li>
 
@@ -83,15 +80,18 @@
 
                 </s:if>
 
-                <li><a href="../admin/userSettings.action?_csrf=<s:property value="#session['_csrf']"/>">Settings</a></li>
-                
-                <li><a href="../logout.action">Logout</a></li>
             </ul>
 
 
             <ul class="nav navbar-nav navbar-right">
-                <li class="navbar-text">
-                    <% out.println(AuthUtil.getUsername(session)); %>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <% out.println(AuthUtil.getUsername(session)); %><b class="caret"></b>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="../admin/userSettings.action?_csrf=<s:property value="#session['_csrf']"/>">Settings</a></li>
+                        <li><a href="../logout.action">Logout</a></li>
+                    </ul>
                 </li>
             </ul>
 
