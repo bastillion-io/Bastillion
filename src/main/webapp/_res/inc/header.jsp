@@ -84,7 +84,7 @@
         $("form").submit(function() {
             $('.btn').attr('disabled', 'disabled');
             return true;
-        });
+        }).attr("accept-charset","utf-8");
 
     });
 </script>
