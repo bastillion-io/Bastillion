@@ -16,7 +16,6 @@
      */
 %>
 <%@ taglib prefix="s" uri="/struts-tags" %>
-<%@ page import="com.keybox.common.util.AuthUtil" %>
 
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="container">
@@ -86,7 +85,7 @@
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <% out.println(AuthUtil.getUsername(session)); %><b class="caret"></b>
+                        <s:property value="#session['username']"/>"><b class="caret"></b>
                     </a>
                     <ul class="dropdown-menu">
                         <li><a href="../admin/userSettings.action?_csrf=<s:property value="#session['_csrf']"/>">Settings</a></li>

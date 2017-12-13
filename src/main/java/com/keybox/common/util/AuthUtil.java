@@ -32,7 +32,7 @@ public class AuthUtil {
 
     public static final String SESSION_ID = "sessionId";
     public static final String USER_ID = "userId";
-    public static final String USER_NAME = "userName";
+    public static final String USERNAME = "username";
     public static final String AUTH_TOKEN = "authToken";
     public static final String TIMEOUT = "timeout";
     public static final String CSRF_TOKEN_NM = "_csrf";
@@ -55,7 +55,7 @@ public class AuthUtil {
     /**
      * set authentication type
      *
-     * @param session http session
+     * @param session  http session
      * @param authType authentication type
      */
     public static void setAuthType(HttpSession session, String authType) {
@@ -78,7 +78,7 @@ public class AuthUtil {
     /**
      * set user type
      *
-     * @param session http session
+     * @param session  http session
      * @param userType user type
      */
     public static void setUserType(HttpSession session, String userType) {
@@ -101,7 +101,7 @@ public class AuthUtil {
     /**
      * set session id
      *
-     * @param session http session
+     * @param session   http session
      * @param sessionId session id
      */
     public static void setSessionId(HttpSession session, Long sessionId) {
@@ -141,15 +141,13 @@ public class AuthUtil {
     }
 
     /**
-     * query session for the user name
+     * query session for the username
      *
      * @param session http session
-     * @return user name
+     * @return username
      */
     public static String getUsername(HttpSession session) {
-        String userNameStrEncripted = (String) session.getAttribute(USER_NAME);
-        String userNameStr = EncryptionUtil.decrypt(userNameStrEncripted);
-        return userNameStr;
+        return (String) session.getAttribute(USERNAME);
     }
 
     /**
@@ -190,7 +188,7 @@ public class AuthUtil {
      * set session OTP shared secret
      *
      * @param session http session
-     * @param secret shared secret
+     * @param secret  shared secret
      */
     public static void setOTPSecret(HttpSession session, String secret) {
         if (secret != null && !secret.trim().equals("")) {
@@ -203,7 +201,7 @@ public class AuthUtil {
      * set session user id
      *
      * @param session http session
-     * @param userId user id
+     * @param userId  user id
      */
     public static void setUserId(HttpSession session, Long userId) {
         if (userId != null) {
@@ -213,14 +211,14 @@ public class AuthUtil {
 
 
     /**
-     * set session user name
+     * set session username
      *
-     * @param session http session
-     * @param userName user name
+     * @param session  http session
+     * @param username username
      */
-    public static void setUsername(HttpSession session, String userName) {
-        if (userName != null) {
-            session.setAttribute(USER_NAME, EncryptionUtil.encrypt(userName));
+    public static void setUsername(HttpSession session, String username) {
+        if (username != null) {
+            session.setAttribute(USERNAME, username);
         }
     }
 
@@ -228,7 +226,7 @@ public class AuthUtil {
     /**
      * set session authentication token
      *
-     * @param session http session
+     * @param session   http session
      * @param authToken authentication token
      */
     public static void setAuthToken(HttpSession session, String authToken) {
