@@ -6,7 +6,7 @@ Administrators can login using two-factor authentication with [FreeOTP](https://
 
 KeyBox layers TLS/SSL on top of SSH and acts as a bastion host for administration. Protocols are stacked (TLS/SSL + SSH) so infrastructure cannot be exposed through tunneling / port forwarding. More details can be found in the following whitepaper: [The Security Implications of SSH](http://www.sans.org/reading-room/whitepapers/vpns/security-implications-ssh-1180). Also, SSH key management is enabled by default to prevent unmanaged public keys and enforce best practices.
 
-![Terminals](http://sshkeybox.com/img/screenshots/medium/terms.png)
+![Terminals](http://sshkeybox.com/images/screenshots/medium/terminals.png)
 
 AMI in the AWS Marketplace
 ------
@@ -22,6 +22,14 @@ Login with
 	password:<Instance ID>
 	
 In order to help register new EC2 instances, the KeyBox public can be found under 'Settings -> Public Key' and should be imported as an EC2 Key Pair in the AWS console.
+
+KeyBox Releases
+------
+KeyBox releases with Jetty are no longer available on Github. Releases and upgrades are available via subscription through the following link: 
+
+https://sshkeybox.com/subscription
+
+Feel free to try out KeyBox using the build instructions below!
 
 Prerequisites
 -------------
@@ -41,42 +49,8 @@ http://maven.apache.org  *(Only needed if building from source)*
     |----------------------|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
     | FreeOTP              | [Google Play](https://play.google.com/store/apps/details?id=org.fedorahosted.freeotp)               | [iTunes](https://itunes.apple.com/us/app/freeotp/id872559395)              |
     | Google Authenticator | [Google Play](https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2) | [iTunes](https://itunes.apple.com/us/app/google-authenticator/id388497605) |
-
-
-To Run Bundled with Jetty
-------
-Download keybox-jetty-vXX.XX.tar.gz
-
-https://github.com/skavanagh/KeyBox/releases
-
-Export environment variables
-
-for Linux/Unix/OSX
-
-     export JAVA_HOME=/path/to/jdk
-     export PATH=$JAVA_HOME/bin:$PATH
-
-for Windows
-
-     set JAVA_HOME=C:\path\to\jdk
-     set PATH=%JAVA_HOME%\bin;%PATH%
-
-Start KeyBox
-
-for Linux/Unix/OSX
-
-        ./startKeyBox.sh
-
-for Windows
-
-        startKeyBox.bat
-
-How to [Configure SSL in Jetty](http://www.eclipse.org/jetty/documentation/current/configuring-ssl.html)
-(it is a good idea to add or generate your own unique certificate)
-
-http://www.eclipse.org/jetty/documentation/current/configuring-ssl.html
-
-To Build from Source
+    
+Build from Source
 ------
 Export environment variables
 
@@ -230,19 +204,19 @@ Auditing is disabled by default and is only a proof of concept.  Can be enabled 
 
 Screenshots
 -----------
-![Login](http://sshkeybox.com/img/screenshots/medium/login.png)
+![Login](http://sshkeybox.com/images/screenshots/medium/login.png)
 
-![Two-Factor](http://sshkeybox.com/img/screenshots/medium/two-factor.png)
+![Two-Factor](http://sshkeybox.com/images/screenshots/medium/two-factor.png)
 
-![More Terminals](http://sshkeybox.com/img/screenshots/medium/more_terms.png)
+![More Terminals](http://sshkeybox.com/images/screenshots/medium/terminals.png)
 
-![Manage Systems](http://sshkeybox.com/img/screenshots/medium/manage_systems.png)
+![Manage Systems](http://sshkeybox.com/images/screenshots/medium/manage_systems.png)
 
-![Manage Users](http://sshkeybox.com/img/screenshots/medium/manage_users.png)
+![Manage Users](http://sshkeybox.com/images/screenshots/medium/manage_users.png)
 
-![Define SSH Keys](http://sshkeybox.com/img/screenshots/medium/manage_keys.png)
+![Define SSH Keys](http://sshkeybox.com/images/screenshots/medium/manage_keys.png)
 
-![Disable SSH Keys](http://sshkeybox.com/img/screenshots/medium/disable_keys.png)
+![Disable SSH Keys](http://sshkeybox.com/images/screenshots/medium/disable_keys.png)
 
 Acknowledgments
 ------
@@ -255,16 +229,10 @@ Third-party dependencies are mentioned in the [_3rdPartyLicenses.md_](3rdPartyLi
 
 Author
 ------
-**Sean Kavanagh**
+**Loophole, LLC - Sean Kavanagh**
 
 + sean.p.kavanagh6@gmail.com
 + https://twitter.com/spkavanagh6
 
+
 (Follow me on twitter for release updates, but mostly nonsense)
-
-Donate
-------
-Dontations are always welcome!
-
-<span class="badge-paypal"><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=KKRTX5GB9GDF8" title="Donate to this project using Paypal"><img src="https://img.shields.io/badge/paypal-donate-yellow.svg" alt="PayPal donate button" /></a></span>
- 
