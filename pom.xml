@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.keybox</groupId>
     <artifactId>keybox</artifactId>
-    <version>3.00.00-SNAPSHOT</version>
+    <version>3.00.00</version>
     <packaging>war</packaging>
     <name>KeyBox</name>
     <properties>
