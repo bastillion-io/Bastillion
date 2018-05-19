@@ -1,0 +1,181 @@
+<!--/**
+*    Copyright (C) 2013 Loophole, LLC
+*
+*    This program is free software: you can redistribute it and/or  modify
+*    it under the terms of the GNU Affero General Public License, version 3,
+*    as published by the Free Software Foundation.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU Affero General Public License for more details.
+*
+*    You should have received a copy of the GNU Affero General Public License
+*    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*
+*    As a special exception, the copyright holders give permission to link the
+*    code of portions of this program with the OpenSSL library under certain
+*    conditions as described in each individual source file and distribute
+*    linked combinations including the program with the OpenSSL library. You
+*    must comply with the GNU Affero General Public License in all respects for
+*    all of the code used other than as permitted herein. If you modify file(s)
+*    with this exception, you may extend this exception to your version of the
+*    file(s), but you are not obligated to do so. If you do not wish to do so,
+*    delete this exception statement from your version. If you delete this
+*    exception statement from all source files in the program, then also delete
+*    it in the license file.
+*/-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <meta th:replace="_res/inc/header"/>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).ready(function () {
+
+
+            $(".terminals_btn").button().click(function () {
+                var id = $(this).attr('id').replace("terminals_btn_", "");
+                window.location = 'getTermsForSession.ktrl?sessionId=' + id + '&_csrf=' + [[${session._csrf}]];
+            });
+
+            $("#view_btn").button().click(function () {
+                $("#viewSessions").submit();
+            });
+
+            //submit add or edit form
+            $(".submit_btn").button().click(function () {
+                $(this).parents('form:first').submit();
+            });
+
+            $(".sort,.sortAsc,.sortDesc").click(function () {
+                var id = $(this).attr('id')
+
+                var orderDirection = $('#viewSessions_sortedSet_orderByDirection');
+                if (orderDirection.attr('value') === 'asc') {
+                    orderDirection.attr('value', 'desc');
+                } else {
+                    orderDirection.attr('value', 'asc');
+                }
+
+                $('#viewSessions_sortedSet_orderByField').attr('value', id);
+                $("#viewSessions").submit();
+
+            });
+            [# th:if= "${!#strings.isEmpty(sortedSet.orderByField)}"]
+                $('#' + [[${sortedSet.orderByField}]]).attr('class', [[${sortedSet.orderByDirection}]]);
+            [/]
+        });
+        /*]]>*/
+    </script>
+
+
+    <title>KeyBox - Audit Sessions</title>
+</head>
+<body>
+
+<div th:replace="_res/inc/navigation"></div>
+
+<div class="container">
+
+
+    <h3>Audit Sessions</h3>
+
+    Audit sessions below
+    <table>
+        <tr>
+            <td class="align_left">
+                <form id="viewSessions" th:action="@{/manage/viewSessions.ktrl}" method="get">
+                    <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
+                    <input type="hidden" id="viewSessions_sortedSet_orderByDirection" name="sortedSet.orderByDirection"
+                           th:value="${sortedSet.orderByDirection}"/>
+                    <input type="hidden" id="viewSessions_sortedSet_orderByField" name="sortedSet.orderByField"
+                           th:value="${sortedSet.orderByField}"/>
+                    <table>
+                        <tr>
+                            <td th:if="${userList != null && !userList.empty}">
+                                <select th:name="'sortedSet.filterMap[' + ${@com.keybox.manage.db.SessionAuditDB@FILTER_BY_USER} + ']'"
+                                        title="User" class="view_frm_select">
+                                    <option value="">- Select User -</option>
+                                    <option th:each="u : ${userList}"
+                                            th:value="${u.username}" th:text="${u.username}"
+                                            th:selected="${#strings.equals(sortedSet.filterMap.get(@com.keybox.manage.db.SessionAuditDB@FILTER_BY_USER), u.username)}"></option>
+                                </select>
+                            </td>
+                            <td th:if="${systemList != null && !systemList.empty}">
+                                <select th:name="'sortedSet.filterMap[' + ${@com.keybox.manage.db.SessionAuditDB@FILTER_BY_SYSTEM} + ']'"
+                                        title="System" class="view_frm_select">
+                                    <option value="">- Select System -</option>
+                                    <option th:each="s : ${systemList}"
+                                            th:value="${s.displayNm}" th:text="${s.displayLabel}"
+                                            th:selected="${#strings.equals(sortedSet.filterMap.get(@com.keybox.manage.db.SessionAuditDB@FILTER_BY_SYSTEM), s.displayNm)}"></option>
+                                </select>
+                            </td>
+                            <td style="padding:5px 5px 0px 5px;">
+                                <div id="view_btn" class="btn btn-default">Filter</div>
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </td>
+        </tr>
+    </table>
+        <div class="scrollWrapper" th:if="${sortedSet.itemList != null && !sortedSet.itemList.empty}">
+
+            <table class="table-striped scrollableTable">
+                <thead>
+                <tr>
+
+
+                    <th th:id="${@com.keybox.manage.db.SessionAuditDB@SORT_BY_USERNAME}" class="sort">
+                        Username
+                    </th>
+
+                    <th th:id="${@com.keybox.manage.db.SessionAuditDB@SORT_BY_LAST_NM}" class="sort">
+                        Last Name
+                    </th>
+                    <th th:id="${@com.keybox.manage.db.SessionAuditDB@SORT_BY_FIRST_NM}" class="sort">
+                        First Name
+                    </th>
+                    <th th:id="${@com.keybox.manage.db.SessionAuditDB@SORT_BY_IP_ADDRESS}" class="sort">
+                        IP Address
+                    </th>
+                    <th th:id="${@com.keybox.manage.db.SessionAuditDB@SORT_BY_SESSION_TM}" class="sort">
+                        Session Time
+                    </th>
+                    <th>&nbsp;</th>
+
+                </tr>
+                </thead>
+                <tbody>
+                    <template th:each="s : ${sortedSet.itemList}" th:remove="tag">
+                    <tr>
+
+                        <td th:text="${s.username}"></td>
+                        <td th:text="${s.lastNm}"></td>
+                        <td th:text="${s.firstNm}"></td>
+                        <td th:text="${s.ipAddress}"></td>
+                        <td th:text="${#dates.format(s.sessionTm, 'dd-MMM-yyyy hh:mm:ss aa')}"></td>
+                        <td>
+                            <div th:id="'terminals_btn_' + ${s.id}" class="btn btn-default terminals_btn">
+                                Audit
+                            </div>
+                        </td>
+
+
+                    </tr>
+
+                    </template>
+                </tbody>
+            </table>
+        </div>
+        <p class="error"  th:if="${sortedSet.itemList == null || sortedSet.itemList.empty}">No session audits available</p>
+
+
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!--/**
+ *    Copyright (C) 2015 Loophole, LLC
+ *
+ *    This program is free software: you can redistribute it and/or  modify
+ *    it under the terms of the GNU Affero General Public License, version 3,
+ *    as published by the Free Software Foundation.
+ *
+ *    This program is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU Affero General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Affero General Public License
+ *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *    As a special exception, the copyright holders give permission to link the
+ *    code of portions of this program with the OpenSSL library under certain
+ *    conditions as described in each individual source file and distribute
+ *    linked combinations including the program with the OpenSSL library. You
+ *    must comply with the GNU Affero General Public License in all respects for
+ *    all of the code used other than as permitted herein. If you modify file(s)
+ *    with this exception, you may extend this exception to your version of the
+ *    file(s), but you are not obligated to do so. If you do not wish to do so,
+ *    delete this exception statement from your version. If you delete this
+ *    exception statement from all source files in the program, then also delete
+ *    it in the license file.
+ */-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <meta th:replace="_res/inc/header"/>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).ready(function () {
+
+            //open add dialog
+            $("#assign_users").button().click(function () {
+                $('#assignUsersToProfile').submit();
+            });
+
+            //select all check boxes
+            $("#assignUsersToProfile_userSelectAll").click(function (e) {
+                e.stopImmediatePropagation();
+                if ($(this).is(':checked')) {
+                    $(".userSelect").prop('checked', true);
+                } else {
+                    $(".userSelect").prop('checked', false);
+                }
+            });
+
+            $(".sort,.sortAsc,.sortDesc").click(function () {
+                var id = $(this).attr('id')
+
+                var orderDirection = $('#viewProfileUsers_sortedSet_orderByDirection');
+                if (orderDirection.attr('value') === 'asc') {
+                    orderDirection.attr('value', 'desc');
+                } else {
+                    orderDirection.attr('value', 'asc');
+                }
+
+                $('#viewProfileUsers_sortedSet_orderByField').attr('value', id);
+                $("#viewProfileUsers").submit();
+
+            });
+            [# th:if= "${!#strings.isEmpty(sortedSet.orderByField)}"]
+                $('#' + [[${sortedSet.orderByField}]]).attr('class', [[${sortedSet.orderByDirection}]]);
+            [/]
+
+        });
+        /*]]>*/
+    </script>
+
+    <title>KeyBox - Assign Users to Profile</title>
+
+</head>
+<body>
+
+<div th:replace="_res/inc/navigation"></div>
+
+<div class="container">
+
+    <form id="viewProfileUsers" th:action="@{/manage/viewProfileUsers.ktrl}" method="get">
+        <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
+        <input type="hidden" id="viewProfileUsers_sortedSet_orderByDirection" name="sortedSet.orderByDirection"
+               th:value="${sortedSet.orderByDirection}"/>
+        <input type="hidden" id="viewProfileUsers_sortedSet_orderByField" name="sortedSet.orderByField"
+               th:value="${sortedSet.orderByField}"/>
+        <input type="hidden" name="profile.id" th:value="${profile.id}"/>
+    </form>
+
+    <h3>Assign Users to Profile</h3>
+
+    <p>Select the users below to be assigned to the current profile.</p>
+
+    <h4 th:text="${profile.nm}"></h4>
+    <p class="small" th:text="${profile.desc}"></p>
+
+
+    <div class="scrollWrapper" th:if="${sortedSet.itemList != null && !sortedSet.itemList.empty}">
+        <form id="assignUsersToProfile" th:action="@{/manage/assignUsersToProfile.ktrl}" method="post">
+            <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
+            <input type="hidden" name="profile.id" th:value="${profile.id}"/>
+            <table class="table-striped scrollableTable">
+                <thead>
+
+                <tr>
+                    <th th:id="${@com.keybox.manage.db.UserDB@PROFILE_ID}" class="sort">
+                        <input type="checkbox" id="assignUsersToProfile_userSelectAll" name="userSelectAll"
+                               class="userSelect"
+                               title="Select All"/>
+                    </th>
+                    <th th:id="${@com.keybox.manage.db.UserDB@USERNAME}" class="sort">Username</th>
+                    <th th:if="${@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}"
+                        th:id="${@com.keybox.manage.db.UserDB@AUTH_TYPE}" class="sort">Auth Type
+                    </th>
+                    <th th:id="${@com.keybox.manage.db.UserDB@LAST_NM}" class="sort">Last
+                        Name
+                    </th>
+                    <th th:id="${@com.keybox.manage.db.UserDB@FIRST_NM}" class="sort">First
+                        Name
+                    </th>
+                    <th th:id="${@com.keybox.manage.db.UserDB@EMAIL}" class="sort">Email
+                        Address
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <template th:each="user : ${sortedSet.itemList}" th:remove="tag">
+                    <tr>
+                        <td>
+                            <input type="checkbox" th:id="'userSelectId_'+ ${user.id}" name="userSelectId"
+                                   class="userSelect" th:value="${user.id}" th:checked="${user.checked}"/>
+
+                        </td>
+                        <td th:text="${user.username}"></td>
+                        <td th:if="${@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}">
+                            <template th:if="${#string.equals(user.authType, 'BASIC')}" th:remove="tag">
+                                Basic
+                            </template>
+                            <template th:if="${#string.equals(user.authType, 'EXTERNAL')}" th:remove="tag">
+                                External
+                            </template>
+                        </td>
+                        <td th:text="${user.lastNm}"></td>
+                        <td th:text="${user.firstNm}"></td>
+                        <td th:text="${user.email}"></td>
+                    </tr>
+                </template>
+                </tbody>
+            </table>
+        </form>
+    </div>
+
+    <div id="assign_users" th:if="${sortedSet.itemList != null && !sortedSet.itemList.empty}" class="btn btn-default assign_user_btn spacer spacer-bottom">Assign</div>
+    <div class="error" th:if="${sortedSet.itemList == null || sortedSet.itemList.empty}">There are no terms associated with session(<a
+            th:href="'viewUsers.ktrl?_csrf=' + ${session._csrf}">Manage Users</a>).
+    </div>
+</div>
+</body>
+</html>

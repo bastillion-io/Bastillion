@@ -1,0 +1,148 @@
+<!--/**
+ *    Copyright (C) 2013 Loophole, LLC
+ *
+ *    This program is free software: you can redistribute it and/or  modify
+ *    it under the terms of the GNU Affero General Public License, version 3,
+ *    as published by the Free Software Foundation.
+ *
+ *    This program is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU Affero General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Affero General Public License
+ *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *    As a special exception, the copyright holders give permission to link the
+ *    code of portions of this program with the OpenSSL library under certain
+ *    conditions as described in each individual source file and distribute
+ *    linked combinations including the program with the OpenSSL library. You
+ *    must comply with the GNU Affero General Public License in all respects for
+ *    all of the code used other than as permitted herein. If you modify file(s)
+ *    with this exception, you may extend this exception to your version of the
+ *    file(s), but you are not obligated to do so. If you do not wish to do so,
+ *    delete this exception statement from your version. If you delete this
+ *    exception statement from all source files in the program, then also delete
+ *    it in the license file.
+ */-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <meta th:replace="_res/inc/header"/>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).ready(function () {
+
+            //open add dialog
+            $("#assign_sys").button().click(function () {
+                $('#assignSystemsToProfile').submit();
+            });
+
+            //select all check boxes
+            $("#assignSystemsToProfile_systemSelectAll").click(function (e) {
+                e.stopImmediatePropagation();
+                if ($(this).is(':checked')) {
+                    $(".systemSelect").prop('checked', true);
+                } else {
+                    $(".systemSelect").prop('checked', false);
+                }
+            });
+
+            $(".sort,.sortAsc,.sortDesc").click(function () {
+                var id = $(this).attr('id')
+
+                var orderDirection = $('#viewProfileSystems_sortedSet_orderByDirection');
+                if (orderDirection.attr('value') === 'asc') {
+                    orderDirection.attr('value', 'desc');
+                } else {
+                    orderDirection.attr('value', 'asc');
+                }
+
+                $('#viewProfileSystems_sortedSet_orderByField').attr('value', id);
+                $("#viewProfileSystems").submit();
+
+            });
+
+            [# th:if= "${!#strings.isEmpty(sortedSet.orderByField)}"]
+                $('#' + [[${sortedSet.orderByField}]]).attr('class', [[${sortedSet.orderByDirection}]]);
+            [/]
+
+        });
+        /*]]>*/
+    </script>
+
+    <title>KeyBox - Assign Systems to Profile</title>
+
+</head>
+<body>
+
+<div th:replace="_res/inc/navigation"></div>
+
+<div class="container">
+
+    <form id="viewProfileSystems" th:action="@{/manage/viewProfileSystems.ktrl}" method="get">
+        <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
+        <input type="hidden" id="viewProfileSystems_sortedSet_orderByDirection" name="sortedSet.orderByDirection"
+               th:value="${sortedSet.orderByDirection}"/>
+        <input type="hidden" id="viewProfileSystems_sortedSet_orderByField" name="sortedSet.orderByField"
+               th:value="${sortedSet.orderByField}"/>
+        <input type="hidden" name="profile.id" th:value="${profile.id}"/>
+    </form>
+
+    <h3>Assign Systems to Profile</h3>
+
+    <p>Select the systems below to be assigned to the current profile.</p>
+
+    <h4 th:text="${profile.nm}"></h4>
+    <p class="small" th:text="${profile.desc}"></p>
+
+
+    <div class="scrollWrapper" th:if="${sortedSet.itemList != null && !sortedSet.itemList.empty}">
+        <form id="assignSystemsToProfile" th:action="@{/manage/assignSystemsToProfile.ktrl}" method="post">
+            <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
+            <input type="hidden" name="profile.id" th:value="${profile.id}"/>
+            <table class="table-striped scrollableTable">
+                <thead>
+
+                <tr>
+                    <th th:id="${@com.keybox.manage.db.SystemDB@PROFILE_ID}" class="sort">
+                        <input type="checkbox" id="assignSystemsToProfile_systemSelectAll" name="systemSelectAll"
+                               class="systemSelect"
+                               title="Select All"/>
+                    </th>
+                    <th th:id="${@com.keybox.manage.db.SystemDB@SORT_BY_NAME}" class="sort">Display Name</th>
+                    <th th:id="${@com.keybox.manage.db.SystemDB@SORT_BY_USER}" class="sort">User</th>
+                    <th th:id="${@com.keybox.manage.db.SystemDB@SORT_BY_HOST}" class="sort">Host</th>
+                </tr>
+                </thead>
+                <tbody>
+
+
+                <template th:each="s : ${sortedSet.itemList}" th:remove="tag">
+                    <tr>
+                        <td>
+                            <input type="checkbox" th:id="'systemSelectId_'+ ${s.id}" name="systemSelectId"
+                                   class="systemSelect" th:value="${s.id}" th:checked="${s.checked}"/>
+                        </td>
+                        <td th:text="${s.displayNm}"></td>
+                        <td th:text="${s.user}"></td>
+                        <td th:text="${s.host}"></td>
+                    </tr>
+
+                </template>
+                </tbody>
+            </table>
+        </form>
+    </div>
+
+    <div id="assign_sys" th:if="${sortedSet.itemList != null && !sortedSet.itemList.empty}" class="btn btn-default assign_sys_btn spacer spacer-bottom">Assign</div>
+    <div class="error" th:if="${sortedSet.itemList == null || sortedSet.itemList.empty}">There are no systems defined
+        (<a th:href="'viewSystems.ktrl?_csrf=' + ${session._csrf}">Manage Systems</a>).
+    </div>
+
+</div>
+
+</body>
+</html>

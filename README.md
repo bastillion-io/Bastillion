@@ -33,17 +33,31 @@ Feel free to try out KeyBox using the build instructions below!
 
 Prerequisites
 -------------
-* Java JDK 1.8 or greater
-http://www.oracle.com/technetwork/java/javase/downloads/index.html
+**Open-JDK / Oracle-JDK - 1.9 or greater**
 
-* Browser with Web Socket support
+> apt-get install openjdk-9-jdk
+
+or
+
+> http://www.oracle.com/technetwork/java/javase/downloads/index.html
+
+**Browser with Web Socket support**
 http://caniuse.com/websockets  *(Note: In Safari if using a self-signed certificate you must import the certificate into your Keychain.
 Select 'Show Certificate' -> 'Always Trust' when prompted in Safari)*
 
-* Maven 3 or greater
-http://maven.apache.org  *(Only needed if building from source)*
+**Maven 3 or greater**  *(Only needed if building from source)*
 
-* Install [FreeOTP](https://freeotp.github.io/) or [Google Authenticator](https://github.com/google/google-authenticator) to enable two-factor authentication with Android or iOS
+> apt-get install maven
+
+or 
+
+> http://maven.apache.org 
+
+**Loophole MVC**  *(Only needed if building from source)*
+
+> https://github.com/skavanagh/lmvc
+
+**Install [FreeOTP](https://freeotp.github.io/) or [Google Authenticator](https://github.com/google/google-authenticator)** to enable two-factor authentication with Android or iOS
 
     | Application          | Android                                                                                             | iOS                                                                        |             
     |----------------------|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
@@ -226,6 +240,18 @@ Special thanks goes to these amazing projects which makes this (and other great 
 + [term.js](https://github.com/chjj/term.js) A terminal written in javascript - by [chjj](https://github.com/chjj)
 
 Third-party dependencies are mentioned in the [_3rdPartyLicenses.md_](3rdPartyLicenses.md)
+
+Dual License
+-----------
+Affero General Public License
+
+Commercial License is also available through a subscription
+
+https://www.sshkeybox.com/subscription
+
+or when running an AMI from the AWS marketplace.
+
+http://aws.amazon.com/marketplace/pp/B076PNFPCL
 
 Author
 ------

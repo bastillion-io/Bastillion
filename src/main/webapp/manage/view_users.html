@@ -1,0 +1,394 @@
+<!--/**
+ *    Copyright (C) 2013 Loophole, LLC
+ *
+ *    This program is free software: you can redistribute it and/or  modify
+ *    it under the terms of the GNU Affero General Public License, version 3,
+ *    as published by the Free Software Foundation.
+ *
+ *    This program is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU Affero General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Affero General Public License
+ *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *    As a special exception, the copyright holders give permission to link the
+ *    code of portions of this program with the OpenSSL library under certain
+ *    conditions as described in each individual source file and distribute
+ *    linked combinations including the program with the OpenSSL library. You
+ *    must comply with the GNU Affero General Public License in all respects for
+ *    all of the code used other than as permitted herein. If you modify file(s)
+ *    with this exception, you may extend this exception to your version of the
+ *    file(s), but you are not obligated to do so. If you do not wish to do so,
+ *    delete this exception statement from your version. If you delete this
+ *    exception statement from all source files in the program, then also delete
+ *    it in the license file.
+ */-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <meta th:replace="_res/inc/header"/>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).ready(function () {
+            //call delete action
+            $(".del_btn").button().click(function () {
+                var id = $(this).attr('id').replace("del_btn_", "");
+                window.location = 'deleteUser.ktrl?user.id=' + id + '&sortedSet.orderByDirection=' + /*[[${sortedSet.orderByDirection}]]*/ ''
+                    + '&sortedSet.orderByField=' + /*[[${sortedSet.orderByField}]]*/ ''
+                    + '&_csrf=' + [[${session._csrf}]];
+            });
+            //submit add or edit form
+            $(".submit_btn").button().click(function () {
+                $(this).parents('.modal').find('form').submit();
+            });
+            $(".sort,.sortAsc,.sortDesc").click(function () {
+                var id = $(this).attr('id');
+
+                var orderDirection = $('#viewUsers_sortedSet_orderByDirection');
+                if (orderDirection.attr('value') === 'asc') {
+                    orderDirection.attr('value', 'desc');
+                } else {
+                    orderDirection.attr('value', 'asc');
+                }
+
+                $('#viewUsers_sortedSet_orderByField').attr('value', id);
+                $("#viewUsers").submit();
+
+            });
+            [# th:if= "${!#strings.isEmpty(sortedSet.orderByField)}"]
+                $('#' + [[${sortedSet.orderByField}]]).attr('class', [[${sortedSet.orderByDirection}]]);
+            [/]
+
+            $('.auth_type').change(function () {
+                hideShowPassword($(this).val());
+            });
+
+        });
+
+        //hide show passwords
+        function hideShowPassword(val) {
+            if (val === 'EXTERNAL') {
+                $('.password').closest('tr').hide();
+            } else {
+                $('.password').closest('tr').show();
+            }
+        }
+
+        /*]]>*/
+    </script>
+
+    <script th:inline="javascript" th:if="${!#maps.isEmpty(fieldErrors) || !errors.empty}">
+        /*<![CDATA[*/
+        $(document).ready(function () {
+            [# th:if= "${user.id > 0}"]
+                $('#edit_dialog_' + [[${user.id}]]).modal();
+            [/]
+
+            [# th:if= "${user.id <= 0}"]
+                $("#add_dialog").modal();
+                [# th:if= "${@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}"]
+                    hideShowPassword($('.auth_type:checked').val());
+                [/]
+            [/]
+        });
+        /*]]>*/
+    </script>
+
+    <title>KeyBox - Manage Users</title>
+
+</head>
+<body>
+
+<div th:replace="_res/inc/navigation"></div>
+
+<div class="container">
+    <form id="viewUsers" th:action="@{/manage/viewUsers.ktrl}" method="get">
+        <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
+        <input type="hidden" id="viewUsers_sortedSet_orderByDirection" name="sortedSet.orderByDirection"
+               th:value="${sortedSet.orderByDirection}"/>
+        <input type="hidden" id="viewUsers_sortedSet_orderByField" name="sortedSet.orderByField"
+               th:value="${sortedSet.orderByField}"/>
+    </form>
+
+    <h3>Manage Users</h3>
+
+    <p>Add / Delete users below so that system profiles may be set for users (<a
+            th:href="'viewProfiles.ktrl?_csrf=' + ${session._csrf}">Manage Profiles</a>).</p>
+
+    <div class="scrollWrapper" th:if="${sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()}">
+        <table class="table-striped  scrollableTable">
+
+            <thead>
+            <tr>
+                <th th:id="${@com.keybox.manage.db.UserDB@USERNAME}" class="sort">Username</th>
+                <th th:id="${@com.keybox.manage.db.UserDB@USER_TYPE}" class="sort">User Type</th>
+                <th th:id="${@com.keybox.manage.db.UserDB@AUTH_TYPE}"
+                    th:if="${@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}" class="sort">Auth Type
+                </th>
+                <th th:id="${@com.keybox.manage.db.UserDB@LAST_NM}" class="sort">Last Name</th>
+                <th th:id="${@com.keybox.manage.db.UserDB@FIRST_NM}" class="sort">First Name</th>
+                <th th:id="${@com.keybox.manage.db.UserDB@EMAIL}" class="sort">Email Address</th>
+                <th>&nbsp;</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="u: ${sortedSet.itemList}">
+                <td th:text="${u.username}"></td>
+                <td th:if="${#strings.equals(u.userType, 'A')}">Administrative Only</td>
+                <td th:if="${!#strings.equals(u.userType, 'A')}">Full Access</td>
+                <template th:if="${@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}" th:remove="tag">
+                    <td th:if="${#strings.equals(u.authType,'BASIC')}">
+                        Basic
+                    </td>
+                    <td th:if="${!#strings.equals(u.authType,'BASIC')}">
+                        External
+                    </td>
+                </template>
+                <td th:text="${u.lastNm}"></td>
+                <td th:text="${u.firstNm}"></td>
+                <td th:text="${u.email}"></td>
+                <td>
+                    <div style="width:235px">
+                        <button class="btn btn-default spacer spacer-left" data-toggle="modal"
+                                th:attr="data-target='#edit_dialog_' + ${u.id}">Edit
+                        </button>
+                        <button th:if="${userId != u.id}" th:id="'del_btn_' + ${u.id}"
+                                class="btn btn-default del_btn spacer spacer-middle">Delete
+                        </button>
+
+                        <div style="clear:both"></div>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+    <button class="btn btn-default add_btn spacer spacer-bottom" data-toggle="modal" data-target="#add_dialog">Add
+        User
+    </button>
+    <div id="add_dialog" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                    <h4 class="modal-title">Add User</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div th:replace="_res/inc/errors"></div>
+                        <form th:action="@{/manage/saveUser.ktrl}" method="post" class="save_user_form_add"
+                              autocomplete="off">
+                            <table>
+                                <tr>
+                                    <td><strong>Username</strong></td>
+                                    <td><input type="hidden" name="_csrf" th:value="${session._csrf}"/>
+                                        <input type="text" name="user.username" th:value="${user.username}"
+                                               title="Username" size="15"/>
+                                        <span class="error" th:text="${fieldErrors.get('user.username')}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>UserType</strong></td>
+                                    <td><select name="user.userType" title="UserType">
+                                        <option value="A" th:selected="${#strings.equals(user.userType, 'A')}">
+                                            Administrative Only
+                                        </option>
+                                        <option value="M" th:selected="${#strings.equals(user.userType, 'M')}">Full
+                                            Access
+                                        </option>
+                                    </select>
+                                        <span class="error" th:text="${fieldErrors.get('user.userType')}"></span>
+                                    </td>
+                                </tr>
+                                <tr th:if="${@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}">
+                                    <td><strong>Authentication Type</strong></td>
+                                    <td>
+                                        <input type="radio" name="user.authType" title="Authentication Type"
+                                               value="BASIC" class="auth_type"
+                                               th:checked="${#strings.equals(user.authType, 'BASIC')}"/>Basic
+                                        <input type="radio" name="user.authType" title="Authentication Type"
+                                               value="EXTERNAL" class="auth_type"
+                                               th:checked="${#strings.equals(user.authType, 'EXTERNAL')}"/>External
+                                        <span class="error" th:text="${fieldErrors.get('user.authType')}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>First Name</strong></td>
+                                    <td><input type="text" name="user.firstNm" th:value="${user.firstNm}"
+                                               title="First Name" size="15"/>
+                                        <span class="error" th:text="${fieldErrors.get('user.firstNm')}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Last Name</strong></td>
+                                    <td><input type="text" name="user.lastNm" th:value="${user.lastNm}"
+                                               title="Last Name" size="15"/>
+                                        <span class="error" th:text="${fieldErrors.get('user.lastNm')}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Email Address</strong></td>
+                                    <td><input type="text" name="user.email" th:value="${user.email}"
+                                               title="Email Address" size="25"/>
+                                        <span class="error" th:text="${fieldErrors.get('user.email')}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Password</strong></td>
+                                    <td><input type="password" name="user.password" value="" title="Password" size="15"
+                                               class="password"/>
+                                        <span class="error" th:text="${fieldErrors.get('user.password')}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Confirm Password</strong></td>
+                                    <td><input type="password" name="user.passwordConfirm" value=""
+                                               title="Confirm Password"
+                                               size="15" class="password"/>
+                                        <span class="error" th:text="${fieldErrors.get('user.passwordConfirm')}"></span>
+                                        <input type="hidden" name="resetSharedSecret" th:value="${resetSharedSecret}"/>
+                                        <input type="hidden" name="sortedSet.orderByDirection"/>
+                                        <input type="hidden" name="sortedSet.orderByField"/></td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-default submit_btn">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <template th:each="u : ${sortedSet.itemList}" th:remove="tag">
+
+        <div th:id="'edit_dialog_' + ${u.id}" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                        <h4 class="modal-title">Edit User</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div th:replace="_res/inc/errors"></div>
+                            <form th:action="@{/manage/saveUser.ktrl}" method="post"
+                                  th:id="'save_user_form_edit_' + ${u.id}" autocomplete="off">
+                                <table>
+                                    <tr>
+                                        <td><strong>Username</strong></td>
+                                        <td><input type="hidden" name="_csrf" th:value="${session._csrf}"/>
+                                            <input type="text" name="user.username" th:value="${u.username}"
+                                                   title="Username"
+                                                   size="15"/>
+                                            <span class="error" th:text="${fieldErrors.get('user.username')}"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>UserType</strong></td>
+                                        <td><select name="user.userType" title="UserType">
+                                            <option value="A" th:selected="${#strings.equals(u.userType, 'A')}">
+                                                Administrative Only
+                                            </option>
+                                            <option value="M" th:selected="${#strings.equals(u.userType, 'M')}">Full
+                                                Access
+                                            </option>
+                                        </select>
+                                            <span class="error" th:text="${fieldErrors.get('user.userType')}"></span>
+
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}">
+                                        <td><strong>Authentication Type</strong></td>
+                                        <td>
+                                            <input type="hidden" name="user.authType" th:value="${u.authType}"/>
+                                            <span th:if="${#strings.equals(u.authType,'BASIC')}">Basic</span>
+                                            <span th:if="${!#strings.equals(u.authType,'BASIC')}">External</span>
+                                            <span class="error" th:text="${fieldErrors.get('user.authType')}"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>First Name</strong></td>
+                                        <td><input type="text" name="user.firstNm" th:value="${u.firstNm}"
+                                                   title="First Name"
+                                                   size="15"/>
+                                            <span class="error" th:text="${fieldErrors.get('user.firstNm')}"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Last Name</strong></td>
+                                        <td><input type="text" name="user.lastNm" th:value="${u.lastNm}"
+                                                   title="Last Name"
+                                                   size="15"/>
+                                            <span class="error" th:text="${fieldErrors.get('user.lastNm')}"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Email Address</strong></td>
+                                        <td><input type="text" name="user.email" th:value="${u.email}"
+                                                   title="Email Address"
+                                                   size="25"/>
+                                            <span class="error" th:text="${fieldErrors.get('user.email')}"></span>
+                                        </td>
+                                    </tr>
+                                    <template
+                                            th:if="${!@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled || #strings.equals(u.authType,'BASIC')}"
+                                            th:remove="tag">
+                                        <tr>
+                                            <td><strong>Password</strong></td>
+                                            <td>
+                                                <input type="password" name="user.password" value="" title="Password"
+                                                       size="15"/>
+                                                <span class="error"
+                                                      th:text="${fieldErrors.get('user.password')}"></span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Confirm Password</strong></td>
+                                            <td>
+                                                <input type="password" name="user.passwordConfirm" value=""
+                                                       title="Confirm Password"
+                                                       size="15"/>
+                                                <span class="error"
+                                                      th:text="${fieldErrors.get('user.passwordConfirm')}"></span>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                    <tr>
+                                        <td><strong>Reset OTP Code</strong></td>
+                                        <td><input type="checkbox" name="resetSharedSecret" title="Reset OTP Code" value="true"/>
+                                            <span class="error"
+                                                  th:text="${fieldErrors.get('resetSharedSecret')}"></span>
+                                            <input type="hidden" name="user.id" th:value="${u.id}"/>
+                                            <input type="hidden" name="sortedSet.orderByDirection"
+                                                   th:value="${sortedSet.orderByDirection}"/>
+                                            <input type="hidden" name="sortedSet.orderByField"
+                                                   th:value="${sortedSet.orderByField}"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-default submit_btn">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+</div>
+
+
+</body>
+</html>

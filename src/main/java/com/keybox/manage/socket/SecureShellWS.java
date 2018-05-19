@@ -1,30 +1,17 @@
-/**
- * Copyright 2013 Sean Kavanagh - sean.p.kavanagh6@gmail.com
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.keybox.manage.socket;
 
 import com.google.gson.Gson;
 import com.keybox.common.util.AppConfig;
 import com.keybox.common.util.AuthUtil;
-import com.keybox.manage.action.SecureShellAction;
+import com.keybox.manage.control.SecureShellKtrl;
 import com.keybox.manage.db.UserDB;
 import com.keybox.manage.model.SchSession;
 import com.keybox.manage.model.UserSchSessions;
 import com.keybox.manage.task.SentOutputTask;
 import com.keybox.manage.util.SessionOutputUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpSession;
 import javax.websocket.*;
@@ -33,8 +20,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * class to run commands and start thread to send web socket terminal output
@@ -45,9 +30,10 @@ public class SecureShellWS {
 
     private static Logger log = LoggerFactory.getLogger(SecureShellWS.class);
 
-    private HttpSession httpSession;
-    private Session session;
+    private HttpSession httpSession = null;
+    private Session session = null;
     private Long sessionId = null;
+    private Long count = 0L;
 
 
 
@@ -62,7 +48,9 @@ public class SecureShellWS {
             session.setMaxIdleTimeout(0);
         }
 
-        this.httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
+        if (this.httpSession == null) {
+            this.httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
+        }
         this.sessionId = AuthUtil.getSessionId(httpSession);
         this.session = session;
 
@@ -71,6 +59,7 @@ public class SecureShellWS {
         thread.start();
 
     }
+
 
     @OnMessage
     public void onMessage(String message) {
@@ -91,7 +80,7 @@ public class SecureShellWS {
                 Integer id = Integer.parseInt(idStr);
 
                 //get servletRequest.getSession() for user
-                UserSchSessions userSchSessions = SecureShellAction.getUserSchSessionMap().get(sessionId);
+                UserSchSessions userSchSessions = SecureShellKtrl.getUserSchSessionMap().get(sessionId);
                 if (userSchSessions != null) {
                     SchSession schSession = userSchSessions.getSchSessionMap().get(id);
                     if (keyCode != null) {
@@ -116,12 +105,17 @@ public class SecureShellWS {
 
 
     }
+    @OnError
+    public void onError(Session session, Throwable t) {
+        log.error(t.toString(), t);
+    }
+
 
     @OnClose
     public void onClose() {
 
-        if (SecureShellAction.getUserSchSessionMap() != null) {
-            UserSchSessions userSchSessions = SecureShellAction.getUserSchSessionMap().get(sessionId);
+        if (SecureShellKtrl.getUserSchSessionMap() != null) {
+            UserSchSessions userSchSessions = SecureShellKtrl.getUserSchSessionMap().get(sessionId);
             if (userSchSessions != null) {
                 Map<Integer, SchSession> schSessionMap = userSchSessions.getSchSessionMap();
 
@@ -145,7 +139,7 @@ public class SecureShellWS {
 
                 //clear and remove session map for user
                 schSessionMap.clear();
-                SecureShellAction.getUserSchSessionMap().remove(sessionId);
+                SecureShellKtrl.getUserSchSessionMap().remove(sessionId);
                 SessionOutputUtil.removeUserSession(sessionId);
             }
         }

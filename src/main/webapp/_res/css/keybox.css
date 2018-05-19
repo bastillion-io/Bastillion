@@ -27,6 +27,10 @@ table tbody {
     float: right;
 }
 
+.navbar-inverse label {
+    color: #dddddd;
+}
+
 form table {
     background-color: #FFF;
     min-width:10px;
@@ -34,6 +38,10 @@ form table {
 
 form table input {
     padding: 2px;
+}
+
+input:focus {
+    outline:0;
 }
 
 form table td, form table th {
@@ -79,16 +87,6 @@ table td, table th {
     white-space: nowrap;
 }
 
-.errorMessage, .errorMessage a {
-    font-size: smaller;
-    color: #cc0000;
-    list-style-type: none;
-}
-
-.errorLabel {
-    color: #cc0000;
-}
-
 form table label,
 form table .label {
     font-size: small;
@@ -116,8 +114,7 @@ div.block .input {
 }
 
 .error, .error a {
-    font-weight: bold;
-    color: #cc0000;
+    color: #b94a48;
 }
 
 .warning {
@@ -222,15 +219,6 @@ div.termwrapper div h6 {
 
 .clear {
     clear: both;
-}
-
-.errorsBg {
-    background-color: #fdd;
-    border: 1px solid red;
-}
-
-.errorMessage {
-    padding: 0 8px;
 }
 
 .output {

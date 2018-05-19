@@ -26,7 +26,7 @@
             <AppenderRef ref="logstash-socket-appender"/>
         </Logger>
         -->
-        <Logger name="com.keybox.manage.action.LoginAudit" level="info" additivity="false">
+        <Logger name="com.keybox.manage.control.LoginAudit" level="info" additivity="false">
             <AppenderRef ref="login-appender"/>
         </Logger>
         <Root level="warn">

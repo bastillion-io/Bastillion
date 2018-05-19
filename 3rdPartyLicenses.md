@@ -1,8 +1,6 @@
 Third party licenses by different vendors:
 =========================================
 
-Apache Struts : Apache License, Version 2.0 -  The Apache Software Foundation
-
 H2 : Mozilla Public License, Version 2.0 - H2 Group
 
 JSch : BSD License - Atsuhiko Yamanaka, JCraft,Inc

@@ -1,0 +1,215 @@
+<!--/**
+ *    Copyright (C) 2013 Loophole, LLC
+ *
+ *    This program is free software: you can redistribute it and/or  modify
+ *    it under the terms of the GNU Affero General Public License, version 3,
+ *    as published by the Free Software Foundation.
+ *
+ *    This program is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU Affero General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Affero General Public License
+ *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *    As a special exception, the copyright holders give permission to link the
+ *    code of portions of this program with the OpenSSL library under certain
+ *    conditions as described in each individual source file and distribute
+ *    linked combinations including the program with the OpenSSL library. You
+ *    must comply with the GNU Affero General Public License in all respects for
+ *    all of the code used other than as permitted herein. If you modify file(s)
+ *    with this exception, you may extend this exception to your version of the
+ *    file(s), but you are not obligated to do so. If you do not wish to do so,
+ *    delete this exception statement from your version. If you delete this
+ *    exception statement from all source files in the program, then also delete
+ *    it in the license file.
+ */-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <meta th:replace="_res/inc/header"/>
+    <script th:src="@{/_res/js/jquery-ui.js}"></script>
+    <link rel="stylesheet" type="text/css" th:href="@{/_res/css/jquery-ui/jquery-ui.css}"/>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).ready(function () {
+
+
+            $(".termwrapper").sortable({
+                helper: 'clone'
+            });
+            //submit add or edit form
+            $(".submit_btn").button().click(function () {
+                filterTerms();
+            });
+
+
+            $(".clear_btn").button().click(function () {
+                $('#filter').val('');
+                filterTerms();
+            });
+
+            function filterTerms() {
+                var filterVal = $('#filter').val();
+
+                if (filterVal != null && filterVal !== '') {
+                    $(".output > .terminal > pre").each(function (index, value) {
+
+                        if ($(this).text().indexOf(filterVal) >= 0) {
+                            $(this).show();
+                        } else {
+                            $(this).hide();
+                        }
+                    });
+                } else {
+                    $(".output > .terminal > pre").show();
+
+                }
+
+            }
+
+            function loadTerms() {
+
+                $(".output").each(function (index, value) {
+
+                    var id = $(this).attr("id").replace("output_", "");
+
+                    $.getJSON('getJSONTermOutputForSession.ktrl?sessionId=' + [[${sessionAudit.id}]] + '&instanceId=' + id + '&t=' + new Date().getTime() + '&_csrf=' + [[${session._csrf}]],
+                        function (data) {
+                            $.each(data, function (key, val) {
+                                if (val.output !== '' && val.instanceId != null) {
+                                    var outputInstance = $("#output_" + val.instanceId + "> .terminal");
+                                    outputInstance.empty();
+                                    var output = val.output;
+                                    output = output.replace(/\r\n\r\n/g, '\r\n \r\n');
+                                    var outputList = output.split('\r\n');
+                                    for (var i = 0; i < outputList.length; i++) {
+                                        outputInstance.append("<pre>" + outputList[i] + "</pre>");
+                                    }
+                                }
+                            });
+                        }
+                    );
+
+                });
+            }
+
+            loadTerms();
+
+        });
+        /*]]>*/
+    </script>
+    <style type="text/css">
+        .run_cmd {
+            min-width: 600px;
+        }
+
+        .terminal {
+            background-color: rgb(240, 240, 240);
+            color: rgb(77, 77, 77);
+            height: 300px;
+            overflow-y: scroll;
+
+        }
+
+        .terminal pre {
+            padding: 0;
+            margin: 2px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            background-color: #F5F5F5;
+        }
+
+        .align-right {
+            padding: 10px 2px 10px 10px;
+            float: right;
+        }
+
+        .term-container {
+            width: 100%;
+            padding: 25px 0;
+            margin: 0;
+        }
+
+    </style>
+
+    <title>KeyBox - Session Terms</title>
+
+</head>
+<body>
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+
+        <div class="navbar-header">
+            <div class="navbar-brand">
+                <div class="nav-img"><img src="/img/keybox_40x40.png" th:src="@{/img/keybox_40x40.png}" alt="keybox"/>
+                </div>
+                KeyBox
+            </div>
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+        <div class="collapse navbar-collapse">
+            <template th:if="${pendingSystemStatus == null}" th:remove="tag">
+
+                <ul class="nav navbar-nav">
+                    <li><a th:href="'viewSessions.ktrl?_csrf=' + ${session._csrf}">Exit Audit</a></li>
+                </ul>
+
+
+                <div class="align-right">
+                    <input type="text" id="filter" name="filter" title="Filter" class="spacer spacer-left"/>
+                    <div class="btn btn-default submit_btn spacer spacer-middle">Filter</div>
+                    <div class="btn btn-default clear_btn spacer spacer-right">Clear</div>
+                </div>
+                <div class="align-right" style="padding-top: 15px">
+                    <label>
+                        <b>Audit ( <span th:text="${sessionAudit.username}"></span>
+                        <span th:if="${sessionAudit.lastNm != null}"
+                              th:text="' - ' + ${sessionAudit.lastNm} + ', ' + ${sessionAudit.firstNm}"></span>
+                        ) </b>
+                    </label>
+                </div>
+                <div class="clear"></div>
+            </template>
+        </div>
+        <!--/.nav-collapse -->
+    </div>
+</div>
+
+
+<div class="term-container container">
+
+    <div class="termwrapper" th:if="${sessionAudit != null}">
+        <template th:each=" s : ${sessionAudit.hostSystemList}" th:remove="tag">
+
+            <div th:id="'run_cmd_' + ${s.instanceId}" class="run_cmd_active run_cmd">
+
+                <h6 class="term-header" th:text="${s.displayLabel}"></h6>
+
+                <div id="term" class="term">
+                    <div th:id="'output_' + ${s.instanceId}" class="output">
+                        <div class="terminal">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+</div>
+<div class="container" th:if="${sessionAudit == null || sessionAudit.hostSystemList.empty}">
+    <div class="error">No terms are associated with
+        this session (<a th:href="'../manage/viewSessions.ktrl?_csrf=' + ${session._csrf}">Audit Sessions</a>).
+    </div>
+</div>
+
+
+</body>
+</html>

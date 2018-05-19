@@ -1,0 +1,152 @@
+<!--/**
+ *    Copyright (C) 2013 Loophole, LLC
+ *
+ *    This program is free software: you can redistribute it and/or  modify
+ *    it under the terms of the GNU Affero General Public License, version 3,
+ *    as published by the Free Software Foundation.
+ *
+ *    This program is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU Affero General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Affero General Public License
+ *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *    As a special exception, the copyright holders give permission to link the
+ *    code of portions of this program with the OpenSSL library under certain
+ *    conditions as described in each individual source file and distribute
+ *    linked combinations including the program with the OpenSSL library. You
+ *    must comply with the GNU Affero General Public License in all respects for
+ *    all of the code used other than as permitted herein. If you modify file(s)
+ *    with this exception, you may extend this exception to your version of the
+ *    file(s), but you are not obligated to do so. If you do not wish to do so,
+ *    delete this exception statement from your version. If you delete this
+ *    exception statement from all source files in the program, then also delete
+ *    it in the license file.
+ */-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:with="isFrame=true">
+
+    <meta th:replace="_res/inc/header"/>
+
+
+    <title> KeyBox - Upload &amp; Push </title>
+
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            $(document).ready(function () {
+
+                $(".submit_btn").button().click(function () {
+                    $('#push').submit();
+                });
+
+                var uploadScrollWrapper = $('.uploadScrollWrapper')
+                if (uploadScrollWrapper.height() >= 200) {
+
+                    uploadScrollWrapper.addClass('uploadScrollWrapperActive');
+                    $('.uploadScrollableTable').floatThead({
+                        scrollContainer: function ($table) {
+                            return $table.closest(".uploadScrollWrapper");
+                        }
+                    });
+                }
+                $(".uploadScrollableTable tr:even").css("background-color", "#e0e0e0");
+
+                [# th:if="${pendingSystemStatus != null && pendingSystemStatus.id != null}"]
+                    //set scroll
+                    var container = uploadScrollWrapper;
+                    var scrollTo = $('#status_' + [[${pendingSystemStatus.id}]]);
+                    container.scrollTop(scrollTo.offset() - container.offset() + container.scrollTop() - 55);
+                [/]
+
+                [# th:if="${currentSystemStatus!=null && #strings.equals(currentSystemStatus.statusCd,'GENERICFAIL')}"]
+                    $("#error_dialog").modal();
+                [/]
+
+                [# th:if="${(currentSystemStatus == null || !#strings.equals(currentSystemStatus.statusCd,'GENERICFAIL')) && pendingSystemStatus != null && pendingSystemStatus.id != null}"]
+                    $('#push').submit();
+                [/]
+            });
+            /*]]>*/
+        </script>
+        <style>
+            body {
+                padding: 10px;
+                background: #FFFFFF;
+            }
+        </style>
+
+</head>
+<body>
+
+<h4 th:text="'Pushing File: ' + ${uploadFileName}"></h4>
+
+
+<div class="uploadScrollWrapper" th:if="${hostSystemList!= null && !hostSystemList.empty}">
+
+    <table class="table-striped uploadScrollableTable">
+        <thead>
+
+        <tr>
+
+            <th>Display Name</th>
+            <th>User</th>
+            <th>Host</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        <tr th:each="system : ${hostSystemList}">
+
+            <td>
+                <div th:id="'status_' + ${system.id}" th:text="${system.displayNm}"></div>
+            </td>
+            <td th:text="${system.user}"></td>
+            <td th:text="${system.host} + ':' + ${system.port}"></td>
+
+            <td>
+                <div class="warning" th:if="${#strings.equals(system.statusCd,'INITIAL')}">Not Started</div>
+                <div class="warning" th:if="${#strings.equals(system.statusCd,'AUTHFAIL')}">Authentication Failed</div>
+                <div class="error" th:if="${#strings.equals(system.statusCd,'HOSTFAIL')}">DNS Lookup Failed</div>
+                <div class="warning" th:if="${#strings.equals(system.statusCd,'KEYAUTHFAIL')}">Passphrase Authentication Failed</div>
+                <div class="error" th:if="${#strings.equals(system.statusCd,'GENERICFAIL')}">Failed</div>
+                <div class="success" th:if="${#strings.equals(system.statusCd,'SUCCESS')}">Success</div>
+            </td>
+
+        </tr>
+
+        </tbody>
+    </table>
+</div>
+<p class="error" th:if="${hostSystemList == null || hostSystemList.empty}">No systems associated with upload</p>
+
+<form id="push" th:action="@{/admin/push.ktrl}" method="post">
+    <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
+    <input type="hidden" name="pushDir" th:value="${pushDir}"/>
+    <input type="hidden" name="uploadFileName" th:value="${uploadFileName}"/>
+</form>
+
+<div id="error_dialog" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                <h4 class="modal-title" th:text="'System: '+ ${currentSystemStatus.displayLabel}"></h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="error" th:if="${currentSystemStatus.errorMsg != null}" th:text="'Error: '+ ${currentSystemStatus.errorMsg}"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default submit_btn">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

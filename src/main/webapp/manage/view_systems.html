@@ -1,0 +1,480 @@
+<!--/**
+ *    Copyright (C) 2013 Loophole, LLC
+ *
+ *    This program is free software: you can redistribute it and/or  modify
+ *    it under the terms of the GNU Affero General Public License, version 3,
+ *    as published by the Free Software Foundation.
+ *
+ *    This program is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU Affero General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Affero General Public License
+ *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *    As a special exception, the copyright holders give permission to link the
+ *    code of portions of this program with the OpenSSL library under certain
+ *    conditions as described in each individual source file and distribute
+ *    linked combinations including the program with the OpenSSL library. You
+ *    must comply with the GNU Affero General Public License in all respects for
+ *    all of the code used other than as permitted herein. If you modify file(s)
+ *    with this exception, you may extend this exception to your version of the
+ *    file(s), but you are not obligated to do so. If you do not wish to do so,
+ *    delete this exception statement from your version. If you delete this
+ *    exception statement from all source files in the program, then also delete
+ *    it in the license file.
+ */-->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <meta th:replace="_res/inc/header"/>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $(document).ready(function () {
+            $("#view_btn").button().click(function () {
+                $("#viewSystems").submit();
+            });
+            $(".refresh_btn").button().click(function () {
+                //get id to submit edit form
+                var id = $(this).attr('id').replace("refresh_btn_", "");
+                $("#save_sys_form_edit_" + id).submit();
+
+            });
+            //call delete action
+            $(".del_btn").button().click(function () {
+                var id = $(this).attr('id').replace("del_btn_", "");
+                window.location = 'deleteSystem.ktrl?hostSystem.id=' + id + '&sortedSet.orderByDirection=' + /*[[${sortedSet.orderByDirection}]]*/ ''
+                    + '&sortedSet.orderByField=' + /*[[${sortedSet.orderByField}]]*/ ''
+                    + '&_csrf=' + [[${session._csrf}]];
+            });
+            //submit add or edit form
+            $(".submit_btn").button().click(function () {
+                $(this).parents('.modal').find('form').submit();
+            });
+
+            $(".sort,.sortAsc,.sortDesc").click(function () {
+                var id = $(this).attr('id');
+
+                var orderDirection = $('#viewSystems_sortedSet_orderByDirection');
+                if (orderDirection.attr('value') === 'asc') {
+                    orderDirection.attr('value', 'desc');
+                } else {
+                    orderDirection.attr('value', 'asc');
+                }
+
+                $('#viewSystems_sortedSet_orderByField').attr('value', id);
+                $("#viewSystems").submit();
+
+            });
+
+            [# th:if= "${!#strings.isEmpty(sortedSet.orderByField)}"]
+                $('#' + [[${sortedSet.orderByField}]]).attr('class', [[${sortedSet.orderByDirection}]]);
+            [/]
+
+            [# th:if= "${#strings.equals(hostSystem.statusCd, 'AUTHFAIL')}"]
+                $("#set_password_dialog").modal();
+            [/]
+
+            [# th:if= "${#strings.equals(hostSystem.statusCd, 'KEYAUTHFAIL')}"]
+                $("#set_passphrase_dialog").modal();
+            [/]
+
+        });
+        /*]]>*/
+    </script>
+    <script th:inline="javascript" th:if="${!#maps.isEmpty(fieldErrors) || !errors.empty}">
+        /*<![CDATA[*/
+        $(document).ready(function () {
+            [# th:if= "${hostSystem.id > 0}"]
+                $('#edit_dialog_' + [[${hostSystem.id}]]).modal();
+            [/]
+
+            [# th:if= "${hostSystem.id <= 0}"]
+                $("#add_dialog").modal();
+            [/]
+        });
+        /*]]>*/
+    </script>
+
+    <title>KeyBox - Manage Systems / Distribute SSH Keys</title>
+</head>
+<body>
+
+<div th:replace="_res/inc/navigation"></div>
+
+<div class="container">
+    <form id="viewSystems" th:action="@{/manage/viewSystems.ktrl}" method="get">
+        <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
+        <input type="hidden" id="viewSystems_sortedSet_orderByDirection" name="sortedSet.orderByDirection"
+               th:value="${sortedSet.orderByDirection}"/>
+        <input type="hidden" id="viewSystems_sortedSet_orderByField" name="sortedSet.orderByField"
+               th:value="${sortedSet.orderByField}"/>
+
+        <h3>Manage Systems</h3>
+
+        <p>Add / Delete systems below or distribute SSH keys</p>
+
+        <div th:if="${profileList != null && !profileList.empty}">
+            <table>
+                <tr>
+                    <td class="align_left">
+                        <select th:name="'sortedSet.filterMap[' + ${@com.keybox.manage.db.SystemDB@FILTER_BY_PROFILE_ID} + ']'"
+                                title="Profile" class="view_frm_select">
+                            <option value="">- Select Profile -</option>
+                            <option th:each="p : ${profileList}"
+                                    th:value="${p.id}" th:text="${p.nm}"
+                                    th:selected="${#strings.equals(sortedSet.filterMap.get(@com.keybox.manage.db.SystemDB@FILTER_BY_PROFILE_ID), p.id)}"></option>
+                        </select>
+                    </td>
+                    <td>
+                        <div id="view_btn" class="btn btn-default">Filter</div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </form>
+
+    <div class="scrollWrapper" th:if="${sortedSet.itemList != null && !sortedSet.itemList.empty}">
+        <table class="table-striped scrollableTable">
+            <thead>
+
+
+            <tr>
+                <th th:id="${@com.keybox.manage.db.SystemDB@SORT_BY_NAME}" class="sort">Display
+                    Name
+                </th>
+                <th th:id="${@com.keybox.manage.db.SystemDB@SORT_BY_USER}" class="sort">User
+                </th>
+                <th th:id="${@com.keybox.manage.db.SystemDB@SORT_BY_HOST}" class="sort">Host
+                </th>
+                <th th:id="${@com.keybox.manage.db.SystemDB@SORT_BY_STATUS}" class="sort">Status
+                </th>
+                <th>&nbsp;</th>
+            </tr>
+            </thead>
+            <tbody>
+
+
+            <template th:each="s : ${sortedSet.itemList}" th:remove="tag">
+                <tr>
+                    <td>
+                        <div th:id="'status_' + ${s.id}" th:text="${s.displayNm}"></div>
+                    </td>
+                    <td th:text="${s.user}"></td>
+                    <td th:text="${s.host} + ':' + ${s.port}"></td>
+                    <td>
+                        <div class="warning" th:if="${#strings.equals(s.statusCd, 'INITIAL')}">Not Started</div>
+                        <div class="warning" th:if="${#strings.equals(s.statusCd, 'AUTHFAIL')}">Authentication
+                            Failed
+                        </div>
+                        <div class="error" th:if="${#strings.equals(s.statusCd, 'HOSTFAIL')}">DNS Lookup Failed
+                        </div>
+                        <div class="warning" th:if="${#strings.equals(s.statusCd, 'KEYAUTHFAIL')}">Passphrase
+                            Authentication Failed
+                        </div>
+                        <div class="error" th:if="${#strings.equals(s.statusCd, 'GENERICFAIL')}">Failed</div>
+                        <div class="success" th:if="${#strings.equals(s.statusCd, 'SUCCESS')}">Success</div>
+                    </td>
+                    <td>
+
+                        <div style="width:160px">
+                            <button th:id="'refresh_btn_' + ${s.id}"
+                                    class="btn btn-default refresh_btn spacer spacer-left"><img src="../img/refresh.png"
+                                                                                                alt="Refresh"
+                                                                                                style="float:left;width:20px;height:20px;"/>
+                            </button>
+                            <button class="btn btn-default spacer spacer-middle" data-toggle="modal"
+                                    th:attr="data-target='#edit_dialog_' + ${s.id}">Edit
+                            </button>
+                            <button th:id="'del_btn_' + ${s.id}"
+                                    class="btn btn-default del_btn spacer spacer-right">Delete
+                            </button>
+                            <div style="clear:both"></div>
+                        </div>
+                    </td>
+                </tr>
+
+            </template>
+            </tbody>
+
+        </table>
+    </div>
+
+
+    <button class="btn btn-default add_btn spacer spacer-bottom" data-toggle="modal" data-target="#add_dialog">Add
+        System
+    </button>
+    <div id="add_dialog" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                    <h4 class="modal-title">Add System</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div th:replace="_res/inc/errors"></div>
+                        <form th:action="@{/manage/saveSystem.ktrl}" method="post" class="save_sys_form_add"
+                              autocomplete="off">
+                            <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
+                            <table>
+                                <tr>
+                                    <td><strong>Display Name</strong></td>
+                                    <td>
+                                        <input type="text" name="hostSystem.displayNm"
+                                               th:value="${hostSystem.displayNm}"
+                                               title="Display Name" size="10"/>
+                                        <span class="error" th:text="${fieldErrors.get('hostSystem.displayNm')}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>System User</strong></td>
+                                    <td>
+                                        <input type="text" name="hostSystem.user" th:value="${hostSystem.user}"
+                                               title="System User" size="10"/>
+                                        <span class="error" th:text="${fieldErrors.get('hostSystem.user')}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Host</strong></td>
+                                    <td>
+                                        <input type="text" name="hostSystem.host" th:value="${hostSystem.host}"
+                                               title="Host" size="18"/>
+                                        <span class="error" th:text="${fieldErrors.get('hostSystem.host')}"></span>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td><strong>Port</strong></td>
+                                    <td>
+
+                                        <input type="text" name="hostSystem.port" th:value="${hostSystem.port}"
+                                               title="Port" size="2"/>
+                                        <span class="error" th:text="${fieldErrors.get('hostSystem.port')}"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Authorized Keys</strong></td>
+                                    <td>
+                                        <input type="text" name="hostSystem.authorizedKeys"
+                                               th:value="${hostSystem.authorizedKeys}" title="Authorized Keys"
+                                               size="30"/>
+                                        <span class="error"
+                                              th:text="${fieldErrors.get('hostSystem.authorizedKeys')}"></span>
+                                        <input type="hidden" name="sortedSet.orderByDirection"
+                                               th:value="${sortedSet.orderByDirection}"/>
+                                        <input type="hidden" name="sortedSet.orderByField"
+                                               th:value="${sortedSet.orderByField}"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-default submit_btn">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <template th:each="s: ${sortedSet.itemList}" th:remove="tag">
+        <div th:id="'edit_dialog_' + ${s.id}" class="modal fade">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                        <h4 class="modal-title">Edit System</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div th:replace="_res/inc/errors"></div>
+                            <form th:action="@{/manage/saveSystem.ktrl}" method="post"
+                                  th:id="'save_sys_form_edit_' + ${s.id}">
+                                <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
+                                <table>
+                                    <tr>
+                                        <td><strong>Display Name</strong></td>
+                                        <td>
+                                            <input type="text" name="hostSystem.displayNm"
+                                                   th:value="${s.displayNm}"
+                                                   title="Display Name" size="10"/>
+                                            <span class="error"
+                                                  th:text="${fieldErrors.get('hostSystem.displayNm')}"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>System User</strong></td>
+                                        <td>
+                                            <input type="text" name="hostSystem.user" th:value="${s.user}"
+                                                   title="System User"
+                                                   size="10"/>
+                                            <span class="error" th:text="${fieldErrors.get('hostSystem.user')}"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Host</strong></td>
+                                        <td>
+                                            <input type="text" name="hostSystem.host" th:value="${s.host}"
+                                                   title="Host"
+                                                   size="18"/>
+                                            <span class="error" th:text="${fieldErrors.get('hostSystem.host')}"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Port</strong></td>
+                                        <td>
+                                            <input type="text" name="hostSystem.port" th:value="${s.port}"
+                                                   title="Port"
+                                                   size="2"/>
+                                            <span class="error" th:text="${fieldErrors.get('hostSystem.port')}"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Authorized Keys</strong></td>
+                                        <td>
+                                            <input type="text" name="hostSystem.authorizedKeys"
+                                                   th:value="${s.authorizedKeys}"
+                                                   title="Authorized Keys" size="30"/>
+                                            <span class="error"
+                                                  th:text="${fieldErrors.get('hostSystem.authorizedKeys')}"></span>
+                                            <input type="hidden" name="hostSystem.id" th:value="${s.id}"/>
+                                            <input type="hidden" name="sortedSet.orderByDirection"
+                                                   th:value="${sortedSet.orderByDirection}"/>
+                                            <input type="hidden" name="sortedSet.orderByField"
+                                                   th:value="${sortedSet.orderByField}"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-default submit_btn">Submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+
+    <div id="set_password_dialog" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                    <h4 class="modal-title" th:text="'Enter password for ' + ${hostSystem.displayLabel}"></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="error" th:text="'Error: ' + ${hostSystem.errorMsg}"></div>
+                        <form th:action="@{/manage/saveSystem.ktrl}" method="post" id="password_frm">
+                            <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
+                            <input type="hidden" name="hostSystem.id" th:value="${hostSystem.id}"/>
+                            <input type="hidden" name="hostSystem.displayNm" th:value="${hostSystem.displayNm}"/>
+                            <input type="hidden" name="hostSystem.user" th:value="${hostSystem.user}"/>
+                            <input type="hidden" name="hostSystem.host" th:value="${hostSystem.host}"/>
+                            <input type="hidden" name="hostSystem.port" th:value="${hostSystem.port}"/>
+                            <input type="hidden" name="hostSystem.authorizedKeys"
+                                   th:value="${hostSystem.authorizedKeys}"/>
+                            <input type="hidden" name="sortedSet.orderByDirection"
+                                   th:value="${sortedSet.orderByDirection}"/>
+                            <input type="hidden" name="sortedSet.orderByField" th:value="${sortedSet.orderByField}"/>
+                            <table>
+                                <tr>
+                                    <td><strong>Password</strong></td>
+                                    <td>
+
+                                        <input type="password" name="password" title="Password" size="15" value=""
+                                               autocomplete="off"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-default submit_btn">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="set_passphrase_dialog" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                    <h4 class="modal-title" th:text="'Enter passphrase for : ' + ${hostSystem.displayLabel}"></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="error" th:text="'Error: ' + ${hostSystem.errorMsg}"></div>
+                        <form th:action="@{/manage/saveSystem.ktrl}" method="post" id="passphrase_frm">
+                            <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
+                            <input type="hidden" name="hostSystem.id" th:value="${hostSystem.id}"/>
+                            <input type="hidden" name="hostSystem.displayNm" th:value="${hostSystem.displayNm}"/>
+                            <input type="hidden" name="hostSystem.user" th:value="${hostSystem.user}"/>
+                            <input type="hidden" name="hostSystem.host" th:value="${hostSystem.host}"/>
+                            <input type="hidden" name="hostSystem.port" th:value="${hostSystem.port}"/>
+                            <input type="hidden" name="hostSystem.authorizedKeys"
+                                   th:value="${hostSystem.authorizedKeys}"/>
+                            <input type="hidden" name="sortedSet.orderByDirection"
+                                   th:value="${sortedSet.orderByDirection}"/>
+                            <input type="hidden" name="sortedSet.orderByField" th:value="${sortedSet.orderByField}"/>
+                            <table>
+                                <tr>
+                                    <td><strong>Passphrase</strong></td>
+                                    <td>
+                                        <input type="password" name="passphrase" title="Passphrase" size="15" value=""
+                                               autocomplete="off"/>
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-default submit_btn">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="error_dialog" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                    <h4 class="modal-title" th:text="'System: ' + ${hostSystem.displayLabel}"></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="error" th:text="'Error: ' + ${hostSystem.errorMsg}"></div>
+                        <form id="error_frm">
+                            <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
+                            <input type="hidden" name="hostSystem.id" th:value="${hostSystem.id}"/>
+                        </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default submit_btn">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+</body>
+</html>
