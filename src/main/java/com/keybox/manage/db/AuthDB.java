@@ -196,11 +196,12 @@ public class AuthDB {
             if (rs.next()) {
 
                 String salt = EncryptionUtil.generateSalt();
-                stmt = con.prepareStatement("update users set password=?, salt=? where auth_token like ?");
-                stmt.setString(1, EncryptionUtil.hash(auth.getPassword() + salt));
-                stmt.setString(2, salt);
-                stmt.setString(3, auth.getAuthToken());
-                stmt.execute();
+                PreparedStatement updateStmt = con.prepareStatement("update users set password=?, salt=? where auth_token like ?");
+                updateStmt.setString(1, EncryptionUtil.hash(auth.getPassword() + salt));
+                updateStmt.setString(2, salt);
+                updateStmt.setString(3, auth.getAuthToken());
+                updateStmt.execute();
+                DBUtils.closeStmt(updateStmt);
                 success = true;
             }
 
