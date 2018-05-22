@@ -45,9 +45,15 @@
                 window.location = 'disablePublicKey.ktrl?publicKey.id=' + id +  '&sortedSet.orderByDirection=' + /*[[${sortedSet.orderByDirection}]]*/ ''
                     + '&sortedSet.orderByField=' + /*[[${sortedSet.orderByField}]]*/ ''
                     + '&_csrf=' + [[${session._csrf}]]
-                    + '&sortedSet.filterMap[' + [[${@com.keybox.manage.db.PublicKeyDB@FILTER_BY_USER_ID}]] + ']=' + /*[[${sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_USER_ID)}]]*/ ''
-                    + '&sortedSet.filterMap[' + [[${@com.keybox.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID}]] + ']=' + /*[[${sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID)}]]*/ ''
-                    + '&sortedSet.filterMap[' + [[${@com.keybox.manage.db.PublicKeyDB@FILTER_BY_ENABLED}]] + ']=' + /*[[${sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_ENABLED)}]]*/ '';
+                    [# th:if= "${sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_USER_ID) != null}"]
+                        + '&sortedSet.filterMap[' + [[${@com.keybox.manage.db.PublicKeyDB@FILTER_BY_USER_ID}]] + ']=' + /*[[${sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_USER_ID)}]]*/ ''
+                    [/]
+                    [# th:if= "${sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID) != null}"]
+                        + '&sortedSet.filterMap[' + [[${@com.keybox.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID}]] + ']=' + /*[[${sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID)}]]*/ ''
+                    [/]
+                    [# th:if= "${sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_ENABLED) != null}"]
+                        + '&sortedSet.filterMap[' + [[${@com.keybox.manage.db.PublicKeyDB@FILTER_BY_ENABLED}]] + ']=' + /*[[${sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_ENABLED)}]]*/ '';
+                    [/]
             });
 
             $(".enable_btn").button().click(function () {
@@ -55,9 +61,15 @@
                 window.location = 'enablePublicKey.ktrl?publicKey.id=' + id +  '&sortedSet.orderByDirection=' + /*[[${sortedSet.orderByDirection}]]*/ ''
                     + '&sortedSet.orderByField=' + /*[[${sortedSet.orderByField}]]*/ ''
                     + '&_csrf=' + [[${session._csrf}]]
-                    + '&sortedSet.filterMap[' + [[${@com.keybox.manage.db.PublicKeyDB@FILTER_BY_USER_ID}]] + ']=' + /*[[${sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_USER_ID)}]]*/ ''
-                    + '&sortedSet.filterMap[' + [[${@com.keybox.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID}]] + ']=' + /*[[${sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID)}]]*/ ''
-                    + '&sortedSet.filterMap[' + [[${@com.keybox.manage.db.PublicKeyDB@FILTER_BY_ENABLED}]] + ']=' + /*[[${sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_ENABLED)}]]*/ '';
+                    [# th:if= "${sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_USER_ID) != null}"]
+                        + '&sortedSet.filterMap[' + [[${@com.keybox.manage.db.PublicKeyDB@FILTER_BY_USER_ID}]] + ']=' + /*[[${sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_USER_ID)}]]*/ ''
+                    [/]
+                    [# th:if= "${sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID) != null}"]
+                        + '&sortedSet.filterMap[' + [[${@com.keybox.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID}]] + ']=' + /*[[${sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID)}]]*/ ''
+                    [/]
+                    [# th:if= "${sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_ENABLED) != null}"]
+                        + '&sortedSet.filterMap[' + [[${@com.keybox.manage.db.PublicKeyDB@FILTER_BY_ENABLED}]] + ']=' + /*[[${sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_ENABLED)}]]*/ '';
+                    [/]
             });
 
 
