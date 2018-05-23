@@ -4,7 +4,7 @@ KeyBox is a web-based SSH console that centrally manages administrative access t
 
 Administrators can login using two-factor authentication with [FreeOTP](https://freeotp.github.io/) or [Google Authenticator](https://github.com/google/google-authenticator). From there they can manage their public SSH keys or connect to their systems through a web-shell. Commands can be shared across shells to make patching easier and eliminate redundant command execution.
 
-KeyBox layers TLS/SSL on top of SSH and acts as a bastion host for administration. Protocols are stacked (TLS/SSL + SSH) so infrastructure cannot be exposed through tunneling / port forwarding. More details can be found in the following whitepaper: [The Security Implications of SSH](http://www.sans.org/reading-room/whitepapers/vpns/security-implications-ssh-1180). Also, SSH key management is enabled by default to prevent unmanaged public keys and enforce best practices.
+KeyBox layers TLS/SSL on top of SSH and acts as a bastion host for administration. Protocols are stacked (TLS/SSL + SSH) so infrastructure cannot be exposed through tunneling / port forwarding. More details can be found in the following whitepaper: [Implementing a Trusted Third-Party System for Secure Shell](https://www.sshkeybox.com/docs/using/whitepaper). Also, SSH key management is enabled by default to prevent unmanaged public keys and enforce best practices.
 
 ![Terminals](https://www.sshkeybox.com/images/screenshots/medium/terminals.png)
 
@@ -243,9 +243,9 @@ Third-party dependencies are mentioned in the [_3rdPartyLicenses.md_](3rdPartyLi
 
 Dual License
 -----------
-Affero General Public License
+KeyBox is available for non-commercial use under the Affero General Public License
 
-Commercial License is also available through a subscription
+A commercial license is also available through a subscription
 
 https://www.sshkeybox.com/subscription
 
