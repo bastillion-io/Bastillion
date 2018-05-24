@@ -59,10 +59,10 @@ or
 
 **Install [FreeOTP](https://freeotp.github.io/) or [Google Authenticator](https://github.com/google/google-authenticator)** to enable two-factor authentication with Android or iOS
 
-    | Application          | Android                                                                                             | iOS                                                                        |             
-    |----------------------|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
-    | FreeOTP              | [Google Play](https://play.google.com/store/apps/details?id=org.fedorahosted.freeotp)               | [iTunes](https://itunes.apple.com/us/app/freeotp/id872559395)              |
-    | Google Authenticator | [Google Play](https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2) | [iTunes](https://itunes.apple.com/us/app/google-authenticator/id388497605) |
+| Application          | Android                                                                                             | iOS                                                                        |             
+|----------------------|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
+| FreeOTP              | [Google Play](https://play.google.com/store/apps/details?id=org.fedorahosted.freeotp)               | [iTunes](https://itunes.apple.com/us/app/freeotp/id872559395)              |
+| Google Authenticator | [Google Play](https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2) | [iTunes](https://itunes.apple.com/us/app/google-authenticator/id388497605) |
     
 Build from Source
 ------
