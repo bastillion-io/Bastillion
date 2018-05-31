@@ -136,10 +136,10 @@
                         </td>
                         <td th:text="${user.username}"></td>
                         <td th:if="${@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}">
-                            <template th:if="${#string.equals(user.authType, 'BASIC')}" th:remove="tag">
+                            <template th:if="${#strings.equals(user.authType, 'BASIC')}" th:remove="tag">
                                 Basic
                             </template>
-                            <template th:if="${#string.equals(user.authType, 'EXTERNAL')}" th:remove="tag">
+                            <template th:if="${#strings.equals(user.authType, 'EXTERNAL')}" th:remove="tag">
                                 External
                             </template>
                         </td>
