@@ -349,7 +349,7 @@
                             <div class="row">
                                 <div th:replace="_res/inc/errors"></div>
                                 <form th:action="@{/admin/savePublicKey.ktrl}"
-                                      th:id="'save_public_key_form_edit_' + ${p.id}" autocomplete="off">
+                                      th:id="'save_public_key_form_edit_' + ${p.id}" method="post" autocomplete="off">
                                     <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
                                     <input type="hidden" name="publicKey.id" th:value="${p.id}"/>
                                     <table>
@@ -371,7 +371,7 @@
                                                     </option>
                                                     <option th:each="o : ${profileList}" th:value="${o.id}"
                                                             th:text="${o.nm}"
-                                                            th:selected="${p.profile.id == o.id}"></option>
+                                                            th:selected="${p.profile != null && p.profile.id == o.id}"></option>
                                                 </select>
                                                 <span class="error" th:text="${fieldErrors.get('publicKey.profile.id')}"></span>
                                             </td>
@@ -402,7 +402,7 @@
                                             <tr>
                                                 <td><strong>Public Key</strong></td>
                                                 <td><textarea class="new_key" name="publicKey.publicKey" title="Public Key" rows="8"
-                                          cols="55"></textarea>
+                                          cols="55" th:text="${p.publicKey}"></textarea>
                                                     <span class="error" th:text="${fieldErrors.get('publicKey.publicKey')}"></span>
                                                 </td>
                                             </tr>
