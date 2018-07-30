@@ -35,22 +35,12 @@ Prerequisites
 -------------
 **Open-JDK / Oracle-JDK - 1.9 or greater**
 
-> apt-get install openjdk-9-jdk
-
-or
-
+*apt-get install openjdk-9-jdk*
 > http://www.oracle.com/technetwork/java/javase/downloads/index.html
-
-**Browser with Web Socket support**
-http://caniuse.com/websockets  *(Note: In Safari if using a self-signed certificate you must import the certificate into your Keychain.
-Select 'Show Certificate' -> 'Always Trust' when prompted in Safari)*
 
 **Maven 3 or greater**  *(Only needed if building from source)*
 
-> apt-get install maven
-
-or 
-
+*apt-get install maven* 
 > http://maven.apache.org 
 
 **Loophole MVC**  *(Only needed if building from source)*
