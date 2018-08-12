@@ -10,7 +10,7 @@ KeyBox layers TLS/SSL on top of SSH and acts as a bastion host for administratio
 
 AMI in the AWS Marketplace
 ------
-If you are using AWS, the simplest way to get started is to run the AMI from the AWS marketplace.
+If you are using AWS, the simplest way to get started is to run the AMI from the AWS Marketplace.
 
 http://aws.amazon.com/marketplace/pp/B076PNFPCL
 
@@ -25,9 +25,13 @@ In order to help register new EC2 instances, the KeyBox public can be found unde
 
 KeyBox Releases
 ------
-KeyBox releases with Jetty are no longer available on Github. Releases and upgrades are available via subscription through the following link: 
+This software is free for non-commercial use under the AGPL licence!
+
+Commercial users can purchase a license through an annual subscription and access the binary releases. 
 
 https://www.sshkeybox.com/subscription
+
+Also, users can purchase through the AWS Marketplace.
 
 Feel free to try out KeyBox using the build instructions below!
 
