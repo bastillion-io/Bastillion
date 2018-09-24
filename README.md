@@ -254,5 +254,3 @@ Author
 + sean.p.kavanagh6@gmail.com
 + https://twitter.com/spkavanagh6
 
-
-(Follow me on twitter for release updates, but mostly nonsense)
