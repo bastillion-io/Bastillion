@@ -92,11 +92,11 @@ public class AuthFilter implements Filter {
                 try {
                     if (timeStr != null && !timeStr.trim().equals("")) {
                         SimpleDateFormat sdf = new SimpleDateFormat("MMddyyyyHHmmss");
-                        Date cookieTimeout = sdf.parse(timeStr);
+                        Date sessionTimeout = sdf.parse(timeStr);
                         Date currentTime = new Date();
 
                         //if current time > timeout then redirect to login page
-                        if (cookieTimeout == null || currentTime.after(cookieTimeout)) {
+                        if (sessionTimeout == null || currentTime.after(sessionTimeout)) {
                             isAdmin = false;
                         } else {
                             AuthUtil.setTimeout(servletRequest.getSession());
