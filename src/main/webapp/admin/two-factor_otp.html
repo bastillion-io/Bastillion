@@ -110,7 +110,7 @@
                 </tbody>
             </table>
             <div th:if="${!@com.keybox.manage.control.OTPKtrl@requireOTP}">
-                <button th:onclick="'window.location = \'menu.html?_csrf=' + ${session._csrf} + '\''"
+                <button th:onclick="window.location = 'menu.html?_csrf=' + [[${session._csrf}]]"
                         class="btn btn-danger spacer spacer-left" style="float:left">Skip for Now
                 </button>
             </div>
