@@ -70,7 +70,7 @@
         });
         /*]]>*/
     </script>
-    <title>KeyBox - Manage Systems</title>
+    <title>Bastillion - Manage Systems</title>
 </head>
 <body>
 
@@ -119,12 +119,12 @@
             <table>
                 <tr>
                     <td class="align_left">
-                        <select th:name="'sortedSet.filterMap[' + ${@com.keybox.manage.db.SystemDB@FILTER_BY_PROFILE_ID} + ']'"
+                        <select th:name="'sortedSet.filterMap[' + ${@io.bastillion.manage.db.SystemDB@FILTER_BY_PROFILE_ID} + ']'"
                                 title="Profile" class="view_frm_select">
                             <option value="">- Select Profile -</option>
                             <option th:each="p : ${profileList}"
                                     th:value="${p.id}" th:text="${p.nm}"
-                                    th:selected="${#strings.equals(sortedSet.filterMap.get(@com.keybox.manage.db.SystemDB@FILTER_BY_PROFILE_ID), p.id)}"></option>
+                                    th:selected="${#strings.equals(sortedSet.filterMap.get(@io.bastillion.manage.db.SystemDB@FILTER_BY_PROFILE_ID), p.id)}"></option>
                         </select>
                     </td>
                     <td>
@@ -145,9 +145,9 @@
 
                 <tr>
                     <th><input type="checkbox" id="select_frm_systemSelectAll" name="systemSelectAll" class="systemSelect" title="Select All"/></th>
-                    <th th:id="${@com.keybox.manage.db.SystemDB@SORT_BY_NAME}" class="sort">Display Name</th>
-                    <th th:id="${@com.keybox.manage.db.SystemDB@SORT_BY_USER}" class="sort">User</th>
-                    <th th:id="${@com.keybox.manage.db.SystemDB@SORT_BY_HOST}" class="sort">Host</th>
+                    <th th:id="${@io.bastillion.manage.db.SystemDB@SORT_BY_NAME}" class="sort">Display Name</th>
+                    <th th:id="${@io.bastillion.manage.db.SystemDB@SORT_BY_USER}" class="sort">User</th>
+                    <th th:id="${@io.bastillion.manage.db.SystemDB@SORT_BY_HOST}" class="sort">Host</th>
                 </tr>
                 </thead>
                 <tbody>

@@ -72,7 +72,7 @@
         /*]]>*/
     </script>
 
-    <title>KeyBox - Assign Users to Profile</title>
+    <title>Bastillion - Assign Users to Profile</title>
 
 </head>
 <body>
@@ -106,22 +106,22 @@
                 <thead>
 
                 <tr>
-                    <th th:id="${@com.keybox.manage.db.UserDB@PROFILE_ID}" class="sort">
+                    <th th:id="${@io.bastillion.manage.db.UserDB@PROFILE_ID}" class="sort">
                         <input type="checkbox" id="assignUsersToProfile_userSelectAll" name="userSelectAll"
                                class="userSelect"
                                title="Select All"/>
                     </th>
-                    <th th:id="${@com.keybox.manage.db.UserDB@USERNAME}" class="sort">Username</th>
-                    <th th:if="${@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}"
-                        th:id="${@com.keybox.manage.db.UserDB@AUTH_TYPE}" class="sort">Auth Type
+                    <th th:id="${@io.bastillion.manage.db.UserDB@USERNAME}" class="sort">Username</th>
+                    <th th:if="${@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled}"
+                        th:id="${@io.bastillion.manage.db.UserDB@AUTH_TYPE}" class="sort">Auth Type
                     </th>
-                    <th th:id="${@com.keybox.manage.db.UserDB@LAST_NM}" class="sort">Last
+                    <th th:id="${@io.bastillion.manage.db.UserDB@LAST_NM}" class="sort">Last
                         Name
                     </th>
-                    <th th:id="${@com.keybox.manage.db.UserDB@FIRST_NM}" class="sort">First
+                    <th th:id="${@io.bastillion.manage.db.UserDB@FIRST_NM}" class="sort">First
                         Name
                     </th>
-                    <th th:id="${@com.keybox.manage.db.UserDB@EMAIL}" class="sort">Email
+                    <th th:id="${@io.bastillion.manage.db.UserDB@EMAIL}" class="sort">Email
                         Address
                     </th>
                 </tr>
@@ -135,7 +135,7 @@
 
                         </td>
                         <td th:text="${user.username}"></td>
-                        <td th:if="${@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}">
+                        <td th:if="${@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled}">
                             <template th:if="${#strings.equals(user.authType, 'BASIC')}" th:remove="tag">
                                 Basic
                             </template>

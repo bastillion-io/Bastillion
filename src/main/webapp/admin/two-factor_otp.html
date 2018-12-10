@@ -29,7 +29,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta th:replace="_res/inc/header"/>
-    <title>KeyBox - One-Time Password Setup</title>
+    <title>Bastillion - One-Time Password Setup</title>
 </head>
 <body>
 
@@ -38,9 +38,9 @@
 
         <div class="navbar-header">
             <div class="navbar-brand">
-                <div class="nav-img"><img src="/img/keybox_40x40.png" th:src="@{/img/keybox_40x40.png}" alt="keybox"/>
+                <div class="nav-img"><img src="/img/bastillion_40x40.png" th:src="@{/img/bastillion_40x40.png}" alt="bastillion"/>
                 </div>
-                KeyBox
+                Bastillion
             </div>
         </div>
         <!--/.nav-collapse -->
@@ -109,7 +109,7 @@
                 </tr>
                 </tbody>
             </table>
-            <div th:if="${!@com.keybox.manage.control.OTPKtrl@requireOTP}">
+            <div th:if="${!@io.bastillion.manage.control.OTPKtrl@requireOTP}">
                 <button th:onclick="window.location = 'menu.html?_csrf=' + [[${session._csrf}]]"
                         class="btn btn-danger spacer spacer-left" style="float:left">Skip for Now
                 </button>

@@ -100,7 +100,7 @@
         /*]]>*/
     </script>
 
-    <title>KeyBox - Manage System Profiles</title>
+    <title>Bastillion - Manage System Profiles</title>
 </head>
 <body>
 
@@ -136,10 +136,10 @@
                                        th:value="${sortedSet.filterMap.get('profile')}"
                                        placeholder="Find associated profiles"/>
                                 <input type="hidden"
-                                       th:name="'sortedSet.filterMap[' + ${@com.keybox.manage.db.ProfileDB@FILTER_BY_SYSTEM} + ']'"
+                                       th:name="'sortedSet.filterMap[' + ${@io.bastillion.manage.db.ProfileDB@FILTER_BY_SYSTEM} + ']'"
                                        id="systemFilter"/>
                                 <input type="hidden"
-                                       th:name="'sortedSet.filterMap[' + ${@com.keybox.manage.db.ProfileDB@FILTER_BY_USER} + ']'"
+                                       th:name="'sortedSet.filterMap[' + ${@io.bastillion.manage.db.ProfileDB@FILTER_BY_USER} + ']'"
                                        id="userFilter"/>
                             </td>
                             <td>
@@ -171,7 +171,7 @@
             <thead>
 
             <tr>
-                <th th:id="${@com.keybox.manage.db.ProfileDB@SORT_BY_PROFILE_NM}" class="sort">
+                <th th:id="${@io.bastillion.manage.db.ProfileDB@SORT_BY_PROFILE_NM}" class="sort">
                     Profile Name
                 </th>
                 <th>&nbsp;</th>

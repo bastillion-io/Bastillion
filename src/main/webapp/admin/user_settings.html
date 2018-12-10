@@ -35,7 +35,7 @@
         }
     </style>
 
-    <title>KeyBox - Set Admin Password</title>
+    <title>Bastillion - Set Admin Password</title>
 </head>
 <body>
 
@@ -43,7 +43,7 @@
 
 
 <div class="container">
-    <div th:if="${!@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled || #strings.equals(session.authType,'BASIC')}">
+    <div th:if="${!@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled || #strings.equals(session.authType,'BASIC')}">
 
         <h3>Set Admin Password</h3>
         <p>Change your administrative password below</p>
@@ -127,6 +127,7 @@
 
             <tr>
                 <td>&nbsp;</td>
+
                 <td>
                     <div id="theme_btn" class="btn btn-default submit_btn">Update Theme</div>
                 </td>
@@ -140,6 +141,18 @@
     <h3>Public Key</h3>
     <p>Public SSH Key used for application authentication when registering systems</p>
     <pre style="white-space:pre-wrap;width:600px;" th:text="${publicKey}"></pre>
+
+    <form th:if="${#strings.equals(session.userType,'M')}" th:action="@{/admin/licenseSubmit.ktrl}" method="post"
+          autocomplete="off">
+        <h3>Software License</h3>
+        <p>Allows you to register an unlimited amount of systems and users.<br/>To purchase a license visit <a
+                href="https://www.bastillion.io/subscription">www.bastillion.io/subscription</a></p>
+
+        <input type="text" name="license" size="70" th:value="${license}"/>
+        <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
+        <div id="theme_btn" class="btn btn-default submit_btn">Apply</div>
+        <p th:if="${!#strings.equals(expirationDt, '')}">Your license is active until <span th:text="${expirationDt}"/></p>
+    </form>
 
 </div>
 

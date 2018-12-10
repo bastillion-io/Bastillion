@@ -45,14 +45,14 @@
                 window.location = 'disablePublicKey.ktrl?publicKey.id=' + id +  '&sortedSet.orderByDirection=' + /*[[${sortedSet.orderByDirection}]]*/ ''
                     + '&sortedSet.orderByField=' + /*[[${sortedSet.orderByField}]]*/ ''
                     + '&_csrf=' + [[${session._csrf}]]
-                    [# th:if= "${sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_USER_ID) != null}"]
-                        + '&sortedSet.filterMap[' + [[${@com.keybox.manage.db.PublicKeyDB@FILTER_BY_USER_ID}]] + ']=' + /*[[${sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_USER_ID)}]]*/ ''
+                    [# th:if= "${sortedSet.filterMap.get(@io.bastillion.manage.db.PublicKeyDB@FILTER_BY_USER_ID) != null}"]
+                        + '&sortedSet.filterMap[' + [[${@io.bastillionlion.manage.db.PublicKeyDB@FILTER_BY_USER_ID}]] + ']=' + /*[[${sortedSet.filterMap.get(@io.bastillionlion.manage.db.PublicKeyDB@FILTER_BY_USER_ID)}]]*/ ''
                     [/]
-                    [# th:if= "${sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID) != null}"]
-                        + '&sortedSet.filterMap[' + [[${@com.keybox.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID}]] + ']=' + /*[[${sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID)}]]*/ ''
+                    [# th:if= "${sortedSet.filterMap.get(@io.bastillion.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID) != null}"]
+                        + '&sortedSet.filterMap[' + [[${@io.bastillionlion.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID}]] + ']=' + /*[[${sortedSet.filterMap.get(@io.bastillionlion.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID)}]]*/ ''
                     [/]
-                    [# th:if= "${sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_ENABLED) != null}"]
-                        + '&sortedSet.filterMap[' + [[${@com.keybox.manage.db.PublicKeyDB@FILTER_BY_ENABLED}]] + ']=' + /*[[${sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_ENABLED)}]]*/ '';
+                    [# th:if= "${sortedSet.filterMap.get(@io.bastillion.manage.db.PublicKeyDB@FILTER_BY_ENABLED) != null}"]
+                        + '&sortedSet.filterMap[' + [[${@io.bastillionlion.manage.db.PublicKeyDB@FILTER_BY_ENABLED}]] + ']=' + /*[[${sortedSet.filterMap.get(@io.bastillionlion.manage.db.PublicKeyDB@FILTER_BY_ENABLED)}]]*/ '';
                     [/]
             });
 
@@ -61,14 +61,14 @@
                 window.location = 'enablePublicKey.ktrl?publicKey.id=' + id +  '&sortedSet.orderByDirection=' + /*[[${sortedSet.orderByDirection}]]*/ ''
                     + '&sortedSet.orderByField=' + /*[[${sortedSet.orderByField}]]*/ ''
                     + '&_csrf=' + [[${session._csrf}]]
-                    [# th:if= "${sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_USER_ID) != null}"]
-                        + '&sortedSet.filterMap[' + [[${@com.keybox.manage.db.PublicKeyDB@FILTER_BY_USER_ID}]] + ']=' + /*[[${sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_USER_ID)}]]*/ ''
+                    [# th:if= "${sortedSet.filterMap.get(@io.bastillion.manage.db.PublicKeyDB@FILTER_BY_USER_ID) != null}"]
+                        + '&sortedSet.filterMap[' + [[${@io.bastillionlion.manage.db.PublicKeyDB@FILTER_BY_USER_ID}]] + ']=' + /*[[${sortedSet.filterMap.get(@io.bastillionlion.manage.db.PublicKeyDB@FILTER_BY_USER_ID)}]]*/ ''
                     [/]
-                    [# th:if= "${sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID) != null}"]
-                        + '&sortedSet.filterMap[' + [[${@com.keybox.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID}]] + ']=' + /*[[${sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID)}]]*/ ''
+                    [# th:if= "${sortedSet.filterMap.get(@io.bastillion.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID) != null}"]
+                        + '&sortedSet.filterMap[' + [[${@io.bastillionlion.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID}]] + ']=' + /*[[${sortedSet.filterMap.get(@io.bastillionlion.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID)}]]*/ ''
                     [/]
-                    [# th:if= "${sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_ENABLED) != null}"]
-                        + '&sortedSet.filterMap[' + [[${@com.keybox.manage.db.PublicKeyDB@FILTER_BY_ENABLED}]] + ']=' + /*[[${sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_ENABLED)}]]*/ '';
+                    [# th:if= "${sortedSet.filterMap.get(@io.bastillion.manage.db.PublicKeyDB@FILTER_BY_ENABLED) != null}"]
+                        + '&sortedSet.filterMap[' + [[${@io.bastillionlion.manage.db.PublicKeyDB@FILTER_BY_ENABLED}]] + ']=' + /*[[${sortedSet.filterMap.get(@io.bastillionlion.manage.db.PublicKeyDB@FILTER_BY_ENABLED)}]]*/ '';
                     [/]
             });
 
@@ -98,7 +98,7 @@
     </script>
 
 
-    <title>KeyBox - View / Disable SSH Keys</title>
+    <title>Bastillion - View / Disable SSH Keys</title>
 
 
 </head>
@@ -129,28 +129,28 @@
                                     class="btn btn-success">Add / Remove Keys</a></td>
                             <td>|</td>
                                 <td th:if="${userList != null && !userList.empty}">
-                                    <select th:name="'sortedSet.filterMap[' + ${@com.keybox.manage.db.PublicKeyDB@FILTER_BY_USER_ID} + ']'"
+                                    <select th:name="'sortedSet.filterMap[' + ${@io.bastillion.manage.db.PublicKeyDB@FILTER_BY_USER_ID} + ']'"
                                             title="User" class="view_frm_select">
                                         <option value="">- Select User -</option>
                                         <option th:each="u : ${userList}"
                                                 th:value="${u.id}" th:text="${u.username}"
-                                                th:selected="${#strings.equals(sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_USER_ID), u.id)}"></option>
+                                                th:selected="${#strings.equals(sortedSet.filterMap.get(@io.bastillion.manage.db.PublicKeyDB@FILTER_BY_USER_ID), u.id)}"></option>
                                     </select>
                                 </td>
                                 <td th:if="${profileList != null && !profileList.empty}">
-                                    <select th:name="'sortedSet.filterMap[' + ${@com.keybox.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID} + ']'"
+                                    <select th:name="'sortedSet.filterMap[' + ${@io.bastillion.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID} + ']'"
                                             title="Profile" class="view_frm_select">
                                         <option value="">- Select Profile -</option>
                                         <option th:each="p : ${profileList}"
                                                 th:value="${p.id}" th:text="${p.nm}"
-                                                th:selected="${#strings.equals(sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID), p.id)}"></option>
+                                                th:selected="${#strings.equals(sortedSet.filterMap.get(@io.bastillion.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID), p.id)}"></option>
                                     </select>
                                 </td>
                             <td>
-                                <select th:name="'sortedSet.filterMap[' + ${@com.keybox.manage.db.PublicKeyDB@FILTER_BY_ENABLED} + ']'"
+                                <select th:name="'sortedSet.filterMap[' + ${@io.bastillion.manage.db.PublicKeyDB@FILTER_BY_ENABLED} + ']'"
                                         title="Profile" class="view_frm_select">
-                                    <option value="true"  th:selected="${#strings.equals(sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_ENABLED), 'true')}">Enabled</option>
-                                    <option value="false" th:selected="${#strings.equals(sortedSet.filterMap.get(@com.keybox.manage.db.PublicKeyDB@FILTER_BY_ENABLED), 'false')}">Disabled</option>
+                                    <option value="true"  th:selected="${#strings.equals(sortedSet.filterMap.get(@io.bastillion.manage.db.PublicKeyDB@FILTER_BY_ENABLED), 'true')}">Enabled</option>
+                                    <option value="false" th:selected="${#strings.equals(sortedSet.filterMap.get(@io.bastillion.manage.db.PublicKeyDB@FILTER_BY_ENABLED), 'false')}">Disabled</option>
                                 </select>
                             </td>
                             <td>
@@ -169,11 +169,11 @@
 
                 <tr>
 
-                    <th th:id="${@com.keybox.manage.db.PublicKeyDB@SORT_BY_KEY_NM}" class="sort">Key Name</th>
-                    <th th:id="${@com.keybox.manage.db.PublicKeyDB@SORT_BY_PROFILE}" class="sort">Profile</th>
-                    <th th:id="${@com.keybox.manage.db.PublicKeyDB@SORT_BY_TYPE}" class="sort">Type</th>
-                    <th th:id="${@com.keybox.manage.db.PublicKeyDB@SORT_BY_FINGERPRINT}" class="sort">Fingerprint</th>
-                    <th th:id="${@com.keybox.manage.db.PublicKeyDB@SORT_BY_CREATE_DT}" class="sort">Created</th>
+                    <th th:id="${@io.bastillion.manage.db.PublicKeyDB@SORT_BY_KEY_NM}" class="sort">Key Name</th>
+                    <th th:id="${@io.bastillion.manage.db.PublicKeyDB@SORT_BY_PROFILE}" class="sort">Profile</th>
+                    <th th:id="${@io.bastillion.manage.db.PublicKeyDB@SORT_BY_TYPE}" class="sort">Type</th>
+                    <th th:id="${@io.bastillion.manage.db.PublicKeyDB@SORT_BY_FINGERPRINT}" class="sort">Fingerprint</th>
+                    <th th:id="${@io.bastillion.manage.db.PublicKeyDB@SORT_BY_CREATE_DT}" class="sort">Created</th>
                     <th>&nbsp;</th>
                 </tr>
                 </thead>

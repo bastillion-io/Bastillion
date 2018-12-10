@@ -72,7 +72,7 @@
     </script>
 
 
-    <title>KeyBox - Audit Sessions</title>
+    <title>Bastillion - Audit Sessions</title>
 </head>
 <body>
 
@@ -96,21 +96,21 @@
                     <table>
                         <tr>
                             <td th:if="${userList != null && !userList.empty}">
-                                <select th:name="'sortedSet.filterMap[' + ${@com.keybox.manage.db.SessionAuditDB@FILTER_BY_USER} + ']'"
+                                <select th:name="'sortedSet.filterMap[' + ${@io.bastillion.manage.db.SessionAuditDB@FILTER_BY_USER} + ']'"
                                         title="User" class="view_frm_select">
                                     <option value="">- Select User -</option>
                                     <option th:each="u : ${userList}"
                                             th:value="${u.username}" th:text="${u.username}"
-                                            th:selected="${#strings.equals(sortedSet.filterMap.get(@com.keybox.manage.db.SessionAuditDB@FILTER_BY_USER), u.username)}"></option>
+                                            th:selected="${#strings.equals(sortedSet.filterMap.get(@io.bastillion.manage.db.SessionAuditDB@FILTER_BY_USER), u.username)}"></option>
                                 </select>
                             </td>
                             <td th:if="${systemList != null && !systemList.empty}">
-                                <select th:name="'sortedSet.filterMap[' + ${@com.keybox.manage.db.SessionAuditDB@FILTER_BY_SYSTEM} + ']'"
+                                <select th:name="'sortedSet.filterMap[' + ${@io.bastillion.manage.db.SessionAuditDB@FILTER_BY_SYSTEM} + ']'"
                                         title="System" class="view_frm_select">
                                     <option value="">- Select System -</option>
                                     <option th:each="s : ${systemList}"
                                             th:value="${s.displayNm}" th:text="${s.displayLabel}"
-                                            th:selected="${#strings.equals(sortedSet.filterMap.get(@com.keybox.manage.db.SessionAuditDB@FILTER_BY_SYSTEM), s.displayNm)}"></option>
+                                            th:selected="${#strings.equals(sortedSet.filterMap.get(@io.bastillion.manage.db.SessionAuditDB@FILTER_BY_SYSTEM), s.displayNm)}"></option>
                                 </select>
                             </td>
                             <td style="padding:5px 5px 0px 5px;">
@@ -129,20 +129,20 @@
                 <tr>
 
 
-                    <th th:id="${@com.keybox.manage.db.SessionAuditDB@SORT_BY_USERNAME}" class="sort">
+                    <th th:id="${@io.bastillion.manage.db.SessionAuditDB@SORT_BY_USERNAME}" class="sort">
                         Username
                     </th>
 
-                    <th th:id="${@com.keybox.manage.db.SessionAuditDB@SORT_BY_LAST_NM}" class="sort">
+                    <th th:id="${@io.bastillion.manage.db.SessionAuditDB@SORT_BY_LAST_NM}" class="sort">
                         Last Name
                     </th>
-                    <th th:id="${@com.keybox.manage.db.SessionAuditDB@SORT_BY_FIRST_NM}" class="sort">
+                    <th th:id="${@io.bastillion.manage.db.SessionAuditDB@SORT_BY_FIRST_NM}" class="sort">
                         First Name
                     </th>
-                    <th th:id="${@com.keybox.manage.db.SessionAuditDB@SORT_BY_IP_ADDRESS}" class="sort">
+                    <th th:id="${@io.bastillion.manage.db.SessionAuditDB@SORT_BY_IP_ADDRESS}" class="sort">
                         IP Address
                     </th>
-                    <th th:id="${@com.keybox.manage.db.SessionAuditDB@SORT_BY_SESSION_TM}" class="sort">
+                    <th th:id="${@io.bastillion.manage.db.SessionAuditDB@SORT_BY_SESSION_TM}" class="sort">
                         Session Time
                     </th>
                     <th>&nbsp;</th>
