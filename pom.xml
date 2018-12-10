@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.bastillion</groupId>
     <artifactId>bastillion</artifactId>
-    <version>3.05.00</version>
+    <version>3.05.01-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>Bastillion</name>
     <properties>
@@ -27,7 +27,7 @@
         <dependency>
             <groupId>com.jcraft</groupId>
             <artifactId>jsch</artifactId>
-            <version>0.1.54</version>
+            <version>0.1.55</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
