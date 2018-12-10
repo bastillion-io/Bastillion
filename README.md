@@ -15,8 +15,6 @@ Commercial users can purchase a license through an annual subscription and acces
 
 https://www.bastillion.io/subscription
 
-Also, users can purchase through the AWS Marketplace.
-
 Feel free to try out Bastillion for a limited amount of users(6) or systems(12)!
 
 https://github.com/bastillion-io/Bastillion/releases
