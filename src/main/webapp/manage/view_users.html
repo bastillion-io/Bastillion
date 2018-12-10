@@ -90,7 +90,7 @@
 
             [# th:if= "${user.id <= 0}"]
                 $("#add_dialog").modal();
-                [# th:if= "${@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}"]
+                [# th:if= "${@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled}"]
                     hideShowPassword($('.auth_type:checked').val());
                 [/]
             [/]
@@ -98,7 +98,7 @@
         /*]]>*/
     </script>
 
-    <title>KeyBox - Manage Users</title>
+    <title>Bastillion - Manage Users</title>
 
 </head>
 <body>
@@ -124,14 +124,14 @@
 
             <thead>
             <tr>
-                <th th:id="${@com.keybox.manage.db.UserDB@USERNAME}" class="sort">Username</th>
-                <th th:id="${@com.keybox.manage.db.UserDB@USER_TYPE}" class="sort">User Type</th>
-                <th th:id="${@com.keybox.manage.db.UserDB@AUTH_TYPE}"
-                    th:if="${@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}" class="sort">Auth Type
+                <th th:id="${@io.bastillion.manage.db.UserDB@USERNAME}" class="sort">Username</th>
+                <th th:id="${@io.bastillion.manage.db.UserDB@USER_TYPE}" class="sort">User Type</th>
+                <th th:id="${@io.bastillion.manage.db.UserDB@AUTH_TYPE}"
+                    th:if="${@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled}" class="sort">Auth Type
                 </th>
-                <th th:id="${@com.keybox.manage.db.UserDB@LAST_NM}" class="sort">Last Name</th>
-                <th th:id="${@com.keybox.manage.db.UserDB@FIRST_NM}" class="sort">First Name</th>
-                <th th:id="${@com.keybox.manage.db.UserDB@EMAIL}" class="sort">Email Address</th>
+                <th th:id="${@io.bastillion.manage.db.UserDB@LAST_NM}" class="sort">Last Name</th>
+                <th th:id="${@io.bastillion.manage.db.UserDB@FIRST_NM}" class="sort">First Name</th>
+                <th th:id="${@io.bastillion.manage.db.UserDB@EMAIL}" class="sort">Email Address</th>
                 <th>&nbsp;</th>
             </tr>
             </thead>
@@ -140,7 +140,7 @@
                 <td th:text="${u.username}"></td>
                 <td th:if="${#strings.equals(u.userType, 'A')}">Administrative Only</td>
                 <td th:if="${!#strings.equals(u.userType, 'A')}">Full Access</td>
-                <template th:if="${@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}" th:remove="tag">
+                <template th:if="${@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled}" th:remove="tag">
                     <td th:if="${#strings.equals(u.authType,'BASIC')}">
                         Basic
                     </td>
@@ -206,7 +206,7 @@
                                         <span class="error" th:text="${fieldErrors.get('user.userType')}"></span>
                                     </td>
                                 </tr>
-                                <tr th:if="${@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}">
+                                <tr th:if="${@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled}">
                                     <td><strong>Authentication Type</strong></td>
                                     <td>
                                         <input type="radio" name="user.authType" title="Authentication Type"
@@ -307,7 +307,7 @@
 
                                         </td>
                                     </tr>
-                                    <tr th:if="${@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled}">
+                                    <tr th:if="${@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled}">
                                         <td><strong>Authentication Type</strong></td>
                                         <td>
                                             <input type="hidden" name="user.authType" th:value="${u.authType}"/>
@@ -341,7 +341,7 @@
                                         </td>
                                     </tr>
                                     <template
-                                            th:if="${!@com.keybox.manage.util.ExternalAuthUtil@externalAuthEnabled || #strings.equals(u.authType,'BASIC')}"
+                                            th:if="${!@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled || #strings.equals(u.authType,'BASIC')}"
                                             th:remove="tag">
                                         <tr>
                                             <td><strong>Password</strong></td>

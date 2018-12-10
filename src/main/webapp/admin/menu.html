@@ -37,7 +37,7 @@
         });
     </script>
 
-    <title>KeyBox - Main Menu</title>
+    <title>Bastillion - Main Menu</title>
 
 </head>
 
@@ -107,7 +107,7 @@
                     Create scripts to be executed on selected systems simultaneously through a web-terminal.
                 </td>
             </tr>
-            <tr th:if="${@com.keybox.manage.util.SSHUtil@keyManagementEnabled}">
+            <tr th:if="${@io.bastillion.manage.util.SSHUtil@keyManagementEnabled}">
 
                 <td th:if="${#strings.equals(session.userType,'M')}">
                     <a th:href="'../manage/viewKeys.ktrl?_csrf=' + ${session._csrf}">Manage SSH Keys</a>
@@ -122,7 +122,7 @@
                     Set additional public SSH keys for current user.
                 </td>
             </tr>
-            <tr th:if="${@com.keybox.manage.util.SessionOutputUtil@enableInternalAudit &&  #strings.equals(session.userType,'M')}">
+            <tr th:if="${@io.bastillion.manage.util.SessionOutputUtil@enableInternalAudit &&  #strings.equals(session.userType,'M')}">
                 <td>
                     <a th:href="'../manage/viewSessions.ktrl?_csrf=' + ${session._csrf}">Audit Sessions</a>
                 </td>

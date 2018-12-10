@@ -30,9 +30,9 @@
 
         <div class="navbar-header">
             <div class="navbar-brand">
-                <div class="nav-img"><img src="/img/keybox_40x40.png" th:src="@{/img/keybox_40x40.png}" alt="keybox"/>
+                <div class="nav-img"><img src="/img/bastillion_40x40.png" th:src="@{/img/bastillion_40x40.png}" alt="bastillion"/>
                 </div>
-                KeyBox
+                Bastillion
             </div>
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                 <span class="sr-only">Toggle navigation</span>
@@ -57,7 +57,7 @@
                             <li><a th:href="'../manage/viewUsers.ktrl?_csrf=' + ${session._csrf}">Users</a></li>
 
                         </template>
-                        <template th:if="${@com.keybox.manage.util.SSHUtil@keyManagementEnabled}" th:remove="tag">
+                        <template th:if="${@io.bastillion.manage.util.SSHUtil@keyManagementEnabled}" th:remove="tag">
                             <li th:if="${#strings.equals(session.userType,'M')}">
                                 <a th:href="'../manage/viewKeys.ktrl?_csrf=' + ${session._csrf}">Manage SSH Keys</a>
                             </li>
@@ -80,7 +80,7 @@
                 </li>
 
 
-                <li th:if="${@com.keybox.manage.util.SessionOutputUtil@enableInternalAudit &&  #strings.equals(session.userType,'M')}">
+                <li th:if="${@io.bastillion.manage.util.SessionOutputUtil@enableInternalAudit &&  #strings.equals(session.userType,'M')}">
                     <a th:href="'../manage/viewSessions.ktrl?_csrf=' + ${session._csrf}">Audit Sessions</a>
                 </li>
             </ul>

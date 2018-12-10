@@ -1,1 +1,1 @@
-KeyBox - Version: ${version}
+Bastillion - Version: ${version}

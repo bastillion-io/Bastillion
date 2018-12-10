@@ -1,39 +1,24 @@
-KeyBox
+Bastillion
 ======
-KeyBox is a web-based SSH console that centrally manages administrative access to systems. Web-based administration is combined with management and distribution of user's public SSH keys. Key management and administration is based on profiles assigned to defined users.
+Bastillion is a web-based SSH console that centrally manages administrative access to systems. Web-based administration is combined with management and distribution of user's public SSH keys. Key management and administration is based on profiles assigned to defined users.
 
 Administrators can login using two-factor authentication with [FreeOTP](https://freeotp.github.io/) or [Google Authenticator](https://github.com/google/google-authenticator). From there they can manage their public SSH keys or connect to their systems through a web-shell. Commands can be shared across shells to make patching easier and eliminate redundant command execution.
 
-KeyBox layers TLS/SSL on top of SSH and acts as a bastion host for administration. Protocols are stacked (TLS/SSL + SSH) so infrastructure cannot be exposed through tunneling / port forwarding. More details can be found in the following whitepaper: [Implementing a Trusted Third-Party System for Secure Shell](https://www.sshkeybox.com/docs/using/whitepaper). Also, SSH key management is enabled by default to prevent unmanaged public keys and enforce best practices.
+Bastillion layers TLS/SSL on top of SSH and acts as a bastion host for administration. Protocols are stacked (TLS/SSL + SSH) so infrastructure cannot be exposed through tunneling / port forwarding. More details can be found in the following whitepaper: [Implementing a Trusted Third-Party System for Secure Shell](https://www.bastillion.io/docs/using/whitepaper). Also, SSH key management is enabled by default to prevent unmanaged public keys and enforce best practices.
 
-![Terminals](https://www.sshkeybox.com/images/screenshots/medium/terminals.png)
+![Terminals](https://www.bastillion.io/images/screenshots/medium/terminals.png)
 
-AMI in the AWS Marketplace
+Bastillion Releases
 ------
-If you are using AWS, the simplest way to get started is to run the AMI from the AWS Marketplace.
-
-http://aws.amazon.com/marketplace/pp/B076PNFPCL
-
-Once the KeyBox instance is up and running, open your browser to https://\<EC2 Instance IP\>:443
-
-Login with 
-
-	username:admin 
-	password:<Instance ID>
-	
-In order to help register new EC2 instances, the KeyBox public can be found under 'Settings -> Public Key' and should be imported as an EC2 Key Pair in the AWS console.
-
-KeyBox Releases
-------
-This software is free for non-commercial use under the AGPL licence!
-
 Commercial users can purchase a license through an annual subscription and access the binary releases. 
 
-https://www.sshkeybox.com/subscription
+https://www.bastillion.io/subscription
 
 Also, users can purchase through the AWS Marketplace.
 
-Feel free to try out KeyBox using the build instructions below!
+Feel free to try out Bastillion for a limited amount of users(6) or systems(12)!
+
+https://github.com/bastillion-io/Bastillion/releases
 
 Prerequisites
 -------------
@@ -49,7 +34,7 @@ Prerequisites
 
 **Loophole MVC**  *(Only needed if building from source)*
 
-> https://github.com/skavanagh/lmvc
+> https://github.com/bastillion-io/lmvc
 
 **Install [FreeOTP](https://freeotp.github.io/) or [Google Authenticator](https://github.com/google/google-authenticator)** to enable two-factor authentication with Android or iOS
 
@@ -72,7 +57,7 @@ In the directory that contains the pom.xml run
 
 *Note: Doing a mvn clean will delete the H2 DB and wipe out all the data.*
 
-Using KeyBox
+Using Bastillion
 ------
 Open browser to https://\<whatever ip\>:8443
 
@@ -97,24 +82,24 @@ Steps:
 
 Managing SSH Keys
 ------
-By default KeyBox will overwrite all values in the specified authorized_keys file for a system.  You can disable key management by editing KeyBoxConfig.properties file and use KeyBox only as a bastion host.  This file is located in the jetty/keybox/WEB-INF/classes directory. (or the src/main/resources directory if building from source)
+By default Bastillion will overwrite all values in the specified authorized_keys file for a system.  You can disable key management by editing BastillionConfig.properties file and use Bastillion only as a bastion host.  This file is located in the jetty/bastillion/WEB-INF/classes directory. (or the src/main/resources directory if building from source)
 
-	#set to false to disable key management. If false, the KeyBox public key will be appended to the authorized_keys file (instead of it being overwritten completely).
+	#set to false to disable key management. If false, the Bastillion public key will be appended to the authorized_keys file (instead of it being overwritten completely).
 	keyManagementEnabled=false
 
-Also, the authorized_keys file is updated/refreshed periodically based on the relationships defined in the application.  If key management is enabled the refresh interval can be specified in the KeyBoxConfig.properties file.
+Also, the authorized_keys file is updated/refreshed periodically based on the relationships defined in the application.  If key management is enabled the refresh interval can be specified in the BastillionConfig.properties file.
 
 	#authorized_keys refresh interval in minutes (no refresh for <=0)
 	authKeysRefreshInterval=120
 
-By default KeyBox will generated and distribute the SSH keys managed by administrators while having them download the generated private. This forces admins to use strong passphrases for keys that are set on systems.  The private key is only available for download once and is not stored on the application side.  To disable and allow administrators to set any public key edit the KeyBoxConfig.properties.
+By default Bastillion will generated and distribute the SSH keys managed by administrators while having them download the generated private. This forces admins to use strong passphrases for keys that are set on systems.  The private key is only available for download once and is not stored on the application side.  To disable and allow administrators to set any public key edit the BastillionConfig.properties.
 
 	#set to true to generate keys when added/managed by users and enforce strong passphrases set to false to allow users to set their own public key
 	forceUserKeyGeneration=false
 
 Supplying a Custom SSH Key Pair
 ------
-KeyBox generates its own public/private SSH key upon initial startup for use when registering systems.  You can specify a custom SSH key pair in the KeyBoxConfig.properties file.
+Bastillion generates its own public/private SSH key upon initial startup for use when registering systems.  You can specify a custom SSH key pair in the BastillionConfig.properties file.
 
 For example:
 
@@ -140,22 +125,22 @@ Adjusting Database Settings
 Database settings can be adjusted in the configuration properties.
 
     #Database user
-    dbUser=keybox
+    dbUser=bastillion
     #Database password
     dbPassword=p@$$w0rd!!
     #Database JDBC driver
     dbDriver=org.h2.Driver
     #Connection URL to the DB
-    dbConnectionURL=jdbc:h2:keydb/keybox;CIPHER=AES;
+    dbConnectionURL=jdbc:h2:keydb/bastillion;CIPHER=AES;
 
 By default the datastore is set as embedded, but a remote H2 database can supported through adjusting the connection URL.
 
     #Connection URL to the DB
-	dbConnectionURL=jdbc:h2:tcp://<host>:<port>/~/keybox;CIPHER=AES;
+	dbConnectionURL=jdbc:h2:tcp://<host>:<port>/~/bastillion;CIPHER=AES;
 
 External Authentication
 ------
-External Authentication can be enabled through the KeyBoxConfig.properties.
+External Authentication can be enabled through the BastillionConfig.properties.
 
 For example:
 
@@ -166,7 +151,7 @@ Connection details need to be set in the jaas.conf file
 
     ldap-ol {
     	com.sun.security.auth.module.LdapLoginModule SUFFICIENT
-    	userProvider="ldap://hostname:389/ou=example,dc=keybox,dc=com"
+    	userProvider="ldap://hostname:389/ou=example,dc=bastillion,dc=com"
     	userFilter="(&(uid={USERNAME})(objectClass=inetOrgPerson))"
     	authzIdentity="{cn}"
     	useSSL=false
@@ -176,7 +161,7 @@ Connection details need to be set in the jaas.conf file
 
 Administrators will be added as they are authenticated and profiles of systems may be assigned by full-privileged users.
 
-User LDAP roles can be mapped to profiles defined in KeyBox through the use of the org.eclipse.jetty.jaas.spi.LdapLoginModule.
+User LDAP roles can be mapped to profiles defined in Bastillion through the use of the org.eclipse.jetty.jaas.spi.LdapLoginModule.
 
     ldap-ol-with-roles {
         //openldap auth with roles that can map to profiles
@@ -190,12 +175,12 @@ User LDAP roles can be mapped to profiles defined in KeyBox through the use of t
         bindPassword="<BIND-DN PASSWORD>"
         authenticationMethod="simple"
         forceBindingLogin="true"
-        userBaseDn="ou=users,dc=keybox,dc=com"
+        userBaseDn="ou=users,dc=bastillion,dc=com"
         userRdnAttribute="uid"
         userIdAttribute="uid"
         userPasswordAttribute="userPassword"
         userObjectClass="inetOrgPerson"
-        roleBaseDn="ou=groups,dc=keybox,dc=com"
+        roleBaseDn="ou=groups,dc=bastillion,dc=com"
         roleNameAttribute="cn"
         roleMemberAttribute="member"
         roleObjectClass="groupOfNames";
@@ -205,26 +190,26 @@ Users will be added/removed from defined profiles as they login and when the rol
 
 Auditing
 ------
-Auditing is disabled by default and is only a proof of concept.  Can be enabled in the KeyBoxConfig.properties.
+Auditing is disabled by default and is only a proof of concept.  Can be enabled in the BastillionConfig.properties.
 
 	#enable audit  --set to true to enable
 	enableInternalAudit=true
 
 Screenshots
 -----------
-![Login](https://www.sshkeybox.com/images/screenshots/medium/login.png)
+![Login](https://www.bastillion.io/images/screenshots/medium/login.png)
 
-![Two-Factor](https://www.sshkeybox.com/images/screenshots/medium/two-factor.png)
+![Two-Factor](https://www.bastillion.io/images/screenshots/medium/two-factor.png)
 
-![More Terminals](https://www.sshkeybox.com/images/screenshots/medium/terminals.png)
+![More Terminals](https://www.bastillion.io/images/screenshots/medium/terminals.png)
 
-![Manage Systems](https://www.sshkeybox.com/images/screenshots/medium/manage_systems.png)
+![Manage Systems](https://www.bastillion.io/images/screenshots/medium/manage_systems.png)
 
-![Manage Users](https://www.sshkeybox.com/images/screenshots/medium/manage_users.png)
+![Manage Users](https://www.bastillion.io/images/screenshots/medium/manage_users.png)
 
-![Define SSH Keys](https://www.sshkeybox.com/images/screenshots/medium/manage_keys.png)
+![Define SSH Keys](https://www.bastillion.io/images/screenshots/medium/manage_keys.png)
 
-![Disable SSH Keys](https://www.sshkeybox.com/images/screenshots/medium/disable_keys.png)
+![Disable SSH Keys](https://www.bastillion.io/images/screenshots/medium/disable_keys.png)
 
 Acknowledgments
 ------
@@ -237,11 +222,11 @@ Third-party dependencies are mentioned in the [_3rdPartyLicenses.md_](3rdPartyLi
 
 Dual License
 -----------
-KeyBox is available for non-commercial use under the Affero General Public License
+Bastillion is available for non-commercial use under the Affero General Public License
 
 A commercial license is also available through a subscription
 
-https://www.sshkeybox.com/subscription
+https://www.bastillion.io/subscription
 
 or when running an AMI from the AWS marketplace.
 
