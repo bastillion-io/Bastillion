@@ -41,7 +41,37 @@ Prerequisites
 |----------------------|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
 | FreeOTP              | [Google Play](https://play.google.com/store/apps/details?id=org.fedorahosted.freeotp)               | [iTunes](https://itunes.apple.com/us/app/freeotp/id872559395)              |
 | Google Authenticator | [Google Play](https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2) | [iTunes](https://itunes.apple.com/us/app/google-authenticator/id388497605) |
-    
+
+To Run Bundled with Jetty
+------
+Download keybox-jetty-vXX.XX.tar.gz
+
+https://github.com/bastillion-io/Bastillion/releases
+
+Export environment variables
+
+for Linux/Unix/OSX
+
+     export JAVA_HOME=/path/to/jdk
+     export PATH=$JAVA_HOME/bin:$PATH
+
+for Windows
+
+     set JAVA_HOME=C:\path\to\jdk
+     set PATH=%JAVA_HOME%\bin;%PATH%
+
+Start KeyBox
+
+for Linux/Unix/OSX
+
+        ./startBastillion.sh
+
+for Windows
+
+        startBastillion.bat
+	
+More Documentation at: https://www.bastillion.io/docs/index.html
+	
 Build from Source
 ------
 Export environment variables
@@ -66,18 +96,6 @@ Login with
 	password:changeme
 	
 *Note: When using the AMI instance, the password is defaulted to the \<Instance ID\>. Also, the AMI uses port 443 as in https://\<Instance IP\>:443*
-
-Steps:
-
-1. Create systems
-2. Create profiles
-3. Assign systems to profile
-4. Assign profiles to users
-5. Users can login to create sessions on assigned systems
-6. Start a composite SSH session or create and execute a script across multiple sessions
-7. Add additional public keys to systems
-8. Disable any administrative public key forcing key rotation.
-9. Audit session history
 
 Managing SSH Keys
 ------
