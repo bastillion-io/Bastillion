@@ -60,7 +60,7 @@ for Windows
      set JAVA_HOME=C:\path\to\jdk
      set PATH=%JAVA_HOME%\bin;%PATH%
 
-Start KeyBox
+Start Bastillion
 
 for Linux/Unix/OSX
 
