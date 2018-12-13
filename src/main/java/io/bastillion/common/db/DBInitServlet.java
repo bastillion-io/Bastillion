@@ -28,11 +28,9 @@
 package io.bastillion.common.db;
 
 import io.bastillion.common.util.AppConfig;
+import io.bastillion.manage.db.LicenseDB;
 import io.bastillion.manage.model.Auth;
-import io.bastillion.manage.util.DBUtils;
-import io.bastillion.manage.util.EncryptionUtil;
-import io.bastillion.manage.util.RefreshAuthKeyUtil;
-import io.bastillion.manage.util.SSHUtil;
+import io.bastillion.manage.util.*;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -147,6 +145,7 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 					if(StringUtils.isNotEmpty(str)) {
 						defaultPassword = EncryptionUtil.hash(str.trim() + salt);
 					}
+					LicenseDB.saveLicense(LicenseUtil.generateForEC2());
 				}
 				//insert default admin user
 				PreparedStatement pStmt = connection.prepareStatement("insert into users (username, password, user_type, salt) values(?,?,?,?)");

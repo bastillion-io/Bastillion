@@ -7,6 +7,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class LicenseUtil {
 
@@ -54,6 +55,7 @@ public class LicenseUtil {
 
 	/**
 	 * returns the license expiration
+	 *
 	 * @param license encrypted license string
 	 * @return license expiration
 	 */
@@ -70,4 +72,19 @@ public class LicenseUtil {
 		}
 		return null;
 	}
+
+	/**
+	 * returns the license for running in ec2
+	 *
+	 * @return license text
+	 */
+	public static String generateForEC2() {
+		Calendar cal = new GregorianCalendar();
+		cal.add(Calendar.YEAR, 50);
+		SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
+
+		return EncryptionUtil.encrypt(k, "ec2@bastillion.io-" + sdf.format(cal.getTime()));
+
+	}
+
 }
