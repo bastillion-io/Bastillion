@@ -4,14 +4,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.bastillion</groupId>
     <artifactId>bastillion</artifactId>
-    <version>3.05.01-SNAPSHOT</version>
+    <version>3.05.01</version>
     <packaging>war</packaging>
     <name>Bastillion</name>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.9</maven.compiler.source>
         <maven.compiler.target>1.9</maven.compiler.target>
-        <jetty-version>9.4.12.v20180830</jetty-version>
+        <jetty-version>9.4.14.v20181114</jetty-version>
     </properties>
     <dependencies>
         <dependency>
