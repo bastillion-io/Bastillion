@@ -26,15 +26,6 @@ Prerequisites
 *apt-get install openjdk-9-jdk*
 > http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
-**Maven 3 or greater**  *(Only needed if building from source)*
-
-*apt-get install maven* 
-> http://maven.apache.org 
-
-**Loophole MVC**  *(Only needed if building from source)*
-
-> https://github.com/bastillion-io/lmvc
-
 **Install [FreeOTP](https://freeotp.github.io/) or [Google Authenticator](https://github.com/google/google-authenticator)** to enable two-factor authentication with Android or iOS
 
 | Application          | Android                                                                                             | iOS                                                                        |             
@@ -74,6 +65,15 @@ More Documentation at: https://www.bastillion.io/docs/index.html
 	
 Build from Source
 ------
+Install Maven 3 or greater
+
+*apt-get install maven* 
+> http://maven.apache.org 
+
+Install Loophole MVC
+
+> https://github.com/bastillion-io/lmvc
+
 Export environment variables
 
     export JAVA_HOME=/path/to/jdk
