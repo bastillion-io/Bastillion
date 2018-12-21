@@ -15,9 +15,13 @@ Commercial users can purchase a license through an annual subscription and acces
 
 https://www.bastillion.io/subscription
 
-Feel free to try out Bastillion for a limited amount of users(6) or systems(12)!
+Feel free to download and try out Bastillion for a limited amount of users(6) or systems(12)
 
 https://github.com/bastillion-io/Bastillion/releases
+
+or try our web-shell demo!
+
+http://demo.bastillion.io
 
 Prerequisites
 -------------
