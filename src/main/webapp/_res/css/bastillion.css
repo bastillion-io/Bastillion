@@ -198,7 +198,6 @@ div.termwrapper div h6 {
     border-radius: 4px;
     margin-top: 5px;
     float: left;
-    width: 50%;
 }
 
 .term {
@@ -222,6 +221,7 @@ div.termwrapper div h6 {
 }
 
 .output {
+    margin: 5px;
     z-index: 100;
 }
 
