@@ -250,16 +250,19 @@
                 var id = element.attr("id").replace("run_cmd_", "");
 
                 if (termMap[id]) {
-                    var width = Math.floor($('#run_cmd_' + id).find(".output:first").innerWidth() - 10);
+                    var width = Math.floor($('#run_cmd_' + id).find(".output:first").innerWidth() - 20);
                     var height = Math.floor($('#run_cmd_' + id).innerHeight() - y_offset);
 
-                    //termMap[id].resize(Math.floor(width / 7.2981), Math.floor(height / 14.4166) - 2);
-                    fit.fit(termMap[id]);
+                    termMap[id].resize(Math.floor(width / 7.2981), Math.floor(height / 16.0166));
+
+
+
                     $.ajax({
                         url: '../admin/setPtyType.ktrl?id=' + id + '&userSettings.ptyWidth=' + width + '&userSettings.ptyHeight=' + height + '&_csrf=' + [[${session._csrf}]],
                         cache: false
                     });
                 }
+
             }
 
             var loc = window.location, ws_uri;
@@ -298,23 +301,41 @@
             function createTermMap(id, output) {
 
                 termMap[id] = new Terminal({
-                    [# th:if= "${userSettings !=null && userSettings.colors != null && userSettings.colors.length == 16}"]
-                colors: [   [# th:each = "c,iter: ${userSettings.colors}" ]
-                                [[${c}]][# th:if= "${iter.index < 16}"] , [/]
-                            [/]
-                        ],
+                    fontSize: 13,
+                    fontFamily: 'DejaVu Sans Mono, Liberation Mono, monospace'
+                });
+
+                var  CUSTOM_THEME =
+                    {
+                    [# th:if= "${userSettings != null && userSettings.bg != null}"]
+                        background: [[${userSettings.bg}]],
                     [/]
-                    fontSize: 13
-            });
+                    [# th:if= "${userSettings != null && userSettings.bg != null}"]
+                        foreground: [[${userSettings.fg}]],
+                        cursor: [[${userSettings.fg}]],
+                        cursorAccent: [[${userSettings.fg}]],
+                    [/]
+                    [# th:if= "${userSettings !=null && userSettings.colors != null && userSettings.colors.length == 16}"]
+                        black: [[${userSettings.colors[0]}]],
+                        red: [[${userSettings.colors[1]}]],
+                        green: [[${userSettings.colors[2]}]],
+                        yellow: [[${userSettings.colors[3]}]],
+                        blue: [[${userSettings.colors[4]}]],
+                        magenta: [[${userSettings.colors[5]}]],
+                        cyan: [[${userSettings.colors[6]}]],
+                        white: [[${userSettings.colors[7]}]],
+                        brightBlack: [[${userSettings.colors[8]}]],
+                        brightRed: [[${userSettings.colors[9]}]],
+                        brightGreen: [[${userSettings.colors[10]}]],
+                        brightYellow: [[${userSettings.colors[11]}]],
+                        brightBlue: [[${userSettings.colors[12]}]],
+                        brightMagenta: [[${userSettings.colors[13]}]],
+                        brightCyan: [[${userSettings.colors[14]}]],
+                        brightWhite: [[${userSettings.colors[15]}]]
+                    [/]
+                    };
 
-                [# th:if= "${userSettings != null && userSettings.bg != null}"]
-                termMap[id].colors = {background: [[${userSettings.bg}]] };
-                [/]
-
-                [# th:if= "${userSettings != null && userSettings.bg != null}"]
-                termMap[id].colors = {foreground: [[${userSettings.fg}]] };
-                [/]
-
+                termMap[id].setOption('theme', CUSTOM_THEME);
                 termMap[id].open($("#run_cmd_" + id).find('.output').get(0));
 
                 resize($("#run_cmd_" + id));
@@ -531,6 +552,9 @@
             width: 100%;
             padding: 10px 0;
             margin: 0;
+        }
+        .term {
+            background: [[${userSettings.bg}]];
         }
 
     </style>

@@ -198,6 +198,7 @@ div.termwrapper div h6 {
     border-radius: 4px;
     margin-top: 5px;
     float: left;
+    width: 50%;
 }
 
 .term {
@@ -229,7 +230,6 @@ div.termwrapper div h6 {
     font-family: "DejaVu Sans Mono", "Liberation Mono", monospace;
     font-size: 12px;
     color: #000;
-    background: #f0f0f0;
     line-height: 1.231;
 }
 
@@ -363,4 +363,7 @@ table.floatThead-table {
 }
 .invisible {
     visibility: hidden;
+}
+.xterm-viewport {
+    overflow: hidden !important;
 }
