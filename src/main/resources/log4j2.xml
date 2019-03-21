@@ -22,7 +22,7 @@
 
     <Loggers>
         <!-- System audit example using logstash
-        <Logger name="io.bastillionlion.manage.util.SystemAudit" level="info" additivity="false">
+        <Logger name="io.bastillion.manage.util.SystemAudit" level="info" additivity="false">
             <AppenderRef ref="logstash-socket-appender"/>
         </Logger>
         -->

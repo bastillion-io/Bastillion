@@ -11,7 +11,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.9</maven.compiler.source>
         <maven.compiler.target>1.9</maven.compiler.target>
-        <jetty-version>9.4.14.v20181114</jetty-version>
+        <jetty-version>9.4.15.v20190215</jetty-version>
     </properties>
     <dependencies>
         <dependency>
@@ -22,7 +22,7 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.4.197</version>
+            <version>1.4.199</version>
         </dependency>
         <dependency>
             <groupId>com.jcraft</groupId>

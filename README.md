@@ -3,7 +3,7 @@ Bastillion
 ======
 Bastillion is a web-based SSH console that centrally manages administrative access to systems. Web-based administration is combined with management and distribution of user's public SSH keys. Key management and administration is based on profiles assigned to defined users.
 
-Administrators can login using two-factor authentication with [FreeOTP](https://freeotp.github.io/) or [Google Authenticator](https://github.com/google/google-authenticator). From there they can manage their public SSH keys or connect to their systems through a web-shell. Commands can be shared across shells to make patching easier and eliminate redundant command execution.
+Administrators can login using two-factor authentication with [Authy](https://authy.com/) or [Google Authenticator](https://github.com/google/google-authenticator). From there they can manage their public SSH keys or connect to their systems through a web-shell. Commands can be shared across shells to make patching easier and eliminate redundant command execution.
 
 Bastillion layers TLS/SSL on top of SSH and acts as a bastion host for administration. Protocols are stacked (TLS/SSL + SSH) so infrastructure cannot be exposed through tunneling / port forwarding. More details can be found in the following whitepaper: [Implementing a Trusted Third-Party System for Secure Shell](https://www.bastillion.io/docs/using/whitepaper). Also, SSH key management is enabled by default to prevent unmanaged public keys and enforce best practices.
 
@@ -30,11 +30,11 @@ Prerequisites
 *apt-get install openjdk-9-jdk*
 > http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
-**Install [FreeOTP](https://freeotp.github.io/) or [Google Authenticator](https://github.com/google/google-authenticator)** to enable two-factor authentication with Android or iOS
+**Install [Authy](https://authy.com/) or [Google Authenticator](https://github.com/google/google-authenticator)** to enable two-factor authentication with Android or iOS
 
 | Application          | Android                                                                                             | iOS                                                                        |             
 |----------------------|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
-| FreeOTP              | [Google Play](https://play.google.com/store/apps/details?id=org.fedorahosted.freeotp)               | [iTunes](https://itunes.apple.com/us/app/freeotp/id872559395)              |
+| Authy                | [Google Play](https://play.google.com/store/apps/details?id=com.authy.authy)                        | [iTunes](https://itunes.apple.com/us/app/authy/id494168017)                |
 | Google Authenticator | [Google Play](https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2) | [iTunes](https://itunes.apple.com/us/app/google-authenticator/id388497605) |
 
 To Run Bundled with Jetty
