@@ -366,7 +366,7 @@ var Buffer = (function () {
             this.scrollTop = 0;
         }
         this.scrollBottom = newRows - 1;
-        if (this._hasScrollback) {
+        if (this._isReflowEnabled) {
             this._reflow(newCols, newRows);
             if (this._cols > newCols) {
                 for (var i = 0; i < this.lines.length; i++) {
@@ -377,33 +377,40 @@ var Buffer = (function () {
         this._cols = newCols;
         this._rows = newRows;
     };
+    Object.defineProperty(Buffer.prototype, "_isReflowEnabled", {
+        get: function () {
+            return this._hasScrollback && !this._terminal.isWinptyCompatEnabled;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Buffer.prototype._reflow = function (newCols, newRows) {
         if (this._cols === newCols) {
             return;
         }
         if (newCols > this._cols) {
-            this._reflowLarger(newCols);
+            this._reflowLarger(newCols, newRows);
         }
         else {
             this._reflowSmaller(newCols, newRows);
         }
     };
-    Buffer.prototype._reflowLarger = function (newCols) {
+    Buffer.prototype._reflowLarger = function (newCols, newRows) {
         var toRemove = BufferReflow_1.reflowLargerGetLinesToRemove(this.lines, newCols, this.ybase + this.y);
         if (toRemove.length > 0) {
             var newLayoutResult = BufferReflow_1.reflowLargerCreateNewLayout(this.lines, toRemove);
             BufferReflow_1.reflowLargerApplyNewLayout(this.lines, newLayoutResult.layout);
-            this._reflowLargerAdjustViewport(newCols, newLayoutResult.countRemoved);
+            this._reflowLargerAdjustViewport(newCols, newRows, newLayoutResult.countRemoved);
         }
     };
-    Buffer.prototype._reflowLargerAdjustViewport = function (newCols, countRemoved) {
+    Buffer.prototype._reflowLargerAdjustViewport = function (newCols, newRows, countRemoved) {
         var viewportAdjustments = countRemoved;
         while (viewportAdjustments-- > 0) {
             if (this.ybase === 0) {
                 if (this.y > 0) {
                     this.y--;
                 }
-                if (this.lines.length < this._rows) {
+                if (this.lines.length < newRows) {
                     this.lines.push(new BufferLine_1.BufferLine(newCols, exports.FILL_CHAR_DATA));
                 }
             }
@@ -485,7 +492,7 @@ var Buffer = (function () {
             var viewportAdjustments = linesToAdd - trimmedLines;
             while (viewportAdjustments-- > 0) {
                 if (this.ybase === 0) {
-                    if (this.y < this._rows - 1) {
+                    if (this.y < newRows - 1) {
                         this.y++;
                         this.lines.pop();
                     }
@@ -1393,6 +1400,8 @@ var CompositionHelper = (function () {
             this._compositionView.style.top = cursorTop + 'px';
             this._compositionView.style.height = cellHeight + 'px';
             this._compositionView.style.lineHeight = cellHeight + 'px';
+            this._compositionView.style.fontFamily = this._terminal.options.fontFamily;
+            this._compositionView.style.fontSize = this._terminal.options.fontSize + 'px';
             var compositionViewBounds = this._compositionView.getBoundingClientRect();
             this._textarea.style.left = cursorLeft + 'px';
             this._textarea.style.top = cursorTop + 'px';
@@ -2660,7 +2669,9 @@ var InputHandler = (function (_super) {
                     if (this._terminal.element) {
                         this._terminal.element.classList.add('enable-mouse-events');
                     }
-                    this._terminal.selectionManager.disable();
+                    if (this._terminal.selectionManager) {
+                        this._terminal.selectionManager.disable();
+                    }
                     this._terminal.log('Binding to mouse events.');
                     break;
                 case 1004:
@@ -2751,7 +2762,9 @@ var InputHandler = (function (_super) {
                     if (this._terminal.element) {
                         this._terminal.element.classList.remove('enable-mouse-events');
                     }
-                    this._terminal.selectionManager.enable();
+                    if (this._terminal.selectionManager) {
+                        this._terminal.selectionManager.enable();
+                    }
                     break;
                 case 1004:
                     this._terminal.sendFocus = false;
@@ -4016,7 +4029,7 @@ var Keyboard_1 = require("./core/input/Keyboard");
 var Clone_1 = require("./common/Clone");
 var document = (typeof window !== 'undefined') ? window.document : null;
 var WRITE_BUFFER_PAUSE_THRESHOLD = 5;
-var WRITE_BATCH_SIZE = 300;
+var WRITE_TIMEOUT_MS = 12;
 var MINIMUM_COLS = 2;
 var MINIMUM_ROWS = 1;
 var CONSTRUCTOR_ONLY_OPTIONS = ['cols', 'rows'];
@@ -4449,6 +4462,12 @@ var Terminal = (function (_super) {
         this.register(Lifecycle_1.addDisposableDomListener(this._viewportElement, 'scroll', function () { return _this.selectionManager.refresh(); }));
         this.mouseHelper = new MouseHelper_1.MouseHelper(this.renderer);
         this.element.classList.toggle('enable-mouse-events', this.mouseEvents);
+        if (this.mouseEvents) {
+            this.selectionManager.disable();
+        }
+        else {
+            this.selectionManager.enable();
+        }
         if (this.options.screenReaderMode) {
             this._accessibilityManager = new AccessibilityManager_1.AccessibilityManager(this);
         }
@@ -4852,15 +4871,17 @@ var Terminal = (function (_super) {
             });
         }
     };
-    Terminal.prototype._innerWrite = function () {
+    Terminal.prototype._innerWrite = function (bufferOffset) {
         var _this = this;
+        if (bufferOffset === void 0) { bufferOffset = 0; }
         if (this._isDisposed) {
             this.writeBuffer = [];
         }
-        var writeBatch = this.writeBuffer.splice(0, WRITE_BATCH_SIZE);
-        while (writeBatch.length > 0) {
-            var data = writeBatch.shift();
-            if (this._xoffSentToCatchUp && writeBatch.length === 0 && this.writeBuffer.length === 0) {
+        var startTime = Date.now();
+        while (this.writeBuffer.length > bufferOffset) {
+            var data = this.writeBuffer[bufferOffset];
+            bufferOffset++;
+            if (this._xoffSentToCatchUp && this.writeBuffer.length === bufferOffset) {
                 this.handler(EscapeSequences_1.C0.DC1);
                 this._xoffSentToCatchUp = false;
             }
@@ -4869,12 +4890,16 @@ var Terminal = (function (_super) {
             this._inputHandler.parse(data);
             this.updateRange(this.buffer.y);
             this.refresh(this._refreshStart, this._refreshEnd);
+            if (Date.now() - startTime >= WRITE_TIMEOUT_MS) {
+                break;
+            }
         }
-        if (this.writeBuffer.length > 0) {
-            setTimeout(function () { return _this._innerWrite(); }, 0);
+        if (this.writeBuffer.length > bufferOffset) {
+            setTimeout(function () { return _this._innerWrite(bufferOffset); }, 0);
         }
         else {
             this._writeInProgress = false;
+            this.writeBuffer = [];
         }
     };
     Terminal.prototype.writeln = function (data) {
@@ -6833,7 +6858,7 @@ var BaseRenderLayer = (function () {
         this._ctx.font = this._getFont(terminal, false, false);
         this._ctx.textBaseline = 'middle';
         this._clipRow(terminal, y);
-        this._ctx.fillText(charData[Buffer_1.CHAR_DATA_CHAR_INDEX], x * this._scaledCellWidth + this._scaledCharLeft, (y + 0.5) * this._scaledCellHeight + this._scaledCharTop);
+        this._ctx.fillText(charData[Buffer_1.CHAR_DATA_CHAR_INDEX], x * this._scaledCellWidth + this._scaledCharLeft, y * this._scaledCellHeight + this._scaledCharTop + this._scaledCharHeight / 2);
     };
     BaseRenderLayer.prototype.drawChars = function (terminal, chars, code, width, x, y, fg, bg, bold, dim, italic) {
         var drawInBrightColor = terminal.options.drawBoldTextInBrightColors && bold && fg < 8 && fg !== Types_1.INVERTED_DEFAULT_COLOR;
@@ -6867,7 +6892,7 @@ var BaseRenderLayer = (function () {
         if (dim) {
             this._ctx.globalAlpha = Types_1.DIM_OPACITY;
         }
-        this._ctx.fillText(chars, x * this._scaledCellWidth + this._scaledCharLeft, (y + 0.5) * this._scaledCellHeight + this._scaledCharTop);
+        this._ctx.fillText(chars, x * this._scaledCellWidth + this._scaledCharLeft, y * this._scaledCellHeight + this._scaledCharTop + this._scaledCharHeight / 2);
         this._ctx.restore();
     };
     BaseRenderLayer.prototype._clipRow = function (terminal, y) {
@@ -7640,7 +7665,7 @@ var Renderer = (function (_super) {
         _this._screenDprMonitor.setListener(function () { return _this.onWindowResize(window.devicePixelRatio); });
         _this.register(_this._screenDprMonitor);
         if ('IntersectionObserver' in window) {
-            var observer_1 = new IntersectionObserver(function (e) { return _this.onIntersectionChange(e[0]); }, { threshold: 0 });
+            var observer_1 = new IntersectionObserver(function (e) { return _this.onIntersectionChange(e[e.length - 1]); }, { threshold: 0 });
             observer_1.observe(_this._terminal.element);
             _this.register({ dispose: function () { return observer_1.disconnect(); } });
         }
@@ -7818,6 +7843,7 @@ var SelectionRenderLayer = (function (_super) {
         }
         this.clearAll();
         if (!start || !end) {
+            this._clearState();
             return;
         }
         var viewportStartRow = start[1] - terminal.buffer.ydisp;
@@ -9344,6 +9370,7 @@ var MouseZoneManager = (function (_super) {
         _this._lastHoverCoords = [null, null];
         _this.register(Lifecycle_2.addDisposableDomListener(_this._terminal.element, 'mousedown', function (e) { return _this._onMouseDown(e); }));
         _this._mouseMoveListener = function (e) { return _this._onMouseMove(e); };
+        _this._mouseLeaveListener = function (e) { return _this._onMouseLeave(e); };
         _this._clickListener = function (e) { return _this._onClick(e); };
         return _this;
     }
@@ -9385,6 +9412,7 @@ var MouseZoneManager = (function (_super) {
         if (!this._areZonesActive) {
             this._areZonesActive = true;
             this._terminal.element.addEventListener('mousemove', this._mouseMoveListener);
+            this._terminal.element.addEventListener('mouseleave', this._mouseLeaveListener);
             this._terminal.element.addEventListener('click', this._clickListener);
         }
     };
@@ -9392,6 +9420,7 @@ var MouseZoneManager = (function (_super) {
         if (this._areZonesActive) {
             this._areZonesActive = false;
             this._terminal.element.removeEventListener('mousemove', this._mouseMoveListener);
+            this._terminal.element.removeEventListener('mouseleave', this._mouseLeaveListener);
             this._terminal.element.removeEventListener('click', this._clickListener);
         }
     };
@@ -9439,6 +9468,15 @@ var MouseZoneManager = (function (_super) {
             if (zone.willLinkActivate(e)) {
                 e.preventDefault();
                 e.stopImmediatePropagation();
+            }
+        }
+    };
+    MouseZoneManager.prototype._onMouseLeave = function (e) {
+        if (this._currentZone) {
+            this._currentZone.leaveCallback();
+            this._currentZone = null;
+            if (this._tooltipTimeout) {
+                clearTimeout(this._tooltipTimeout);
             }
         }
     };

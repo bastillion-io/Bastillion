@@ -10,6 +10,7 @@ function winptyCompatInit(terminal) {
     if (!isWindows) {
         return;
     }
+    addonTerminal._core.isWinptyCompatEnabled = true;
     addonTerminal.on('linefeed', function () {
         var line = addonTerminal._core.buffer.lines.get(addonTerminal._core.buffer.ybase + addonTerminal._core.buffer.y - 1);
         var lastChar = line.get(addonTerminal.cols - 1);
