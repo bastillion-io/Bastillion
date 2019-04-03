@@ -72,12 +72,12 @@
                     <span class="error" th:text="${fieldErrors.get('auth.password')}"></span>
                 </td>
             </tr>
-            <tr>
+            <tr th:if="${otpEnabled}">
                 <td>
                     <strong>OTP Access Code:</strong>
                 </td>
                 <td>
-                    <input type="text" name="auth.otpToken" title="OTP Access Code" th:if="${otpEnabled}"/>
+                    <input type="text" name="auth.otpToken" title="OTP Access Code"/>
                     <span class="error" th:text="${fieldErrors.get('auth.otpToken')}"></span>
                 </td>
             </tr>
