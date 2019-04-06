@@ -11,9 +11,6 @@ Bastillion layers TLS/SSL on top of SSH and acts as a bastion host for administr
 
 Bastillion Releases
 ------
-Commercial users can purchase a license through an annual subscription and access the binary releases. 
-
-https://www.bastillion.io/subscription
 
 Feel free to download and try out Bastillion for a limited amount of users(6) or systems(12)
 
