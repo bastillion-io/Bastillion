@@ -11,17 +11,14 @@ Bastillion layers TLS/SSL on top of SSH and acts as a bastion host for administr
 
 Bastillion Releases
 ------
-Commercial users can purchase a license through an annual subscription and access the binary releases. 
-
-https://www.bastillion.io/subscription
 
 Feel free to download and try out Bastillion for a limited amount of users(6) or systems(12)
 
 https://github.com/bastillion-io/Bastillion/releases
 
-or try our web-shell demo!
+or purchase a subscription
 
-http://demo.bastillion.io
+https://www.bastillion.io/subscription
 
 Prerequisites
 -------------
@@ -241,17 +238,9 @@ Special thanks goes to these amazing projects which makes this (and other great 
 
 Third-party dependencies are mentioned in the [_3rdPartyLicenses.md_](3rdPartyLicenses.md)
 
-Dual License
+AGPL License
 -----------
 Bastillion is available for non-commercial use under the Affero General Public License
-
-A commercial license is also available through a subscription
-
-https://www.bastillion.io/subscription
-
-or when running an AMI from the AWS marketplace.
-
-http://aws.amazon.com/marketplace/pp/B076PNFPCL
 
 Author
 ------
