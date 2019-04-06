@@ -16,9 +16,9 @@ Feel free to download and try out Bastillion for a limited amount of users(6) or
 
 https://github.com/bastillion-io/Bastillion/releases
 
-or try our web-shell demo!
+or purchase a subscription
 
-http://demo.bastillion.io
+https://www.bastillion.io/subscription
 
 Prerequisites
 -------------
