@@ -139,6 +139,8 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 				//if exists readfile to set default password
 				String salt = EncryptionUtil.generateSalt();
 				String defaultPassword = EncryptionUtil.hash("changeme" + salt);
+
+				//set license if running in EC2
 				File file = new File("/opt/bastillion/instance_id");
 				if (file.exists()) {
 					String str = FileUtils.readFileToString(file, "UTF-8");
@@ -146,6 +148,15 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 						defaultPassword = EncryptionUtil.hash(str.trim() + salt);
 					}
 					LicenseDB.saveLicense(LicenseUtil.generateForEC2());
+				}
+
+				//license key text file
+				file = new File(AppConfig.class.getClassLoader().getResource(".").getPath() + "../../../../LICENSE_KEY.txt");
+				if (file.exists()) {
+					String str = FileUtils.readFileToString(file, "UTF-8");
+					if(StringUtils.isNotEmpty(str)) {
+						LicenseDB.saveLicense(str.trim());
+					}
 				}
 				//insert default admin user
 				PreparedStatement pStmt = connection.prepareStatement("insert into users (username, password, user_type, salt) values(?,?,?,?)");
