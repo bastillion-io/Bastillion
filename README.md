@@ -238,17 +238,9 @@ Special thanks goes to these amazing projects which makes this (and other great 
 
 Third-party dependencies are mentioned in the [_3rdPartyLicenses.md_](3rdPartyLicenses.md)
 
-Dual License
+AGPL License
 -----------
 Bastillion is available for non-commercial use under the Affero General Public License
-
-A commercial license is also available through a subscription
-
-https://www.bastillion.io/subscription
-
-or when running an AMI from the AWS marketplace.
-
-http://aws.amazon.com/marketplace/pp/B076PNFPCL
 
 Author
 ------
