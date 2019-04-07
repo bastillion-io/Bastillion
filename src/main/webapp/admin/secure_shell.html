@@ -236,31 +236,32 @@
 
 
             $("#reset_size").click(function () {
+                resetSize();
+            });
+
+            function resetSize() {
                 var ids = getActiveTermsInstanceIds();
                 for (var i = 0; i < ids.length; i++) {
-                    $("#run_cmd_" + ids[i]).width("48%");
-                    $("#run_cmd_" + ids[i]).height(346 + y_offset);
-                    resize($("#run_cmd_" + ids[i]));
+                    var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+                    $("#output_" + ids[i]).width((w - 125)/2);
+                    $("#output_" + ids[i]).height(346 + y_offset);
+                    resize($("#output_" + ids[i]));
                 }
-
-            });
+            }
 
             //resize element during drag event. Makes call to set pty width and height
             function resize(element) {
-                var id = element.attr("id").replace("run_cmd_", "");
+                var id = element.attr("id").replace("output_", "");
 
                 if (termMap[id]) {
-                    var width = Math.floor($('#run_cmd_' + id).find(".output:first").innerWidth() - 20);
-                    var height = Math.floor($('#run_cmd_' + id).innerHeight() - y_offset);
-
-                    termMap[id].resize(Math.floor(width / 7.2981), Math.floor(height / 16.0166));
-
-
+                    var width = Math.floor($('#output_' + id).innerWidth() - 20);
+                    var height = Math.floor($('#output_' + id).innerHeight() - y_offset);
 
                     $.ajax({
                         url: '../admin/setPtyType.ktrl?id=' + id + '&userSettings.ptyWidth=' + width + '&userSettings.ptyHeight=' + height + '&_csrf=' + [[${session._csrf}]],
                         cache: false
                     });
+                    termMap[id].fit();
                 }
 
             }
@@ -288,18 +289,18 @@
                     if (val.output != '') {
                         if (!termMap[val.instanceId]) {
                             createTermMap(val.instanceId, val.output);
+                            resetSize();
                         } else {
                             termMap[val.instanceId].write(val.output);
                         }
                     }
 
                 });
-
-
             };
 
             function createTermMap(id, output) {
 
+                Terminal.applyAddon(fit);
                 termMap[id] = new Terminal({
                     fontSize: 13,
                     fontFamily: 'DejaVu Sans Mono, Liberation Mono, monospace'
@@ -338,7 +339,6 @@
                 termMap[id].setOption('theme', CUSTOM_THEME);
                 termMap[id].open($("#run_cmd_" + id).find('.output').get(0));
 
-                resize($("#run_cmd_" + id));
 
                 termMap[id].write(output);
 
@@ -450,7 +450,7 @@
                 });
 
                 //set resizable
-                element.resizable({
+                $(".output").resizable({
                     ghost: true,
                     stop: function (event, ui) {
                         resize($(this));
