@@ -345,77 +345,6 @@
 
             }
 
-
-            $('#match_btn').off().click(function () {
-                $('#match_frm').submit();
-            });
-
-            $('#match_frm').submit(function () {
-                runRegExMatch();
-                return false;
-            });
-
-
-            var matchFunction = null;
-
-            function runRegExMatch() {
-
-                if ($('#match_btn').hasClass('btn-success')) {
-                    $('#match_btn').addClass('btn-danger');
-                    $('#match_btn').removeClass('btn-success');
-                    $('#match_btn').text("Stop");
-
-                    matchFunction = setInterval(function () {
-
-                        var termMap = [];
-                        var existingTerms = [];
-                        $(".run_cmd").each(function () {
-                            var matchRegEx = null;
-                            try {
-                                matchRegEx = new RegExp($('#match').val(), 'g');
-                            } catch (ex) {
-                            }
-                            if (matchRegEx != null) {
-                                var attrId = $(this).attr("id");
-                                if (attrId && attrId != '') {
-                                    var id = attrId.replace("run_cmd_", "");
-
-                                    var match = $('#output_' + id + ' > .terminal').text().match(matchRegEx);
-
-                                    if (match != null) {
-                                        termMap.push({id: id, no_matches: match.length});
-                                    }
-                                    existingTerms.push({id: id});
-                                }
-                            }
-                        });
-
-
-                        var sorted = termMap.slice(0).sort(function (a, b) {
-                            return a.no_matches - b.no_matches;
-                        });
-
-
-                        for (var i = 0; i < sorted.length; ++i) {
-                            var termId = sorted[i].id;
-                            $('#run_cmd_' + termId).prependTo('.termwrapper');
-                            if (sorted[sorted.length - i - 1].id != existingTerms[i].id) {
-                                $('#run_cmd_' + termId).fadeTo(100, .5).fadeTo(100, 1);
-                            }
-                        }
-
-
-                    }, 5000);
-                } else {
-                    $('#match_btn').addClass('btn-success');
-                    $('#match_btn').removeClass('btn-danger');
-                    $('#match_btn').text("Start");
-                    clearInterval(matchFunction)
-                }
-                $('.btn').removeAttr('disabled');
-            }
-
-
             //function to set all terminal bindings when creating a term window
             function setTerminalEvents(element) {
 
@@ -606,15 +535,7 @@
                         </li>
                         <li><a th:href="'exitTerms.ktrl?_csrf=' + ${session._csrf}">Exit Terminals</a></li>
                     </ul>
-                    <div class="align-right">
-                        <form id="match_frm">
-                            <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
-                            <label>Sort By</label>&nbsp;&nbsp;<input type="text" id="match" name="match"
-                                                                     placeholder="Bring terminals to top that match RegExp"
-                                                                     size="40"/>
-                            <div id="match_btn" class="btn btn-success">Start</div>
-                        </form>
-                    </div>
+
 
                     <div class="clear"></div>
                     <div style="float:right;width:1px;height:1px;overflow:hidden">
