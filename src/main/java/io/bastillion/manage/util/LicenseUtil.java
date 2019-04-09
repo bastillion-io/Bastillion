@@ -41,7 +41,8 @@ public class LicenseUtil {
 		String str = EncryptionUtil.decrypt(k, license);
 		if (StringUtils.isNotEmpty(str) && str.contains("@") && str.contains("-")) {
 			try {
-				Date expirationDt = sdf.parse(str.split("-")[1]);
+				int index = str.lastIndexOf("-");
+				Date expirationDt = sdf.parse(str.substring(index + 1));
 				if (expirationDt.before(Calendar.getInstance().getTime())) {
 					return false;
 				}
@@ -65,8 +66,9 @@ public class LicenseUtil {
 		String str = EncryptionUtil.decrypt(k, license);
 		if (StringUtils.isNotEmpty(str) && str.contains("@") && str.contains("-")) {
 			try {
-				sdf.parse(str.split("-")[1]);
-				return str.split("-")[1];
+				int index = str.lastIndexOf("-");
+				sdf.parse(str.substring(index + 1));
+				return str.substring(index + 1);
 			} catch (ParseException ex) {
 			}
 		}
