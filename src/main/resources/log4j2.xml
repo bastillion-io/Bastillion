@@ -5,29 +5,27 @@
         <Console name="console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d %-5p %c{1} - %m%n"/>
         </Console>
-        <Console name="login-appender" target="SYSTEM_OUT">
+        <!--
+        <File name="audit-appender" fileName="/var/log/bastillion-audit.log" append="true">
             <PatternLayout pattern="%d %-5p %c{1} - %m%n"/>
-        </Console>
-        <!-- Alternative login audit appender example
-        <File name="login-appender" fileName="/var/log/bastillion-login-audit.log" append="true">
+        </File>
+        <File name="login-appender" fileName="/var/log/bastillion-login.log" append="true">
            <PatternLayout pattern="%d %-5p %c{1} - %m%n"/>
         </File>
-        -->
-        <!-- System audit example using logstash
-        <Socket name="logstash-socket-appender" host="127.0.0.1" port="5300">
-            <SerializedLayout/>
-        </Socket>
         -->
     </Appenders>
 
     <Loggers>
-        <!-- System audit example using logstash
+        <!-- System audit example
         <Logger name="io.bastillion.manage.util.SystemAudit" level="info" additivity="false">
-            <AppenderRef ref="logstash-socket-appender"/>
+            <AppenderRef ref="audit-appender"/>
+        </Logger>
+        <Logger name="io.bastillion.manage.control.LoginAudit" level="info" additivity="false">
+            <AppenderRef ref="login-appender"/>
         </Logger>
         -->
         <Logger name="io.bastillion.manage.control.LoginAudit" level="info" additivity="false">
-            <AppenderRef ref="login-appender"/>
+            <AppenderRef ref="console"/>
         </Logger>
         <Root level="warn">
             <AppenderRef ref="console"/>
