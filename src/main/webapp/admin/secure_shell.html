@@ -143,6 +143,7 @@
             $('#dummy').focus();
             var keys = {};
 
+            var termFocus = true;
             $(document).keypress(function (e) {
                 if (termFocus) {
                     var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
