@@ -15,6 +15,14 @@ Apache Commons DBCP : Apache License, Version 2.0 -  The Apache Software Foundat
 
 Apache Commons Configuration : Apache License, Version 2.0 -  The Apache Software Foundation
 
+Apache Commons Lang: Apache License, Version 2.0 -  The Apache Software Foundation
+
+Apache Commons Log4j 2: Apache License, Version 2.0 -  The Apache Software Foundation
+
+SLF4J : MIT License - QOS.ch
+
+Thymeleaf: Apache License, Version 2.0 -  The THYMELEAF team
+
 ZXing : Apache License, Version 2.0 -  ZXing Authors
 
 Bootstrap : MIT License - Twitter, Inc.
@@ -25,4 +33,4 @@ jQueryUI : MIT License - jQuery Foundation, Inc.
 
 jquery.floatThead : MIT License - Misha Koryak
 
-term.js : MIT License - Christopher Jeffrey
+xterm.js : MIT License - The xterm.js authors 
