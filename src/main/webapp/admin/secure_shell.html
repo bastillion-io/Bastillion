@@ -73,9 +73,9 @@
             $(".cancel_btn").button().click(function () {
                 window.location = 'getNextPendingSystemForTerms.ktrl?pendingSystemStatus.id=' + /*[[${pendingSystemStatus.id}]]*/ ''
                     [# th:if= "${script != null && script.id > 0}"]
-                +'&script.id=' + /*[[${script.id}]]*/ ''
+                        +'&script.id=' + /*[[${script.id}]]*/ ''
                     [/]
-                + '&_csrf=' + [[${session._csrf}]];
+                    + '&_csrf=' + [[${session._csrf}]];
             });
 
             //disconnect terminals and remove from view
@@ -122,7 +122,7 @@
             });
 
             [# th:if= "${currentSystemStatus != null && (#strings.equals(currentSystemStatus.statusCd, 'GENERICFAIL') || #strings.equals(currentSystemStatus.statusCd, 'HOSTFAIL'))}"]
-            $("#error_dialog").modal();
+                $("#error_dialog").modal();
             [/]
             [# th:if= "${pendingSystemStatus != null && pendingSystemStatus.id != null && (currentSystemStatus == null || (!#strings.equals(currentSystemStatus.statusCd, 'GENERICFAIL') && !#strings.equals(currentSystemStatus.statusCd, 'HOSTFAIL')) )}"]
                 [# th:if= "${ #strings.equals(pendingSystemStatus.statusCd, 'AUTHFAIL')}"]
@@ -138,20 +138,10 @@
                 [/]
             [/]
 
-                [# th:if= "${pendingSystemStatus == null || pendingSystemStatus.id == null}"]
+            [# th:if= "${pendingSystemStatus == null || pendingSystemStatus.id == null}"]
 
             $('#dummy').focus();
             var keys = {};
-
-
-            var termFocus = true;
-            $("#match").focus(function () {
-                termFocus = false;
-            });
-            $("#match").blur(function () {
-                termFocus = true;
-            });
-
 
             $(document).keypress(function (e) {
                 if (termFocus) {
@@ -213,10 +203,6 @@
             $(document).click(function (e) {
                 if (termFocus && !$('body').hasClass('modal-open')) {
                     $('#dummy').focus();
-                }
-                //always change focus unless in match sort
-                if (e.target.id !== 'match') {
-                    termFocus = true;
                 }
             });
 
@@ -458,8 +444,8 @@
 
             //set connected systems
             [# th:each = "s : ${systemList}" ]
-            $(createTermElement([[${s.instanceId}]], [[${s.id}]], [[${s.displayLabel}]])).appendTo(".termwrapper");
-            setTerminalEvents($("#run_cmd_" + [[${s.instanceId}]]));
+                $(createTermElement([[${s.instanceId}]], [[${s.id}]], [[${s.displayLabel}]])).appendTo(".termwrapper");
+                setTerminalEvents($("#run_cmd_" + [[${s.instanceId}]]));
             [/]
 
             var y_offset = $('.run_cmd:first').innerHeight() - $('.run_cmd').find(".output:first").innerHeight();
@@ -471,12 +457,6 @@
     </script>
 
     <style>
-
-        .align-right {
-            padding: 10px 2px 10px 10px;
-            float: right;
-        }
-
         .term-container {
             width: 100%;
             padding: 10px 0;
