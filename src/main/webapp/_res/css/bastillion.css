@@ -162,7 +162,7 @@ div.termwrapper {
     margin: 0 auto;
 }
 
-div.termwrapper div h6 {
+div.termwrapper div h5 {
     margin: 8px 0 0 8px;
 }
 
@@ -190,7 +190,7 @@ div.termwrapper div h6 {
     border: 1px solid #cccccc;
 }
 
-.run_cmd_active h6 {
+.run_cmd_active h5 {
     color: #f0f0f0;
 }
 
