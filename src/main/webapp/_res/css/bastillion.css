@@ -239,11 +239,6 @@ div.termwrapper div h6 {
     line-height: 1.231;
 }
 
-.terminal div {
-    white-space: nowrap;
-    height: 14px;
-}
-
 .reverse-video {
     color: #f0f0f0;
     background: #4d4d4d;
@@ -363,6 +358,7 @@ table.floatThead-table {
 .invisible {
     visibility: hidden;
 }
-.xterm-viewport {
-    overflow: hidden !important;
+
+.output .ui-icon {
+    background-image: none;
 }
