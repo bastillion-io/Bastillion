@@ -104,15 +104,17 @@
     </script>
     <style type="text/css">
         .run_cmd {
-            min-width: 600px;
+           width: 50%
+        }
+
+        .term {
+            background-color: rgb(240, 240, 240);
+            color: rgb(77, 77, 77);
         }
 
         .terminal {
-            background-color: rgb(240, 240, 240);
-            color: rgb(77, 77, 77);
             height: 300px;
             overflow-y: scroll;
-
         }
 
         .terminal pre {
@@ -192,7 +194,7 @@
 
             <div th:id="'run_cmd_' + ${s.instanceId}" class="run_cmd_active run_cmd">
 
-                <h6 class="term-header" th:text="${s.displayLabel}"></h6>
+                <h5 class="term-header" th:text="${s.displayLabel}"></h5>
 
                 <div id="term" class="term">
                     <div th:id="'output_' + ${s.instanceId}" class="output">
