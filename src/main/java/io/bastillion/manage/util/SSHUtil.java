@@ -401,9 +401,7 @@ public class SSHUtil {
 			}
 
 		} catch (Exception e) {
-			log.info(e.toString(), e);
-			hostSystem.setErrorMsg(e.getMessage());
-			hostSystem.setStatusCd(HostSystem.GENERIC_FAIL_STATUS);
+			log.error(e.toString(), e);
 		}
 		return hostSystem;
 	}
