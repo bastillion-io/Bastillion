@@ -170,7 +170,6 @@ public class AuthKeysKtrl extends BaseKontroller {
             distributePublicKeys(publicKey);
         }
 
-        log.error(publicKey.getKeyNm());
         return "redirect:/admin/viewKeys.ktrl?sortedSet.orderByDirection=" + sortedSet.getOrderByDirection() + "&sortedSet.orderByField=" + sortedSet.getOrderByField() + "&keyNm=" + publicKey.getKeyNm();
     }
 
