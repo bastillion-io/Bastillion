@@ -27,6 +27,7 @@
  */
 package io.bastillion.manage.db;
 
+import io.bastillion.common.util.AppConfig;
 import io.bastillion.manage.model.Auth;
 import io.bastillion.manage.model.User;
 import io.bastillion.manage.util.DBUtils;
@@ -37,6 +38,9 @@ import org.apache.commons.lang3.StringUtils;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +51,8 @@ import org.slf4j.LoggerFactory;
 public class AuthDB {
 
     private static Logger log = LoggerFactory.getLogger(AuthDB.class);
+
+    public static final int EXPIRATION_DAYS = StringUtils.isNumeric(AppConfig.getProperty("accountExpirationDays")) ? Integer.parseInt(AppConfig.getProperty("accountExpirationDays")) : -1;
 
     private AuthDB() {
     }
@@ -174,6 +180,57 @@ public class AuthDB {
             log.error(e.toString(), e);
         }
 
+
+    }
+
+    /**
+     * updates the last login and expiration time
+     *
+     * @param con  DB connection
+     * @param auth username and password object
+     */
+    public static void updateLastLogin(Connection con, Auth auth) {
+
+        try {
+            PreparedStatement stmt = con.prepareStatement("update users set last_login_tm=?, expiration_tm=? where id=?");
+
+            Calendar c = Calendar.getInstance();
+            c.setTime(new Date());
+            stmt.setTimestamp(1, new Timestamp(c.getTime().getTime()));
+            if(Auth.MANAGER.equals(auth.getUserType()) || EXPIRATION_DAYS <=0) {
+                stmt.setTimestamp(2, null);
+            } else {
+                c.add(Calendar.DATE, EXPIRATION_DAYS);
+                stmt.setTimestamp(2, new Timestamp(c.getTime().getTime()));
+            }
+            stmt.setLong(3, auth.getId());
+            stmt.execute();
+
+            DBUtils.closeStmt(stmt);
+
+        } catch (Exception e) {
+            log.error(e.toString(), e);
+        }
+
+    }
+
+    /**
+     * updates the last login and expiration time
+     *
+     * @param auth username and password object
+     */
+    public static void updateLastLogin(Auth auth) {
+
+        Connection con = null;
+        try {
+            con = DBUtils.getConn();
+            updateLastLogin(con, auth);
+        } catch (Exception e) {
+            log.error(e.toString(), e);
+        }
+        finally {
+            DBUtils.closeConn(con);
+        }
 
     }
 
@@ -407,6 +464,14 @@ public class AuthDB {
                 user.setEmail(rs.getString("email"));
                 user.setUsername(rs.getString("username"));
                 user.setUserType(rs.getString("user_type"));
+                user.setLastLoginTm(rs.getTimestamp("last_login_tm"));
+                user.setExpirationTm(rs.getTimestamp("expiration_tm"));
+                if (EXPIRATION_DAYS > 0 && user.getExpirationTm() != null && user.getExpirationTm().before(new Date())) {
+                    user.setExpired(true);
+                }
+                else {
+                    user.setExpired(false);
+                }
                 user.setProfileList(UserProfileDB.getProfilesByUser(con, user.getId()));
             }
             DBUtils.closeRs(rs);

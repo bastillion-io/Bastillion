@@ -113,6 +113,15 @@ public class UsersKtrl extends BaseKontroller {
         return "redirect:/manage/viewUsers.ktrl?sortedSet.orderByDirection=" + sortedSet.getOrderByDirection() + "&sortedSet.orderByField=" + sortedSet.getOrderByField();
     }
 
+    @Kontrol(path = "/manage/unlockUser", method = MethodType.GET)
+    public String unlockUser() {
+
+        if (user.getId() != null && !user.getId().equals(AuthUtil.getUserId(getRequest().getSession()))) {
+            UserDB.unlockAccount(user.getId());
+        }
+        return "redirect:/manage/viewUsers.ktrl?sortedSet.orderByDirection=" + sortedSet.getOrderByDirection() + "&sortedSet.orderByField=" + sortedSet.getOrderByField();
+    }
+
     /**
      * Validates all fields for adding a user
      */

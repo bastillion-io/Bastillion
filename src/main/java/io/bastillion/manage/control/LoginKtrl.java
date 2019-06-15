@@ -53,6 +53,7 @@ public class LoginKtrl extends BaseKontroller {
     private static Logger loginAuditLogger = LoggerFactory.getLogger("io.bastillion.manage.control.LoginAudit");
     private final String AUTH_ERROR = "Authentication Failed : Login credentials are invalid";
     private final String AUTH_ERROR_NO_PROFILE = "Authentication Failed : There are no profiles assigned to this account";
+    private final String AUTH_ERROR_EXPIRED_ACCOUNT = "Authentication Failed : Account has expired";
     @Model(name = "auth")
     Auth auth;
 
@@ -94,11 +95,20 @@ public class LoginKtrl extends BaseKontroller {
                     return "/login.html";
                 }
 
+                //check to see if account has expired
+                if (user.isExpired()) {
+                    loginAuditLogger.info(auth.getUsername() + " (" + clientIP + ") - " + AUTH_ERROR_EXPIRED_ACCOUNT);
+                    addError(AUTH_ERROR_EXPIRED_ACCOUNT);
+                    return "/login.html";
+                }
+
                 AuthUtil.setAuthToken(getRequest().getSession(), authToken);
                 AuthUtil.setUserId(getRequest().getSession(), user.getId());
                 AuthUtil.setAuthType(getRequest().getSession(), user.getAuthType());
                 AuthUtil.setTimeout(getRequest().getSession());
                 AuthUtil.setUsername(getRequest().getSession(), user.getUsername());
+
+                AuthDB.updateLastLogin(user);
 
                 //for first time login redirect to set OTP
                 if (otpEnabled && StringUtils.isEmpty(sharedSecret)) {

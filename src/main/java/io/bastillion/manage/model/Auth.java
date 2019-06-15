@@ -27,6 +27,8 @@
  */
 package io.bastillion.manage.model;
 
+import java.util.Date;
+
 /**
  * Value object that contains login information
  */
@@ -50,6 +52,9 @@ public class Auth {
     String salt;
     String userType=ADMINISTRATOR;
     String authType=AUTH_BASIC;
+    Date lastLoginTm;
+    Date expirationTm;
+    boolean expired=false;
 
     public String getUsername() {
         return username;
@@ -137,5 +142,30 @@ public class Auth {
 
     public void setAuthType(String authType) {
         this.authType = authType;
+    }
+
+    public Date getLastLoginTm() {
+        return lastLoginTm;
+    }
+
+    public void setLastLoginTm(Date lastLoginTm) {
+        this.lastLoginTm = lastLoginTm;
+    }
+
+    public Date getExpirationTm() {
+        return expirationTm;
+    }
+
+    public void setExpirationTm(Date expirationTm) {
+        this.expirationTm = expirationTm;
+    }
+
+    public boolean isExpired() {
+
+        return expired;
+    }
+
+    public void setExpired(boolean expired) {
+        this.expired = expired;
     }
 }

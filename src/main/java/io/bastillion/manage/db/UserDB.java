@@ -27,19 +27,22 @@
  */
 package io.bastillion.manage.db;
 
+import io.bastillion.manage.model.Auth;
 import io.bastillion.manage.model.SortedSet;
 import io.bastillion.manage.model.User;
 import io.bastillion.manage.util.DBUtils;
 import io.bastillion.manage.util.EncryptionUtil;
 import org.apache.commons.lang3.StringUtils;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static io.bastillion.manage.db.AuthDB.EXPIRATION_DAYS;
 
 
 /**
@@ -57,6 +60,8 @@ public class UserDB {
     public static final String USER_TYPE = "user_type";
     public static final String AUTH_TYPE = "auth_type";
     public static final String PROFILE_ID = "profile_id";
+    public static final String LAST_LOGIN_TM = "last_login_tm";
+    public static final String EXPIRATION_TM = "expiration_tm";
 
     private UserDB() {
     }
@@ -92,6 +97,14 @@ public class UserDB {
                 user.setPassword(rs.getString(PASSWORD));
                 user.setAuthType(rs.getString(AUTH_TYPE));
                 user.setUserType(rs.getString(USER_TYPE));
+                user.setLastLoginTm(rs.getTimestamp(LAST_LOGIN_TM));
+                user.setExpirationTm(rs.getTimestamp(EXPIRATION_TM));
+				if (EXPIRATION_DAYS > 0 && user.getExpirationTm() != null && user.getExpirationTm().before(new Date())) {
+                    user.setExpired(true);
+                }
+                else {
+                    user.setExpired(false);
+                }
                 userList.add(user);
 
             }
@@ -142,6 +155,14 @@ public class UserDB {
                 user.setPassword(rs.getString(PASSWORD));
                 user.setAuthType(rs.getString(AUTH_TYPE));
                 user.setUserType(rs.getString(USER_TYPE));
+                user.setLastLoginTm(rs.getTimestamp(LAST_LOGIN_TM));
+                user.setExpirationTm(rs.getTimestamp(EXPIRATION_TM));
+				if (EXPIRATION_DAYS > 0 && user.getExpirationTm() != null && user.getExpirationTm().before(new Date())) {
+                    user.setExpired(true);
+                }
+                else {
+                    user.setExpired(false);
+                }
                 if (profileId != null && profileId.equals(rs.getLong(PROFILE_ID))) {
                     user.setChecked(true);
                 } else {
@@ -213,6 +234,14 @@ public class UserDB {
                 user.setPassword(rs.getString(PASSWORD));
                 user.setAuthType(rs.getString(AUTH_TYPE));
                 user.setUserType(rs.getString(USER_TYPE));
+                user.setLastLoginTm(rs.getTimestamp(LAST_LOGIN_TM));
+                user.setExpirationTm(rs.getTimestamp(EXPIRATION_TM));
+				if (EXPIRATION_DAYS > 0 && user.getExpirationTm() != null && user.getExpirationTm().before(new Date())) {
+                    user.setExpired(true);
+                }
+                else {
+                    user.setExpired(false);
+                }
                 user.setSalt(rs.getString("salt"));
                 user.setProfileList(UserProfileDB.getProfilesByUser(con, userId));
             }
@@ -260,7 +289,7 @@ public class UserDB {
         Long userId=null;
         
         try {
-            PreparedStatement stmt = con.prepareStatement("insert into users (first_nm, last_nm, email, username, auth_type, user_type, password, salt) values (?,?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement stmt = con.prepareStatement("insert into users (first_nm, last_nm, email, username, auth_type, user_type, password, salt, expiration_tm) values (?,?,?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
             stmt.setString(1, user.getFirstNm());
             stmt.setString(2, user.getLastNm());
             stmt.setString(3, user.getEmail());
@@ -272,8 +301,16 @@ public class UserDB {
                 stmt.setString(7, EncryptionUtil.hash(user.getPassword() + salt));
                 stmt.setString(8, salt);
             }else {
-                stmt.setString(7, null);
-                stmt.setString(8, null);
+				stmt.setString(7, null);
+				stmt.setString(8, null);
+			}
+            if(Auth.MANAGER.equals(user.getUserType()) || EXPIRATION_DAYS <=0) {
+                stmt.setTimestamp(9, null);
+            } else {
+                Calendar c = Calendar.getInstance();
+                c.setTime(new Date());
+                c.add(Calendar.DATE, EXPIRATION_DAYS);
+                stmt.setTimestamp(9, new Timestamp(c.getTime().getTime()));
             }
             stmt.execute();
             ResultSet rs = stmt.getGeneratedKeys();
@@ -437,6 +474,33 @@ public class UserDB {
 
         return isUnique;
 
+    }
+
+    /**
+	 * Unlock account that has expired due to inactivity.
+     * @param userId user Id
+     */
+    public static void unlockAccount(Long userId) {
+
+
+        Connection con = null;
+        try {
+            con = DBUtils.getConn();
+            PreparedStatement stmt = con.prepareStatement("update users set expiration_tm=? where id=?");
+            Calendar c = Calendar.getInstance();
+            c.setTime(new Date());
+            c.add(Calendar.DATE, EXPIRATION_DAYS);
+            stmt.setTimestamp(1, new Timestamp(c.getTime().getTime()));
+            stmt.setLong(2, userId);
+            stmt.execute();
+            DBUtils.closeStmt(stmt);
+
+        } catch (Exception e) {
+            log.error(e.toString(), e);
+        }
+        finally {
+            DBUtils.closeConn(con);
+        }
     }
 
 
