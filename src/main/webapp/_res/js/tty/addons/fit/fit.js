@@ -20,8 +20,8 @@ function proposeGeometry(term) {
     var availableHeight = parentElementHeight - elementPaddingVer;
     var availableWidth = parentElementWidth - elementPaddingHor - term._core.viewport.scrollBarWidth;
     var geometry = {
-        cols: Math.floor(availableWidth / term._core.renderer.dimensions.actualCellWidth),
-        rows: Math.floor(availableHeight / term._core.renderer.dimensions.actualCellHeight)
+        cols: Math.floor(availableWidth / term._core._renderCoordinator.dimensions.actualCellWidth),
+        rows: Math.floor(availableHeight / term._core._renderCoordinator.dimensions.actualCellHeight)
     };
     return geometry;
 }
@@ -30,7 +30,7 @@ function fit(term) {
     var geometry = proposeGeometry(term);
     if (geometry) {
         if (term.rows !== geometry.rows || term.cols !== geometry.cols) {
-            term._core.renderer.clear();
+            term._core._renderCoordinator.clear();
             term.resize(geometry.cols, geometry.rows);
         }
     }
