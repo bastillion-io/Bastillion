@@ -1,4 +1,4 @@
-/** @preserve jQuery.floatThead 2.1.2 - https://mkoryak.github.io/floatThead/ - Copyright (c) 2012 - 2018 Misha Koryak **/
+/** @preserve jQuery.floatThead 2.1.4 - https://mkoryak.github.io/floatThead/ - Copyright (c) 2012 - 2019 Misha Koryak **/
 // @license MIT
 
 /* @author Misha Koryak
@@ -33,6 +33,12 @@
       // override it if the first row of the table is going to contain colgroups (any cell spans greater than one col)
       // it should return a jquery object containing a wrapped set of table cells comprising a row that contains no col spans and is visible
       return $table.find('tbody tr:visible:first>*:visible');
+    },
+    ariaLabel: function($table, $headerCell, columnIndex) { // This function will run for every header cell that exists in the table when we add aria-labels. 
+      // Override to customize the aria-label. NOTE: These labels will be added to the 'sizer cells' which get added to the real table and are not visible by the user (only screen readers), 
+      // The number of sizer columns might not match the header columns in your real table - I insert one sizer header cell per column. This means that if your table uses colspans or multiple header rows,
+      // this will not be reflected by sizer cells. This is why I am giving you the `columnIndex`.
+      return $headerCell.text();
     },
     floatTableClass: 'floatThead-table',
     floatWrapperClass: 'floatThead-wrapper',
@@ -69,7 +75,7 @@
     $.each(isThings, function(){
       var name = this;
       that['is' + name] = function(obj) {
-        return Object.prototype.toString.call(obj) == '[object ' + name + ']';
+        return Object.prototype.toString.call(obj) === '[object ' + name + ']';
       };
     });
     that.debounce = function(func, wait, immediate) {
@@ -105,6 +111,7 @@
   var ieVersion = function(){for(var a=3,b=document.createElement("b"),c=b.all||[];a = 1+a,b.innerHTML="<!--[if gt IE "+ a +"]><i><![endif]-->",c[0];);return 4<a?a:document.documentMode}();
   var isFF = /Gecko\//.test(navigator.userAgent);
   var isWebkit = /WebKit\//.test(navigator.userAgent);
+  var isRTL = /rtl/i.test(document.documentElement.dir || '');
 
   if(!(ieVersion || isFF || isWebkit)){
     ieVersion = 11; //yey a hack!
@@ -114,16 +121,16 @@
   var isTableWidthBug = function(){
     if(isWebkit) {
       var $test = $('<div>').css('width', 0).append(
-        $('<table>').css('max-width', '100%').append(
-          $('<tr>').append(
-            $('<th>').append(
-              $('<div>').css('min-width', 100).text('X')
-            )
+          $('<table>').css('max-width', '100%').append(
+              $('<tr>').append(
+                  $('<th>').append(
+                      $('<div>').css('min-width', 100).text('X')
+                  )
+              )
           )
-        )
       );
       $("body").append($test);
-      var ret = ($test.find("table").width() == 0);
+      var ret = ($test.find("table").width() === 0);
       $test.remove();
       return ret;
     }
@@ -141,11 +148,11 @@
     var _afterPrint = window.onafterprint;
     window.onbeforeprint = function () {
       _beforePrint && _beforePrint();
-      $window.triggerHandler("beforeprint");
+      $window.triggerHandler("fth-beforeprint");
     };
     window.onafterprint = function () {
       _afterPrint && _afterPrint();
-      $window.triggerHandler("afterprint");
+      $window.triggerHandler("fth-afterprint");
     };
   }
 
@@ -154,11 +161,11 @@
    * @param cb
    */
   function windowResize(eventName, cb){
-    if(ieVersion == 8){ //ie8 is crap: https://github.com/mkoryak/floatThead/issues/65
+    if(ieVersion === 8){ //ie8 is crap: https://github.com/mkoryak/floatThead/issues/65
       var winWidth = $window.width();
       var debouncedCb = util.debounce(function(){
         var winWidthNew = $window.width();
-        if(winWidth != winWidthNew){
+        if(winWidth !== winWidthNew){
           winWidth = winWidthNew;
           cb();
         }
@@ -178,11 +185,11 @@
           .getComputedStyle(parent)
           .getPropertyValue('overflow');
 
-      if (pos != 'visible') break;
+      if (pos !== 'visible') break;
 
     } while (parent = parent.parentElement);
 
-    if(parent == document.body){
+    if(parent === document.body){
       return $([]);
     }
     return $(parent);
@@ -221,7 +228,7 @@
     if($table.dataTableSettings){
       for(var i = 0; i < $table.dataTableSettings.length; i++){
         var table = $table.dataTableSettings[i].nTable;
-        if($table[0] == table){
+        if($table[0] === table){
           return true;
         }
       }
@@ -288,7 +295,7 @@
     });
     if(opts.debug){
       var v = $.fn.jquery.split(".");
-      if(parseInt(v[0], 10) == 1 && parseInt(v[1], 10) <= 7){
+      if(parseInt(v[0], 10) === 1 && parseInt(v[1], 10) <= 7){
         debug("jQuery version "+$.fn.jquery+" detected! This plugin supports 1.8 or better, or 1.7.x with jQuery UI 1.8.24 -> http://jqueryui.com/resources/download/jquery-ui-1.8.24.zip")
       }
     }
@@ -305,9 +312,9 @@
       canObserveMutations = opts.autoReflow && canObserveMutations; //option defaults to false!
       var $header = $table.children('thead:first');
       var $tbody = $table.children('tbody:first');
-      if($header.length == 0 || $tbody.length == 0){
+      if($header.length === 0 || $tbody.length === 0){
         if(opts.debug) {
-          if($header.length == 0){
+          if($header.length === 0){
             debug('The thead element is missing.');
           } else{
             debug('The tbody element is missing.');
@@ -360,7 +367,7 @@
         useAbsolutePositioning = locked;
       }
       var $caption = $table.find("caption");
-      var haveCaption = $caption.length == 1;
+      var haveCaption = $caption.length === 1;
       if(haveCaption){
         var captionAlignTop = ($caption.css("caption-side") || $caption.attr("align") || "top") === "top";
       }
@@ -380,7 +387,7 @@
       var $floatColGroup = $("<colgroup/>");
       var $tableColGroup = $table.children('colgroup:first');
       var existingColGroup = true;
-      if($tableColGroup.length == 0){
+      if($tableColGroup.length === 0){
         $tableColGroup = $("<colgroup/>");
         existingColGroup = false;
       }
@@ -393,7 +400,7 @@
       var $floatContainer = $('<div>').css(opts.floatContainerCss).attr('aria-hidden', 'true');
       var floatTableHidden = false; //this happens when the table is hidden and we do magic when making it visible
       var $newHeader = $("<thead/>");
-      var $sizerRow = $('<tr class="size-row" aria-hidden="true"/>');
+      var $sizerRow = $('<tr class="size-row"/>');
       var $sizerCells = $([]);
       var $tableCells = $([]); //used for sizing - either $sizerCells or $tableColGroup cols. $tableColGroup cols are only created in chrome for borderCollapse:collapse because of a chrome bug.
       var $headerCells = $([]);
@@ -412,16 +419,16 @@
         $floatTable.attr('class', $table.attr('class'));
       }
       $floatTable.attr({ //copy over some deprecated table attributes that people still like to use. Good thing people don't use colgroups...
-                         'cellpadding': $table.attr('cellpadding'),
-                         'cellspacing': $table.attr('cellspacing'),
-                         'border': $table.attr('border')
-                       });
+        'cellpadding': $table.attr('cellpadding'),
+        'cellspacing': $table.attr('cellspacing'),
+        'border': $table.attr('border')
+      });
       var tableDisplayCss = $table.css('display');
       $floatTable.css({
-                        'borderCollapse': $table.css('borderCollapse'),
-                        'border': $table.css('border'),
-                        'display': tableDisplayCss
-                      });
+        'borderCollapse': $table.css('borderCollapse'),
+        'border': $table.css('border'),
+        'display': tableDisplayCss
+      });
       if(!locked){
         $floatTable.css('width', 'auto');
       }
@@ -434,16 +441,16 @@
       if(useAbsolutePositioning){
         var makeRelative = function($container, alwaysWrap){
           var positionCss = $container.css('position');
-          var relativeToScrollContainer = (positionCss == "relative" || positionCss == "absolute");
+          var relativeToScrollContainer = (positionCss === "relative" || positionCss === "absolute");
           var $containerWrap = $container;
           if(!relativeToScrollContainer || alwaysWrap){
             var css = {"paddingLeft": $container.css('paddingLeft'), "paddingRight": $container.css('paddingRight')};
             $floatContainer.css(css);
             $containerWrap = $container.data('floatThead-containerWrap') || $container.wrap(
-              $('<div>').addClass(opts.floatWrapperClass).css({
-                'position': 'relative',
-                'clear': 'both'
-              })
+                $('<div>').addClass(opts.floatWrapperClass).css({
+                  'position': 'relative',
+                  'clear': 'both'
+                })
             ).parent();
             $container.data('floatThead-containerWrap', $containerWrap); //multiple tables inside one scrolling container - #242
             wrappedContainer = true;
@@ -486,7 +493,7 @@
         $header.children("tr:visible").each(function(){
           headerHeight += $(this).outerHeight(true);
         });
-        if($table.css('border-collapse') == 'collapse') {
+        if($table.css('border-collapse') === 'collapse') {
           var tableBorderTopHeight = parseInt($table.css('border-top-width'), 10);
           var cellBorderTopHeight = parseInt($table.find("thead tr:first").find(">*:first").css('border-top-width'), 10);
           if(tableBorderTopHeight > cellBorderTopHeight) {
@@ -502,13 +509,13 @@
         var tw = tableWidth($table, $fthCells, true);
         var $container = responsive ? $responsiveContainer : $scrollContainer;
         var width = $container.length ? getOffsetWidth($container[0]) : tw;
-        var floatContainerWidth = $container.css("overflow-y") != 'hidden' ? width - scrollbarOffset.vertical : width;
+        var floatContainerWidth = $container.css("overflow-y") !== 'hidden' ? width - scrollbarOffset.vertical : width;
         $floatContainer.width(floatContainerWidth);
         if(locked){
           var percent = 100 * tw / (floatContainerWidth);
           $floatTable.css('width', percent+'%');
         } else {
-          $floatTable.outerWidth(tw);
+          $floatTable.css('width', tw+'px');
         }
       }
 
@@ -533,30 +540,31 @@
         }
         if(count !== lastColumnCount){
           lastColumnCount = count;
-          var cells = [], cols = [], psuedo = [], content;
+          var cells = [], cols = [], psuedo = [];
+          $sizerRow.empty();
           for(var x = 0; x < count; x++){
-            content = $headerColumns.eq(x).text();
-            cells.push('<th class="floatThead-col" aria-label="'+content+'"/>');
+            var cell = document.createElement('th');
+            cell.setAttribute('aria-label', opts.ariaLabel($table, $headerColumns.eq(x), x));
+            cell.className = 'floatThead-col';
+            $sizerRow[0].appendChild(cell);
             cols.push('<col/>');
             psuedo.push(
-              $('<fthtd>').css({
-                'display': 'table-cell',
-                'height': 0,
-                'width': 'auto'
-              })
+                $('<fthtd>').css({
+                  'display': 'table-cell',
+                  'height': 0,
+                  'width': 'auto'
+                })
             );
           }
 
           cols = cols.join('');
-          cells = cells.join('');
-
+  
           if(createElements){
             $fthRow.empty();
             $fthRow.append(psuedo);
             $fthCells = $fthRow.find('fthtd');
           }
-
-          $sizerRow.html(cells);
+          
           $sizerCells = $sizerRow.find("th");
           if(!existingColGroup){
             $tableColGroup.html(cols);
@@ -603,13 +611,13 @@
       var isHeaderFloatingLogical = false; //for the purpose of this event, the header is/isnt floating, even though the element
                                            //might be in some other state. this is what the header looks like to the user
       function triggerFloatEvent(isFloating){
-        if(isHeaderFloatingLogical != isFloating){
+        if(isHeaderFloatingLogical !== isFloating){
           isHeaderFloatingLogical = isFloating;
           $table.triggerHandler("floatThead", [isFloating, $floatContainer])
         }
       }
       function changePositioning(isAbsolute){
-        if(useAbsolutePositioning != isAbsolute){
+        if(useAbsolutePositioning !== isAbsolute){
           useAbsolutePositioning = isAbsolute;
           $floatContainer.css({
             position: useAbsolutePositioning ? 'absolute' : 'fixed'
@@ -640,7 +648,7 @@
           $tableCells = $tableColGroup.find('col');
           var $rowCells = getSizingRow($table, $tableCells, $fthCells, ieVersion);
 
-          if($rowCells.length == numCols && numCols > 0){
+          if($rowCells.length === numCols && numCols > 0){
             if(!existingColGroup){
               for(i=0; i < numCols; i++){
                 $tableCells.eq(i).css('width', '');
@@ -678,7 +686,7 @@
       }
 
       function isResponsiveContainerActive(){
-        return $responsiveContainer.css("overflow-x") == 'auto';
+        return $responsiveContainer.css("overflow-x") === 'auto';
       }
       /**
        * first performs initial calculations that we expect to not change when the table, window, or scrolling container are scrolled.
@@ -735,10 +743,10 @@
             }
           }
 
-          if(eventType == 'windowScroll'){
+          if(eventType === 'windowScroll'){
             windowTop = $window.scrollTop();
             windowLeft = $window.scrollLeft();
-          } else if(eventType == 'containerScroll'){
+          } else if(eventType === 'containerScroll'){
             if($responsiveContainer.length){
               if(!responsive){
                 return; //we dont care about the event if we arent responsive right now
@@ -748,23 +756,24 @@
               scrollingContainerTop = $scrollContainer.scrollTop();
               scrollContainerLeft = $scrollContainer.scrollLeft();
             }
-          } else if(eventType != 'init') {
+          } else if(eventType !== 'init') {
             windowTop = $window.scrollTop();
             windowLeft = $window.scrollLeft();
             scrollingContainerTop = $scrollContainer.scrollTop();
             scrollContainerLeft =  getScrollContainerLeft();
           }
-          if(isWebkit && (windowTop < 0 || windowLeft < 0)){ //chrome overscroll effect at the top of the page - breaks fixed positioned floated headers
+          if(isWebkit && (windowTop < 0 || (isRTL && windowLeft > 0 ) || ( !isRTL && windowLeft < 0 )) ){
+            //chrome overscroll effect at the top of the page - breaks fixed positioned floated headers
             return;
           }
 
           if(absoluteToFixedOnScroll){
-            if(eventType == 'windowScrollDone'){
+            if(eventType === 'windowScrollDone'){
               changePositioning(true); //change to absolute
             } else {
               changePositioning(false); //change to fixed
             }
-          } else if(eventType == 'windowScrollDone'){
+          } else if(eventType === 'windowScrollDone'){
             return null; //event is fired when they stop scrolling. ignore it if not 'absoluteToFixedOnScroll'
           }
 
@@ -780,6 +789,9 @@
               var gap = tableContainerGap - scrollingContainerTop + tableTopGap;
               top = gap > 0 ? gap : 0;
               triggerFloatEvent(false);
+            } else if(scrollingContainerTop - tableContainerGap > tableHeight - floatContainerHeight){
+              // scrolled past table but there is space in the container under it..
+              top = tableHeight - floatContainerHeight - scrollingContainerTop - tableContainerGap;
             } else {
               top = wrappedContainer ? tableTopGap : scrollingContainerTop;
               //headers stop at the top of the viewport
@@ -788,7 +800,7 @@
             left = tableLeftGap;
           } else if(!locked && useAbsolutePositioning) { //window scrolling, absolute positioning
             if(windowTop > floatEnd + tableHeight + captionScrollOffset){
-              top = tableHeight - floatContainerHeight + captionScrollOffset; //scrolled past table
+              top = tableHeight - floatContainerHeight + captionScrollOffset + scrollingBottom; //scrolled past table
             } else if (tableOffset.top >= windowTop + scrollingTop) {
               top = 0; //scrolling to table
               unfloat();
@@ -839,7 +851,7 @@
         var oldLeft = null;
         var oldScrollLeft = null;
         return function(pos, setWidth, setHeight){
-          if(pos != null && (oldTop != pos.top || oldLeft != pos.left)){
+          if(pos != null && (oldTop !== pos.top || oldLeft !== pos.left)){
             if(ieVersion === 8){
               $floatContainer.css({
                 top: pos.top,
@@ -854,8 +866,8 @@
                 '-o-transform'      : transform,
                 'transform'         : transform,
                 'top': 0,
+                'left': 0,
               };
-              cssObj[/rtl/i.test(document.documentElement.dir || '') ? 'right': 'left'] = 0;
               $floatContainer.css(cssObj);
             }
             oldTop = pos.top;
@@ -868,7 +880,7 @@
             setHeaderHeight();
           }
           var scrollLeft = (responsive ? $responsiveContainer : $scrollContainer).scrollLeft();
-          if(!useAbsolutePositioning || oldScrollLeft != scrollLeft){
+          if(!useAbsolutePositioning || oldScrollLeft !== scrollLeft){
             $floatContainer.scrollLeft(scrollLeft);
             oldScrollLeft = scrollLeft;
           }
@@ -883,14 +895,14 @@
           if(opts.support && opts.support.perfectScrollbar && $scrollContainer.data().perfectScrollbar){
             scrollbarOffset = {horizontal:0, vertical:0};
           } else {
-            if($scrollContainer.css('overflow-x') == 'scroll'){
+            if($scrollContainer.css('overflow-x') === 'scroll'){
               scrollbarOffset.horizontal = scrollbarWidth;
             } else {
               var sw = $scrollContainer.width(), tw = tableWidth($table, $fthCells);
               var offsetv = sh < th ? scrollbarWidth : 0;
               scrollbarOffset.horizontal = sw - offsetv < tw ? scrollbarWidth : 0;
             }
-            if($scrollContainer.css('overflow-y') == 'scroll'){
+            if($scrollContainer.css('overflow-y') === 'scroll'){
               scrollbarOffset.vertical = scrollbarWidth;
             } else {
               var sh = $scrollContainer.height(), th = $table.height();
@@ -975,8 +987,8 @@
         matchMediaPrint = window.matchMedia("print");
         matchMediaPrint.addListener(printEvent);
       } else {
-        $window.on('beforeprint', beforePrint);
-        $window.on('afterprint', afterPrint);
+        $window.on('fth-beforeprint', beforePrint);
+        $window.on('fth-afterprint', afterPrint);
       }
       ////// end printing stuff
 
@@ -1022,7 +1034,7 @@
         }
         mObs = new MutationObserver(function(e){
           var wasTableRelated = function(nodes){
-            return nodes && nodes[0] && (nodes[0].nodeName == "THEAD" || nodes[0].nodeName == "TD"|| nodes[0].nodeName == "TH");
+            return nodes && nodes[0] && (nodes[0].nodeName === "THEAD" || nodes[0].nodeName === "TD"|| nodes[0].nodeName === "TH");
           };
           for(var i=0; i < e.length; i++){
             if(!(wasTableRelated(e[i].addedNodes) || wasTableRelated(e[i].removedNodes))){
@@ -1073,6 +1085,7 @@
           $floatContainer.remove();
           $table.data('floatThead-attached', false);
           $window.off(ns);
+          $window.off('fth-beforeprint fth-afterprint'); // Not bound with id, so cant use ns.
           if (matchMediaPrint) {
             matchMediaPrint.removeListener(printEvent);
           }
