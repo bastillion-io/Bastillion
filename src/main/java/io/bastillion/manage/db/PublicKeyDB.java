@@ -98,7 +98,7 @@ public class PublicKeyDB {
     public static void deleteUnassignedKeysByProfile(Connection con, Long profileId){
 
         try {
-            PreparedStatement stmt = con.prepareStatement("delete from public_keys where profile_id=? and user_id not in (select user_id from user_map where profile_id=?)");
+            PreparedStatement stmt = con.prepareStatement("delete from public_keys where profile_id=? and user_id not in (select id from users where user_type = 'M' union select user_id from user_map where profile_id=?)");
             stmt.setLong(1, profileId);
             stmt.setLong(2, profileId);
             stmt.execute();
