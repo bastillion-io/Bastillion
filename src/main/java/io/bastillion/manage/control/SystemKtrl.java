@@ -33,8 +33,6 @@ import io.bastillion.manage.db.ScriptDB;
 import io.bastillion.manage.db.SystemDB;
 import io.bastillion.manage.db.UserProfileDB;
 import io.bastillion.manage.model.*;
-import io.bastillion.manage.model.*;
-import io.bastillion.manage.util.LicenseUtil;
 import io.bastillion.manage.util.SSHUtil;
 import loophole.mvc.annotation.Kontrol;
 import loophole.mvc.annotation.MethodType;
@@ -103,12 +101,7 @@ public class SystemKtrl extends BaseKontroller {
         if (hostSystem.getId() != null) {
             SystemDB.updateSystem(hostSystem);
         } else {
-            if (LicenseUtil.isValid() || SystemDB.getSystemSet(sortedSet).getItemList().size() < 12) {
-                hostSystem.setId(SystemDB.insertSystem(hostSystem));
-            } else {
-                addError("Systems can no longer be added without a valid license");
-                retVal = "/manage/view_systems.html";
-            }
+            hostSystem.setId(SystemDB.insertSystem(hostSystem));
         }
         sortedSet = SystemDB.getSystemSet(sortedSet);
 

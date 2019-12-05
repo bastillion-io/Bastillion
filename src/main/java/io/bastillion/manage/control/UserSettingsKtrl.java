@@ -29,19 +29,16 @@ package io.bastillion.manage.control;
 
 import io.bastillion.common.util.AuthUtil;
 import io.bastillion.manage.db.AuthDB;
-import io.bastillion.manage.db.LicenseDB;
 import io.bastillion.manage.db.PrivateKeyDB;
 import io.bastillion.manage.db.UserThemeDB;
 import io.bastillion.manage.model.Auth;
 import io.bastillion.manage.model.UserSettings;
-import io.bastillion.manage.util.LicenseUtil;
 import io.bastillion.manage.util.PasswordUtil;
 import loophole.mvc.annotation.Kontrol;
 import loophole.mvc.annotation.MethodType;
 import loophole.mvc.annotation.Model;
 import loophole.mvc.annotation.Validate;
 import loophole.mvc.base.BaseKontroller;
-import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -76,10 +73,6 @@ public class UserSettingsKtrl extends BaseKontroller {
     Auth auth;
     @Model(name = "userSettings")
     UserSettings userSettings;
-    @Model(name = "license")
-    String license;
-    @Model(name ="expirationDt")
-    String expirationDt;
 
 
 
@@ -90,11 +83,6 @@ public class UserSettingsKtrl extends BaseKontroller {
     @Kontrol(path = "/admin/userSettings", method = MethodType.GET)
     public String userSettings() {
         userSettings = UserThemeDB.getTheme(AuthUtil.getUserId(getRequest().getSession()));
-        license = LicenseDB.getLicense();
-        expirationDt = LicenseUtil.getExpirationDt(license);
-        if(StringUtils.isNotEmpty(license) && !LicenseUtil.isValid(license)) {
-            addError("License is invalid or has expired");
-        }
         return "/admin/user_settings.html";
     }
 
@@ -130,17 +118,6 @@ public class UserSettingsKtrl extends BaseKontroller {
         return "redirect:/admin/menu.html";
     }
 
-    @Kontrol(path = "/admin/licenseSubmit", method = MethodType.POST)
-    public String licenseSubmit() {
-        String retVal = "/admin/user_settings.html";
-        if(LicenseUtil.isValid(license)) {
-            LicenseDB.saveLicense(license);
-            retVal = "redirect:/admin/menu.html";
-        } else {
-            addError("License is invalid or has expired");
-        }
-        return retVal;
-    }
     /**
      * Validates fields for password submit
      */

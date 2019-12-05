@@ -33,7 +33,6 @@ import io.bastillion.manage.db.UserDB;
 import io.bastillion.manage.model.Auth;
 import io.bastillion.manage.model.SortedSet;
 import io.bastillion.manage.model.User;
-import io.bastillion.manage.util.LicenseUtil;
 import io.bastillion.manage.util.PasswordUtil;
 import io.bastillion.manage.util.RefreshAuthKeyUtil;
 import loophole.mvc.annotation.Kontrol;
@@ -87,17 +86,7 @@ public class UsersKtrl extends BaseKontroller {
                 UserDB.resetSharedSecret(user.getId());
             }
         } else {
-
-            if(LicenseUtil.isValid() || UserDB.getUserSet(sortedSet).getItemList().size() < 6) {
-                UserDB.insertUser(user);
-            } else {
-                addError("Users can no longer be added without a valid license");
-
-                userId = AuthUtil.getUserId(getRequest().getSession());
-                sortedSet = UserDB.getUserSet(sortedSet);
-
-                retVal="/manage/view_users.html";
-            }
+            UserDB.insertUser(user);
         }
         return  retVal;
     }

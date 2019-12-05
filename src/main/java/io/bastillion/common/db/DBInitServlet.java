@@ -28,7 +28,6 @@
 package io.bastillion.common.db;
 
 import io.bastillion.common.util.AppConfig;
-import io.bastillion.manage.db.LicenseDB;
 import io.bastillion.manage.model.Auth;
 import io.bastillion.manage.util.*;
 
@@ -63,7 +62,6 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 	 * task init method that created DB and generated public/private keys
 	 *
 	 * @param config task config
-	 * @throws ServletException
 	 */
 	public void init(ServletConfig config) throws ServletException {
 
@@ -147,17 +145,8 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 					if(StringUtils.isNotEmpty(str)) {
 						defaultPassword = EncryptionUtil.hash(str.trim() + salt);
 					}
-					LicenseDB.saveLicense(LicenseUtil.generateForEC2());
 				}
 
-				//license key text file
-				file = new File(AppConfig.class.getClassLoader().getResource(".").getPath() + "../../../../LICENSE_KEY.txt");
-				if (file.exists()) {
-					String str = FileUtils.readFileToString(file, "UTF-8");
-					if(StringUtils.isNotEmpty(str)) {
-						LicenseDB.saveLicense(str.trim());
-					}
-				}
 				//insert default admin user
 				PreparedStatement pStmt = connection.prepareStatement("insert into users (username, password, user_type, salt) values(?,?,?,?)");
 				pStmt.setString(1, "admin");
