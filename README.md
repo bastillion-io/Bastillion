@@ -209,7 +209,7 @@ Auditing
 ------
 Auditing is disabled by default. Audit logs can be enabled through the log4j2.xml by uncommenting the **io.bastillion.manage.util.SystemAudit** and the **audit-appender** definations.
 
-	https://github.com/bastillion-io/Bastillion/blob/master/src/main/resources/log4j2.xml#L19-L22
+> https://github.com/bastillion-io/Bastillion/blob/master/src/main/resources/log4j2.xml#L19-L22
 	
 Auditing through the application is only a proof of concept.  It can be enabled in the BastillionConfig.properties.
 
