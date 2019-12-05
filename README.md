@@ -11,14 +11,13 @@ Bastillion layers TLS/SSL on top of SSH and acts as a bastion host for administr
 
 Bastillion Releases
 ------
-
-Feel free to download and try out Bastillion for a limited amount of users(6) or systems(12)
+Bastillion is available for free use under the Affero General Public License
 
 https://github.com/bastillion-io/Bastillion/releases
 
-or purchase a subscription
+or purchase from the AWS marketplace
 
-https://www.bastillion.io/subscription
+https://aws.amazon.com/marketplace/pp/Loophole-LLC-Bastillion/B076PNFPCL
 
 Prerequisites
 -------------
@@ -240,7 +239,7 @@ Third-party dependencies are mentioned in the [_3rdPartyLicenses.md_](3rdPartyLi
 
 AGPL License
 -----------
-Bastillion is available for non-commercial use under the Affero General Public License
+Bastillion is available for use under the Affero General Public License
 
 Author
 ------
