@@ -207,14 +207,18 @@ Users will be added/removed from defined profiles as they login and when the rol
 
 Auditing
 ------
-Auditing is disabled by default and is only a proof of concept.  Can be enabled in the BastillionConfig.properties.
+Auditing is disabled by default. Audit logs can be enabled through the log4j2.xml by uncommenting the **io.bastillion.manage.util.SystemAudit** and the **audit-appender** definations.
+
+	https://github.com/bastillion-io/Bastillion/blob/master/src/main/resources/log4j2.xml#L19-L22
+	
+Auditing through the application is only a proof of concept.  It can be enabled in the BastillionConfig.properties.
 
 	#enable audit  --set to true to enable
 	enableInternalAudit=true
 
 Screenshots
 -----------
-![Login](https://www.bastillion.io/images/screenshots/medium/login.png)
+![Login](https://www.bastillion.iohttps://github.com/bastillion-io/Bastillion/blob/master/src/main/resources/log4j2.xml#L19-L22/images/screenshots/medium/login.png)
 
 ![Two-Factor](https://www.bastillion.io/images/screenshots/medium/two-factor.png)
 
