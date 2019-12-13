@@ -218,7 +218,7 @@ Auditing through the application is only a proof of concept.  It can be enabled 
 
 Screenshots
 -----------
-![Login](https://www.bastillion.iohttps://github.com/bastillion-io/Bastillion/blob/master/src/main/resources/log4j2.xml#L19-L22/images/screenshots/medium/login.png)
+![Login](https://www.bastillion.io/images/screenshots/medium/login.png)
 
 ![Two-Factor](https://www.bastillion.io/images/screenshots/medium/two-factor.png)
 
