@@ -132,13 +132,12 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 
 				statement.executeUpdate("create table if not exists session_log (id BIGINT PRIMARY KEY AUTO_INCREMENT, session_tm timestamp default CURRENT_TIMESTAMP, first_nm varchar, last_nm varchar, username varchar not null, ip_address varchar)");
 				statement.executeUpdate("create table if not exists terminal_log (session_id BIGINT, instance_id INTEGER, output varchar not null, log_tm timestamp default CURRENT_TIMESTAMP, display_nm varchar not null, user varchar not null, host varchar not null, port INTEGER not null, foreign key (session_id) references session_log(id) on delete cascade)");
-				statement.executeUpdate("create table if not exists license (id INTEGER PRIMARY KEY AUTO_INCREMENT, license_tx varchar not null)");
 
 				//if exists readfile to set default password
 				String salt = EncryptionUtil.generateSalt();
 				String defaultPassword = EncryptionUtil.hash("changeme" + salt);
 
-				//set license if running in EC2
+				//set password if running in EC2
 				File file = new File("/opt/bastillion/instance_id");
 				if (file.exists()) {
 					String str = FileUtils.readFileToString(file, "UTF-8");
