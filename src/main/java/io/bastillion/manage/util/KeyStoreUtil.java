@@ -63,7 +63,7 @@ public class KeyStoreUtil {
 			'-', '0', '^', 'Y', ')', '5', 'V', 'M', '7', 'S', 'a', 'c', 'D', 'C', 'w', 'A', 'o', 'n', 's', 'r', '*',
 			'G', '[', 'l', 'h', '$', 'U', 's', '_', 'D', 'f', 'X', '~', '.', '7', 'B', 'A', 'E', '(', '#', ']', ':',
 			'`', ',', 'k', 'y'};
-	private static int KEYLENGTH = AppConfig.getProperty("use256EncryptionKey").equals("true") ? 256 :128;
+	private static int KEYLENGTH = 256;
 
 	//Alias for encryption keystore
 	public static final String ENCRYPTION_KEY_ALIAS = "KEYBOX-ENCRYPTION_KEY";
