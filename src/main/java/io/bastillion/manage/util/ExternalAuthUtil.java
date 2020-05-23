@@ -73,6 +73,7 @@ public class ExternalAuthUtil {
     public static final boolean externalAuthEnabled = StringUtils.isNotEmpty(AppConfig.getProperty("jaasModule"));
     private static final String JAAS_CONF = "jaas.conf";
     private static final String JAAS_MODULE = AppConfig.getProperty("jaasModule");
+    private static final String DEFAULT_LDAP_PROFILE = AppConfig.getProperty("defaultProfileForLdap");
 
 
     static {
@@ -259,6 +260,10 @@ public class ExternalAuthUtil {
                         }
 
                     }
+                    if(StringUtils.isNotEmpty(DEFAULT_LDAP_PROFILE)) {
+                        UserProfileDB.assignProfileToUser(con, user.getId(), DEFAULT_LDAP_PROFILE);
+                    }
+
                     authToken = UUID.randomUUID().toString();
                     user.setAuthToken(authToken);
                     user.setAuthType(Auth.AUTH_EXTERNAL);

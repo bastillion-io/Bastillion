@@ -232,4 +232,50 @@ public class UserProfileDB {
         }
     }
 
+    /**
+     * assigns profiles to given user
+     *
+     * @param userId                 user id
+     * @param profileNm              profile name
+     */
+    public static void assignProfileToUser(Connection con, Long userId, String profileNm) {
+
+        PreparedStatement stmt = null;
+
+        try {
+
+            if (StringUtils.isNotEmpty(profileNm)) {
+
+                Long profileId = null;
+                stmt = con.prepareStatement("select id from  profiles p where lower(p.nm) like ?");
+                stmt.setString(1, profileNm.toLowerCase());
+                ResultSet rs = stmt.executeQuery();
+                while (rs.next()) {
+                        profileId = rs.getLong("id");
+                }
+                DBUtils.closeRs(rs);
+                DBUtils.closeStmt(stmt);
+
+                if (profileId != null) {
+                    stmt = con.prepareStatement("delete from user_map where profile_id=?");
+                    stmt.setLong(1, profileId);
+                    stmt.execute();
+                    DBUtils.closeStmt(stmt);
+
+                    stmt = con.prepareStatement("insert into user_map (profile_id, user_id) values (?,?)");
+                    stmt.setLong(1, profileId);
+                    stmt.setLong(2, userId);
+                    stmt.execute();
+                    DBUtils.closeStmt(stmt);
+
+                    //delete all unassigned keys by profile
+                    PublicKeyDB.deleteUnassignedKeysByProfile(con, profileId);
+                }
+            }
+
+        } catch (Exception e) {
+            log.error(e.toString(), e);
+        }
+    }
+
 }
