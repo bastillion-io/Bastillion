@@ -19,6 +19,10 @@ or purchase from the AWS marketplace
 
 https://aws.amazon.com/marketplace/pp/Loophole-LLC-Bastillion/B076PNFPCL
 
+Also, Bastillion can be installed on FreeBSD via the FreeBSD ports system. To install via the binary package, simply run:
+	
+	pkg install security/bastillion
+
 Prerequisites
 -------------
 **Open-JDK / Oracle-JDK - 1.9 or greater**
