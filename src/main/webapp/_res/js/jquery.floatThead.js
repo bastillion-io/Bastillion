@@ -1,4 +1,4 @@
-/** @preserve jQuery.floatThead 2.1.4 - https://mkoryak.github.io/floatThead/ - Copyright (c) 2012 - 2019 Misha Koryak **/
+/** @preserve jQuery.floatThead 2.2.0 - https://mkoryak.github.io/floatThead/ - Copyright (c) 2012 - 2019 Misha Koryak **/
 // @license MIT
 
 /* @author Misha Koryak
@@ -34,8 +34,8 @@
       // it should return a jquery object containing a wrapped set of table cells comprising a row that contains no col spans and is visible
       return $table.find('tbody tr:visible:first>*:visible');
     },
-    ariaLabel: function($table, $headerCell, columnIndex) { // This function will run for every header cell that exists in the table when we add aria-labels. 
-      // Override to customize the aria-label. NOTE: These labels will be added to the 'sizer cells' which get added to the real table and are not visible by the user (only screen readers), 
+    ariaLabel: function($table, $headerCell, columnIndex) { // This function will run for every header cell that exists in the table when we add aria-labels.
+      // Override to customize the aria-label. NOTE: These labels will be added to the 'sizer cells' which get added to the real table and are not visible by the user (only screen readers),
       // The number of sizer columns might not match the header columns in your real table - I insert one sizer header cell per column. This means that if your table uses colspans or multiple header rows,
       // this will not be reflected by sizer cells. This is why I am giving you the `columnIndex`.
       return $headerCell.text();
@@ -391,6 +391,7 @@
         $tableColGroup = $("<colgroup/>");
         existingColGroup = false;
       }
+      var colSelector = existingColGroup ? "col:visible" : "col";
       var $fthRow = $('<fthtr>').css({ //created unstyled elements (used for sizing the table because chrome can't read <col> width)
         'display': 'table-row',
         'border-spacing': 0,
@@ -531,7 +532,7 @@
         var count;
         var $headerColumns = $header.find(opts.headerCellSelector);
         if(existingColGroup){
-          count = $tableColGroup.find('col').length;
+          count = $tableColGroup.find(colSelector).length;
         } else {
           count = 0;
           $headerColumns.each(function () {
@@ -557,21 +558,25 @@
             );
           }
 
-          cols = cols.join('');
-  
+          if(existingColGroup){
+            cols = $tableColGroup.html();
+          } else {
+            cols = cols.join('');
+          }
+
           if(createElements){
             $fthRow.empty();
             $fthRow.append(psuedo);
             $fthCells = $fthRow.find('fthtd');
           }
-          
+
           $sizerCells = $sizerRow.find("th");
           if(!existingColGroup){
             $tableColGroup.html(cols);
           }
-          $tableCells = $tableColGroup.find('col');
+          $tableCells = $tableColGroup.find(colSelector);
           $floatColGroup.html(cols);
-          $headerCells = $floatColGroup.find("col");
+          $headerCells = $floatColGroup.find(colSelector);
 
         }
         return count;
@@ -645,7 +650,7 @@
         return function(){
           //Cache the current scrollLeft value so that it can be reset post reflow
           var scrollLeft = $floatContainer.scrollLeft();
-          $tableCells = $tableColGroup.find('col');
+          $tableCells = $tableColGroup.find(colSelector);
           var $rowCells = getSizingRow($table, $tableCells, $fthCells, ieVersion);
 
           if($rowCells.length === numCols && numCols > 0){

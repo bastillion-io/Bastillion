@@ -220,6 +220,7 @@
 
 
             var termMap = {};
+            var fitMap = {};
 
 
             $("#reset_size").click(function () {
@@ -248,7 +249,7 @@
                         url: '../admin/setPtyType.ktrl?id=' + id + '&userSettings.ptyWidth=' + width + '&userSettings.ptyHeight=' + height + '&_csrf=' + [[${session._csrf}]],
                         cache: false
                     });
-                    termMap[id].fit();
+                    fitMap[id].fit();
                 }
 
             }
@@ -287,11 +288,13 @@
 
             function createTermMap(id, output) {
 
-                Terminal.applyAddon(fit);
                 termMap[id] = new Terminal({
                     fontSize: 14,
                     fontFamily: 'DejaVu Sans Mono, Liberation Mono, monospace'
                 });
+
+                fitMap[id] = new FitAddon.FitAddon()
+                termMap[id].loadAddon(fitMap[id])
 
                 var  CUSTOM_THEME =
                     {
