@@ -263,7 +263,20 @@
             ws_uri += "//" + loc.host + loc.pathname + '/../terms.ws?t=' + new Date().getTime();
 
             var connection = new WebSocket(ws_uri);
-
+        
+            function heartbeat() {
+                if (!connection) return;
+                if (connection.readyState !== 1) return;
+                connection.send("heartbeat");
+                
+                // Set heartbeat interval 10,000 ms
+                setTimeout(heartbeat, 10000);
+            };
+            
+            // Register websocket heartbeat
+            connection.onopen = function (e) {
+                heartbeat();
+            };
 
             // Log errors
             connection.onerror = function (error) {
