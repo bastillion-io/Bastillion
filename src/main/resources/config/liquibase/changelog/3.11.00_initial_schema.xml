@@ -208,12 +208,12 @@
 			<column name="id" autoIncrement="true" type="bigint">
 				<constraints primaryKey="true" nullable="false" />
 			</column>
-			<column name="key_nm varchar" type="varchar(100)">
+			<column name="key_nm" type="varchar(100)">
 				<constraints nullable="false" />
 			</column>
 			<column name="type" type="varchar(100)" />
 			<column name="fingerprint" type="varchar(100)" />
-			<column name="public_key varchar" type="varchar(4096)">
+			<column name="public_key" type="varchar(4096)">
 				<constraints nullable="false" />
 			</column>
 			<column name="enabled" type="boolean" defaultValue="true">
