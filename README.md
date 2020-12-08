@@ -213,12 +213,11 @@ External Authentication via HTTP_HEADER
 ------
 Bastillion supports authentication based on **REMOTE_USER** http header.
 
-This allows more integrated authentication scenarios, using a reverse-proxy. The followinfg can - for example - bu used:
+This allows more integrated authentication scenarios, using a reverse-proxy. The followinfg can - for example - be used:
 - mod_cas, to authenticate against a CAS server
 - Shibboleth SP, to authenticate against a SAML IdP
 
-The external authentication mode is exclusive from all others authentication mode, and is activated through the **** param:
-
+The external authentication mode is exclusive from all others authentication mode, and is activated through the **authenticationMode** param:
 
 Auditing
 ------
