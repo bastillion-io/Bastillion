@@ -67,6 +67,16 @@ for Windows
 	
 More Documentation at: https://www.bastillion.io/docs/index.html
 	
+To run with Tomcat
+------
+
+Download Tomcat 8.5.x or above.
+
+Build war:
+	mvn clean install
+	
+Put the war file in **webapps/** folder
+
 Build from Source
 ------
 Install Maven 3 or greater
@@ -89,6 +99,19 @@ In the directory that contains the pom.xml run
 	mvn package jetty:run
 
 *Note: Doing a mvn clean will delete the H2 DB and wipe out all the data.*
+
+Build to run with Mariadb
+------
+
+	mvn clean install -Pmariadb
+
+Database management
+------
+The database schema is managed with Liquibase (https://www.liquibase.org/).
+
+Resources are under src/main/resources/config/liquibase/
+
+The **dbCreate** param conntrols whether or not the schema creation/update should be done when Bastillion starts.
 
 Using Bastillion
 ------
