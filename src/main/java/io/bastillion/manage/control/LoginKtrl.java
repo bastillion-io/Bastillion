@@ -27,6 +27,13 @@
  */
 package io.bastillion.manage.control;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.bastillion.common.util.AppConfig;
 import io.bastillion.common.util.AuthUtil;
 import io.bastillion.manage.db.AuthDB;
@@ -38,12 +45,6 @@ import loophole.mvc.annotation.MethodType;
 import loophole.mvc.annotation.Model;
 import loophole.mvc.annotation.Validate;
 import loophole.mvc.base.BaseKontroller;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 public class LoginKtrl extends BaseKontroller {
 
@@ -51,9 +52,9 @@ public class LoginKtrl extends BaseKontroller {
     @Model(name = "otpEnabled")
     static final Boolean otpEnabled = ("required".equals(AppConfig.getProperty("oneTimePassword")) || "optional".equals(AppConfig.getProperty("oneTimePassword")));
     private static Logger loginAuditLogger = LoggerFactory.getLogger("io.bastillion.manage.control.LoginAudit");
-    private final String AUTH_ERROR = "Authentication Failed : Login credentials are invalid";
+    public static final String AUTH_ERROR = "Authentication Failed : Login credentials are invalid";
     private final String AUTH_ERROR_NO_PROFILE = "Authentication Failed : There are no profiles assigned to this account";
-    private final String AUTH_ERROR_EXPIRED_ACCOUNT = "Authentication Failed : Account has expired";
+    public static final String AUTH_ERROR_EXPIRED_ACCOUNT = "Authentication Failed : Account has expired";
     @Model(name = "auth")
     Auth auth;
 

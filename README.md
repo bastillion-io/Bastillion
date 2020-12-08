@@ -182,7 +182,7 @@ By default the datastore is set as embedded, but a remote H2 database can suppor
     #Connection URL to the DB
 	dbConnectionURL=jdbc:h2:tcp://<host>:<port>/~/bastillion;CIPHER=AES;
 
-External Authentication
+External Authentication with JAAS
 ------
 External Authentication can be enabled through the BastillionConfig.properties.
 
@@ -231,6 +231,16 @@ User LDAP roles can be mapped to profiles defined in Bastillion through the use 
     };
 
 Users will be added/removed from defined profiles as they login and when the role name matches the profile name.
+
+External Authentication via HTTP_HEADER
+------
+Bastillion supports authentication based on **REMOTE_USER** http header.
+
+This allows more integrated authentication scenarios, using a reverse-proxy. The followinfg can - for example - be used:
+- mod_cas, to authenticate against a CAS server
+- Shibboleth SP, to authenticate against a SAML IdP
+
+The external authentication mode is exclusive from all others authentication mode, and is activated through the **authenticationMode** param:
 
 Auditing
 ------
