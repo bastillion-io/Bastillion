@@ -27,10 +27,6 @@
  */
 package io.bastillion.manage.db;
 
-import io.bastillion.manage.model.Profile;
-import io.bastillion.manage.model.SortedSet;
-import io.bastillion.manage.util.DBUtils;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -41,247 +37,241 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.bastillion.manage.model.Profile;
+import io.bastillion.manage.model.SortedSet;
+import io.bastillion.manage.util.DBUtils;
 
 /**
  * DAO to manage profile
  */
 public class ProfileDB {
 
-    private static Logger log = LoggerFactory.getLogger(ProfileDB.class);
+	private static Logger log = LoggerFactory.getLogger(ProfileDB.class);
 
-    public static final String FILTER_BY_SYSTEM = "system";
-    public static final String FILTER_BY_USER = "user";
-    public static final String SORT_BY_PROFILE_NM="nm";
+	public static final String FILTER_BY_SYSTEM = "system";
+	public static final String FILTER_BY_USER = "user";
+	public static final String SORT_BY_PROFILE_NM = "nm";
 
-    private ProfileDB() {
-    }
+	private ProfileDB() {
+	}
 
-    /**
-     * method to do order by based on the sorted set object for profiles
-     * @return list of profiles
-     */
-    public static SortedSet getProfileSet(SortedSet sortedSet) {
+	/**
+	 * method to do order by based on the sorted set object for profiles
+	 * 
+	 * @return list of profiles
+	 */
+	public static SortedSet getProfileSet(SortedSet sortedSet) {
 
-        ArrayList<Profile> profileList = new ArrayList<>();
+		ArrayList<Profile> profileList = new ArrayList<>();
 
-        String orderBy = "";
-        if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
-            orderBy = " order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
-        }
-        String sql = "select distinct p.* from  profiles p ";
-        if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM))) {
-           sql = sql + ", system_map m, system s where m.profile_id = p.id and m.system_id = s.id" +
-                   " and (lower(s.display_nm) like ? or lower(s.host) like ?)";
-        } else if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_USER))) {
-            sql = sql + ", user_map m, users u where m.profile_id = p.id and m.user_id = u.id" +
-                    " and (lower(u.first_nm) like ? or lower(u.last_nm) like ?" +
-                    " or lower(u.email) like ? or lower(u.username) like ?)";
-        }
-        sql = sql + orderBy;
+		String orderBy = "";
+		if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
+			orderBy = " order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
+		}
+		String sql = "select distinct p.* from  profiles p ";
+		if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM))) {
+			sql = sql + ", system_map m, system s where m.profile_id = p.id and m.system_id = s.id"
+					+ " and (lower(s.display_nm) like ? or lower(s.host) like ?)";
+		} else if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_USER))) {
+			sql = sql + ", user_map m, users u where m.profile_id = p.id and m.user_id = u.id"
+					+ " and (lower(u.first_nm) like ? or lower(u.last_nm) like ?"
+					+ " or lower(u.email) like ? or lower(u.username) like ?)";
+		}
+		sql = sql + orderBy;
 
-        Connection con = null;
-        try {
-            con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement(sql);
-            if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM))) {
-                stmt.setString(1, "%" + sortedSet.getFilterMap().get(FILTER_BY_SYSTEM).toLowerCase() + "%");
-                stmt.setString(2, "%" + sortedSet.getFilterMap().get(FILTER_BY_SYSTEM).toLowerCase() + "%");
-            } else if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_USER))) {
-                stmt.setString(1, "%" + sortedSet.getFilterMap().get(FILTER_BY_USER).toLowerCase() + "%");
-                stmt.setString(2, "%" + sortedSet.getFilterMap().get(FILTER_BY_USER).toLowerCase() + "%");
-                stmt.setString(3, "%" + sortedSet.getFilterMap().get(FILTER_BY_USER).toLowerCase() + "%");
-                stmt.setString(4, "%" + sortedSet.getFilterMap().get(FILTER_BY_USER).toLowerCase() + "%");
-            }
-            ResultSet rs = stmt.executeQuery();
+		Connection con = null;
+		try {
+			con = DBUtils.getConn();
+			PreparedStatement stmt = con.prepareStatement(sql);
+			if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM))) {
+				stmt.setString(1, "%" + sortedSet.getFilterMap().get(FILTER_BY_SYSTEM).toLowerCase() + "%");
+				stmt.setString(2, "%" + sortedSet.getFilterMap().get(FILTER_BY_SYSTEM).toLowerCase() + "%");
+			} else if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_USER))) {
+				stmt.setString(1, "%" + sortedSet.getFilterMap().get(FILTER_BY_USER).toLowerCase() + "%");
+				stmt.setString(2, "%" + sortedSet.getFilterMap().get(FILTER_BY_USER).toLowerCase() + "%");
+				stmt.setString(3, "%" + sortedSet.getFilterMap().get(FILTER_BY_USER).toLowerCase() + "%");
+				stmt.setString(4, "%" + sortedSet.getFilterMap().get(FILTER_BY_USER).toLowerCase() + "%");
+			}
+			ResultSet rs = stmt.executeQuery();
 
-            while (rs.next()) {
-                Profile profile = new Profile();
-                profile.setId(rs.getLong("id"));
-                profile.setNm(rs.getString("nm"));
-                profile.setDesc(rs.getString("desc"));
-                profileList.add(profile);
+			while (rs.next()) {
+				Profile profile = new Profile();
+				profile.setId(rs.getLong("id"));
+				profile.setNm(rs.getString("nm"));
+				profile.setDesc(rs.getString("desc"));
+				profileList.add(profile);
 
-            }
-            DBUtils.closeRs(rs);
-            DBUtils.closeStmt(stmt);
+			}
+			DBUtils.closeRs(rs);
+			DBUtils.closeStmt(stmt);
 
-        } catch (Exception e) {
-            log.error(e.toString(), e);
-        }
-        finally {
-            DBUtils.closeConn(con);
-        }
+		} catch (Exception e) {
+			log.error(e.toString(), e);
+		} finally {
+			DBUtils.closeConn(con);
+		}
 
-        sortedSet.setItemList(profileList);
-        return sortedSet;
-    }
+		sortedSet.setItemList(profileList);
+		return sortedSet;
+	}
 
+	/**
+	 * returns all profile information
+	 *
+	 * @return list of profiles
+	 */
+	public static List<Profile> getAllProfiles() {
 
-    /**
-     * returns all profile information
-     *
-     * @return list of profiles
-     */
-    public static List<Profile> getAllProfiles() {
+		ArrayList<Profile> profileList = new ArrayList<>();
+		Connection con = null;
+		try {
+			con = DBUtils.getConn();
+			PreparedStatement stmt = con.prepareStatement("select * from  profiles order by nm asc");
+			ResultSet rs = stmt.executeQuery();
 
-        ArrayList<Profile> profileList = new ArrayList<>();
-        Connection con = null;
-        try {
-            con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("select * from  profiles order by nm asc");
-            ResultSet rs = stmt.executeQuery();
+			while (rs.next()) {
+				Profile profile = new Profile();
+				profile.setId(rs.getLong("id"));
+				profile.setNm(rs.getString("nm"));
+				profile.setDesc(rs.getString("desc"));
+				profileList.add(profile);
 
-            while (rs.next()) {
-                Profile profile = new Profile();
-                profile.setId(rs.getLong("id"));
-                profile.setNm(rs.getString("nm"));
-                profile.setDesc(rs.getString("desc"));
-                profileList.add(profile);
+			}
+			DBUtils.closeRs(rs);
+			DBUtils.closeStmt(stmt);
 
-            }
-            DBUtils.closeRs(rs);
-            DBUtils.closeStmt(stmt);
+		} catch (Exception e) {
+			log.error(e.toString(), e);
+		} finally {
+			DBUtils.closeConn(con);
+		}
 
-        } catch (Exception e) {
-            log.error(e.toString(), e);
-        }
-        finally {
-            DBUtils.closeConn(con);
-        }
+		return profileList;
+	}
 
-        return profileList;
-    }
+	/**
+	 * returns profile based on id
+	 *
+	 * @param profileId profile id
+	 * @return profile
+	 */
+	public static Profile getProfile(Long profileId) {
 
-    /**
-     * returns profile based on id
-     *
-     * @param profileId profile id
-     * @return profile
-     */
-    public static Profile getProfile(Long profileId) {
+		Profile profile = null;
+		Connection con = null;
+		try {
+			con = DBUtils.getConn();
+			profile = getProfile(con, profileId);
+		} catch (Exception e) {
+			log.error(e.toString(), e);
+		} finally {
+			DBUtils.closeConn(con);
+		}
 
-        Profile profile = null;
-        Connection con = null;
-        try {
-            con = DBUtils.getConn();
-           profile=getProfile(con, profileId);
-        } catch (Exception e) {
-            log.error(e.toString(), e);
-        }
-        finally {
-            DBUtils.closeConn(con);
-        }
+		return profile;
+	}
 
-        return profile;
-    }
+	/**
+	 * returns profile based on id
+	 *
+	 * @param con       db connection object
+	 * @param profileId profile id
+	 * @return profile
+	 */
+	public static Profile getProfile(Connection con, Long profileId) {
 
-    /**
-     * returns profile based on id
-     *
-     * @param con db connection object
-     * @param profileId profile id
-     * @return profile
-     */
-    public static Profile getProfile(Connection con, Long profileId) {
+		Profile profile = null;
+		try {
+			PreparedStatement stmt = con.prepareStatement("select * from profiles where id=?");
+			stmt.setLong(1, profileId);
+			ResultSet rs = stmt.executeQuery();
 
-        Profile profile = null;
-        try {
-            PreparedStatement stmt = con.prepareStatement("select * from profiles where id=?");
-            stmt.setLong(1, profileId);
-            ResultSet rs = stmt.executeQuery();
+			while (rs.next()) {
+				profile = new Profile();
+				profile.setId(rs.getLong("id"));
+				profile.setNm(rs.getString("nm"));
+				profile.setDesc(rs.getString("desc"));
+				profile.setHostSystemList(ProfileSystemsDB.getSystemsByProfile(con, profileId));
 
-            while (rs.next()) {
-                profile = new Profile();
-                profile.setId(rs.getLong("id"));
-                profile.setNm(rs.getString("nm"));
-                profile.setDesc(rs.getString("desc"));
-                profile.setHostSystemList(ProfileSystemsDB.getSystemsByProfile(con, profileId));
+			}
+			DBUtils.closeRs(rs);
+			DBUtils.closeStmt(stmt);
 
-            }
-            DBUtils.closeRs(rs);
-            DBUtils.closeStmt(stmt);
+		} catch (Exception e) {
+			log.error(e.toString(), e);
+		}
 
-        } catch (Exception e) {
-            log.error(e.toString(), e);
-        }
+		return profile;
+	}
 
-        return profile;
-    }
+	/**
+	 * inserts new profile
+	 *
+	 * @param profile profile object
+	 */
+	public static void insertProfile(Profile profile) {
 
-    /**
-     * inserts new profile
-     *
-     * @param profile profile object
-     */
-    public static void insertProfile(Profile profile) {
+		Connection con = null;
+		try {
+			con = DBUtils.getConn();
 
+			PreparedStatement stmt = con.prepareStatement("insert into profiles (nm, `desc`) values (?,?)");
+			stmt.setString(1, profile.getNm());
+			stmt.setString(2, profile.getDesc());
+			stmt.execute();
+			DBUtils.closeStmt(stmt);
 
-        Connection con = null;
-        try {
-            con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("insert into profiles (nm, desc) values (?,?)");
-            stmt.setString(1, profile.getNm());
-            stmt.setString(2, profile.getDesc());
-            stmt.execute();
-            DBUtils.closeStmt(stmt);
+		} catch (Exception e) {
+			log.error(e.toString(), e);
+		} finally {
+			DBUtils.closeConn(con);
+		}
+	}
 
-        } catch (Exception e) {
-            log.error(e.toString(), e);
-        }
-        finally {
-            DBUtils.closeConn(con);
-        }
-    }
+	/**
+	 * updates profile
+	 *
+	 * @param profile profile object
+	 */
+	public static void updateProfile(Profile profile) {
 
-    /**
-     * updates profile
-     *
-     * @param profile profile object
-     */
-    public static void updateProfile(Profile profile) {
+		Connection con = null;
+		try {
+			con = DBUtils.getConn();
+			PreparedStatement stmt = con.prepareStatement("update profiles set nm=?, desc=? where id=?");
+			stmt.setString(1, profile.getNm());
+			stmt.setString(2, profile.getDesc());
+			stmt.setLong(3, profile.getId());
+			stmt.execute();
+			DBUtils.closeStmt(stmt);
 
+		} catch (Exception e) {
+			log.error(e.toString(), e);
+		} finally {
+			DBUtils.closeConn(con);
+		}
+	}
 
-        Connection con = null;
-        try {
-            con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("update profiles set nm=?, desc=? where id=?");
-            stmt.setString(1, profile.getNm());
-            stmt.setString(2, profile.getDesc());
-            stmt.setLong(3, profile.getId());
-            stmt.execute();
-            DBUtils.closeStmt(stmt);
+	/**
+	 * deletes profile
+	 *
+	 * @param profileId profile id
+	 */
+	public static void deleteProfile(Long profileId) {
 
-        } catch (Exception e) {
-            log.error(e.toString(), e);
-        }
-        finally {
-            DBUtils.closeConn(con);
-        }
-    }
+		Connection con = null;
+		try {
+			con = DBUtils.getConn();
+			PreparedStatement stmt = con.prepareStatement("delete from profiles where id=?");
+			stmt.setLong(1, profileId);
+			stmt.execute();
+			DBUtils.closeStmt(stmt);
 
-    /**
-     * deletes profile
-     *
-     * @param profileId profile id
-     */
-    public static void deleteProfile(Long profileId) {
-
-
-        Connection con = null;
-        try {
-            con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("delete from profiles where id=?");
-            stmt.setLong(1, profileId);
-            stmt.execute();
-            DBUtils.closeStmt(stmt);
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
-        }
-        finally {
-            DBUtils.closeConn(con);
-        }
-    }
-
+		} catch (Exception e) {
+			log.error(e.toString(), e);
+		} finally {
+			DBUtils.closeConn(con);
+		}
+	}
 
 }
