@@ -27,14 +27,6 @@
  */
 package io.bastillion.manage.db;
 
-import io.bastillion.common.util.AppConfig;
-import io.bastillion.manage.model.Auth;
-import io.bastillion.manage.model.User;
-import io.bastillion.manage.util.DBUtils;
-import io.bastillion.manage.util.EncryptionUtil;
-import io.bastillion.manage.util.ExternalAuthUtil;
-import org.apache.commons.lang3.StringUtils;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -42,8 +34,18 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.bastillion.common.util.AppConfig;
+import io.bastillion.manage.model.Auth;
+import io.bastillion.manage.model.User;
+import io.bastillion.manage.util.DBUtils;
+import io.bastillion.manage.util.EncryptionUtil;
+import io.bastillion.manage.util.ExternalAuthUtil;
+import io.bastillion.manage.util.ProxyAuthUtil;
 
 /**
  * DAO to login administrative users
@@ -64,8 +66,14 @@ public class AuthDB {
      * @return auth token if success
      */
     public static String login(Auth auth) {
-        //check ldap first
-        String authToken = ExternalAuthUtil.login(auth);
+    	
+		// if proxy, check it first
+		String authToken = ProxyAuthUtil.login(auth);
+
+		// check ldap second
+		if (StringUtils.isEmpty(authToken)) {
+			authToken = ExternalAuthUtil.login(auth);
+		}
         
         if (StringUtils.isEmpty(authToken)) {
 
