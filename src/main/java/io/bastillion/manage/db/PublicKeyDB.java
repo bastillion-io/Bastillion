@@ -27,12 +27,6 @@
  */
 package io.bastillion.manage.db;
 
-import io.bastillion.manage.model.PublicKey;
-import io.bastillion.manage.model.SortedSet;
-import io.bastillion.manage.util.DBUtils;
-import io.bastillion.manage.util.SSHUtil;
-import org.apache.commons.lang3.StringUtils;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -41,8 +35,15 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.bastillion.manage.model.PublicKey;
+import io.bastillion.manage.model.SortedSet;
+import io.bastillion.manage.util.DBUtils;
+import io.bastillion.manage.util.SSHUtil;
 
 /**
  * DAO to manage public keys
@@ -572,7 +573,7 @@ public class PublicKeyDB {
         try {
           con = DBUtils.getConn();
 
-          stmt = con.prepareStatement("select * from public_keys where user_id=? and fingerprint like ? and profile_id is ? and id is not ?");
+          stmt = con.prepareStatement("select * from public_keys where user_id=? and fingerprint like ? and profile_id = ? and id != ?");
           stmt.setLong(1, userId);
           stmt.setString(2, SSHUtil.getFingerprint(publicKey.getPublicKey()));
           if(publicKey.getProfile()!=null && publicKey.getProfile().getId()!=null){
