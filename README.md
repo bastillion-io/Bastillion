@@ -67,6 +67,51 @@ for Windows
 
 More Documentation at: https://www.bastillion.io/docs/index.html
 
+To run with Tomcat
+------
+
+Download Tomcat 8.5.x or above.
+
+Build war with MariaDB support:
+        mvn clean install -Pmariadb
+
+Put the war file in **webapps/** folder
+
+        cp target/bastillion-3.xx.xx.war /opt/tomcat/webapps/bastillion.war
+
+Externalise Bastillion config in **/etc/bastillion/**
+
+```bash
+$ mkdir /etc/bastillion
+$ chown tomcat /etc/bastillion
+# put you config file into
+# add property pointing to /etc/bastillion/
+$ echo 'JAVA_OPTS="$JAVA_OPTS -DCONFIG_DIR=/etc/bastillion/"' >> /opt/tomcat/bin/setenv.sh
+# Create database and mariadb user
+$ mysql -u root
+
+MariaDB > CREATE DATABASE IF NOT EXISTS bastillion CHARACTER SET=utf8;
+MariaDB > create user bastillion identified by 'password';
+MariaDB > grant all privileges on bastillion.* to 'bastillion'@'localhost' identified by 'password';
+MariaDB > flush privileges;
+
+# Start Tomcat
+$ systemctl start tomcat
+```
+
+**Sample httpd config:**
+
+```
+<Location /bastillion>
+  ProxyPass http://127.0.0.1:8080/bastillion
+  ProxyPass http://127.0.0.1:8080/bastillion
+</Location>
+<LocationMatch "/bastillion/admin/(terms.*)">
+  ProxyPass ws://127.0.0.1:8080/bastillion/admin/$1
+  ProxyPassReverse ws://127.0.0.1:8080/bastillion/admin/$1
+</LocationMatch>
+```
+
 Build from Source
 ------
 Install Maven 3 or greater
@@ -89,6 +134,19 @@ In the directory that contains the pom.xml run
 	mvn package jetty:run
 
 *Note: Doing a mvn clean will delete the H2 DB and wipe out all the data.*
+
+Build to run with Mariadb
+------
+
+	mvn clean install -Pmariadb
+
+Database management
+------
+The database schema is managed with Liquibase (https://www.liquibase.org/).
+
+Resources are under src/main/resources/config/liquibase/
+
+The **dbCreate** param conntrols whether or not the schema creation/update should be done when Bastillion starts.
 
 Using Bastillion
 ------
