@@ -127,7 +127,10 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
 			try {
 				rs = statement.executeQuery("select * from users");
 				databaseExists = true;
-			} finally {
+			} catch(Exception e) {
+				// This is not an issue. It just means the database doesn't exists
+			}
+				finally {
 				DBUtils.closeRs(rs);
 			}
 
