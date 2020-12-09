@@ -20,7 +20,7 @@ or purchase from the AWS marketplace
 https://aws.amazon.com/marketplace/pp/Loophole-LLC-Bastillion/B076PNFPCL
 
 Also, Bastillion can be installed on FreeBSD via the FreeBSD ports system. To install via the binary package, simply run:
-	
+
 	pkg install security/bastillion
 
 Prerequisites
@@ -32,7 +32,7 @@ Prerequisites
 
 **Install [Authy](https://authy.com/) or [Google Authenticator](https://github.com/google/google-authenticator)** to enable two-factor authentication with Android or iOS
 
-| Application          | Android                                                                                             | iOS                                                                        |             
+| Application          | Android                                                                                             | iOS                                                                        |
 |----------------------|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
 | Authy                | [Google Play](https://play.google.com/store/apps/details?id=com.authy.authy)                        | [iTunes](https://itunes.apple.com/us/app/authy/id494168017)                |
 | Google Authenticator | [Google Play](https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2) | [iTunes](https://itunes.apple.com/us/app/google-authenticator/id388497605) |
@@ -64,25 +64,60 @@ for Linux/Unix/OSX
 for Windows
 
         startBastillion.bat
-	
+
 More Documentation at: https://www.bastillion.io/docs/index.html
-	
+
 To run with Tomcat
 ------
 
 Download Tomcat 8.5.x or above.
 
-Build war:
-	mvn clean install
-	
+Build war with MariaDB support:
+        mvn clean install -Pmariadb
+
 Put the war file in **webapps/** folder
+
+        cp target/bastillion-3.xx.xx.war /opt/tomcat/webapps/bastillion.war
+
+Externalise Bastillion config in **/etc/bastillion/**
+
+```bash
+$ mkdir /etc/bastillion
+$ chown tomcat /etc/bastillion
+# put you config file into
+# add property pointing to /etc/bastillion/
+$ echo 'JAVA_OPTS="$JAVA_OPTS -DCONFIG_DIR=/etc/bastillion/"' >> /opt/tomcat/bin/setenv.sh
+# Create database and mariadb user
+$ mysql -u root
+
+MariaDB > CREATE DATABASE IF NOT EXISTS bastillion CHARACTER SET=utf8;
+MariaDB > create user bastillion identified by 'password';
+MariaDB > grant all privileges on bastillion.* to 'bastillion'@'localhost' identified by 'password';
+MariaDB > flush privileges;
+
+# Start Tomcat
+$ systemctl start tomcat
+```
+
+**Sample httpd config:**
+
+```
+<Location /bastillion>
+  ProxyPass http://127.0.0.1:8080/bastillion
+  ProxyPass http://127.0.0.1:8080/bastillion
+</Location>
+<LocationMatch "/bastillion/admin/(terms.*)">
+  ProxyPass ws://127.0.0.1:8080/bastillion/admin/$1
+  ProxyPassReverse ws://127.0.0.1:8080/bastillion/admin/$1
+</LocationMatch>
+```
 
 Build from Source
 ------
 Install Maven 3 or greater
 
-*apt-get install maven* 
-> http://maven.apache.org 
+*apt-get install maven*
+> http://maven.apache.org
 
 Install Loophole MVC
 
@@ -121,7 +156,7 @@ Login with
 
 	username:admin
 	password:changeme
-	
+
 *Note: When using the AMI instance, the password is defaulted to the \<Instance ID\>. Also, the AMI uses port 443 as in https://\<Instance IP\>:443*
 
 Managing SSH Keys
@@ -158,10 +193,10 @@ For example:
 
 	#public key  --set pub key
 	publicKey=/Users/kavanagh/.ssh/id_rsa.pub
-	
+
 	#default passphrase  --leave blank if passphrase is empty
 	defaultSSHPassphrase=myPa$$w0rd
-	
+
 After startup and once the key has been registered it can then be removed from the system. The passphrase and the key paths will be removed from the configuration file.
 
 Adjusting Database Settings
@@ -190,7 +225,7 @@ For example:
 
 	#specify a external authentication module (ex: ldap-ol, ldap-ad).  Edit the jaas.conf to set connection details
 	jaasModule=ldap-ol
-    
+
 Connection details need to be set in the jaas.conf file
 
     ldap-ol {
@@ -201,7 +236,7 @@ Connection details need to be set in the jaas.conf file
     	useSSL=false
     	debug=false;
     };
-    
+
 
 Administrators will be added as they are authenticated and profiles of systems may be assigned by full-privileged users.
 
@@ -247,7 +282,7 @@ Auditing
 Auditing is disabled by default. Audit logs can be enabled through the **log4j2.xml** by uncommenting the **io.bastillion.manage.util.SystemAudit** and the **audit-appender** definitions.
 
 > https://github.com/bastillion-io/Bastillion/blob/master/src/main/resources/log4j2.xml#L19-L22
-	
+
 Auditing through the application is only a proof of concept.  It can be enabled in the BastillionConfig.properties.
 
 	#enable audit  --set to true to enable
@@ -288,4 +323,3 @@ Author
 
 + sean.p.kavanagh6@gmail.com
 + https://twitter.com/spkavanagh6
-
