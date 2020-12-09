@@ -27,7 +27,7 @@
         <Logger name="io.bastillion.manage.control.LoginAudit" level="info" additivity="false">
             <AppenderRef ref="console"/>
         </Logger>
-        <Root level="warn">
+        <Root level="info">
             <AppenderRef ref="console"/>
         </Root>
     </Loggers>

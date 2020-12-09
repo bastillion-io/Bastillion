@@ -1,37 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
 
-    <session-config>
-        <cookie-config>
-            <http-only>true</http-only>
-        </cookie-config>
-    </session-config>
+	<session-config>
+		<cookie-config>
+			<http-only>true</http-only>
+		</cookie-config>
+	</session-config>
+
+	<filter>
+		<filter-name>ProxyAuthFilter</filter-name>
+		<filter-class>io.bastillion.common.filter.ProxyAuthFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>ProxyAuthFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<filter>
+		<filter-name>AuthFilter</filter-name>
+		<filter-class>io.bastillion.common.filter.AuthFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>AuthFilter</filter-name>
+		<url-pattern>/manage/*</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+		<filter-name>AuthFilter</filter-name>
+		<url-pattern>/admin/*</url-pattern>
+	</filter-mapping>
 
 
-    <filter>
-        <filter-name>AuthFilter</filter-name>
-        <filter-class>io.bastillion.common.filter.AuthFilter</filter-class>
-    </filter>
 
-    <filter-mapping>
-        <filter-name>AuthFilter</filter-name>
-        <url-pattern>/manage/*</url-pattern>
-    </filter-mapping>
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+		<welcome-file>index.htm</welcome-file>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
 
-    <filter-mapping>
-        <filter-name>AuthFilter</filter-name>
-        <url-pattern>/admin/*</url-pattern>
-    </filter-mapping>
-
-    <welcome-file-list>
-        <welcome-file>index.html</welcome-file>
-        <welcome-file>index.htm</welcome-file>
-        <welcome-file>index.jsp</welcome-file>
-    </welcome-file-list>
-
-    <error-page>
-        <location>/error.html</location>
-    </error-page>
+	<error-page>
+		<location>/error.html</location>
+	</error-page>
 
 </web-app>

@@ -40,6 +40,10 @@ public class Auth {
     
     public static final String AUTH_BASIC="BASIC";
     public static final String AUTH_EXTERNAL="EXTERNAL";
+	public static final String AUTH_PROXY="PROXY";
+	
+	public static final String AUTHENTICATION_MODE_FORM="form";
+	public static final String AUTHENTICATION_MODE_PROXY="proxy";
 
     Long id;
     String username;
