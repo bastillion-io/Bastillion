@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <property name="autoIncrement" value="true" />
+    <!-- FIXME: delete cascade -->
+    <changeSet id="3.11.00_initial_schema" author="geoffroya">
+
+        <createTable tableName="users">
+            <column name="id" autoIncrement="true" type="bigint">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="first_nm" type="varchar(100)" />
+            <column name="last_nm" type="varchar(100)" />
+            <column name="email" type="varchar(100)" />
+            <column name="username" type="varchar(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="password" type="varchar(100)" />
+            <column name="auth_token" type="varchar(100)" />
+            <column name="auth_type" type="varchar(100)"
+                    defaultValue="BASIC">
+                <constraints nullable="false" />
+            </column>
+            <column name="user_type" type="varchar(100)" defaultValue="A">
+                <constraints nullable="false" />
+            </column>
+            <column name="salt" type="varchar(100)" />
+            <column name="otp_secret" type="varchar(100)" />
+            <column name="last_login_tm" type="timestamp" />
+            <column name="expiration_tm" type="timestamp" />
+        </createTable>
+
+        <createTable tableName="user_theme">
+            <column name="user_id" autoIncrement="true" type="bigint">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="bg" type="varchar(7)" />
+            <column name="fg" type="varchar(7)" />
+            <column name="d1" type="varchar(7)" />
+            <column name="d2" type="varchar(7)" />
+            <column name="d3" type="varchar(7)" />
+            <column name="d4" type="varchar(7)" />
+            <column name="d5" type="varchar(7)" />
+            <column name="d6" type="varchar(7)" />
+            <column name="d7" type="varchar(7)" />
+            <column name="d8" type="varchar(7)" />
+            <column name="b1" type="varchar(7)" />
+            <column name="b2" type="varchar(7)" />
+            <column name="b3" type="varchar(7)" />
+            <column name="b4" type="varchar(7)" />
+            <column name="b5" type="varchar(7)" />
+            <column name="b6" type="varchar(7)" />
+            <column name="b7" type="varchar(7)" />
+            <column name="b8" type="varchar(7)" />
+        </createTable>
+
+        <addForeignKeyConstraint
+                constraintName="user_theme_fk1" onDelete="CASCADE"
+                baseColumnNames="user_id" baseTableName="user_theme"
+                referencedColumnNames="id" referencedTableName="users" />
+
+
+        <createTable tableName="system">
+            <column name="id" autoIncrement="true" type="bigint">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="display_nm" type="varchar(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="user" type="varchar(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="host" type="varchar(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="port" type="integer">
+                <constraints nullable="false" />
+            </column>
+            <column name="authorized_keys" type="varchar(500)">
+                <constraints nullable="false" />
+            </column>
+            <column name="status_cd" type="varchar(100)"
+                    defaultValue="INITIAL">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+
+        <createTable tableName="profiles">
+            <column name="id" autoIncrement="true" type="bigint">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="nm" type="varchar(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="desc" type="varchar(500)">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+
+        <createTable tableName="system_map">
+            <column name="profile_id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+            <column name="system_id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="profile_id, system_id"
+                       tableName="system_map" />
+        <addForeignKeyConstraint
+                constraintName="system_map_fk1" onDelete="CASCADE"
+                baseColumnNames="profile_id" baseTableName="system_map"
+                referencedColumnNames="id" referencedTableName="profiles" />
+        <addForeignKeyConstraint
+                constraintName="system_map_fk2" onDelete="CASCADE"
+                baseColumnNames="system_id" baseTableName="system_map"
+                referencedColumnNames="id" referencedTableName="system" />
+
+        <createTable tableName="user_map">
+            <column name="user_id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+            <column name="profile_id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="user_id, profile_id"
+                       tableName="user_map" />
+        <addForeignKeyConstraint
+                constraintName="user_map_fk1" onDelete="CASCADE"
+                baseColumnNames="profile_id" baseTableName="user_map"
+                referencedColumnNames="id" referencedTableName="profiles" />
+        <addForeignKeyConstraint
+                constraintName="user_map_fk2" onDelete="CASCADE"
+                baseColumnNames="user_id" baseTableName="user_map"
+                referencedColumnNames="id" referencedTableName="users" />
+
+
+        <createTable tableName="application_key">
+            <column name="id" autoIncrement="true" type="bigint">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="public_key" type="varchar(4096)">
+                <constraints nullable="false" />
+            </column>
+            <column name="private_key" type="varchar(4096)">
+                <constraints nullable="false" />
+            </column>
+            <column name="passphrase" type="varchar(100)">
+            </column>
+        </createTable>
+
+        <createTable tableName="status">
+            <column name="id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+            <column name="status_cd" type="varchar(100)"
+                    defaultValue="INITIAL">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <addPrimaryKey columnNames="id, user_id"
+                       tableName="status" />
+        <addForeignKeyConstraint
+                constraintName="status_fk1" onDelete="CASCADE" baseColumnNames="id"
+                baseTableName="status" referencedColumnNames="id"
+                referencedTableName="system" />
+        <addForeignKeyConstraint
+                constraintName="status_fk2" onDelete="CASCADE"
+                baseColumnNames="user_id" baseTableName="status"
+                referencedColumnNames="id" referencedTableName="users" />
+
+        <createTable tableName="scripts">
+            <column name="id" autoIncrement="true" type="bigint">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="user_id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+            <column name="display_nm" type="varchar(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="script" type="text">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                constraintName="scripts_fk1" onDelete="CASCADE"
+                baseColumnNames="user_id" baseTableName="scripts"
+                referencedColumnNames="id" referencedTableName="users" />
+
+
+        <createTable tableName="public_keys">
+            <column name="id" autoIncrement="true" type="bigint">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="key_nm" type="varchar(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="type" type="varchar(100)" />
+            <column name="fingerprint" type="varchar(100)" />
+            <column name="public_key" type="varchar(4096)">
+                <constraints nullable="false" />
+            </column>
+            <column name="enabled" type="boolean" defaultValue="true">
+                <constraints nullable="false" />
+            </column>
+            <column name="create_dt" type="timestamp"
+                    defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false" />
+            </column>
+
+            <column name="user_id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+            <column name="profile_id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                constraintName="public_keys_fk1" onDelete="CASCADE"
+                baseColumnNames="user_id" baseTableName="public_keys"
+                referencedColumnNames="id" referencedTableName="users" />
+        <addForeignKeyConstraint
+                constraintName="public_keys_fk2" onDelete="CASCADE"
+                baseColumnNames="profile_id" baseTableName="public_keys"
+                referencedColumnNames="id" referencedTableName="profiles" />
+
+        <createTable tableName="session_log">
+            <column name="id" autoIncrement="true" type="bigint">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="session_tm" type="timestamp"
+                    defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false" />
+            </column>
+            <column name="first_nm" type="varchar(100)" />
+            <column name="last_nm" type="varchar(100)" />
+            <column name="username" type="varchar(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="ip_address" type="varchar(100)" />
+        </createTable>
+
+
+        <createTable tableName="terminal_log">
+            <column name="session_id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+            <column name="instance_id" type="bigint" />
+            <column name="output" type="varchar(500)">
+                <constraints nullable="false" />
+            </column>
+            <column name="log_tm" type="timestamp"
+                    defaultValueComputed="CURRENT_TIMESTAMP" />
+            <column name="display_nm" type="varchar(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="user" type="varchar(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="host" type="varchar(100)">
+                <constraints nullable="false" />
+            </column>
+            <column name="port" type="integer">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+                constraintName="terminal_log_fk1" onDelete="CASCADE"
+                baseColumnNames="session_id" baseTableName="terminal_log"
+                referencedColumnNames="id" referencedTableName="session_log" />
+
+    </changeSet>
+</databaseChangeLog>

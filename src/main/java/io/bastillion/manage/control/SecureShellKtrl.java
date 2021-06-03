@@ -31,8 +31,6 @@ import com.jcraft.jsch.ChannelShell;
 import io.bastillion.common.util.AuthUtil;
 import io.bastillion.manage.db.*;
 import io.bastillion.manage.model.*;
-import io.bastillion.manage.db.*;
-import io.bastillion.manage.model.*;
 import io.bastillion.manage.util.SSHUtil;
 import loophole.mvc.annotation.Kontrol;
 import loophole.mvc.annotation.MethodType;
