@@ -11,7 +11,7 @@ Bastillion layers TLS/SSL on top of SSH and acts as a bastion host for administr
 
 Bastillion Releases
 ------
-Bastillion is available for free use under the Affero General Public License
+Bastillion is available for free use under the Prosperity Public License
 
 https://github.com/bastillion-io/Bastillion/releases
 
@@ -20,7 +20,7 @@ or purchase from the AWS marketplace
 https://aws.amazon.com/marketplace/pp/Loophole-LLC-Bastillion/B076PNFPCL
 
 Also, Bastillion can be installed on FreeBSD via the FreeBSD ports system. To install via the binary package, simply run:
-	
+
 	pkg install security/bastillion
 
 Prerequisites
@@ -64,15 +64,15 @@ for Linux/Unix/OSX
 for Windows
 
         startBastillion.bat
-	
+
 More Documentation at: https://www.bastillion.io/docs/index.html
-	
+
 Build from Source
 ------
 Install Maven 3 or greater
 
-*apt-get install maven* 
-> http://maven.apache.org 
+*apt-get install maven*
+> http://maven.apache.org
 
 Install Loophole MVC
 
@@ -98,7 +98,7 @@ Login with
 
 	username:admin
 	password:changeme
-	
+
 *Note: When using the AMI instance, the password is defaulted to the \<Instance ID\>. Also, the AMI uses port 443 as in https://\<Instance IP\>:443*
 
 Managing SSH Keys
@@ -138,7 +138,7 @@ For example:
 	
 	#default passphrase  --leave blank if passphrase is empty
 	defaultSSHPassphrase=myPa$$w0rd
-	
+
 After startup and once the key has been registered it can then be removed from the system. The passphrase and the key paths will be removed from the configuration file.
 
 Adjusting Database Settings
@@ -167,7 +167,7 @@ For example:
 
 	#specify a external authentication module (ex: ldap-ol, ldap-ad).  Edit the jaas.conf to set connection details
 	jaasModule=ldap-ol
-    
+
 Connection details need to be set in the jaas.conf file
 
     ldap-ol {
@@ -178,7 +178,7 @@ Connection details need to be set in the jaas.conf file
     	useSSL=false
     	debug=false;
     };
-    
+
 
 Administrators will be added as they are authenticated and profiles of systems may be assigned by full-privileged users.
 
@@ -214,7 +214,7 @@ Auditing
 Auditing is disabled by default. Audit logs can be enabled through the **log4j2.xml** by uncommenting the **io.bastillion.manage.util.SystemAudit** and the **audit-appender** definitions.
 
 > https://github.com/bastillion-io/Bastillion/blob/master/src/main/resources/log4j2.xml#L19-L22
-	
+
 Auditing through the application is only a proof of concept.  It can be enabled in the BastillionConfig.properties.
 
 	#enable audit  --set to true to enable
@@ -245,9 +245,9 @@ Special thanks goes to these amazing projects which makes this (and other great 
 
 Third-party dependencies are mentioned in the [_3rdPartyLicenses.md_](3rdPartyLicenses.md)
 
-AGPL License
+The Prosperity Public License
 -----------
-Bastillion is available for use under the Affero General Public License
+Bastillion is available for use under the Prosperity Public License
 
 Author
 ------
