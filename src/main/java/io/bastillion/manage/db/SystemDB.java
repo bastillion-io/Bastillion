@@ -290,7 +290,7 @@ public class SystemDB {
 		Long userId = null;
 		try {
 			con = DBUtils.getConn();
-			PreparedStatement stmt = con.prepareStatement("insert into system (display_nm, user, host, port, authorized_keys, status_cd) values (?,?,?,?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
+			PreparedStatement stmt = con.prepareStatement("insert into system (display_nm, \"user\", host, port, authorized_keys, status_cd) values (?,?,?,?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
 			stmt.setString(1, hostSystem.getDisplayNm());
 			stmt.setString(2, hostSystem.getUser());
 			stmt.setString(3, hostSystem.getHost());
@@ -327,7 +327,7 @@ public class SystemDB {
 		try {
 			con = DBUtils.getConn();
 
-			PreparedStatement stmt = con.prepareStatement("update system set display_nm=?, user=?, host=?, port=?, authorized_keys=?, status_cd=?  where id=?");
+			PreparedStatement stmt = con.prepareStatement("update system set display_nm=?, \"user\"=?, host=?, port=?, authorized_keys=?, status_cd=?  where id=?");
 			stmt.setString(1, hostSystem.getDisplayNm());
 			stmt.setString(2, hostSystem.getUser());
 			stmt.setString(3, hostSystem.getHost());

@@ -4,30 +4,30 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.bastillion</groupId>
     <artifactId>bastillion</artifactId>
-    <version>3.12.00-SNAPSHOT</version>
+    <version>3.12.00</version>
     <packaging>war</packaging>
     <name>Bastillion</name>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.9</maven.compiler.source>
         <maven.compiler.target>1.9</maven.compiler.target>
-        <jetty-version>9.4.39.v20210325</jetty-version>
+        <jetty-version>9.4.44.v20210927</jetty-version>
     </properties>
     <dependencies>
         <dependency>
             <groupId>loophole.mvc</groupId>
             <artifactId>lmvc</artifactId>
-            <version>1.08.00</version>
+            <version>1.09.00</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <version>1.4.200</version>
+            <version>2.0.202</version>
         </dependency>
         <dependency>
-            <groupId>com.jcraft</groupId>
+            <groupId>com.github.mwiede</groupId>
             <artifactId>jsch</artifactId>
-            <version>0.1.55</version>
+            <version>0.1.71</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -90,6 +90,41 @@
         </resources>
         <plugins>
             <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>1.12.0</version>
+                <executions>
+                    <execution>
+                        <id>install node and npm</id>
+                        <goals>
+                            <goal>install-node-and-npm</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                    </execution>
+                    <execution>
+                        <id>npm install</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <arguments>clean-install</arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>grunt build</id>
+                        <goals>
+                            <goal>grunt</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <nodeVersion>v16.13.1</nodeVersion>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
             </plugin>

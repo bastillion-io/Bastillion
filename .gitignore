@@ -5,6 +5,9 @@
 *.war
 *.ear
 target/*
+node/*
+node_modules/*
+src/main/webapp/_res/node/*
 .idea/*
 *.iml
 *.DS_Store

@@ -1,6 +1,7 @@
 package io.bastillion.manage.socket;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import io.bastillion.common.util.AppConfig;
 import io.bastillion.common.util.AuthUtil;
 import io.bastillion.manage.control.SecureShellKtrl;
@@ -36,7 +37,6 @@ public class SecureShellWS {
     private Long count = 0L;
 
 
-
     @OnOpen
     public void onOpen(Session session, EndpointConfig config) {
 
@@ -64,47 +64,44 @@ public class SecureShellWS {
     @OnMessage
     public void onMessage(String message) {
 
-        if (session.isOpen() && StringUtils.isNotEmpty(message)) {
+        if (session.isOpen() && StringUtils.isNotEmpty(message) && !"heartbeat".equals(message)) {
 
-            Map jsonRoot = new Gson().fromJson(message, Map.class);
+            try {
+                Map jsonRoot = new Gson().fromJson(message, Map.class);
 
-            String command = (String) jsonRoot.get("command");
+                String command = (String) jsonRoot.get("command");
 
-            Integer keyCode = null;
-            Double keyCodeDbl = (Double) jsonRoot.get("keyCode");
-            if (keyCodeDbl != null) {
-                keyCode = keyCodeDbl.intValue();
-            }
-
-            for (String idStr : (ArrayList<String>) jsonRoot.get("id")) {
-                Integer id = Integer.parseInt(idStr);
-
-                //get servletRequest.getSession() for user
-                UserSchSessions userSchSessions = SecureShellKtrl.getUserSchSessionMap().get(sessionId);
-                if (userSchSessions != null) {
-                    SchSession schSession = userSchSessions.getSchSessionMap().get(id);
-                    if (keyCode != null) {
-                        if (keyMap.containsKey(keyCode)) {
-                            try {
-                                schSession.getCommander().write(keyMap.get(keyCode));
-                            } catch (IOException ex) {
-                                log.error(ex.toString(), ex);
-                            }
-                        }
-                    } else {
-                        schSession.getCommander().print(command);
-                    }
+                Integer keyCode = null;
+                Double keyCodeDbl = (Double) jsonRoot.get("keyCode");
+                if (keyCodeDbl != null) {
+                    keyCode = keyCodeDbl.intValue();
                 }
 
+                for (String idStr : (ArrayList<String>) jsonRoot.get("id")) {
+                    Integer id = Integer.parseInt(idStr);
+
+                    //get servletRequest.getSession() for user
+                    UserSchSessions userSchSessions = SecureShellKtrl.getUserSchSessionMap().get(sessionId);
+                    if (userSchSessions != null) {
+                        SchSession schSession = userSchSessions.getSchSessionMap().get(id);
+                        if (keyCode != null) {
+                            if (keyMap.containsKey(keyCode)) {
+                                schSession.getCommander().write(keyMap.get(keyCode));
+                            }
+                        } else {
+                            schSession.getCommander().print(command);
+                        }
+                    }
+
+                }
+                //update timeout
+                AuthUtil.setTimeout(httpSession);
+            } catch (IllegalStateException | JsonSyntaxException | IOException ex) {
+                log.error(ex.toString(), ex);
             }
-            //update timeout
-            AuthUtil.setTimeout(httpSession);
-
         }
-
-
-
     }
+
     @OnError
     public void onError(Session session, Throwable t) {
         log.error(t.toString(), t);
