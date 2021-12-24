@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.bastillion</groupId>
     <artifactId>bastillion</artifactId>
-    <version>3.12.00</version>
+    <version>3.12.01</version>
     <packaging>war</packaging>
     <name>Bastillion</name>
     <properties>
