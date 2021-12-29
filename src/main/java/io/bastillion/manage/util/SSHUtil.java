@@ -9,9 +9,7 @@ import com.jcraft.jsch.*;
 import io.bastillion.common.util.AppConfig;
 import io.bastillion.manage.db.*;
 import io.bastillion.manage.model.*;
-import io.bastillion.manage.db.*;
 import io.bastillion.manage.task.SecureShellTask;
-import io.bastillion.manage.model.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -40,7 +38,7 @@ public class SSHUtil {
 
 	//key type - rsa or dsa
 	public static final String KEY_TYPE = AppConfig.getProperty("sshKeyType");
-	public static final int KEY_LENGTH = StringUtils.isNumeric(AppConfig.getProperty("sshKeyLength")) ? Integer.parseInt(AppConfig.getProperty("sshKeyLength")) : 2048;
+	public static final int KEY_LENGTH = StringUtils.isNumeric(AppConfig.getProperty("sshKeyLength")) ? Integer.parseInt(AppConfig.getProperty("sshKeyLength")) : 4096;
 
 	//private key name
 	public static final String PVT_KEY = KEY_PATH + "/id_" + KEY_TYPE;
@@ -177,14 +175,15 @@ public class SSHUtil {
 					type = KeyPair.DSA;
 				} else if ("ecdsa".equals(SSHUtil.KEY_TYPE)) {
 					type = KeyPair.ECDSA;
+				} else if("ed448".equals(SSHUtil.KEY_TYPE)) {
+					type = KeyPair.ED448;
+				} else if("ed25519".equals(SSHUtil.KEY_TYPE)) {
+					type = KeyPair.ED25519;
 				}
 				String comment = "bastillion@global_key";
 
 				JSch jsch = new JSch();
-
-
 				KeyPair keyPair = KeyPair.genKeyPair(jsch, type, KEY_LENGTH);
-
 				keyPair.writePrivateKey(PVT_KEY, passphrase.getBytes());
 				keyPair.writePublicKey(PUB_KEY, comment);
 				System.out.println("Finger print: " + keyPair.getFingerPrint());
