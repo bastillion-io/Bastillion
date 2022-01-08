@@ -28,7 +28,7 @@ public class ProfileDB {
     private static Logger log = LoggerFactory.getLogger(ProfileDB.class);
 
     public static final String FILTER_BY_SYSTEM = "system";
-    public static final String FILTER_BY_USER = "user";
+    public static final String FILTER_BY_USER = "username";
     public static final String SORT_BY_PROFILE_NM="nm";
 
     private ProfileDB() {

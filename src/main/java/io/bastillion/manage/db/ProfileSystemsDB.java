@@ -85,7 +85,7 @@ public class ProfileSystemsDB {
 				HostSystem hostSystem = new HostSystem();
 				hostSystem.setId(rs.getLong("id"));
 				hostSystem.setDisplayNm(rs.getString("display_nm"));
-				hostSystem.setUser(rs.getString("user"));
+				hostSystem.setUser(rs.getString("username"));
 				hostSystem.setHost(rs.getString("host"));
 				hostSystem.setPort(rs.getInt("port"));
 				hostSystem.setAuthorizedKeys(rs.getString("authorized_keys"));

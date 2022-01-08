@@ -31,7 +31,7 @@ public class SystemDB {
 
 	public static final String DISPLAY_NM = "display_nm";
 	public static final String SORT_BY_NAME = DISPLAY_NM;
-	public static final String SORT_BY_USER = "user";
+	public static final String SORT_BY_USER = "username";
 	public static final String SORT_BY_HOST = "host";
 	public static final String STATUS_CD = "status_cd";
 	public static final String PROFILE_ID = "profile_id";
@@ -77,7 +77,7 @@ public class SystemDB {
 				HostSystem hostSystem = new HostSystem();
 				hostSystem.setId(rs.getLong("id"));
 				hostSystem.setDisplayNm(rs.getString(DISPLAY_NM));
-				hostSystem.setUser(rs.getString("user"));
+				hostSystem.setUser(rs.getString("username"));
 				hostSystem.setHost(rs.getString("host"));
 				hostSystem.setPort(rs.getInt("port"));
 				hostSystem.setAuthorizedKeys(rs.getString(AUTHORIZED_KEYS));
@@ -127,7 +127,7 @@ public class SystemDB {
 				HostSystem hostSystem = new HostSystem();
 				hostSystem.setId(rs.getLong("id"));
 				hostSystem.setDisplayNm(rs.getString(DISPLAY_NM));
-				hostSystem.setUser(rs.getString("user"));
+				hostSystem.setUser(rs.getString("username"));
 				hostSystem.setHost(rs.getString("host"));
 				hostSystem.setPort(rs.getInt("port"));
 				hostSystem.setAuthorizedKeys(rs.getString(AUTHORIZED_KEYS));
@@ -184,7 +184,7 @@ public class SystemDB {
 				HostSystem hostSystem = new HostSystem();
 				hostSystem.setId(rs.getLong("id"));
 				hostSystem.setDisplayNm(rs.getString(DISPLAY_NM));
-				hostSystem.setUser(rs.getString("user"));
+				hostSystem.setUser(rs.getString("username"));
 				hostSystem.setHost(rs.getString("host"));
 				hostSystem.setPort(rs.getInt("port"));
 				hostSystem.setAuthorizedKeys(rs.getString(AUTHORIZED_KEYS));
@@ -258,7 +258,7 @@ public class SystemDB {
 				hostSystem = new HostSystem();
 				hostSystem.setId(rs.getLong("id"));
 				hostSystem.setDisplayNm(rs.getString(DISPLAY_NM));
-				hostSystem.setUser(rs.getString("user"));
+				hostSystem.setUser(rs.getString("username"));
 				hostSystem.setHost(rs.getString("host"));
 				hostSystem.setPort(rs.getInt("port"));
 				hostSystem.setAuthorizedKeys(rs.getString(AUTHORIZED_KEYS));
@@ -290,7 +290,7 @@ public class SystemDB {
 		Long userId = null;
 		try {
 			con = DBUtils.getConn();
-			PreparedStatement stmt = con.prepareStatement("insert into system (display_nm, \"user\", host, port, authorized_keys, status_cd) values (?,?,?,?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
+			PreparedStatement stmt = con.prepareStatement("insert into system (display_nm, username, host, port, authorized_keys, status_cd) values (?,?,?,?,?,?)", PreparedStatement.RETURN_GENERATED_KEYS);
 			stmt.setString(1, hostSystem.getDisplayNm());
 			stmt.setString(2, hostSystem.getUser());
 			stmt.setString(3, hostSystem.getHost());
@@ -327,7 +327,7 @@ public class SystemDB {
 		try {
 			con = DBUtils.getConn();
 
-			PreparedStatement stmt = con.prepareStatement("update system set display_nm=?, \"user\"=?, host=?, port=?, authorized_keys=?, status_cd=?  where id=?");
+			PreparedStatement stmt = con.prepareStatement("update system set display_nm=?, username=?, host=?, port=?, authorized_keys=?, status_cd=?  where id=?");
 			stmt.setString(1, hostSystem.getDisplayNm());
 			stmt.setString(2, hostSystem.getUser());
 			stmt.setString(3, hostSystem.getHost());
@@ -424,7 +424,7 @@ public class SystemDB {
 				HostSystem hostSystem = new HostSystem();
 				hostSystem.setId(rs.getLong("id"));
 				hostSystem.setDisplayNm(rs.getString(DISPLAY_NM));
-				hostSystem.setUser(rs.getString("user"));
+				hostSystem.setUser(rs.getString("username"));
 				hostSystem.setHost(rs.getString("host"));
 				hostSystem.setPort(rs.getInt("port"));
 				hostSystem.setAuthorizedKeys(rs.getString(AUTHORIZED_KEYS));
