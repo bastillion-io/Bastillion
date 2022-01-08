@@ -73,10 +73,6 @@ Install Maven 3 or greater
 *apt-get install maven*
 > http://maven.apache.org
 
-Install Loophole MVC
-
-> https://github.com/bastillion-io/lmvc
-
 Export environment variables
 
     export JAVA_HOME=/path/to/jdk

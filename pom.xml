@@ -4,9 +4,23 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.bastillion</groupId>
     <artifactId>bastillion</artifactId>
-    <version>3.13.00</version>
+    <version>3.13.01-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>Bastillion</name>
+    <licenses>
+        <license>
+            <name>The Prosperity Public License 3.0.0</name>
+            <url>https://prosperitylicense.com/versions/3.0.0.html</url>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <name>Sean Kavanagh</name>
+            <email>sean.p.kavanagh6@gmail.com</email>
+            <organization>Loophole, LLC</organization>
+            <organizationUrl>https://www.bastillion.io</organizationUrl>
+        </developer>
+    </developers>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.9</maven.compiler.source>
@@ -15,9 +29,9 @@
     </properties>
     <dependencies>
         <dependency>
-            <groupId>loophole.mvc</groupId>
+            <groupId>io.bastillion</groupId>
             <artifactId>lmvc</artifactId>
-            <version>1.09.01</version>
+            <version>1.10.00</version>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
