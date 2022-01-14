@@ -1,36 +1,40 @@
 Third party licenses by different vendors:
 =========================================
 
-H2 : Mozilla Public License, Version 2.0 - H2 Group
+Apache Commons Codec : Apache License, Version 2.0 - The Apache Software Foundation
 
-JSch : BSD License - Atsuhiko Yamanaka, JCraft,Inc
+Apache Commons Configuration : Apache License, Version 2.0 - The Apache Software Foundation
+
+Apache Commons DBCP2 : Apache License, Version 2.0 - The Apache Software Foundation
+
+Apache Commons FileUpload : Apache License, Version 2.0 - The Apache Software Foundation
+
+Apache Commons Lang : Apache License, Version 2.0 - The Apache Software Foundation
+
+Apache Commons Log4j 2 : Apache License, Version 2.0 - The Apache Software Foundation
+
+Bootstrap : MIT License - Twitter, Inc.
 
 Google-Gson : Apache License, Version 2.0 - Google, Inc.
 
-Apache Commons FileUpload : Apache License, Version 2.0 -  The Apache Software Foundation
+H2 : Mozilla Public License, Version 2.0 - H2 Group
 
-Apache Commons Codec : Apache License, Version 2.0 -  The Apache Software Foundation
+Jetty : Apache License, Version 2.0 - The Eclipse Foundation
 
-Apache Commons DBCP : Apache License, Version 2.0 -  The Apache Software Foundation
+JSch (mwiede) : BSD License - Atsuhiko Yamanaka - JCraft,Inc, Matthias Wiedemann, Jeremy Norris
 
-Apache Commons Configuration : Apache License, Version 2.0 -  The Apache Software Foundation
-
-Apache Commons Lang: Apache License, Version 2.0 -  The Apache Software Foundation
-
-Apache Commons Log4j 2: Apache License, Version 2.0 -  The Apache Software Foundation
-
-SLF4J : MIT License - QOS.ch
-
-Thymeleaf: Apache License, Version 2.0 -  The THYMELEAF team
-
-ZXing : Apache License, Version 2.0 -  ZXing Authors
-
-Bootstrap : MIT License - Twitter, Inc.
+jquery.floatThead : MIT License - Misha Koryak
 
 jQuery : MIT License - jQuery Foundation, Inc.
 
 jQueryUI : MIT License - jQuery Foundation, Inc.
 
-jquery.floatThead : MIT License - Misha Koryak
+Popper : MIT License - Floating UI Contributors
 
-xterm.js : MIT License - The xterm.js authors 
+SLF4J : MIT License - QOS.ch
+
+Thymeleaf: Apache License, Version 2.0 -  The THYMELEAF team
+
+xterm.js : MIT License - The xterm.js Authors
+
+ZXing : Apache License, Version 2.0 -  ZXing Authors
