@@ -1,4 +1,4 @@
-name: Bastillion
+name: Build
 
 on: [push]
 
