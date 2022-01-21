@@ -10,7 +10,7 @@
     "bootstrap": "^3.4.1",
     "floatthead": "^2.2.4",
     "jquery": "^3.6.0",
-    "jquery-ui": "^1.13.0",
+    "jquery-ui": "^1.13.1",
     "xterm": "^4.15.0",
     "xterm-addon-fit": "^0.5.0"
   },
