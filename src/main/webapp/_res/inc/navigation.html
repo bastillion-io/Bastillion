@@ -3,82 +3,82 @@
  *
  *    Licensed under The Prosperity Public License 3.0.0
  */-->
-<div class="navbar navbar-default navbar-fixed-top" role="navigation" xmlns:th="http://www.thymeleaf.org">
+<div class="navbar navbar-light bg-light fixed-top navbar-expand-md" role="navigation"
+     xmlns:th="http://www.thymeleaf.org">
     <div class="container">
-
-        <div class="navbar-header">
-            <div class="navbar-brand">
-                <div class="nav-img"><img src="/img/bastillion_40x40.png" th:src="@{/img/bastillion_40x40.png}" alt="bastillion"/>
-                </div>
-                Bastillion
+        <div class="navbar-brand">
+            <div class="nav-img">
+                <img src="/img/bastillion_40x40.png" th:src="@{/img/bastillion_40x40.png}"
+                     alt="bastillion">
             </div>
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
+            Bastillion
         </div>
-        <div class="collapse navbar-collapse">
-            <ul class="nav navbar-nav">
-                <li><a th:href="'../admin/menu.html?_csrf=' + ${session._csrf}">Home</a></li>
-
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Manage <b class="caret"></b></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a th:href="'../admin/menu.html?_csrf=' + ${session._csrf}"
+                                        class="nav-link">Home</a>
+                </li>
+                <li class="dropdown nav-item"><a href="#" class="dropdown-toggle nav-link" data-bs-toggle="dropdown">Manage
+                    <b class="caret"></b></a>
                     <ul class="dropdown-menu">
                         <template th:if="${#strings.equals(session.userType,'M')}" th:remove="tag">
-
-                            <li><a th:href="'../manage/viewSystems.ktrl?_csrf=' + ${session._csrf}">Systems</a></li>
-
-                            <li><a th:href="'../manage/viewProfiles.ktrl?_csrf=' + ${session._csrf}">Profiles</a></li>
-
-                            <li><a th:href="'../manage/viewUsers.ktrl?_csrf=' + ${session._csrf}">Users</a></li>
-
-                        </template>
-                        <template th:if="${@io.bastillion.manage.util.SSHUtil@keyManagementEnabled}" th:remove="tag">
-                            <li th:if="${#strings.equals(session.userType,'M')}">
-                                <a th:href="'../manage/viewKeys.ktrl?_csrf=' + ${session._csrf}">Manage SSH Keys</a>
+                            <li><a class="dropdown-item"
+                                   th:href="'../manage/viewSystems.ktrl?_csrf=' + ${session._csrf}">Systems</a>
                             </li>
-                            <li th:if="${!#strings.equals(session.userType,'M')}">
-                                <a th:href="'../admin/viewKeys.ktrl?_csrf=' + ${session._csrf}">Manage SSH Keys</a>
+                            <li><a class="dropdown-item"
+                                   th:href="'../manage/viewProfiles.ktrl?_csrf=' + ${session._csrf}">Profiles</a>
+                            </li>
+                            <li><a class="dropdown-item" th:href="'../manage/viewUsers.ktrl?_csrf=' + ${session._csrf}">Users</a>
                             </li>
                         </template>
+                        <template th:if="${@io.bastillion.manage.util.SSHUtil@keyManagementEnabled}"
+                                  th:remove="tag">
+                            <li th:if="${#strings.equals(session.userType,'M')}"><a class="dropdown-item"
+                                                                                    th:href="'../manage/viewKeys.ktrl?_csrf=' + ${session._csrf}">Manage
+                                SSH Keys</a>
+                            </li>
+                            <li th:if="${!#strings.equals(session.userType,'M')}"><a class="dropdown-item"
+                                                                                     th:href="'../admin/viewKeys.ktrl?_csrf=' + ${session._csrf}">Manage
+                                SSH Keys</a>
+                            </li>
+                        </template>
                     </ul>
                 </li>
-
-
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Secure Shell <b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                        <li><a th:href="'../admin/viewSystems.ktrl?_csrf=' + ${session._csrf}">Composite SSH Terms</a>
+                <li class="dropdown nav-item"><a href="#" class="dropdown-toggle nav-link" data-bs-toggle="dropdown">Secure
+                    Shell <b class="caret"></b></a>
+                    <ul
+                            class="dropdown-menu">
+                        <li><a class="dropdown-item" th:href="'../admin/viewSystems.ktrl?_csrf=' + ${session._csrf}">Terminals</a>
                         </li>
-                        <li><a th:href="'../admin/viewScripts.ktrl?_csrf=' + ${session._csrf}">Composite Scripts</a>
+                        <li><a class="dropdown-item" th:href="'../admin/viewScripts.ktrl?_csrf=' + ${session._csrf}">Scripts</a>
                         </li>
                     </ul>
                 </li>
-
-
-                <li th:if="${@io.bastillion.manage.util.SessionOutputUtil@enableInternalAudit &&  #strings.equals(session.userType,'M')}">
-                    <a th:href="'../manage/viewSessions.ktrl?_csrf=' + ${session._csrf}">Audit Sessions</a>
+                <li th:if="${@io.bastillion.manage.util.SessionOutputUtil@enableInternalAudit &&  #strings.equals(session.userType,'M')}"
+                    class="nav-item"><a th:href="'../manage/viewSessions.ktrl?_csrf=' + ${session._csrf}"
+                                        class="nav-link">Audit Sessions</a>
                 </li>
             </ul>
+            <ul class="navbar-nav mb-2 mb-lg-0" style="float:right">
+                <li class="dropdown nav-item"><a href="#" class="dropdown-toggle nav-link" data-bs-toggle="dropdown">
 
+                    <span th:text="${session.username}"></span>
 
-            <ul class="nav navbar-nav navbar-right">
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        <span th:text="${session.username}"></span>
-                        <b class="caret"></b>
-                    </a>
+                    <b class="caret"></b>
+
+                </a>
                     <ul class="dropdown-menu">
-                        <li><a th:href="'../admin/userSettings.ktrl?_csrf=' + ${session._csrf}">Settings</a></li>
-                        <li><a href="../logout.ktrl">Logout</a></li>
+                        <li class="dropdown-item"><a th:href="'../admin/userSettings.ktrl?_csrf=' + ${session._csrf}">Settings</a>
+                        </li>
+                        <li class="dropdown-item"><a href="../logout.ktrl">Logout</a>
+                        </li>
                     </ul>
                 </li>
             </ul>
-
         </div>
         <!--/.nav-collapse -->
     </div>
 </div>
-

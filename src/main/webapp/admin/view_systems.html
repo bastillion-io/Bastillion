@@ -5,9 +5,10 @@
  */-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
 
-    <meta th:replace="_res/inc/header"/>
+    <meta th:replace="_res/inc/header">
 
     <script th:inline="javascript">
         /*<![CDATA[*/
@@ -50,118 +51,106 @@
     </script>
     <title>Bastillion - Manage Systems</title>
 </head>
+
 <body>
-
 <div th:replace="_res/inc/navigation"></div>
-
 <div class="container">
-
     <template th:if="${script != null && script.id != null }" th:remove="tag">
         <h3>Execute Script on Systems</h3>
-        <p>Run <b> <a data-toggle="modal" data-target="#script_dialog" th:text="${script.displayNm}"></a></b> on the
-            selected systems below</p>
-
+        <p>Run <b> <a data-bs-toggle="modal" data-bs-target="#script_dialog" th:text="${script.displayNm}"></a></b> on
+            the selected systems below</p>
         <div id="script_dialog" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                        <h4 class="modal-title" th:text="'View Script: ' + ${script.displayNm}"></h4>
+                        <h5 class="modal-title" th:text="'View Script: ' + ${script.displayNm}"></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <div class="row">
-                            <pre th:text="${script.script}"></pre>
+                        <div class="row"> <pre th:text="${script.script}"></pre>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Close</button>
-
+                        <button type="button" class="btn btn-secondary cancel_btn" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
         </div>
     </template>
     <template th:if="${script == null || script.id == null}" th:remove="tag">
-        <h3>Composite SSH Terminals</h3>
-        <p>Select the systems below to generate composite SSH sessions in multiple terminals</p>
+        <h3>Terminals</h3>
+        <p>Select the systems below to generate SSH sessions in multiple terminals</p>
     </template>
-
     <form th:action="@{/admin/viewSystems.ktrl}" id="viewSystems" method="get">
-        <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
+        <input type="hidden" name="_csrf" th:value="${session._csrf}">
         <input type="hidden" id="viewSystems_sortedSet_orderByDirection" name="sortedSet.orderByDirection"
-               th:value="${sortedSet.orderByDirection}"/>
+               th:value="${sortedSet.orderByDirection}">
         <input type="hidden" id="viewSystems_sortedSet_orderByField" name="sortedSet.orderByField"
-               th:value="${sortedSet.orderByField}"/>
-        <input type="hidden" name="script.id" th:if="${script != null && script.id != null}" th:value="${script.id}" />
+               th:value="${sortedSet.orderByField}">
+        <input type="hidden" name="script.id" th:if="${script != null && script.id != null}"
+               th:value="${script.id}">
         <div th:if="${profileList != null && !profileList.empty}">
             <table>
                 <tr>
                     <td class="align_left">
                         <select th:name="'sortedSet.filterMap[' + ${@io.bastillion.manage.db.SystemDB@FILTER_BY_PROFILE_ID} + ']'"
-                                title="Profile" class="view_frm_select">
+                                title="Profile" class="form-select view_frm_select">
                             <option value="">- Select Profile -</option>
-                            <option th:each="p : ${profileList}"
-                                    th:value="${p.id}" th:text="${p.nm}"
-                                    th:selected="${#strings.equals(sortedSet.filterMap.get(@io.bastillion.manage.db.SystemDB@FILTER_BY_PROFILE_ID), p.id)}"></option>
+                            <option th:each="p : ${profileList}" th:value="${p.id}"
+                                    th:text="${p.nm}" th:selected="${#strings.equals(sortedSet.filterMap.get(@io.bastillion.manage.db.SystemDB@FILTER_BY_PROFILE_ID), p.id)}"></option>
                         </select>
                     </td>
                     <td>
-                        <div id="view_btn" class="btn btn-default">Filter</div>
+                        <div id="view_btn" class="btn btn-secondary">Filter</div>
                     </td>
                 </tr>
             </table>
         </div>
     </form>
     <div class="scrollWrapper" th:if="${sortedSet.itemList != null && !sortedSet.itemList.empty}">
-
         <form th:action="@{/admin/selectSystemsForCompositeTerms.ktrl}" id="select_frm">
-            <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
-            <input type="hidden" name="script.id" th:if="${script != null && script.id != null}" th:value="${script.id}"/>
-
+            <input type="hidden" name="_csrf" th:value="${session._csrf}">
+            <input type="hidden" name="script.id" th:if="${script != null && script.id != null}"
+                   th:value="${script.id}">
             <table class="table-striped scrollableTable">
                 <thead>
-
                 <tr>
-                    <th><input type="checkbox" id="select_frm_systemSelectAll" name="systemSelectAll" class="systemSelect" title="Select All"/></th>
+                    <th>
+                        <input type="checkbox" id="select_frm_systemSelectAll" name="systemSelectAll"
+                               class="systemSelect form-check-input" title="Select All">
+                    </th>
                     <th th:id="${@io.bastillion.manage.db.SystemDB@SORT_BY_NAME}" class="sort">Display Name</th>
-                    <th th:id="${@io.bastillion.manage.db.SystemDB@SORT_BY_USER}" class="sort">User</th>
-                    <th th:id="${@io.bastillion.manage.db.SystemDB@SORT_BY_HOST}" class="sort">Host</th>
+                    <th th:id="${@io.bastillion.manage.db.SystemDB@SORT_BY_USER}"
+                        class="sort">User</th>
+                    <th th:id="${@io.bastillion.manage.db.SystemDB@SORT_BY_HOST}"
+                        class="sort">Host</th>
                 </tr>
                 </thead>
                 <tbody>
-
                 <template th:each="s : ${sortedSet.itemList}" th:remove="tag">
                     <tr>
                         <td>
-                            <input type="checkbox" name="systemSelectId" th:value="${s.id}"
-                                   class="systemSelect" th:title="${s.displayNm}"/>
+                            <input type="checkbox" name="systemSelectId" th:value="${s.id}" class="systemSelect form-check-input"
+                                   th:title="${s.displayNm}">
                         </td>
                         <td th:text="${s.displayNm}"></td>
                         <td th:text="${s.user}"></td>
                         <td th:text="${s.host} +':' + ${s.port}"></td>
                     </tr>
-
                 </template>
                 </tbody>
             </table>
         </form>
     </div>
-    <div class="btn btn-default select_frm_btn spacer spacer-bottom"
-         th:if="${script != null && script.id != null && sortedSet.itemList != null && !sortedSet.itemList.empty}">Execute Script
-    </div>
-    <div class="btn btn-default select_frm_btn spacer spacer-bottom"
-         th:if="${(script == null || script.id == null) && sortedSet.itemList != null && !sortedSet.itemList.empty}">Create SSH Terminals
-    </div>
+    <div class="btn btn-secondary select_frm_btn spacer spacer-bottom" th:if="${script != null && script.id != null && sortedSet.itemList != null && !sortedSet.itemList.empty}">Execute Script</div>
+    <div class="btn btn-secondary select_frm_btn spacer spacer-bottom"
+         th:if="${(script == null || script.id == null) && sortedSet.itemList != null && !sortedSet.itemList.empty}">Create Terminals</div>
     <div class="actionMessage" th:if="${(script == null || script.id == null) && (sortedSet.itemList == null || sortedSet.itemList.empty)}">
         <p class="error">Systems not available
-            <template th:if="${#strings.equals(session.userType,'M')}" th:remove="tag">
-                (<a th:href="'../manage/viewSystems.ktrl?_csrf=' + ${session._csrf} ">Manage Systems</a>)
-            </template>
-            .
-        </p>
+            <template th:if="${#strings.equals(session.userType,'M')}"
+                      th:remove="tag">(<a th:href="'../manage/viewSystems.ktrl?_csrf=' + ${session._csrf} ">Manage Systems</a>)</template>.</p>
     </div>
 </div>
-
-
 </body>
+
 </html>

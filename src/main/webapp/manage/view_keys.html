@@ -5,9 +5,10 @@
  */-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
 
-    <meta th:replace="_res/inc/header"/>
+    <meta th:replace="_res/inc/header">
 
     <script th:inline="javascript">
         /*<![CDATA[*/
@@ -73,66 +74,69 @@
 
         });
         /*]]>*/
+
     </script>
 
 
     <title>Bastillion - View / Disable SSH Keys</title>
-
-
 </head>
+
 <body>
-
 <div th:replace="_res/inc/navigation"></div>
-
 <div class="container">
-
     <h3>View / Disable SSH Keys</h3>
-
-    <p>Disabling will remove the public key from all host systems. Additional SSH keys with the same fingerprint can no
-        longer be set forcing users to rotate keys.</p>
+    <p>Disabling will remove the public key from all host systems. Additional
+        SSH keys with the same fingerprint can no longer be set forcing users to
+        rotate keys.</p>
     <table>
         <tr>
             <td class="align_left">
-                    <form id="viewKeys" th:action="@{/manage/viewKeys.ktrl}" method="get">
-                        <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
-                        <input type="hidden" id="viewKeys_sortedSet_orderByDirection" name="sortedSet.orderByDirection"
-                               th:value="${sortedSet.orderByDirection}"/>
-                        <input type="hidden" id="viewKeys_sortedSet_orderByField" name="sortedSet.orderByField"
-                               th:value="${sortedSet.orderByField}"/>
-
+                <form id="viewKeys" th:action="@{/manage/viewKeys.ktrl}" method="get">
+                    <input type="hidden" name="_csrf" th:value="${session._csrf}">
+                    <input type="hidden" id="viewKeys_sortedSet_orderByDirection" name="sortedSet.orderByDirection"
+                           th:value="${sortedSet.orderByDirection}">
+                    <input type="hidden" id="viewKeys_sortedSet_orderByField" name="sortedSet.orderByField"
+                           th:value="${sortedSet.orderByField}">
                     <table>
                         <tr>
                             <td class="align_left"><a
                                     th:href="'../admin/viewKeys.ktrl?_csrf=' + ${session._csrf}"
-                                    class="btn btn-success">Add / Remove Keys</a></td>
+                                    class="btn btn-success">Add / Remove Keys</a>
+                            </td>
                             <td>|</td>
-                                <td th:if="${userList != null && !userList.empty}">
-                                    <select th:name="'sortedSet.filterMap[' + ${@io.bastillion.manage.db.PublicKeyDB@FILTER_BY_USER_ID} + ']'"
-                                            title="User" class="view_frm_select">
-                                        <option value="">- Select User -</option>
-                                        <option th:each="u : ${userList}"
-                                                th:value="${u.id}" th:text="${u.username}"
-                                                th:selected="${#strings.equals(sortedSet.filterMap.get(@io.bastillion.manage.db.PublicKeyDB@FILTER_BY_USER_ID), u.id)}"></option>
-                                    </select>
-                                </td>
-                                <td th:if="${profileList != null && !profileList.empty}">
-                                    <select th:name="'sortedSet.filterMap[' + ${@io.bastillion.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID} + ']'"
-                                            title="Profile" class="view_frm_select">
-                                        <option value="">- Select Profile -</option>
-                                        <option th:each="p : ${profileList}"
-                                                th:value="${p.id}" th:text="${p.nm}"
-                                                th:selected="${#strings.equals(sortedSet.filterMap.get(@io.bastillion.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID), p.id)}"></option>
-                                    </select>
-                                </td>
-                            <td>
-                                <select th:name="'sortedSet.filterMap[' + ${@io.bastillion.manage.db.PublicKeyDB@FILTER_BY_ENABLED} + ']'"
-                                        title="Profile" class="view_frm_select">
-                                    <option value="true"  th:selected="${#strings.equals(sortedSet.filterMap.get(@io.bastillion.manage.db.PublicKeyDB@FILTER_BY_ENABLED), 'true')}">Enabled</option>
-                                    <option value="false" th:selected="${#strings.equals(sortedSet.filterMap.get(@io.bastillion.manage.db.PublicKeyDB@FILTER_BY_ENABLED), 'false')}">Disabled</option>
+                            <td th:if="${userList != null && !userList.empty}">
+                                <select th:name="'sortedSet.filterMap[' + ${@io.bastillion.manage.db.PublicKeyDB@FILTER_BY_USER_ID} + ']'"
+                                        title="User" class="form-select view_frm_select">
+                                    <option value="">- Select User -</option>
+                                    <option th:each="u : ${userList}" th:value="${u.id}"
+                                            th:text="${u.username}"
+                                            th:selected="${#strings.equals(sortedSet.filterMap.get(@io.bastillion.manage.db.PublicKeyDB@FILTER_BY_USER_ID), u.id)}"></option>
+                                </select>
+                            </td>
+                            <td th:if="${profileList != null && !profileList.empty}">
+                                <select th:name="'sortedSet.filterMap[' + ${@io.bastillion.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID} + ']'"
+                                        title="Profile" class="form-select view_frm_select">
+                                    <option value="">- Select Profile -</option>
+                                    <option th:each="p : ${profileList}" th:value="${p.id}"
+                                            th:text="${p.nm}"
+                                            th:selected="${#strings.equals(sortedSet.filterMap.get(@io.bastillion.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID), p.id)}"></option>
                                 </select>
                             </td>
                             <td>
-                                <div id="view_btn" class="btn btn-default">Filter</div>
+                                <select th:name="'sortedSet.filterMap[' + ${@io.bastillion.manage.db.PublicKeyDB@FILTER_BY_ENABLED} + ']'"
+                                        title="Profile" class="form-select view_frm_select">
+                                    <option value="true"
+                                            th:selected="${#strings.equals(sortedSet.filterMap.get(@io.bastillion.manage.db.PublicKeyDB@FILTER_BY_ENABLED), 'true')}">
+                                        Enabled
+                                    </option>
+                                    <option value="false"
+                                            th:selected="${#strings.equals(sortedSet.filterMap.get(@io.bastillion.manage.db.PublicKeyDB@FILTER_BY_ENABLED), 'false')}">
+                                        Disabled
+                                    </option>
+                                </select>
+                            </td>
+                            <td>
+                                <div id="view_btn" class="btn btn-secondary">Filter</div>
                             </td>
                         </tr>
                     </table>
@@ -140,50 +144,57 @@
             </td>
         </tr>
     </table>
-
-        <div class="scrollWrapper" th:if="${sortedSet.itemList != null && !sortedSet.itemList.empty}">
-            <table class="table-striped scrollableTable">
-                <thead>
-
+    <div class="scrollWrapper" th:if="${sortedSet.itemList != null && !sortedSet.itemList.empty}">
+        <table class="table-striped scrollableTable">
+            <thead>
+            <tr>
+                <th th:id="${@io.bastillion.manage.db.PublicKeyDB@SORT_BY_KEY_NM}" class="sort">Key Name</th>
+                <th th:id="${@io.bastillion.manage.db.PublicKeyDB@SORT_BY_PROFILE}"
+                    class="sort">Profile
+                </th>
+                <th th:id="${@io.bastillion.manage.db.PublicKeyDB@SORT_BY_TYPE}"
+                    class="sort">Type
+                </th>
+                <th th:id="${@io.bastillion.manage.db.PublicKeyDB@SORT_BY_FINGERPRINT}"
+                    class="sort">Fingerprint
+                </th>
+                <th th:id="${@io.bastillion.manage.db.PublicKeyDB@SORT_BY_CREATE_DT}"
+                    class="sort">Created
+                </th>
+                <th>&#xA0;</th>
+            </tr>
+            </thead>
+            <tbody>
+            <template th:each="p : ${sortedSet.itemList}" th:remove="tag">
                 <tr>
-
-                    <th th:id="${@io.bastillion.manage.db.PublicKeyDB@SORT_BY_KEY_NM}" class="sort">Key Name</th>
-                    <th th:id="${@io.bastillion.manage.db.PublicKeyDB@SORT_BY_PROFILE}" class="sort">Profile</th>
-                    <th th:id="${@io.bastillion.manage.db.PublicKeyDB@SORT_BY_TYPE}" class="sort">Type</th>
-                    <th th:id="${@io.bastillion.manage.db.PublicKeyDB@SORT_BY_FINGERPRINT}" class="sort">Fingerprint</th>
-                    <th th:id="${@io.bastillion.manage.db.PublicKeyDB@SORT_BY_CREATE_DT}" class="sort">Created</th>
-                    <th>&nbsp;</th>
+                    <td th:text="${p.keyNm}"></td>
+                    <td>
+                        <div th:if="${p.profile == null}">All Systems</div>
+                        <div th:if="${p.profile != null}"><span th:text="${p.profile.nm}"></span>
+                        </div>
+                    </td>
+                    <td th:text="'[ ' + ${p.type} + ' ]'"></td>
+                    <td th:text="${p.fingerprint}"></td>
+                    <td th:text="${#dates.format(p.createDt, 'dd-MMM-yyyy')}"></td>
+                    <td>
+                        <div>
+                            <button class="btn btn-secondary btn-danger spacer spacer-left disable_btn"
+                                    data-bs-toggle="modal" th:if="${p.enabled}" th:id="'disable_btn_' + ${p.id}">
+                                Disable
+                            </button>
+                            <button class="btn btn-secondary btn-success spacer spacer-left enable_btn"
+                                    data-bs-toggle="modal" th:if="${!p.enabled}" th:id="'enable_btn_' + ${p.id}">
+                                Enable
+                            </button>
+                            <div style="clear:both"></div>
+                        </div>
+                    </td>
                 </tr>
-                </thead>
-                <tbody>
-                <template th:each="p : ${sortedSet.itemList}" th:remove="tag">
-                    <tr>
-                        <td th:text="${p.keyNm}"></td>
-                        <td>
-                            <div th:if="${p.profile == null}">
-                                All Systems
-                            </div>
-                            <div th:if="${p.profile != null}"><span th:text="${p.profile.nm}"></span></div>
-                        </td>
-                        <td th:text="'[ ' + ${p.type} + ' ]'"></td>
-                        <td th:text="${p.fingerprint}"></td>
-                        <td th:text="${#dates.format(p.createDt, 'dd-MMM-yyyy')}"></td>
-                        <td>
-                            <div>
-                                    <button class="btn btn-default btn-danger spacer spacer-left disable_btn"
-                                            data-toggle="modal" th:if="${p.enabled}"
-                                            th:id="'disable_btn_' + ${p.id}">Disable</button>
-                                    <button class="btn btn-default btn-success spacer spacer-left enable_btn"
-                                            data-toggle="modal" th:if="${!p.enabled}" th:id="'enable_btn_' + ${p.id}">Enable</button>
-                                <div style="clear:both"></div>
-                            </div>
-                        </td>
-                    </tr>
-                </template>
-                </tbody>
-            </table>
-        </div>
+            </template>
+            </tbody>
+        </table>
+    </div>
 </div>
-
 </body>
+
 </html>

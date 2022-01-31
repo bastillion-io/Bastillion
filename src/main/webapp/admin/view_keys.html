@@ -5,9 +5,9 @@
  */-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
 
-    <meta th:replace="_res/inc/header"/>
+<head>
+    <meta th:replace="_res/inc/header">
 
     <script th:inline="javascript">
         /*<![CDATA[*/
@@ -92,94 +92,91 @@
             [/]
         });
         /*]]>*/
+
     </script>
 
     <script th:inline="javascript" th:if="${!#maps.isEmpty(fieldErrors) || !errors.empty}">
         /*<![CDATA[*/
         $(document).ready(function () {
             [# th:if= "${publicKey.id > 0}"]
-                $('#edit_dialog_' + [[${publicKey.id}]]).modal();
+                new bootstrap.Modal($('#edit_dialog_' + [[${publicKey.id}]])).show();
             [/]
 
             [# th:if= "${publicKey.id <= 0}"]
-                $("#add_dialog").modal();
+                new bootstrap.Modal($("#add_dialog")).show();
             [/]
         });
         /*]]>*/
+
     </script>
 
 
     <title>Bastillion - Manage Keys</title>
-
 </head>
+
 <body>
-
 <div th:replace="_res/inc/navigation"></div>
-
 <div class="container">
-
     <form id="viewKeys" th:action="@{/admin/viewKeys.ktrl}" method="get">
-        <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
+        <input type="hidden" name="_csrf" th:value="${session._csrf}">
         <input type="hidden" id="viewKeys_sortedSet_orderByDirection" name="sortedSet.orderByDirection"
-               th:value="${sortedSet.orderByDirection}"/>
+               th:value="${sortedSet.orderByDirection}">
         <input type="hidden" id="viewKeys_sortedSet_orderByField" name="sortedSet.orderByField"
-               th:value="${sortedSet.orderByField}"/>
+               th:value="${sortedSet.orderByField}">
     </form>
-
-
     <h3>Manage SSH Keys</h3>
-
     <p>Add / Delete SSH keys for current user.</p>
-
-    <template th:if="${#strings.equals(session.userType, 'M') || (profileList != null && !profileList.empty)}"
-              th:remove="tag">
+    <template
+            th:if="${#strings.equals(session.userType, 'M') || (profileList != null && !profileList.empty)}"
+            th:remove="tag">
         <table th:if="${#strings.equals(session.userType, 'M')}">
             <tr>
-                <td class="align_left">
-                    <a th:href="'../manage/viewKeys.ktrl?_csrf=' + ${session._csrf}" class="btn btn-danger">View / Disable SSH Keys</a>
+                <td class="align_left"><a th:href="'../manage/viewKeys.ktrl?_csrf=' + ${session._csrf}"
+                                          class="btn btn-danger">View / Disable SSH Keys</a>
                 </td>
             </tr>
         </table>
     </template>
-
     <div class="scrollWrapper" th:if="${sortedSet.itemList != null && !sortedSet.itemList.empty}">
-
         <table class="table-striped scrollableTable">
             <thead>
             <tr>
-
                 <th th:id="${@io.bastillion.manage.db.PublicKeyDB@SORT_BY_KEY_NM}" class="sort">Key Name</th>
-                <th th:id="${@io.bastillion.manage.db.PublicKeyDB@SORT_BY_PROFILE}" class="sort">Profile</th>
-                <th th:id="${@io.bastillion.manage.db.PublicKeyDB@SORT_BY_TYPE}" class="sort">Type</th>
-                <th th:id="${@io.bastillion.manage.db.PublicKeyDB@SORT_BY_FINGERPRINT}" class="sort">Fingerprint</th>
-                <th th:id="${@io.bastillion.manage.db.PublicKeyDB@SORT_BY_CREATE_DT}" class="sort">Created</th>
-                <th>&nbsp;</th>
+                <th th:id="${@io.bastillion.manage.db.PublicKeyDB@SORT_BY_PROFILE}"
+                    class="sort">Profile
+                </th>
+                <th th:id="${@io.bastillion.manage.db.PublicKeyDB@SORT_BY_TYPE}"
+                    class="sort">Type
+                </th>
+                <th th:id="${@io.bastillion.manage.db.PublicKeyDB@SORT_BY_FINGERPRINT}"
+                    class="sort">Fingerprint
+                </th>
+                <th th:id="${@io.bastillion.manage.db.PublicKeyDB@SORT_BY_CREATE_DT}"
+                    class="sort">Created
+                </th>
+                <th>&#xA0;</th>
             </tr>
             </thead>
             <tbody>
-
             <template th:each="p : ${sortedSet.itemList}" th:remove="tag">
                 <tr>
                     <td th:text="${p.keyNm}"></td>
                     <td>
-                        <div th:if="${p.profile == null}">
-                            All Systems
+                        <div th:if="${p.profile == null}">All Systems</div>
+                        <div th:if="${p.profile != null}"><span th:text="${p.profile.nm}"></span>
                         </div>
-                        <div th:if="${p.profile != null}"><span th:text="${p.profile.nm}"></span></div>
                     </td>
                     <td th:text="'[ ' + ${p.type} + ' ]'"></td>
                     <td th:text="${p.fingerprint}"></td>
                     <td th:text="${#dates.format(p.createDt, 'dd-MMM-yyyy')}"></td>
                     <td>
                         <div>
-                            <button th:if="${!forceUserKeyGenEnabled}" class="btn btn-default spacer spacer-left"
-                                    data-toggle="modal"
-                                    th:attr="data-target='#edit_dialog_' + ${p.id}">Edit
+                            <button th:if="${!forceUserKeyGenEnabled}" class="btn btn-secondary spacer spacer-left"
+                                    data-bs-toggle="modal" th:attr="data-bs-target='#edit_dialog_' + ${p.id}">Edit
                             </button>
                             <button th:id="'del_btn_' + ${p.id}"
-                                    class="btn btn-default del_btn spacer spacer-right">Delete
-                            </button>
-                            &nbsp;&nbsp;&nbsp;
+                                    class="btn btn-secondary del_btn spacer spacer-right">Delete
+                            </button>&#xA0;&#xA0;&#xA0;
                             <div style="clear:both"></div>
                         </div>
                     </td>
@@ -188,240 +185,251 @@
             </tbody>
         </table>
     </div>
-
-
-    <button class="btn btn-default add_btn spacer spacer-bottom" data-toggle="modal" data-target="#add_dialog">Add SSH
-        Key
+    <button class="btn btn-secondary add_btn spacer spacer-bottom" data-bs-toggle="modal"
+            data-bs-target="#add_dialog">Add SSH Key
     </button>
     <div id="add_dialog" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
                     <div class="new_key_label">
-                        <div class="alert alert-success">
-                            .. or <strong>select an <a href="#" class="alert-link">existing key</a></strong>
+                        <div class="alert alert-success">.. or select an <a href="#" class="alert-link">existing
+                            key</a>
                         </div>
-                        <h4 th:if="${forceUserKeyGenEnabled}" class="modal-title">Generate &amp; Download an SSH
-                            Key</h4>
-                        <h4 th:if="${!forceUserKeyGenEnabled}" class="modal-title">Add Public SSH Key</h4>
-                    </div>
+                        <h5 th:if="${forceUserKeyGenEnabled}" class="modal-title">Generate &amp; Download an SSH
 
-                    <div class="existing_key_label">
-                        <div class="alert alert-success">
-                            .. or <strong>create a <a href="#" class="alert-link">new key</a></strong>
-                        </div>
-                        <h4 class="modal-title">Select &amp; Assign an SSH Key</h4>
+                            Key</h5>
+                        <h5 th:if="${!forceUserKeyGenEnabled}" class="modal-title">Add Public SSH Key</h5>
                     </div>
+                    <div class="existing_key_label">
+                        <div class="alert alert-success">.. or create a <a href="#" class="alert-link">new
+                            key</a>
+                        </div>
+                        <h5 class="modal-title">Select &amp; Assign an SSH Key</h5>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
                         <div th:replace="_res/inc/errors"></div>
-                        <form th:action="@{/admin/savePublicKey.ktrl}" id="save_public_key_form_add" method="post"
-                              autocomplete="off">
-                            <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
-
+                        <form th:action="@{/admin/savePublicKey.ktrl}" id="save_public_key_form_add"
+                              method="post" autocomplete="off">
+                            <input type="hidden" name="_csrf" th:value="${session._csrf}">
                             <table>
                                 <tr>
-                                    <td><strong>Key Name</strong></td>
+                                    <td>Key Name
+                                    </td>
                                     <td>
                                         <input type="text" name="publicKey.keyNm" th:value="${publicKey.keyNm}"
-                                               title="Key Name"
-                                               size="15"/>
-                                        <span class="error" th:text="${fieldErrors.get('publicKey.keyNm')}"></span>
+                                               class="form-control" title="Key Name" size="15"> <span class="error"
+                                                                                 th:text="${fieldErrors.get('publicKey.keyNm')}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Profile</strong></td>
+                                    <td>Profile
+                                    </td>
                                     <td>
-                                        <select name="publicKey.profile.id" title="Profile">
-                                            <option th:if="${#strings.equals(session.userType, 'M')}" value="">All Systems
+                                        <select name="publicKey.profile.id" class="form-select" title="Profile">
+                                            <option th:if="${#strings.equals(session.userType, 'M')}"
+                                                    value="">All Systems
                                             </option>
-                                            <option th:each="o : ${profileList}" th:value="${o.id}" th:text="${o.nm}"
+                                            <option th:each="o : ${profileList}" th:value="${o.id}"
+                                                    th:text="${o.nm}"
                                                     th:selected="${publicKey.profile != null && publicKey.profile.id == o.id}"></option>
-                                        </select>
-                                        <span class="error" th:text="${fieldErrors.get('publicKey.profile.id')}"></span>
+                                        </select> <span class="error"
+                                                        th:text="${fieldErrors.get('publicKey.profile.id')}"></span>
                                     </td>
                                 </tr>
-
                                 <template th:if="${forceUserKeyGenEnabled}" th:remove="tag">
                                     <tr>
-                                        <td><strong>Passphrase</strong></td>
+                                        <td>Passphrase
+                                        </td>
                                         <td>
-                                            <input type="password" class="new_key" name="publicKey.passphrase" value=""
-                                                   title="Passphrase"/>
-                                            <span class="error" th:text="${fieldErrors.get('publicKey.passphrase')}"></span>
+                                            <input type="password" class="new_key form-control" name="publicKey.passphrase" value=""
+                                                   title="Passphrase"> <span class="error"
+                                                                             th:text="${fieldErrors.get('publicKey.passphrase')}"></span>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td><strong>Confirm Passphrase</strong></td>
+                                        <td>Confirm Passphrase
+                                        </td>
                                         <td>
-                                            <input type="password" class="new_key" name="publicKey.passphraseConfirm"
-                                                   value=""
-                                                   title="Confirm Passphrase"/>
-                                            <span class="error" th:text="${fieldErrors.get('publicKey.passphraseConfirm')}"></span>
+                                            <input type="password" class="new_key form-control" name="publicKey.passphraseConfirm"
+                                                   value="" title="Confirm Passphrase"> <span class="error"
+                                                                                              th:text="${fieldErrors.get('publicKey.passphraseConfirm')}"></span>
                                         </td>
                                     </tr>
                                 </template>
                                 <template th:if="${!forceUserKeyGenEnabled}" th:remove="tag">
                                     <tr>
-                                        <td><strong>Public Key</strong></td>
+                                        <td>Public Key
+                                        </td>
                                         <td>
-                                            <textarea class="new_key" name="publicKey.publicKey" title="Public Key" rows="8" cols="55" th:text="${publicKey.publicKey}"></textarea>
-                                            <span class="error" th:text="${fieldErrors.get('publicKey.publicKey')}"></span>
+                                                    <textarea class="new_key form-control" name="publicKey.publicKey"
+                                                              title="Public Key"
+                                                              rows="8" cols="55"
+                                                              th:text="${publicKey.publicKey}"></textarea> <span
+                                                class="error"
+                                                th:text="${fieldErrors.get('publicKey.publicKey')}"></span>
                                         </td>
                                     </tr>
                                 </template>
                                 <tr>
-                                    <td><strong>Existing Key</strong></td>
+                                    <td>Existing Key
+                                    </td>
                                     <td>
-                                        <select class="existing_key" name="existingKeyId" title="Existing Key">
+                                        <select class="existing_key form-select" name="existingKeyId" title="Existing Key">
                                             <option value="">- Select Key -</option>
                                             <option th:each="o : ${userPublicKeyList}" th:value="${o.id}"
                                                     th:text="${o.keyNm} + ' (' + ${o.fingerprint}+ ')'"
                                                     th:selected="${existingKeyId == o.id}"></option>
-                                        </select>
-                                        <span class="error" th:text="${fieldErrors.get('existingKeyId')}"></span>
+                                        </select> <span class="error"
+                                                        th:text="${fieldErrors.get('existingKeyId')}"></span>
                                     </td>
                                 </tr>
                             </table>
                             <input type="hidden" name="sortedSet.orderByDirection"
-                                   th:value="${sortedSet.orderByDirection}"/>
-                            <input type="hidden" name="sortedSet.orderByField"
-                                   th:value="${sortedSet.orderByField}"/>
+                                   th:value="${sortedSet.orderByDirection}">
+                            <input type="hidden" name="sortedSet.orderByField" th:value="${sortedSet.orderByField}">
                         </form>
                     </div>
                 </div>
                 <div class="modal-footer">
-
-                    <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-default submit_btn">Submit</button>
+                    <button type="button" class="btn btn-secondary cancel_btn" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary submit_btn">Submit</button>
                 </div>
             </div>
         </div>
     </div>
-
-
     <template th:if="${!forceUserKeyGenEnabled}" th:remove="tag">
         <template th:each="p : ${sortedSet.itemList}" th:remove="tag">
             <div th:id="'edit_dialog_' + ${p.id}" class="modal fade">
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
                             <div class="new_key_label">
-                                <div class="alert alert-success">
-                                    .. or <strong>select an <a href="#" class="alert-link">existing key</a></strong>
+                                <div class="alert alert-success">.. or select an <a href="#" class="alert-link">existing
+                                    key</a>
                                 </div>
-                                <h4 class="modal-title">Edit Public SSH Key</h4>
+                                <h5 class="modal-title">Edit Public SSH Key</h5>
                             </div>
-
                             <div class="existing_key_label">
-                                <div class="alert alert-success">
-                                    .. or <strong>create a <a href="#" class="alert-link">new key</a></strong>
+                                <div class="alert alert-success">.. or create a <a href="#" class="alert-link">new
+                                    key</a>
                                 </div>
-                                <h4 class="modal-title">Select &amp; Assign an SSH Key</h4>
+                                <h5 class="modal-title">Select &amp; Assign an SSH Key</h5>
                             </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                             <div class="row">
                                 <div th:replace="_res/inc/errors"></div>
                                 <form th:action="@{/admin/savePublicKey.ktrl}"
-                                      th:id="'save_public_key_form_edit_' + ${p.id}" method="post" autocomplete="off">
-                                    <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
-                                    <input type="hidden" name="publicKey.id" th:value="${p.id}"/>
+                                      th:id="'save_public_key_form_edit_' + ${p.id}"
+                                      method="post" autocomplete="off">
+                                    <input type="hidden" name="_csrf" th:value="${session._csrf}">
+                                    <input type="hidden" name="publicKey.id" th:value="${p.id}">
                                     <table>
                                         <tr>
-                                            <td><strong>Key Name</strong></td>
+                                            <td>Key Name
+                                            </td>
                                             <td>
                                                 <input type="text" name="publicKey.keyNm" th:value="${p.keyNm}"
-                                                       title="Key Name"
-                                                       size="15"/>
-                                                <span class="error" th:text="${fieldErrors.get('publicKey.keyNm')}"></span>
+                                                       class="form-control" title="Key Name"
+                                                       size="15"> <span class="error"
+                                                                        th:text="${fieldErrors.get('publicKey.keyNm')}"></span>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td><strong>Profile</strong></td>
+                                            <td>Profile
+                                            </td>
                                             <td>
-                                                <select name="publicKey.profile.id" title="Profile">
-                                                    <option th:if="${#strings.equals(session.userType, 'M')}" value="">All
-                                                        Systems
+                                                <select name="publicKey.profile.id" class="form-select" title="Profile">
+                                                    <option th:if="${#strings.equals(session.userType, 'M')}"
+                                                            value="">All Systems
                                                     </option>
                                                     <option th:each="o : ${profileList}" th:value="${o.id}"
                                                             th:text="${o.nm}"
                                                             th:selected="${p.profile != null && p.profile.id == o.id}"></option>
-                                                </select>
-                                                <span class="error" th:text="${fieldErrors.get('publicKey.profile.id')}"></span>
+                                                </select> <span class="error"
+                                                                th:text="${fieldErrors.get('publicKey.profile.id')}"></span>
                                             </td>
                                         </tr>
-
                                         <template th:if="${forceUserKeyGenEnabled}" th:remove="tag">
                                             <tr>
-                                                <td><strong>Passphrase</strong></td>
+                                                <td>Passphrase
+                                                </td>
                                                 <td>
-                                                    <input type="password" class="new_key" name="publicKey.passphrase"
+                                                    <input type="password" class="new_key form-control" name="publicKey.passphrase"
                                                            value=""
-                                                           title="Passphrase"/>
-                                                    <span class="error" th:text="${fieldErrors.get('publicKey.passphrase')}"></span>
+                                                           title="Passphrase"> <span class="error"
+                                                                                     th:text="${fieldErrors.get('publicKey.passphrase')}"></span>
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td><strong>Confirm Passphrase</strong></td>
+                                                <td>Confirm Passphrase
+                                                </td>
                                                 <td>
-                                                    <input type="password" class="new_key"
+                                                    <input type="password" class="new_key form-control"
                                                            name="publicKey.passphraseConfirm"
-                                                           value=""
-                                                           title="Confirm Passphrase"/>
-                                                    <span class="error" th:text="${fieldErrors.get('publicKey.passphraseConfirm')}"></span>
+                                                           value="" title="Confirm Passphrase"> <span class="error"
+                                                                                                      th:text="${fieldErrors.get('publicKey.passphraseConfirm')}"></span>
                                                 </td>
                                             </tr>
                                         </template>
                                         <template th:if="${!forceUserKeyGenEnabled}" th:remove="tag">
                                             <tr>
-                                                <td><strong>Public Key</strong></td>
-                                                <td><textarea class="new_key" name="publicKey.publicKey" title="Public Key" rows="8"
-                                          cols="55" th:text="${p.publicKey}"></textarea>
-                                                    <span class="error" th:text="${fieldErrors.get('publicKey.publicKey')}"></span>
+                                                <td>Public Key
+                                                </td>
+                                                <td>
+                                                            <textarea class="new_key form-control" name="publicKey.publicKey"
+                                                                      title="Public Key"
+                                                                      rows="8" cols="55"
+                                                                      th:text="${p.publicKey}"></textarea> <span
+                                                        class="error"
+                                                        th:text="${fieldErrors.get('publicKey.publicKey')}"></span>
                                                 </td>
                                             </tr>
                                         </template>
                                         <tr>
-                                            <td><strong>Existing Key</strong></td>
+                                            <td>Existing Key
+                                            </td>
                                             <td>
-                                                <select class="existing_key" name="existingKeyId" title="Existing Key">
+                                                <select class="existing_key form-select" name="existingKeyId" title="Existing Key">
                                                     <option value="">- Select Key -</option>
                                                     <option th:each="o : ${userPublicKeyList}" th:value="${o.id}"
                                                             th:text="${o.keyNm} + ' (' + ${o.fingerprint}+ ')'"
                                                             th:selected="${existingKeyId == o.id}"></option>
-                                                </select>
-                                                <span class="error" th:text="${fieldErrors.get('existingKeyId')}"></span>
+                                                </select> <span class="error"
+                                                                th:text="${fieldErrors.get('existingKeyId')}"></span>
                                             </td>
                                         </tr>
                                     </table>
                                     <input type="hidden" name="sortedSet.orderByDirection"
-                                           th:value="${sortedSet.orderByDirection}"/>
+                                           th:value="${sortedSet.orderByDirection}">
                                     <input type="hidden" name="sortedSet.orderByField"
-                                           th:value="${sortedSet.orderByField}"/>
+                                           th:value="${sortedSet.orderByField}">
                                 </form>
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
-                            <button type="button" class="btn btn-default submit_btn">Submit</button>
+                            <button type="button" class="btn btn-secondary cancel_btn" data-bs-dismiss="modal">Cancel
+                            </button>
+                            <button type="button" class="btn btn-secondary submit_btn">Submit</button>
                         </div>
                     </div>
                 </div>
             </div>
         </template>
     </template>
-
-
-    <template th:if="${!#strings.equals(session.userType, 'M') && (profileList == null || profileList.empty)}" th:remove="tag">
+    <template
+            th:if="${!#strings.equals(session.userType, 'M') && (profileList == null || profileList.empty)}"
+            th:remove="tag">
         <div class="actionMessage">
             <p class="error">No profiles have been assigned</p>
         </div>
     </template>
 </div>
-
 </body>
+
 </html>

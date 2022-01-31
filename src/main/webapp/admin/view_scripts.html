@@ -5,9 +5,10 @@
  */-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
 
-    <meta th:replace="_res/inc/header"/>
+    <meta th:replace="_res/inc/header">
 
     <script th:inline="javascript">
         /*<![CDATA[*/
@@ -45,180 +46,180 @@
 
         });
         /*]]>*/
+
+
     </script>
 
     <script th:inline="javascript" th:if="${!#maps.isEmpty(fieldErrors) || !errors.empty}">
         /*<![CDATA[*/
         $(document).ready(function () {
             [# th:if= "${script.id > 0}"]
-                $('#edit_dialog_' + [[${script.id}]]).modal();
+                new bootstrap.Modal($('#edit_dialog_' + [[${script.id}]])).show();
             [/]
             [# th:if= "${script.id <= 0}"]
-                $("#add_dialog").modal();
+                new bootstrap.Modal($("#add_dialog")).show();
             [/]
         });
         /*]]>*/
+
+
     </script>
 
     <title>Bastillion - Manage Scripts</title>
-
 </head>
+
 <body>
-
 <div th:replace="_res/inc/navigation"></div>
-
 <div class="container">
-
     <form id="viewScripts" th:action="@{/admin/viewScripts.ktrl}" method="get">
-        <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
+        <input type="hidden" name="_csrf" th:value="${session._csrf}">
         <input type="hidden" id="viewScripts_sortedSet_orderByDirection" name="sortedSet.orderByDirection"
-               th:value="${sortedSet.orderByDirection}"/>
+               th:value="${sortedSet.orderByDirection}">
         <input type="hidden" id="viewScripts_sortedSet_orderByField" name="sortedSet.orderByField"
-               th:value="${sortedSet.orderByField}"/>
+               th:value="${sortedSet.orderByField}">
     </form>
     <h3>Manage Scripts</h3>
-
     <p>Add / Delete scripts or select a script below to execute</p>
-
-    <div class="scrollWrapper" th:if="${sortedSet.itemList != null && !sortedSet.itemList.empty}">
+    <div class="scrollWrapper"
+         th:if="${sortedSet.itemList != null && !sortedSet.itemList.empty}">
         <table class="table-striped scrollableTable">
             <thead>
-
             <tr>
                 <th th:id="${@io.bastillion.manage.db.ScriptDB@SORT_BY_DISPLAY_NM}" class="sort">Script Name</th>
-                <th>&nbsp;</th>
+                <th>&#xA0;</th>
             </tr>
             </thead>
             <tbody>
-
-
             <template th:each="s : ${sortedSet.itemList}" th:remove="tag">
                 <tr>
                     <td>
-                        <a th:href="'viewSystems.ktrl?script.id=' + ${s.id} + '&_csrf=' + ${session._csrf}"
+                        <a th:href="'viewSystems.ktrl?script.id=' + ${s.id} + '&amp;_csrf=' + ${session._csrf}"
                            th:text="${s.displayNm}"></a>
                     </td>
                     <td>
-                        <div style="width:240px">
+                        <div><a
+                                th:href="'viewSystems.ktrl?script.id=' + ${s.id} + '&amp;_csrf=' + ${session._csrf}">
 
-                            <a th:href="'viewSystems.ktrl?script.id=' + ${s.id} + '&_csrf=' + ${session._csrf}">
-                                <button th:id="'exec_btn_' + ${s.id}"
-                                        class="btn btn-default edit_btn spacer spacer-left">Execute Script
-                                </button></a>
-                            <button class="btn btn-default spacer spacer-middle" data-toggle="modal"
-                                    th:attr="data-target='#edit_dialog_' + ${s.id}">Edit
+                            <button th:id="'exec_btn_' + ${s.id}"
+                                    class="btn btn-secondary edit_btn spacer spacer-left">Execute Script
+
+                            </button>
+                        </a>
+                            <button class="btn btn-secondary spacer spacer-middle"
+                                    data-bs-toggle="modal" th:attr="data-bs-target='#edit_dialog_' + ${s.id}">Edit
                             </button>
                             <button th:id="'del_btn_' + ${s.id}"
-                                    class="btn btn-default del_btn spacer spacer-right">Delete
+                                    class="btn btn-secondary del_btn spacer spacer-right">Delete
                             </button>
                             <div style="clear:both"></div>
-
                         </div>
                     </td>
-
                 </tr>
             </template>
             </tbody>
         </table>
     </div>
-
-    <button class="btn btn-default add_btn spacer spacer-bottom" data-toggle="modal" data-target="#add_dialog">Add
-        Script
+    <button class="btn btn-secondary add_btn spacer spacer-bottom" data-bs-toggle="modal"
+            data-bs-target="#add_dialog">Add Script
     </button>
     <div id="add_dialog" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                    <h4 class="modal-title">Add Script</h4>
+                    <h5 class="modal-title">Add Script</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
                         <div th:replace="_res/inc/errors"></div>
                         <form th:action="@{/admin/saveScript.ktrl}" method="post" class="save_script_form_add">
-                            <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
+                            <input type="hidden" name="_csrf" th:value="${session._csrf}">
                             <table>
                                 <tr>
-                                    <td><strong>Script Name</strong></td>
+                                    <td>Script Name
+                                    </td>
                                     <td>
                                         <input type="text" name="script.displayNm" th:value="${script.displayNm}"
-                                               title="Script Name" size="15"/>
-                                        <span class="error" th:text="${fieldErrors.get('script.displayNm')}"></span>
+                                               class="form-control" title="Script Name" size="15"> <span class="error"
+                                                                                    th:text="${fieldErrors.get('script.displayNm')}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Script</strong></td>
+                                    <td>Script
+                                    </td>
                                     <td>
-                                        <textarea name="script.script" th:text="${script.script}" title="Script"
-                                                      rows="15" cols="35" wrap="hard"></textarea>
-                                        <span class="error" th:text="${fieldErrors.get('script.script')}"></span>
+                                                <textarea name="script.script" th:text="${script.script}" class="form-control" title="Script"
+                                                          rows="15" cols="35" wrap="hard"></textarea> <span
+                                            class="error"
+                                            th:text="${fieldErrors.get('script.script')}"></span>
                                     </td>
                                 </tr>
                             </table>
                             <input type="hidden" name="sortedSet.orderByDirection"
-                                   th:value="${sortedSet.orderByDirection}"/>
-                            <input type="hidden" name="sortedSet.orderByField" th:value="${sortedSet.orderByField}"/>
+                                   th:value="${sortedSet.orderByDirection}">
+                            <input type="hidden" name="sortedSet.orderByField" th:value="${sortedSet.orderByField}">
                         </form>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-default submit_btn">Submit</button>
+                    <button type="button" class="btn btn-secondary cancel_btn" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary submit_btn">Submit</button>
                 </div>
             </div>
         </div>
     </div>
-
     <template th:each="s : ${sortedSet.itemList}" th:remove="tag">
         <div th:id="'edit_dialog_' + ${s.id}" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                        <h4 class="modal-title">Edit Script</h4>
+                        <h5 class="modal-title">Edit Script</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="row">
                             <div th:replace="_res/inc/errors"></div>
-                            <form th:action="@{/admin/saveScript.ktrl}" method="post" th:id="'save_script_form_edit_' + ${s.id}">
-                                <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
+                            <form th:action="@{/admin/saveScript.ktrl}" method="post"
+                                  th:id="'save_script_form_edit_' + ${s.id}">
+                                <input type="hidden" name="_csrf" th:value="${session._csrf}">
                                 <table>
                                     <tr>
-                                        <td><strong>Script Name</strong></td>
+                                        <td>Script Name
+                                        </td>
                                         <td>
                                             <input type="text" name="script.displayNm" th:value="${s.displayNm}"
-                                                   title="Script Name" size="15"/>
-                                            <span class="error" th:text="${fieldErrors.get('script.displayNm')}"></span>
+                                                   class="form-control" title="Script Name"
+                                                   size="15"> <span class="error"
+                                                                    th:text="${fieldErrors.get('script.displayNm')}"></span>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td><strong>Script</strong></td>
+                                        <td>Script
+                                        </td>
                                         <td>
-                                            <textarea name="script.script" th:text="${s.script}" title="Script"
-                                                      rows="15" cols="35" wrap="hard"></textarea>
-                                            <span class="error" th:text="${fieldErrors.get('script.script')}"></span>
+                                                    <textarea name="script.script" th:text="${s.script}" class="form-control" title="Script"
+                                                              rows="15"
+                                                              cols="35" wrap="hard"></textarea> <span class="error"
+                                                                                                      th:text="${fieldErrors.get('script.script')}"></span>
                                         </td>
                                     </tr>
                                 </table>
-                                <input type="hidden" name="script.id" th:value="${s.id}"/>
+                                <input type="hidden" name="script.id" th:value="${s.id}">
                                 <input type="hidden" name="sortedSet.orderByDirection"
-                                       th:value="${sortedSet.orderByDirection}"/>
-                                <input type="hidden" name="sortedSet.orderByField"
-                                       th:value="${sortedSet.orderByField}"/>
+                                       th:value="${sortedSet.orderByDirection}">
+                                <input type="hidden" name="sortedSet.orderByField" th:value="${sortedSet.orderByField}">
                             </form>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-default submit_btn">Submit</button>
+                        <button type="button" class="btn btn-secondary cancel_btn" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-secondary submit_btn">Submit</button>
                     </div>
                 </div>
             </div>
         </div>
     </template>
-
-
 </div>
-
 </body>
+
 </html>

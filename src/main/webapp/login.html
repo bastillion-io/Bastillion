@@ -5,73 +5,65 @@
  */-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta th:replace="_res/inc/header"/>
-    <title>Bastillion - Login </title>
+    <meta th:replace="_res/inc/header">
+    <title>Bastillion - Login</title>
 </head>
+
 <body>
-
-<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+<div class="navbar navbar-light bg-light fixed-top navbar-expand-md" role="navigation">
     <div class="container">
-
-        <div class="navbar-header">
-            <div class="navbar-brand">
-                <div class="nav-img"><img src="/img/bastillion_40x40.png" th:src="@{/img/bastillion_40x40.png}" alt="bastillion"/>
-                </div>
-                Bastillion
+        <div class="navbar-brand">
+            <div class="nav-img">
+                <img src="/img/bastillion_40x40.png" th:src="@{/img/bastillion_40x40.png}"
+                     alt="bastillion">
             </div>
+            Bastillion
         </div>
         <!--/.nav-collapse -->
     </div>
 </div>
-
 <div class="container">
     <h3></h3>
     <div th:replace="_res/inc/errors"></div>
-
-    <form id="loginSubmit" th:action="@{/loginSubmit.ktrl}" method="post" autocomplete="off">
-
+    <form id="loginSubmit" th:action="@{/loginSubmit.ktrl}" method="post"
+          autocomplete="off">
         <table>
             <tr>
-                <td>
-                    <strong>Username:</strong>
+                <td>Username:
                 </td>
                 <td>
-                    <input type="text" name="auth.username" title="Username"/>
-                    <span class="error" th:text="${fieldErrors.get('auth.username')}"></span>
+                    <input type="text" name="auth.username" class="form-control" title="Username"> <span class="error"
+                                                                                    th:text="${fieldErrors.get('auth.username')}"></span>
                 </td>
             </tr>
             <tr>
-                <td>
-                    <strong>Password:</strong>
+                <td>Password:
                 </td>
                 <td>
-                    <input type="password" name="auth.password" title="Password"/>
-                    <span class="error" th:text="${fieldErrors.get('auth.password')}"></span>
+                    <input type="password" name="auth.password" class="form-control" title="Password"> <span class="error"
+                                                                                        th:text="${fieldErrors.get('auth.password')}"></span>
                 </td>
             </tr>
             <tr th:if="${otpEnabled}">
-                <td>
-                    <strong>OTP Access Code:</strong>
+                <td>OTP Access Code:
                 </td>
                 <td>
-                    <input type="text" name="auth.otpToken" title="OTP Access Code"/>
-                    <span class="error" th:text="${fieldErrors.get('auth.otpToken')}"></span>
+                    <input type="text" name="auth.otpToken" class="form-control" title="OTP Access Code"> <span class="error"
+                                                                                           th:text="${fieldErrors.get('auth.otpToken')}"></span>
                 </td>
             </tr>
             <tr>
-                <td>&nbsp;</td>
+                <td>&#xA0;</td>
                 <td>
-                    <div id="login_btn" class="btn btn-default submit_btn">Login</div>
+                    <div id="login_btn" class="btn btn-secondary submit_btn">Login</div>
                 </td>
             </tr>
-
         </table>
-        <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
+        <input type="hidden" name="_csrf" th:value="${session._csrf}">
     </form>
-
-
 </div>
-
 </body>
+
 </html>

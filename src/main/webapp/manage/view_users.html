@@ -5,9 +5,10 @@
  */-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
 
-    <meta th:replace="_res/inc/header"/>
+    <meta th:replace="_res/inc/header">
 
     <script th:inline="javascript">
         /*<![CDATA[*/
@@ -70,11 +71,11 @@
         /*<![CDATA[*/
         $(document).ready(function () {
             [# th:if= "${user.id > 0}"]
-                $('#edit_dialog_' + [[${user.id}]]).modal();
+                new bootstrap.Modal($('#edit_dialog_' + [[${user.id}]])).show();
             [/]
 
             [# th:if= "${user.id <= 0}"]
-                $("#add_dialog").modal();
+                new bootstrap.Modal($("#add_dialog")).show();
                 [# th:if= "${@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled}"]
                     hideShowPassword($('.auth_type:checked').val());
                 [/]
@@ -84,41 +85,39 @@
     </script>
 
     <title>Bastillion - Manage Users</title>
-
 </head>
+
 <body>
-
 <div th:replace="_res/inc/navigation"></div>
-
 <div class="container">
     <form id="viewUsers" th:action="@{/manage/viewUsers.ktrl}" method="get">
-        <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
+        <input type="hidden" name="_csrf" th:value="${session._csrf}">
         <input type="hidden" id="viewUsers_sortedSet_orderByDirection" name="sortedSet.orderByDirection"
-               th:value="${sortedSet.orderByDirection}"/>
+               th:value="${sortedSet.orderByDirection}">
         <input type="hidden" id="viewUsers_sortedSet_orderByField" name="sortedSet.orderByField"
-               th:value="${sortedSet.orderByField}"/>
+               th:value="${sortedSet.orderByField}">
     </form>
-
     <h3>Manage Users</h3>
-
-    <p>Add / Delete users below so that system profiles may be set for users (<a
-            th:href="'viewProfiles.ktrl?_csrf=' + ${session._csrf}">Manage Profiles</a>).</p>
-
-    <div class="scrollWrapper" th:if="${sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()}">
+    <p>Add / Delete users below so that system profiles may be set for users
+        (<a th:href="'viewProfiles.ktrl?_csrf=' + ${session._csrf}">Manage Profiles</a>).</p>
+    <div
+            class="scrollWrapper" th:if="${sortedSet.itemList!= null && !sortedSet.itemList.isEmpty()}">
         <table class="table-striped  scrollableTable">
-
             <thead>
             <tr>
                 <th th:id="${@io.bastillion.manage.db.UserDB@USERNAME}" class="sort">Username</th>
-                <th th:id="${@io.bastillion.manage.db.UserDB@USER_TYPE}" class="sort">User Type</th>
+                <th th:id="${@io.bastillion.manage.db.UserDB@USER_TYPE}"
+                    class="sort">User Type</th>
                 <th th:id="${@io.bastillion.manage.db.UserDB@AUTH_TYPE}"
-                    th:if="${@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled}" class="sort">Auth Type
-                </th>
+                    th:if="${@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled}"
+                    class="sort">Auth Type</th>
                 <th th:id="${@io.bastillion.manage.db.UserDB@LAST_NM}" class="sort">Last Name</th>
-                <th th:id="${@io.bastillion.manage.db.UserDB@FIRST_NM}" class="sort">First Name</th>
+                <th th:id="${@io.bastillion.manage.db.UserDB@FIRST_NM}"
+                    class="sort">First Name</th>
                 <th th:id="${@io.bastillion.manage.db.UserDB@EMAIL}" class="sort">Email Address</th>
-                <th th:id="${@io.bastillion.manage.db.UserDB@LAST_LOGIN_TM}" class="sort">Last Login</th>
-                <th>&nbsp;</th>
+                <th th:id="${@io.bastillion.manage.db.UserDB@LAST_LOGIN_TM}"
+                    class="sort">Last Login</th>
+                <th>&#xA0;</th>
             </tr>
             </thead>
             <tbody>
@@ -126,13 +125,10 @@
                 <td th:text="${u.username}"></td>
                 <td th:if="${#strings.equals(u.userType, 'A')}">Administrative Only</td>
                 <td th:if="${!#strings.equals(u.userType, 'A')}">Full Access</td>
-                <template th:if="${@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled}" th:remove="tag">
-                    <td th:if="${#strings.equals(u.authType,'BASIC')}">
-                        Basic
-                    </td>
-                    <td th:if="${!#strings.equals(u.authType,'BASIC')}">
-                        External
-                    </td>
+                <template th:if="${@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled}"
+                          th:remove="tag">
+                    <td th:if="${#strings.equals(u.authType,'BASIC')}">Basic</td>
+                    <td th:if="${!#strings.equals(u.authType,'BASIC')}">External</td>
                 </template>
                 <td th:text="${u.lastNm}"></td>
                 <td th:text="${u.firstNm}"></td>
@@ -140,16 +136,12 @@
                 <td th:text="${#dates.format(u.lastLoginTm, 'dd-MMM-yyyy hh:mm:ss')}"></td>
                 <td>
                     <div style="width:235px">
-                        <button class="btn btn-default spacer spacer-left" data-toggle="modal"
-                                th:attr="data-target='#edit_dialog_' + ${u.id}">Edit
-                        </button>
+                        <button class="btn btn-secondary spacer spacer-left" data-bs-toggle="modal"
+                                th:attr="data-bs-target='#edit_dialog_' + ${u.id}">Edit</button>
                         <button th:if="${userId != u.id}" th:id="'del_btn_' + ${u.id}"
-                                class="btn btn-default del_btn spacer spacer-middle">Delete
-                        </button>
+                                class="btn btn-secondary del_btn spacer spacer-middle">Delete</button>
                         <button th:if="${u.expired}" th:id="'unlock_btn_' + ${u.id}"
-                                class="btn btn-default unlock_btn spacer spacer-middle">Unlock
-                        </button>
-
+                                class="btn btn-secondary unlock_btn spacer spacer-middle">Unlock</button>
                         <div style="clear:both"></div>
                     </div>
                 </td>
@@ -157,17 +149,14 @@
             </tbody>
         </table>
     </div>
-
-
-    <button class="btn btn-default add_btn spacer spacer-bottom" data-toggle="modal" data-target="#add_dialog">Add
-        User
-    </button>
+    <button class="btn btn-secondary add_btn spacer spacer-bottom" data-bs-toggle="modal"
+            data-bs-target="#add_dialog">Add User</button>
     <div id="add_dialog" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                    <h4 class="modal-title">Add User</h4>
+                    <h5 class="modal-title">Add User</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
@@ -176,193 +165,182 @@
                               autocomplete="off">
                             <table>
                                 <tr>
-                                    <td><strong>Username</strong></td>
-                                    <td><input type="hidden" name="_csrf" th:value="${session._csrf}"/>
-                                        <input type="text" name="user.username" th:value="${user.username}"
-                                               title="Username" size="15"/>
-                                        <span class="error" th:text="${fieldErrors.get('user.username')}"></span>
+                                    <td>Username
+                                    </td>
+                                    <td>
+                                        <input type="hidden" name="_csrf" th:value="${session._csrf}">
+                                        <input type="text" name="user.username" th:value="${user.username}" class="form-control" title="Username"
+                                               size="15"> <span class="error" th:text="${fieldErrors.get('user.username')}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td><strong>UserType</strong></td>
-                                    <td><select name="user.userType" title="UserType">
-                                        <option value="A" th:selected="${#strings.equals(user.userType, 'A')}">
-                                            Administrative Only
-                                        </option>
-                                        <option value="M" th:selected="${#strings.equals(user.userType, 'M')}">Full
-                                            Access
-                                        </option>
-                                    </select>
-                                        <span class="error" th:text="${fieldErrors.get('user.userType')}"></span>
+                                    <td>UserType
+                                    </td>
+                                    <td>
+                                        <select name="user.userType" class="form-select" title="UserType">
+                                            <option value="A" th:selected="${#strings.equals(user.userType, 'A')}">Administrative Only</option>
+                                            <option value="M" th:selected="${#strings.equals(user.userType, 'M')}">Full Access</option>
+                                        </select> <span class="error" th:text="${fieldErrors.get('user.userType')}"></span>
                                     </td>
                                 </tr>
                                 <tr th:if="${@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled}">
-                                    <td><strong>Authentication Type</strong></td>
+                                    <td>Authentication Type
+                                    </td>
                                     <td>
+                                        <input type="radio" name="user.authType" title="Authentication Type" value="BASIC"
+                                               class="auth_type form-control" th:checked="${#strings.equals(user.authType, 'BASIC')}">Basic
                                         <input type="radio" name="user.authType" title="Authentication Type"
-                                               value="BASIC" class="auth_type"
-                                               th:checked="${#strings.equals(user.authType, 'BASIC')}"/>Basic
-                                        <input type="radio" name="user.authType" title="Authentication Type"
-                                               value="EXTERNAL" class="auth_type"
-                                               th:checked="${#strings.equals(user.authType, 'EXTERNAL')}"/>External
-                                        <span class="error" th:text="${fieldErrors.get('user.authType')}"></span>
+                                               value="EXTERNAL" class="auth_type form-control" th:checked="${#strings.equals(user.authType, 'EXTERNAL')}">External <span class="error" th:text="${fieldErrors.get('user.authType')}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td><strong>First Name</strong></td>
-                                    <td><input type="text" name="user.firstNm" th:value="${user.firstNm}"
-                                               title="First Name" size="15"/>
-                                        <span class="error" th:text="${fieldErrors.get('user.firstNm')}"></span>
+                                    <td>First Name
+                                    </td>
+                                    <td>
+                                        <input type="text" name="user.firstNm" th:value="${user.firstNm}" class="form-control" title="First Name"
+                                               size="15"> <span class="error" th:text="${fieldErrors.get('user.firstNm')}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Last Name</strong></td>
-                                    <td><input type="text" name="user.lastNm" th:value="${user.lastNm}"
-                                               title="Last Name" size="15"/>
-                                        <span class="error" th:text="${fieldErrors.get('user.lastNm')}"></span>
+                                    <td>Last Name
+                                    </td>
+                                    <td>
+                                        <input type="text" name="user.lastNm" th:value="${user.lastNm}" class="form-control" title="Last Name"
+                                               size="15"> <span class="error" th:text="${fieldErrors.get('user.lastNm')}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Email Address</strong></td>
-                                    <td><input type="text" name="user.email" th:value="${user.email}"
-                                               title="Email Address" size="25"/>
-                                        <span class="error" th:text="${fieldErrors.get('user.email')}"></span>
+                                    <td>Email Address
+                                    </td>
+                                    <td>
+                                        <input type="text" name="user.email" th:value="${user.email}" class="form-control" title="Email Address"
+                                               size="25"> <span class="error" th:text="${fieldErrors.get('user.email')}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Password</strong></td>
-                                    <td><input type="password" name="user.password" value="" title="Password" size="15"
-                                               class="password"/>
-                                        <span class="error" th:text="${fieldErrors.get('user.password')}"></span>
+                                    <td>Password
+                                    </td>
+                                    <td>
+                                        <input type="password" name="user.password" value="" title="Password"
+                                               size="15" class="password form-control"> <span class="error" th:text="${fieldErrors.get('user.password')}"></span>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Confirm Password</strong></td>
-                                    <td><input type="password" name="user.passwordConfirm" value=""
-                                               title="Confirm Password"
-                                               size="15" class="password"/>
-                                        <span class="error" th:text="${fieldErrors.get('user.passwordConfirm')}"></span>
-                                        <input type="hidden" name="resetSharedSecret" th:value="${resetSharedSecret}"/>
-                                        <input type="hidden" name="sortedSet.orderByDirection"/>
-                                        <input type="hidden" name="sortedSet.orderByField"/></td>
+                                    <td>Confirm Password
+                                    </td>
+                                    <td>
+                                        <input type="password" name="user.passwordConfirm" value="" title="Confirm Password"
+                                               size="15" class="password form-control"> <span class="error" th:text="${fieldErrors.get('user.passwordConfirm')}"></span>
+                                        <input type="hidden" name="resetSharedSecret" th:value="${resetSharedSecret}">
+                                        <input type="hidden" name="sortedSet.orderByDirection">
+                                        <input type="hidden" name="sortedSet.orderByField">
+                                    </td>
                                 </tr>
                             </table>
                         </form>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-default submit_btn">Submit</button>
+                    <button type="button" class="btn btn-secondary cancel_btn" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary submit_btn">Submit</button>
                 </div>
             </div>
         </div>
     </div>
-
-
     <template th:each="u : ${sortedSet.itemList}" th:remove="tag">
-
         <div th:id="'edit_dialog_' + ${u.id}" class="modal fade">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                        <h4 class="modal-title">Edit User</h4>
+                        <h5 class="modal-title">Edit User</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="row">
                             <div th:replace="_res/inc/errors"></div>
-                            <form th:action="@{/manage/saveUser.ktrl}" method="post"
-                                  th:id="'save_user_form_edit_' + ${u.id}" autocomplete="off">
+                            <form th:action="@{/manage/saveUser.ktrl}" method="post" th:id="'save_user_form_edit_' + ${u.id}"
+                                  autocomplete="off">
                                 <table>
                                     <tr>
-                                        <td><strong>Username</strong></td>
-                                        <td><input type="hidden" name="_csrf" th:value="${session._csrf}"/>
-                                            <input type="text" name="user.username" th:value="${u.username}"
-                                                   title="Username"
-                                                   size="15"/>
-                                            <span class="error" th:text="${fieldErrors.get('user.username')}"></span>
+                                        <td>Username
+                                        </td>
+                                        <td>
+                                            <input type="hidden" name="_csrf" th:value="${session._csrf}">
+                                            <input type="text" name="user.username" th:value="${u.username}" class="form-control" title="Username"
+                                                   size="15"> <span class="error" th:text="${fieldErrors.get('user.username')}"></span>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td><strong>UserType</strong></td>
-                                        <td><select name="user.userType" title="UserType">
-                                            <option value="A" th:selected="${#strings.equals(u.userType, 'A')}">
-                                                Administrative Only
-                                            </option>
-                                            <option value="M" th:selected="${#strings.equals(u.userType, 'M')}">Full
-                                                Access
-                                            </option>
-                                        </select>
-                                            <span class="error" th:text="${fieldErrors.get('user.userType')}"></span>
-
+                                        <td>UserType
+                                        </td>
+                                        <td>
+                                            <select name="user.userType" class="form-select" title="UserType">
+                                                <option value="A" th:selected="${#strings.equals(u.userType, 'A')}">Administrative Only</option>
+                                                <option value="M" th:selected="${#strings.equals(u.userType, 'M')}">Full Access</option>
+                                            </select> <span class="error" th:text="${fieldErrors.get('user.userType')}"></span>
                                         </td>
                                     </tr>
                                     <tr th:if="${@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled}">
-                                        <td><strong>Authentication Type</strong></td>
+                                        <td>Authentication Type
+                                        </td>
                                         <td>
-                                            <input type="hidden" name="user.authType" th:value="${u.authType}"/>
-                                            <span th:if="${#strings.equals(u.authType,'BASIC')}">Basic</span>
-                                            <span th:if="${!#strings.equals(u.authType,'BASIC')}">External</span>
-                                            <span class="error" th:text="${fieldErrors.get('user.authType')}"></span>
+                                            <input type="hidden" name="user.authType" th:value="${u.authType}"> <span th:if="${#strings.equals(u.authType,'BASIC')}">Basic</span>
+                                            <span
+                                                    th:if="${!#strings.equals(u.authType,'BASIC')}">External</span> <span class="error" th:text="${fieldErrors.get('user.authType')}"></span>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td><strong>First Name</strong></td>
-                                        <td><input type="text" name="user.firstNm" th:value="${u.firstNm}"
-                                                   title="First Name"
-                                                   size="15"/>
-                                            <span class="error" th:text="${fieldErrors.get('user.firstNm')}"></span>
+                                        <td>First Name
+                                        </td>
+                                        <td>
+                                            <input type="text" name="user.firstNm" th:value="${u.firstNm}" class="form-control" title="First Name"
+                                                   size="15"> <span class="error" th:text="${fieldErrors.get('user.firstNm')}"></span>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td><strong>Last Name</strong></td>
-                                        <td><input type="text" name="user.lastNm" th:value="${u.lastNm}"
-                                                   title="Last Name"
-                                                   size="15"/>
-                                            <span class="error" th:text="${fieldErrors.get('user.lastNm')}"></span>
+                                        <td>Last Name
+                                        </td>
+                                        <td>
+                                            <input type="text" name="user.lastNm" th:value="${u.lastNm}" class="form-control" title="Last Name"
+                                                   size="15"> <span class="error" th:text="${fieldErrors.get('user.lastNm')}"></span>
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td><strong>Email Address</strong></td>
-                                        <td><input type="text" name="user.email" th:value="${u.email}"
-                                                   title="Email Address"
-                                                   size="25"/>
-                                            <span class="error" th:text="${fieldErrors.get('user.email')}"></span>
+                                        <td>Email Address
+                                        </td>
+                                        <td>
+                                            <input type="text" name="user.email" th:value="${u.email}" class="form-control" title="Email Address"
+                                                   size="25"> <span class="error" th:text="${fieldErrors.get('user.email')}"></span>
                                         </td>
                                     </tr>
-                                    <template
-                                            th:if="${!@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled || #strings.equals(u.authType,'BASIC')}"
-                                            th:remove="tag">
+                                    <template th:if="${!@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled || #strings.equals(u.authType,'BASIC')}"
+                                              th:remove="tag">
                                         <tr>
-                                            <td><strong>Password</strong></td>
+                                            <td>Password
+                                            </td>
                                             <td>
-                                                <input type="password" name="user.password" value="" title="Password"
-                                                       size="15"/>
-                                                <span class="error"
-                                                      th:text="${fieldErrors.get('user.password')}"></span>
+                                                <input type="password" name="user.password" value="" class="form-control" title="Password"
+                                                       size="15"> <span class="error" th:text="${fieldErrors.get('user.password')}"></span>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td><strong>Confirm Password</strong></td>
+                                            <td>Confirm Password
+                                            </td>
                                             <td>
-                                                <input type="password" name="user.passwordConfirm" value=""
-                                                       title="Confirm Password"
-                                                       size="15"/>
-                                                <span class="error"
-                                                      th:text="${fieldErrors.get('user.passwordConfirm')}"></span>
+                                                <input type="password" name="user.passwordConfirm" value="" class="form-control" title="Confirm Password"
+                                                       size="15"> <span class="error" th:text="${fieldErrors.get('user.passwordConfirm')}"></span>
                                             </td>
                                         </tr>
                                     </template>
                                     <tr>
-                                        <td><strong>Reset OTP Code</strong></td>
-                                        <td><input type="checkbox" name="resetSharedSecret" title="Reset OTP Code" value="true"/>
-                                            <span class="error"
-                                                  th:text="${fieldErrors.get('resetSharedSecret')}"></span>
-                                            <input type="hidden" name="user.id" th:value="${u.id}"/>
-                                            <input type="hidden" name="sortedSet.orderByDirection"
-                                                   th:value="${sortedSet.orderByDirection}"/>
-                                            <input type="hidden" name="sortedSet.orderByField"
-                                                   th:value="${sortedSet.orderByField}"/>
+                                        <td>Reset OTP Code
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" name="resetSharedSecret" class="form-check-input" title="Reset OTP Code"
+                                                   value="true"> <span class="error" th:text="${fieldErrors.get('resetSharedSecret')}"></span>
+                                            <input type="hidden" name="user.id" th:value="${u.id}">
+                                            <input type="hidden" name="sortedSet.orderByDirection" th:value="${sortedSet.orderByDirection}">
+                                            <input type="hidden" name="sortedSet.orderByField" th:value="${sortedSet.orderByField}">
                                         </td>
                                     </tr>
                                 </table>
@@ -370,15 +348,14 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-default submit_btn">Submit</button>
+                        <button type="button" class="btn btn-secondary cancel_btn" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-secondary submit_btn">Submit</button>
                     </div>
                 </div>
             </div>
         </div>
     </template>
 </div>
-
-
 </body>
+
 </html>

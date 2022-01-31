@@ -5,9 +5,10 @@
  */-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
 
-    <meta th:replace="_res/inc/header"/>
+    <meta th:replace="_res/inc/header">
 
     <script th:inline="javascript">
         /*<![CDATA[*/
@@ -49,78 +50,73 @@
 
         });
         /*]]>*/
+
     </script>
 
     <title>Bastillion - Assign Systems to Profile</title>
-
 </head>
+
 <body>
-
 <div th:replace="_res/inc/navigation"></div>
-
 <div class="container">
-
-    <form id="viewProfileSystems" th:action="@{/manage/viewProfileSystems.ktrl}" method="get">
-        <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
-        <input type="hidden" id="viewProfileSystems_sortedSet_orderByDirection" name="sortedSet.orderByDirection"
-               th:value="${sortedSet.orderByDirection}"/>
+    <form id="viewProfileSystems" th:action="@{/manage/viewProfileSystems.ktrl}"
+          method="get">
+        <input type="hidden" name="_csrf" th:value="${session._csrf}">
+        <input type="hidden" id="viewProfileSystems_sortedSet_orderByDirection"
+               name="sortedSet.orderByDirection" th:value="${sortedSet.orderByDirection}">
         <input type="hidden" id="viewProfileSystems_sortedSet_orderByField" name="sortedSet.orderByField"
-               th:value="${sortedSet.orderByField}"/>
-        <input type="hidden" name="profile.id" th:value="${profile.id}"/>
+               th:value="${sortedSet.orderByField}">
+        <input type="hidden" name="profile.id" th:value="${profile.id}">
     </form>
-
     <h3>Assign Systems to Profile</h3>
-
     <p>Select the systems below to be assigned to the current profile.</p>
-
-    <h4 th:text="${profile.nm}"></h4>
+    <h4
+            th:text="${profile.nm}"></h4>
     <p class="small" th:text="${profile.desc}"></p>
-
-
     <div class="scrollWrapper" th:if="${sortedSet.itemList != null && !sortedSet.itemList.empty}">
-        <form id="assignSystemsToProfile" th:action="@{/manage/assignSystemsToProfile.ktrl}" method="post">
-            <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
-            <input type="hidden" name="profile.id" th:value="${profile.id}"/>
+        <form id="assignSystemsToProfile" th:action="@{/manage/assignSystemsToProfile.ktrl}"
+              method="post">
+            <input type="hidden" name="_csrf" th:value="${session._csrf}">
+            <input type="hidden" name="profile.id" th:value="${profile.id}">
             <table class="table-striped scrollableTable">
                 <thead>
-
                 <tr>
                     <th th:id="${@io.bastillion.manage.db.SystemDB@PROFILE_ID}" class="sort">
                         <input type="checkbox" id="assignSystemsToProfile_systemSelectAll" name="systemSelectAll"
-                               class="systemSelect"
-                               title="Select All"/>
+                               class="systemSelect form-check-input" title="Select All">
                     </th>
                     <th th:id="${@io.bastillion.manage.db.SystemDB@SORT_BY_NAME}" class="sort">Display Name</th>
-                    <th th:id="${@io.bastillion.manage.db.SystemDB@SORT_BY_USER}" class="sort">User</th>
-                    <th th:id="${@io.bastillion.manage.db.SystemDB@SORT_BY_HOST}" class="sort">Host</th>
+                    <th th:id="${@io.bastillion.manage.db.SystemDB@SORT_BY_USER}"
+                        class="sort">User
+                    </th>
+                    <th th:id="${@io.bastillion.manage.db.SystemDB@SORT_BY_HOST}"
+                        class="sort">Host
+                    </th>
                 </tr>
                 </thead>
                 <tbody>
-
-
                 <template th:each="s : ${sortedSet.itemList}" th:remove="tag">
                     <tr>
                         <td>
                             <input type="checkbox" th:id="'systemSelectId_'+ ${s.id}" name="systemSelectId"
-                                   class="systemSelect" th:value="${s.id}" th:checked="${s.checked}"/>
+                                   class="systemSelect form-check-input" th:value="${s.id}" th:checked="${s.checked}">
                         </td>
                         <td th:text="${s.displayNm}"></td>
                         <td th:text="${s.user}"></td>
                         <td th:text="${s.host}"></td>
                     </tr>
-
                 </template>
                 </tbody>
             </table>
         </form>
     </div>
-
-    <div id="assign_sys" th:if="${sortedSet.itemList != null && !sortedSet.itemList.empty}" class="btn btn-default assign_sys_btn spacer spacer-bottom">Assign</div>
+    <div id="assign_sys" th:if="${sortedSet.itemList != null && !sortedSet.itemList.empty}"
+         class="btn btn-secondary assign_sys_btn spacer spacer-bottom">Assign
+    </div>
     <div class="error" th:if="${sortedSet.itemList == null || sortedSet.itemList.empty}">There are no systems defined
         (<a th:href="'viewSystems.ktrl?_csrf=' + ${session._csrf}">Manage Systems</a>).
     </div>
-
 </div>
-
 </body>
+
 </html>
