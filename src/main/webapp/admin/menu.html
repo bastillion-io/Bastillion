@@ -5,118 +5,86 @@
  */-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta th:replace="_res/inc/header"/>
-
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $("table").css("background-color", "#ffffff");
-            $("table tr:even").css("background-color", "#e0e0e0");
-        });
-    </script>
-
+    <meta th:replace="_res/inc/header">
     <title>Bastillion - Main Menu</title>
-
 </head>
-
 
 <body>
 <div th:replace="_res/inc/navigation"></div>
-
-
 <div class="container">
-    <div class="template">
-
-        <table class="table-striped">
-            <thead>
-            <tr>
-                <th colspan="2">Main Menu</th>
-            </tr>
-            </thead>
-
-            <tbody>
+    <h3>Main Menu</h3>
+    <div class="row featurette">
+        <div class="list-group">
             <template th:if="${#strings.equals(session.userType,'M')}" th:remove="tag">
-                <tr>
-
-                    <td>
-                        <a th:href="'../manage/viewSystems.ktrl?_csrf=' + ${session._csrf}">Systems</a>
-
-                    </td>
-
-
-                    <td>
-                        Manage systems so that access may be granted for establishing SSH sessions.
-                    </td>
-
-                </tr>
-                <tr>
-                    <td>
-                        <a th:href="'../manage/viewProfiles.ktrl?_csrf=' + ${session._csrf}">Profiles</a>
-                    </td>
-                    <td>
-                        Create profiles and assign systems to grant user access and distribute keys.
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <a th:href="'../manage/viewUsers.ktrl?_csrf=' + ${session._csrf}">Users</a>
-
-                    </td>
-                    <td>
-                        Manage user accounts and profiles. Profiles grants a user access to the defined systems.
-                    </td>
-                </tr>
+                <a th:href="'../manage/viewSystems.ktrl?_csrf=' + ${session._csrf}"
+                   class="list-group-item list-group-item-action list-group-item-light">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Systems</h5>
+                    </div>
+                    <p class="mb-1">Manage systems so that access may be granted for establishing SSH sessions.</p>
+                </a>
+                <a th:href="'../manage/viewProfiles.ktrl?_csrf=' + ${session._csrf}"
+                   class="list-group-item list-group-item-action list-group-item-secondary">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Profiles</h5>
+                    </div>
+                    <p class="mb-1">Create profiles and assign systems to grant user access and distribute keys.</p>
+                </a>
+                <a th:href="'../manage/viewUsers.ktrl?_csrf=' + ${session._csrf}"
+                   class="list-group-item list-group-item-action list-group-item-light">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Users</h5>
+                    </div>
+                    <p class="mb-1">Manage user accounts and profiles. Profiles grant a user access to the defined
+                        systems.</p>
+                </a>
             </template>
-
-
-            <tr>
-                <td>
-                    <a th:href="'../admin/viewSystems.ktrl?_csrf=' + ${session._csrf}">Composite SSH Terms</a>
-                </td>
-                <td>
-                    Execute multiple-simultaneous web-terminals on selected systems.
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <a th:href="'../admin/viewScripts.ktrl?_csrf=' + ${session._csrf}">Composite Scripts</a>
-                </td>
-                <td>
-                    Create scripts to be executed on selected systems simultaneously through a web-terminal.
-                </td>
-            </tr>
-            <tr th:if="${@io.bastillion.manage.util.SSHUtil@keyManagementEnabled}">
-
-                <td th:if="${#strings.equals(session.userType,'M')}">
-                    <a th:href="'../manage/viewKeys.ktrl?_csrf=' + ${session._csrf}">Manage SSH Keys</a>
-                </td>
-                <td th:if="${#strings.equals(session.userType,'M')}">
-                    Disable any administrative key forcing rotation. Set additional public SSH keys for current user.
-                </td>
-                <td th:if="${!#strings.equals(session.userType,'M')}">
-                    <a th:href="'../admin/viewKeys.ktrl?_csrf=' + ${session._csrf}">Manage SSH Keys</a>
-                </td>
-                <td th:if="${!#strings.equals(session.userType,'M')}">
-                    Set additional public SSH keys for current user.
-                </td>
-            </tr>
-            <tr th:if="${@io.bastillion.manage.util.SessionOutputUtil@enableInternalAudit &&  #strings.equals(session.userType,'M')}">
-                <td>
-                    <a th:href="'../manage/viewSessions.ktrl?_csrf=' + ${session._csrf}">Audit Sessions</a>
-                </td>
-                <td>
-                    Audit administrator's sessions and terminal history.
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <a th:href="'../admin/userSettings.ktrl?_csrf=' + ${session._csrf}">Settings</a>
-                </td>
-                <td>Administrative settings</td>
-            </tr>
-            </tbody>
-        </table>
+            <a th:href="'../admin/viewSystems.ktrl?_csrf=' + ${session._csrf}"
+               class="list-group-item list-group-item-action list-group-item-secondary">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">Terminals</h5>
+                </div>
+                <p class="mb-1">Execute multiple-simultaneous web-terminals on selected systems.</p>
+            </a>
+            <a th:href="'../admin/viewScripts.ktrl?_csrf=' + ${session._csrf}"
+               class="list-group-item list-group-item-action list-group-item-light">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">Composite Scripts</h5>
+                </div>
+                <p class="mb-1">Create scripts to be executed on selected systems simultaneously through a
+                    web-terminal.</p>
+            </a>
+            <template th:if="${@io.bastillion.manage.util.SSHUtil@keyManagementEnabled}" th:remove="tag">
+                <a th:if="${#strings.equals(session.userType,'M')}"
+                   th:href="'../manage/viewKeys.ktrl?_csrf=' + ${session._csrf}"
+                   class="list-group-item list-group-item-action list-group-item-secondary">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Manage SSH Keys</h5>
+                    </div>
+                    <p class="mb-1">Disable any administrative key forcing rotation. Set additional public SSH keys for
+                        current user.</p>
+                </a>
+                <a th:if="${!#strings.equals(session.userType,'M')}"
+                   th:href="'../admin/viewKeys.ktrl?_csrf=' + ${session._csrf}"
+                   class="list-group-item list-group-item-action list-group-item-secondary">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Manage SSH Keys</h5>
+                    </div>
+                    <p class="mb-1">Set additional public SSH keys for current user.</p>
+                </a>
+            </template>
+            <a th:href="'../admin/userSettings.ktrl?_csrf=' + ${session._csrf}"
+               class="list-group-item list-group-item-action list-group-item-light">
+                <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1">Settings</h5>
+                </div>
+                <p class="mb-1">Administrative settings.</p>
+            </a>
+        </div>
     </div>
 </div>
 </body>
+
 </html>

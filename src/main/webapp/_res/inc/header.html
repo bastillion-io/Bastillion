@@ -11,7 +11,9 @@
     <link rel="stylesheet" type="text/css" th:href="@{/_res/node/css/jquery-ui/all.css}"/>
     <link rel="stylesheet" type="text/css" th:href="@{/_res/node/css/xterm.css}"/>
     <link rel="stylesheet" type="text/css" th:href="@{/_res/node/css/bootstrap.min.css}"/>
-    <link rel="stylesheet" type="text/css" th:href="@{/_res/node/css/bootstrap-theme.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/_res/node/css/bootstrap-grid.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/_res/node/css/bootstrap-reboot.min.css}"/>
+    <link rel="stylesheet" type="text/css" th:href="@{/_res/node/css/bootstrap-utilities.min.css}"/>
     <link rel="stylesheet" type="text/css" th:href="@{/_res/css/bastillion.css}"/>
 
     <script th:src="@{/_res/node/js/jquery.min.js}"></script>
@@ -53,13 +55,6 @@
 
             $.ajaxSetup({cache: false});
 
-            $(function () {
-                $("a").tooltip({
-                    'selector': '',
-                    'placement': 'bottom',
-                    'container': 'body'
-                });
-            });
             $(function () {
                 var tabindex = 1;
                 $('input,textarea,select,.btn').each(function () {

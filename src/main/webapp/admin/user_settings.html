@@ -6,122 +6,100 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta th:replace="_res/inc/header"/>
+    <meta th:replace="_res/inc/header">
     <style>
-        form table {
-            width: 350px;
-        }
-    </style>
+            form table {
+                width: 350px;
+            }
 
+    </style>
     <title>Bastillion - Set Admin Password</title>
 </head>
+
 <body>
-
 <div th:replace="_res/inc/navigation"></div>
-
-
 <div class="container">
     <div th:if="${!@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled || #strings.equals(session.authType,'BASIC')}">
-
         <h3>Set Admin Password</h3>
         <p>Change your administrative password below</p>
-
         <div th:replace="_res/inc/errors"></div>
         <form th:action="@{/admin/passwordSubmit.ktrl}" method="post" autocomplete="off">
-
             <table>
                 <tr>
-                    <td>
-                        <strong>Current Password:</strong>
+                    <td>Current Password:
                     </td>
                     <td>
-                        <input type="password" name="auth.prevPassword" title="Current Password"/>
-                        <span class="error" th:text="${fieldErrors.get('auth.prevPassword')}"></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <strong>New Password:</strong>
-                    </td>
-                    <td>
-                        <input type="password" name="auth.password" title="New Password"/>
-                        <span class="error" th:text="${fieldErrors.get('auth.password')}"></span>
+                        <input type="password" name="auth.prevPassword" class="form-control" title="Current Password"> <span class="error"
+                                                                                                        th:text="${fieldErrors.get('auth.prevPassword')}"></span>
                     </td>
                 </tr>
                 <tr>
-                    <td>
-                        <strong>Confirm New Password:</strong>
+                    <td>New Password:
                     </td>
                     <td>
-                        <input type="password" name="auth.passwordConfirm" title="Confirm New Password"/>
-                        <span class="error" th:text="${fieldErrors.get('auth.passwordConfirm')}"></span>
+                        <input type="password" name="auth.password" class="form-control" title="New Password"> <span class="error"
+                                                                                                th:text="${fieldErrors.get('auth.password')}"></span>
                     </td>
                 </tr>
                 <tr>
-                    <td>&nbsp;</td>
+                    <td>Confirm New Password:
+                    </td>
                     <td>
-                        <div id="change_btn" class="btn btn-default submit_btn">Change Password</div>
+                        <input type="password" name="auth.passwordConfirm" class="form-control" title="Confirm New Password"> <span
+                            class="error" th:text="${fieldErrors.get('auth.passwordConfirm')}"></span>
                     </td>
                 </tr>
-
+                <tr>
+                    <td>&#xA0;</td>
+                    <td>
+                        <div id="change_btn" class="btn btn-secondary submit_btn">Change Password</div>
+                    </td>
+                </tr>
             </table>
-            <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
+            <input type="hidden" name="_csrf" th:value="${session._csrf}">
         </form>
     </div>
-
-
     <h3>Set Terminal Theme</h3>
-
     <p>Change the theme for your terminals below</p>
-    <form th:action="@{/admin/themeSubmit.ktrl}" method="post" autocomplete="off">
-
+    <form th:action="@{/admin/themeSubmit.ktrl}"
+          method="post" autocomplete="off">
         <table>
             <tr>
-                <td>
-                    <strong>Terminal Theme:</strong>
+                <td>Terminal Theme:
                 </td>
                 <td>
-                    <select name="userSettings.theme" title="Terminal Theme">
+                    <select name="userSettings.theme" class="form-select" title="Terminal Theme">
                         <option value="">- Select Theme -</option>
-                        <option th:each="o : ${themeMap}"
-                                th:value="${o.value}" th:text="${o.key}"
-                                th:selected="${userSettings.theme == o.value}"></option>
+                        <option th:each="o : ${themeMap}" th:value="${o.value}"
+                                th:text="${o.key}" th:selected="${userSettings.theme == o.value}"></option>
                     </select>
                 </td>
             </tr>
-
             <tr>
-                <td>
-                    <strong>Foreground / Background:</strong>
+                <td>Foreground / Background:
                 </td>
                 <td>
-                    <select name="userSettings.plane" title="Foreground / Background">
+                    <select name="userSettings.plane" class="form-select" title="Foreground / Background">
                         <option value="">- Select FG / BG -</option>
-                        <option th:each="o : ${planeMap}" th:value="${o.value}" th:text="${o.key}"
-                                th:selected="${userSettings.plane == o.value}"></option>
+                        <option th:each="o : ${planeMap}" th:value="${o.value}"
+                                th:text="${o.key}" th:selected="${userSettings.plane == o.value}"></option>
                     </select>
                 </td>
             </tr>
-
             <tr>
-                <td>&nbsp;</td>
-
+                <td>&#xA0;</td>
                 <td>
-                    <div id="theme_btn" class="btn btn-default submit_btn">Update Theme</div>
+                    <div id="theme_btn" class="btn btn-secondary submit_btn">Update Theme</div>
                 </td>
             </tr>
-
         </table>
-        <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
+        <input type="hidden" name="_csrf" th:value="${session._csrf}">
     </form>
-
-
     <h3>Public Key</h3>
     <p>Public SSH Key used for application authentication when registering systems</p>
-    <pre style="white-space:pre-wrap;width:600px;" th:text="${publicKey}"></pre>
-
+    <pre
+            style="white-space:pre-wrap;width:600px;" th:text="${publicKey}"></pre>
 </div>
-
-
 </body>
+
 </html>

@@ -4,7 +4,7 @@
  *    Licensed under The Prosperity Public License 3.0.0
  */-->
 <div class="alert alert-danger" th:if="${!errors.empty}" xmlns:th="http://www.thymeleaf.org">
-    <strong>Error!</strong>
+    Error!
     <div th:each="e : ${errors}">
         <span th:text="${e}"></span>
     </div>

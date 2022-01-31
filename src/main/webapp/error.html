@@ -5,32 +5,29 @@
  */-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta th:replace="_res/inc/header"/>
+    <meta th:replace="_res/inc/header">
     <title>Bastillion - Error</title>
 </head>
+
 <body>
-
-<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+<div class="navbar navbar-light bg-light fixed-top navbar-expand-md" role="navigation">
     <div class="container">
-
-        <div class="navbar-header">
-            <div class="navbar-brand">
-                <div class="nav-img">
-                    <img src="/img/bastillion_40x40.png" th:src="@{/img/bastillion_40x40.png}" alt="bastillion"/>
-                </div>
-                Bastillion
+        <div class="navbar-brand">
+            <div class="nav-img">
+                <img src="/img/bastillion_40x40.png" th:src="@{/img/bastillion_40x40.png}"
+                     alt="bastillion">
             </div>
+            Bastillion
         </div>
         <!--/.nav-collapse -->
     </div>
 </div>
-
 <div class="container">
     <h3>Error</h3>
     <p>Uh oh... Something went wrong!</p>
-
 </div>
-
 </body>
+
 </html>

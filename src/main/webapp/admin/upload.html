@@ -5,9 +5,9 @@
  */-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:with="isFrame=true">
 
-    <meta th:replace="_res/inc/header"/>
+<head th:with="isFrame=true">
+    <meta th:replace="_res/inc/header">
 
     <script th:inline="javascript">
         /*<![CDATA[*/
@@ -20,50 +20,48 @@
         /*]]>*/
     </script>
     <style>
-        body {
-            padding: 10px;
-            background: #FFFFFF;
-        }
-    </style>
+            body {
+                padding: 10px;
+                background: #FFFFFF;
+            }
 
+    </style>
     <title>Bastillion - Upload &amp; Push</title>
 </head>
+
 <body>
-
 <template th:if="${idList!= null && !idList.empty}" th:remove="tag">
-
     <div th:replace="_res/inc/errors"></div>
-    <form id="upload" th:action="@{/admin/uploadSubmit.ktrl} + '?_csrf=' + ${session._csrf}" method="post" enctype="multipart/form-data">
+    <form id="upload" th:action="@{/admin/uploadSubmit.ktrl} + '?_csrf=' + ${session._csrf}"
+          method="post" enctype="multipart/form-data">
         <table>
             <tr>
-                <td>
-                    <strong>File:</strong>
+                <td>File:
                 </td>
                 <td>
-                    <input name="upload" type="file" required="required" title="File"/>
-                    <span class="error" th:text="${fieldErrors.get('upload')}"></span>
+                    <input name="upload" type="file" required="required" class="form-control" title="File"> <span class="error"
+                                                                                             th:text="${fieldErrors.get('upload')}"></span>
                 </td>
             </tr>
             <tr>
-                <td>
-                    <strong>Destination Directory:</strong>
+                <td>Destination Directory:
                 </td>
                 <td>
-                    <input name="pushDir" type="text" title="Destination Directory" required="required" th:value="${pushDir}"/>
-                    <span class="error" th:text="${fieldErrors.get('pushDir')}"></span>
+                    <input name="pushDir" type="text" class="form-control" title="Destination Directory" required="required"
+                           th:value="${pushDir}"> <span class="error"
+                                                        th:text="${fieldErrors.get('pushDir')}"></span>
                 </td>
             </tr>
-
             <tr>
-                <td>&nbsp;</td>
+                <td>&#xA0;</td>
                 <td>
-                    <div id="upload_btn" class="btn btn-default upload">Upload</div>
+                    <div id="upload_btn" class="btn btn-secondary upload">Upload</div>
                 </td>
             </tr>
         </table>
     </form>
 </template>
 <p class="error" th:if="${idList == null || idList.empty}">No systems associated with upload</p>
-
 </body>
+
 </html>

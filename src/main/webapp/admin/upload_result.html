@@ -5,14 +5,12 @@
  */-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head th:with="isFrame=true">
-
-    <meta th:replace="_res/inc/header"/>
-
-
+    <meta th:replace="_res/inc/header">
     <title> Bastillion - Upload &amp; Push </title>
 
-        <script th:inline="javascript">
+    <script th:inline="javascript">
             /*<![CDATA[*/
             $(document).ready(function () {
 
@@ -40,7 +38,7 @@
                 [/]
 
                 [# th:if="${currentSystemStatus!=null && #strings.equals(currentSystemStatus.statusCd,'GENERICFAIL')}"]
-                    $("#error_dialog").modal();
+                    new bootstrap.Modal($("#error_dialog")).show();
                 [/]
 
                 [# th:if="${(currentSystemStatus == null || !#strings.equals(currentSystemStatus.statusCd,'GENERICFAIL')) && pendingSystemStatus != null && pendingSystemStatus.id != null}"]
@@ -48,27 +46,24 @@
                 [/]
             });
             /*]]>*/
-        </script>
-        <style>
+
+    </script>
+    <style>
             body {
                 padding: 10px;
                 background: #FFFFFF;
             }
-        </style>
 
+    </style>
 </head>
+
 <body>
 
 <h4 th:text="'Pushing File: ' + ${uploadFileName}"></h4>
-
-
 <div class="uploadScrollWrapper" th:if="${hostSystemList!= null && !hostSystemList.empty}">
-
     <table class="table-striped uploadScrollableTable">
         <thead>
-
         <tr>
-
             <th>Display Name</th>
             <th>User</th>
             <th>Host</th>
@@ -76,55 +71,55 @@
         </tr>
         </thead>
         <tbody>
-
         <tr th:each="system : ${hostSystemList}">
-
             <td>
                 <div th:id="'status_' + ${system.id}" th:text="${system.displayNm}"></div>
             </td>
             <td th:text="${system.user}"></td>
             <td th:text="${system.host} + ':' + ${system.port}"></td>
-
             <td>
                 <div class="warning" th:if="${#strings.equals(system.statusCd,'INITIAL')}">Not Started</div>
-                <div class="warning" th:if="${#strings.equals(system.statusCd,'AUTHFAIL')}">Authentication Failed</div>
-                <div class="error" th:if="${#strings.equals(system.statusCd,'HOSTFAIL')}">DNS Lookup Failed</div>
-                <div class="warning" th:if="${#strings.equals(system.statusCd,'KEYAUTHFAIL')}">Passphrase Authentication Failed</div>
+                <div class="warning" th:if="${#strings.equals(system.statusCd,'AUTHFAIL')}">Authentication
+                    Failed
+                </div>
+                <div class="error" th:if="${#strings.equals(system.statusCd,'HOSTFAIL')}">DNS Lookup Failed
+                </div>
+                <div class="warning" th:if="${#strings.equals(system.statusCd,'KEYAUTHFAIL')}">Passphrase
+                    Authentication Failed
+                </div>
                 <div class="error" th:if="${#strings.equals(system.statusCd,'GENERICFAIL')}">Failed</div>
                 <div class="success" th:if="${#strings.equals(system.statusCd,'SUCCESS')}">Success</div>
             </td>
-
         </tr>
-
         </tbody>
     </table>
 </div>
 <p class="error" th:if="${hostSystemList == null || hostSystemList.empty}">No systems associated with upload</p>
-
-<form id="push" th:action="@{/admin/push.ktrl}" method="post">
-    <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
-    <input type="hidden" name="pushDir" th:value="${pushDir}"/>
-    <input type="hidden" name="uploadFileName" th:value="${uploadFileName}"/>
+<form id="push" th:action="@{/admin/push.ktrl}"
+      method="post">
+    <input type="hidden" name="_csrf" th:value="${session._csrf}">
+    <input type="hidden" name="pushDir" th:value="${pushDir}">
+    <input type="hidden" name="uploadFileName" th:value="${uploadFileName}">
 </form>
-
 <div id="error_dialog" class="modal fade">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                <h4 class="modal-title" th:text="'System: '+ ${currentSystemStatus.displayLabel}"></h4>
+                <h5 class="modal-title" th:text="'System: '+ ${currentSystemStatus.displayLabel}"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="error" th:if="${currentSystemStatus.errorMsg != null}" th:text="'Error: '+ ${currentSystemStatus.errorMsg}"></div>
+                    <div class="error" th:if="${currentSystemStatus.errorMsg != null}"
+                         th:text="'Error: '+ ${currentSystemStatus.errorMsg}"></div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default submit_btn">OK</button>
+                <button type="button" class="btn btn-secondary submit_btn">OK</button>
             </div>
         </div>
     </div>
 </div>
-
 </body>
+
 </html>

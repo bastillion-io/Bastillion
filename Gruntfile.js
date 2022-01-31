@@ -22,7 +22,7 @@ module.exports = function(grunt) {
                     {
                         expand: true,
                         flatten: true,
-                        src: ['<%= node %>/bootstrap/dist/css/*',
+                        src: ['<%= node %>/bootstrap/dist/css/bootstrap*min*',
                               '<%= node %>/xterm/css/xterm.*'
                              ],
                         dest: '<%= destCss %>/',
@@ -46,7 +46,8 @@ module.exports = function(grunt) {
                         expand: true,
                         flatten: true,
                         src: ['<%= node %>/jquery/dist/jquery.min.*',
-                              '<%= node %>/@popperjs/core/dist/umd/popper.min.*',
+                              '<%= node %>/@popperjs/core/dist/umd/popper.min.js',
+                              '<%= node %>/@popperjs/core/dist/umd/popper.min.js.map',
                               '<%= node %>/bootstrap/dist/js/bootstrap.min.*',
                               '<%= node %>/floatthead/dist/jquery.floatThead.min.*',
                               '<%= node %>/xterm/lib/xterm.*',

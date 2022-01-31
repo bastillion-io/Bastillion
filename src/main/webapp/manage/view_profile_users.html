@@ -5,9 +5,10 @@
  */-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
 
-    <meta th:replace="_res/inc/header"/>
+    <meta th:replace="_res/inc/header">
 
     <script th:inline="javascript">
         /*<![CDATA[*/
@@ -51,57 +52,43 @@
     </script>
 
     <title>Bastillion - Assign Users to Profile</title>
-
 </head>
+
 <body>
-
 <div th:replace="_res/inc/navigation"></div>
-
 <div class="container">
-
-    <form id="viewProfileUsers" th:action="@{/manage/viewProfileUsers.ktrl}" method="get">
-        <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
-        <input type="hidden" id="viewProfileUsers_sortedSet_orderByDirection" name="sortedSet.orderByDirection"
-               th:value="${sortedSet.orderByDirection}"/>
+    <form id="viewProfileUsers" th:action="@{/manage/viewProfileUsers.ktrl}"
+          method="get">
+        <input type="hidden" name="_csrf" th:value="${session._csrf}">
+        <input type="hidden" id="viewProfileUsers_sortedSet_orderByDirection"
+               name="sortedSet.orderByDirection" th:value="${sortedSet.orderByDirection}">
         <input type="hidden" id="viewProfileUsers_sortedSet_orderByField" name="sortedSet.orderByField"
-               th:value="${sortedSet.orderByField}"/>
-        <input type="hidden" name="profile.id" th:value="${profile.id}"/>
+               th:value="${sortedSet.orderByField}">
+        <input type="hidden" name="profile.id" th:value="${profile.id}">
     </form>
-
     <h3>Assign Users to Profile</h3>
-
     <p>Select the users below to be assigned to the current profile.</p>
-
     <h4 th:text="${profile.nm}"></h4>
     <p class="small" th:text="${profile.desc}"></p>
-
-
     <div class="scrollWrapper" th:if="${sortedSet.itemList != null && !sortedSet.itemList.empty}">
-        <form id="assignUsersToProfile" th:action="@{/manage/assignUsersToProfile.ktrl}" method="post">
-            <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
-            <input type="hidden" name="profile.id" th:value="${profile.id}"/>
+        <form id="assignUsersToProfile" th:action="@{/manage/assignUsersToProfile.ktrl}"
+              method="post">
+            <input type="hidden" name="_csrf" th:value="${session._csrf}">
+            <input type="hidden" name="profile.id" th:value="${profile.id}">
             <table class="table-striped scrollableTable">
                 <thead>
-
                 <tr>
                     <th th:id="${@io.bastillion.manage.db.UserDB@PROFILE_ID}" class="sort">
                         <input type="checkbox" id="assignUsersToProfile_userSelectAll" name="userSelectAll"
-                               class="userSelect"
-                               title="Select All"/>
+                               class="userSelect form-check-input" title="Select All">
                     </th>
                     <th th:id="${@io.bastillion.manage.db.UserDB@USERNAME}" class="sort">Username</th>
                     <th th:if="${@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled}"
-                        th:id="${@io.bastillion.manage.db.UserDB@AUTH_TYPE}" class="sort">Auth Type
-                    </th>
-                    <th th:id="${@io.bastillion.manage.db.UserDB@LAST_NM}" class="sort">Last
-                        Name
-                    </th>
-                    <th th:id="${@io.bastillion.manage.db.UserDB@FIRST_NM}" class="sort">First
-                        Name
-                    </th>
-                    <th th:id="${@io.bastillion.manage.db.UserDB@EMAIL}" class="sort">Email
-                        Address
-                    </th>
+                        th:id="${@io.bastillion.manage.db.UserDB@AUTH_TYPE}" class="sort">Auth Type</th>
+                    <th th:id="${@io.bastillion.manage.db.UserDB@LAST_NM}" class="sort">Last Name</th>
+                    <th th:id="${@io.bastillion.manage.db.UserDB@FIRST_NM}"
+                        class="sort">First Name</th>
+                    <th th:id="${@io.bastillion.manage.db.UserDB@EMAIL}" class="sort">Email Address</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -109,17 +96,14 @@
                     <tr>
                         <td>
                             <input type="checkbox" th:id="'userSelectId_'+ ${user.id}" name="userSelectId"
-                                   class="userSelect" th:value="${user.id}" th:checked="${user.checked}"/>
-
+                                   class="userSelect form-check-input" th:value="${user.id}" th:checked="${user.checked}">
                         </td>
                         <td th:text="${user.username}"></td>
                         <td th:if="${@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled}">
-                            <template th:if="${#strings.equals(user.authType, 'BASIC')}" th:remove="tag">
-                                Basic
-                            </template>
-                            <template th:if="${#strings.equals(user.authType, 'EXTERNAL')}" th:remove="tag">
-                                External
-                            </template>
+                            <template th:if="${#strings.equals(user.authType, 'BASIC')}"
+                                      th:remove="tag">Basic</template>
+                            <template th:if="${#strings.equals(user.authType, 'EXTERNAL')}"
+                                      th:remove="tag">External</template>
                         </td>
                         <td th:text="${user.lastNm}"></td>
                         <td th:text="${user.firstNm}"></td>
@@ -130,11 +114,10 @@
             </table>
         </form>
     </div>
-
-    <div id="assign_users" th:if="${sortedSet.itemList != null && !sortedSet.itemList.empty}" class="btn btn-default assign_user_btn spacer spacer-bottom">Assign</div>
-    <div class="error" th:if="${sortedSet.itemList == null || sortedSet.itemList.empty}">There are no terms associated with session(<a
-            th:href="'viewUsers.ktrl?_csrf=' + ${session._csrf}">Manage Users</a>).
-    </div>
+    <div id="assign_users" th:if="${sortedSet.itemList != null && !sortedSet.itemList.empty}"
+         class="btn btn-secondary assign_user_btn spacer spacer-bottom">Assign</div>
+    <div class="error" th:if="${sortedSet.itemList == null || sortedSet.itemList.empty}">There are no terms associated with session(<a th:href="'viewUsers.ktrl?_csrf=' + ${session._csrf}">Manage Users</a>).</div>
 </div>
 </body>
+
 </html>

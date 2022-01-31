@@ -5,8 +5,9 @@
  */-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta th:replace="_res/inc/header"/>
+    <meta th:replace="_res/inc/header">
     <script th:inline="javascript">
         /*<![CDATA[*/
 
@@ -81,7 +82,7 @@
 
                 var ids = [];
                 $(".run_cmd_active").each(function (index) {
-                    var id = $(this).find(".host").attr("data-hostId");
+                    var id = $(this).find(".host").attr("data-bs-hostId");
                     if (ids.indexOf(id) === -1) {
                         ids.push(id);
                     }
@@ -93,19 +94,19 @@
                 });
 
                 $("#upload_push_frame").attr("src", "setUpload.ktrl" + idListStr);
-                $("#upload_push_dialog").modal();
+                new bootstrap.Modal($("#upload_push_dialog")).show();
             });
 
             [# th:if= "${currentSystemStatus != null && (#strings.equals(currentSystemStatus.statusCd, 'GENERICFAIL') || #strings.equals(currentSystemStatus.statusCd, 'HOSTFAIL'))}"]
-                $("#error_dialog").modal();
+                new bootstrap.Modal($("#error_dialog")).show();
             [/]
             [# th:if= "${pendingSystemStatus != null && pendingSystemStatus.id != null && (currentSystemStatus == null || (!#strings.equals(currentSystemStatus.statusCd, 'GENERICFAIL') && !#strings.equals(currentSystemStatus.statusCd, 'HOSTFAIL')) )}"]
                 [# th:if= "${ #strings.equals(pendingSystemStatus.statusCd, 'AUTHFAIL')}"]
-                    $("#set_password_dialog").modal();
+                    new bootstrap.Modal($("#set_password_dialog")).show();
                 [/]
 
                 [# th:if= "${#strings.equals(pendingSystemStatus.statusCd, 'KEYAUTHFAIL')}"]
-                    $("#set_passphrase_dialog").modal();
+                    new bootstrap.Modal($("#set_passphrase_dialog")).show();
                 [/]
 
                 [# th:if= "${currentSystemStatus == null || (!#strings.equals(pendingSystemStatus.statusCd, 'AUTHFAIL') && !#strings.equals(pendingSystemStatus.statusCd, 'KEYAUTHFAIL')&& !#strings.equals(pendingSystemStatus.statusCd, 'GENERICFAIL'))}"]
@@ -369,11 +370,11 @@
             function createTermElement(instanceId, hostId, displayLabel) {
                 var instance =
                     "<div id=\"run_cmd_" + instanceId + "\" class=\"run_cmd_active run_cmd\">"
-                    + "<h5 class=\"term-header\">" + displayLabel + "</h5>"
+                    + "<h6 class=\"term-header\">" + displayLabel + "</h6>"
                     + "<div class=\"term\">"
                     + "<div id=\"output_" + instanceId + "\" class=\"output\"></div>"
                     + "</div>"
-                    + "<div data-hostId=\"" + hostId + "\" class=\"host\"></div>"
+                    + "<div data-bs-hostId=\"" + hostId + "\" class=\"host\"></div>"
                     + "</div>";
                 return instance;
             }
@@ -385,7 +386,7 @@
                 for (var i = 0; i < instanceIds.length; i++) {
 
                     var instanceId = instanceIds[i];
-                    var hostId = $('#run_cmd_' + instanceId).find(".host").attr("data-hostId");
+                    var hostId = $('#run_cmd_' + instanceId).find(".host").attr("data-bs-hostId");
                     var displayLabel = $('#run_cmd_' + instanceId).find(".term-header").text();
                     var newInstanceId = getNextInstanceId();
 
@@ -459,227 +460,220 @@
         }
 
     </style>
-
-    <title>Bastillion - Composite Terms</title>
-
+    <title>Bastillion - Terminals</title>
 </head>
 <body>
-<template th:if="${(systemList != null && !systemList.empty) || pendingSystemStatus.id != null }" th:remove="tag">
-
-    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+<template th:if="${(systemList != null && !systemList.empty) || pendingSystemStatus.id != null }"
+          th:remove="tag">
+    <div class="navbar navbar-light bg-light fixed-top navbar-expand-md" role="navigation">
         <div class="container">
-
-            <div class="navbar-header">
-                <div class="navbar-brand">
-                    <div class="nav-img"><img src="/img/bastillion_40x40.png" th:src="@{/img/bastillion_40x40.png}"
-                                              alt="bastillion"/>
-                    </div>
-                    Bastillion
+            <div class="navbar-brand">
+                <div class="nav-img">
+                    <img src="/img/bastillion_40x40.png" th:src="@{/img/bastillion_40x40.png}"
+                         alt="bastillion">
                 </div>
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
+                Bastillion
             </div>
-            <div class="collapse navbar-collapse">
-                <template th:if="${pendingSystemStatus == null || pendingSystemStatus.id == null}" th:remove="tag">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <template th:if="${pendingSystemStatus == null || pendingSystemStatus.id == null}"
+                          th:remove="tag">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item"><a id="select_all" href="#"
+                                                title="Use CMD-Click or CTRL-Click to select multiple individual terminals"
+                                                class="nav-link">Select
 
-                    <ul class="nav navbar-nav">
-                        <li><a id="select_all" href="#"
-                               title="Use CMD-Click or CTRL-Click to select multiple individual terminals">Select
-                            All</a></li>
-
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Terminal Actions<b
-                                    class="caret"></b></a>
-                            <ul class="dropdown-menu">
-                                <li><a id="upload_push" href="#">Upload &amp; Push</a></li>
-                                <li><a id="connect_to_host" data-toggle="modal" data-target="#connect_to_host_dialog"
-
-
-                                       href="#">Connect to Host</a></li>
-                                <li><a id="dup_session" href="#">Duplicate Session</a></li>
-                                <li><a id="reset_size" href="#">Reset Size</a></li>
-                                <li><a id="disconnect" href="#">Disconnect</a></li>
+                            All</a>
+                        </li>
+                        <li class="dropdown nav-item"><a href="#" class="dropdown-toggle nav-link"
+                                                         data-bs-toggle="dropdown">Terminal Actions<b
+                                class="caret"></b></a>
+                            <ul
+                                    class="dropdown-menu">
+                                <li class="dropdown-item"><a id="upload_push" href="#">Upload &amp; Push</a>
+                                </li>
+                                <li class="dropdown-item"><a id="connect_to_host" data-bs-toggle="modal"
+                                                             data-bs-target="#connect_to_host_dialog"
+                                                             href="#">Connect to Host</a>
+                                </li>
+                                <li class="dropdown-item"><a id="dup_session" href="#">Duplicate Session</a>
+                                </li>
+                                <li class="dropdown-item"><a id="reset_size" href="#">Reset Size</a>
+                                </li>
+                                <li class="dropdown-item"><a id="disconnect" href="#">Disconnect</a>
+                                </li>
                             </ul>
                         </li>
-                        <li><a th:href="'exitTerms.ktrl?_csrf=' + ${session._csrf}">Exit Terminals</a></li>
+                        <li class="nav-item"><a th:href="'exitTerms.ktrl?_csrf=' + ${session._csrf}"
+                                                class="nav-link">Exit Terminals</a>
+                        </li>
                     </ul>
-
-
                     <div class="clear"></div>
                     <div style="float:right;width:1px;height:1px;overflow:hidden">
-                    <textarea name="dummy" id="dummy" size="1"
-                              style="border:none;color:#FFFFFF;width:1px;height:1px"></textarea>
+                        <textarea name="dummy" id="dummy" size="1"
+                                  style="border:none;color:#FFFFFF;width:1px;height:1px"></textarea>
                         <input type="text" name="dummy2" id="dummy2" size="1"
-                               style="border:none;color:#FFFFFF;width:1px;height:1px"/>
+                               style="border:none;color:#FFFFFF;width:1px;height:1px">
                     </div>
                 </template>
             </div>
             <!--/.nav-collapse -->
         </div>
-
-
     </div>
-
     <div class="term-container container">
-
-
-        <div class="termwrapper">
-
-
-        </div>
+        <div class="termwrapper"></div>
     </div>
 </template>
-<template th:if="${(systemList == null || systemList.empty) && pendingSystemStatus.id == null}" th:remove="tag">
-
+<template th:if="${(systemList == null || systemList.empty) && pendingSystemStatus.id == null}"
+          th:remove="tag">
     <div th:replace="_res/inc/navigation"></div>
-
     <div class="container">
-        <h3>Composite SSH Terms</h3>
-
+        <h3>Terminals</h3>
         <p class="error">No sessions could be created</p>
     </div>
 </template>
-
 <div id="connect_to_host_dialog" class="modal fade">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                <h4 class="modal-title">Connect to Host</h4>
+                <h5 class="modal-title">Connect to Host</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <select id="connectHostId" name="connectHostId" title="Connect to Host"
-                            class="host_frm_select">
-                        <option th:each="s : ${allocatedSystemList}"
-                                th:value="${s.id}" th:text="${s.displayLabel}"></option>
+                    <select id="connectHostId" class="host_frm_select form-select" name="connectHostId" title="Connect to Host">
+                        <option th:each="s : ${allocatedSystemList}" th:value="${s.id}"
+                                th:text="${s.displayLabel}"></option>
                     </select>
-
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-default connect_btn" data-dismiss="modal">Connect</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-secondary connect_btn"
+                        data-bs-dismiss="modal">Connect
+                </button>
             </div>
         </div>
     </div>
 </div>
-
 <div id="set_password_dialog" class="modal fade">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close cancel_btn" data-dismiss="modal" aria-hidden="true">x</button>
-                <h4 class="modal-title" th:text="'Enter password for ' + ${pendingSystemStatus.displayLabel}"></h4>
+                <button type="button" class="close cancel_btn" data-bs-dismiss="modal" aria-hidden="true">x</button>
+                <h4 class="modal-title"
+                    th:text="'Enter password for ' + ${pendingSystemStatus.displayLabel}"></h4>
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="error" th:if="${pendingSystemStatus.errorMsg != null}" th:text="'Error: ' + ${pendingSystemStatus.errorMsg}"></div>
+                    <div class="error" th:if="${pendingSystemStatus.errorMsg != null}"
+                         th:text="'Error: ' + ${pendingSystemStatus.errorMsg}"></div>
                     <form id="password_frm" th:action="@{/admin/createTerms.ktrl}" method="post">
-                        <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
-                        <input type="hidden" name="pendingSystemStatus.id" th:value="${pendingSystemStatus.id}"/>
+                        <input type="hidden" name="_csrf" th:value="${session._csrf}">
+                        <input type="hidden" name="pendingSystemStatus.id" th:value="${pendingSystemStatus.id}">
                         <table>
                             <tr>
-                                <td>
-                                    <strong>Password:</strong>
+                                <td>Password:
                                 </td>
-                                <td><input type="password" name="password" title="Password" size="15" value="" autocomplete="off"/></td>
+                                <td>
+                                    <input type="password" name="password" class="form-control" title="Password" size="15" value=""
+                                           autocomplete="off">
+                                </td>
                             </tr>
                         </table>
-                        <input type="hidden" name="script.id" th:if="${script != null}" th:value="${script.id}"/>
+                        <input type="hidden" name="script.id" th:if="${script != null}" th:value="${script.id}">
                     </form>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-default submit_btn">Submit</button>
+                <button type="button" class="btn btn-secondary cancel_btn" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-secondary submit_btn">Submit</button>
             </div>
         </div>
     </div>
 </div>
-
-
 <div id="set_passphrase_dialog" class="modal fade">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close cancel_btn" data-dismiss="modal" aria-hidden="true">x</button>
-                <h4 class="modal-title" th:text="'Enter passphrase for ' + ${pendingSystemStatus.displayLabel}"></h4>
+                <button type="button" class="close cancel_btn" data-bs-dismiss="modal" aria-hidden="true">x</button>
+                <h4 class="modal-title"
+                    th:text="'Enter passphrase for ' + ${pendingSystemStatus.displayLabel}"></h4>
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="error" th:if="${pendingSystemStatus.errorMsg != null}" th:text="'Error: ' + ${pendingSystemStatus.errorMsg}"></div>
-                    <form id="passphrase_frm" th:action="@{/admin/createTerms.ktrl}" method="post">
-                        <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
-                        <input type="hidden" name="pendingSystemStatus.id" th:value="${pendingSystemStatus.id}"/>
+                    <div class="error" th:if="${pendingSystemStatus.errorMsg != null}"
+                         th:text="'Error: ' + ${pendingSystemStatus.errorMsg}"></div>
+                    <form id="passphrase_frm" th:action="@{/admin/createTerms.ktrl}"
+                          method="post">
+                        <input type="hidden" name="_csrf" th:value="${session._csrf}">
+                        <input type="hidden" name="pendingSystemStatus.id" th:value="${pendingSystemStatus.id}">
                         <table>
                             <tr>
-                                <td>
-                                    <strong>Password:</strong>
+                                <td>Password:
                                 </td>
-                                <td><input type="password" name="passphrase" title="Passphrase" size="15" value="" autocomplete="off"/></td>
+                                <td>
+                                    <input type="password" name="passphrase" class="form-control" title="Passphrase" size="15"
+                                           value="" autocomplete="off">
+                                </td>
                             </tr>
                         </table>
-                        <input type="hidden" name="script.id" th:if="${script != null}" th:value="${script.id}"/>
+                        <input type="hidden" name="script.id" th:if="${script != null}" th:value="${script.id}">
                     </form>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default cancel_btn" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-default submit_btn">Submit</button>
+                <button type="button" class="btn btn-secondary cancel_btn" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-secondary submit_btn">Submit</button>
             </div>
         </div>
     </div>
 </div>
-
 <div id="error_dialog" class="modal fade">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                <h4 class="modal-title" th:text="'System: ' + ${currentSystemStatus.displayLabel}"></h4>
+                <h5 class="modal-title" th:text="'System: ' + ${currentSystemStatus.displayLabel}"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="error" th:if="${currentSystemStatus.errorMsg != null}" th:text="'Error: ' + ${currentSystemStatus.errorMsg}"></div>
+                    <div class="error" th:if="${currentSystemStatus.errorMsg != null}"
+                         th:text="'Error: ' + ${currentSystemStatus.errorMsg}"></div>
                     <form id="error_frm" th:action="@{/admin/createTerms.ktrl}" method="post">
-                        <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
-                        <input type="hidden" name="pendingSystemStatus.id" th:value="${pendingSystemStatus.id}"/>
-                        <input type="hidden" name="script.id" th:if="${script != null}" th:value="${script.id}"/>
+                        <input type="hidden" name="_csrf" th:value="${session._csrf}">
+                        <input type="hidden" name="pendingSystemStatus.id" th:value="${pendingSystemStatus.id}">
+                        <input type="hidden" name="script.id" th:if="${script != null}" th:value="${script.id}">
                     </form>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default submit_btn">OK</button>
+                <button type="button" class="btn btn-secondary submit_btn">OK</button>
             </div>
         </div>
     </div>
 </div>
-
 <div id="upload_push_dialog" class="modal fade">
-    <div class="modal-dialog" style="width:700px">
-        <div class="modal-content">
+    <div class="modal-dialog">
+        <div class="modal-content" style="width:700px">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                <h4 class="modal-title">Upload &amp; Push</h4>
+                <h5 class="modal-title">Upload &amp; Push</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <iframe id="upload_push_frame" width="675px" height="300px" style="border: none;">
-                </iframe>
+                <iframe id="upload_push_frame" width="675px" height="300px" style="border: none;"></iframe>
             </div>
         </div>
     </div>
 </div>
-
-<form id="composite_terms_frm" th:action="@{/admin/createTerms.ktrl}" method="post">
-    <input type="hidden" name="_csrf" th:value="${session._csrf}"/>
-    <input type="hidden" name="pendingSystemStatus.id" th:value="${pendingSystemStatus.id}"/>
-    <input type="hidden" name="script.id" th:if="${script != null}" th:value="${script.id}"/>
+<form id="composite_terms_frm" th:action="@{/admin/createTerms.ktrl}"
+      method="post">
+    <input type="hidden" name="_csrf" th:value="${session._csrf}">
+    <input type="hidden" name="pendingSystemStatus.id" th:value="${pendingSystemStatus.id}">
+    <input type="hidden" name="script.id" th:if="${script != null}" th:value="${script.id}">
 </form>
-
 </body>
+
 </html>

@@ -5,9 +5,10 @@
  */-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
 
-    <meta th:replace="_res/inc/header"/>
+    <meta th:replace="_res/inc/header">
     <script th:inline="javascript">
         /*<![CDATA[*/
         $(document).ready(function () {
@@ -78,79 +79,64 @@
         /*]]>*/
     </script>
     <style type="text/css">
-        .run_cmd {
-           width: 50%
-        }
-
-        .term {
-            background-color: rgb(240, 240, 240);
-            color: rgb(77, 77, 77);
-        }
-
-        .terminal {
-            height: 300px;
-            overflow-y: scroll;
-        }
-
-        .terminal pre {
-            padding: 0;
-            margin: 2px;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            background-color: #F5F5F5;
-        }
-
-        .align-right {
-            padding: 10px 2px 10px 10px;
-            float: right;
-        }
-
-        .term-container {
-            width: 100%;
-            padding: 25px 0;
-            margin: 0;
-        }
-
-    </style>
-
-    <title>Bastillion - Session Terms</title>
-
+            .run_cmd {
+                width: 50%
+            }
+            .term {
+                background-color: rgb(240, 240, 240);
+                color: rgb(77, 77, 77);
+            }
+            .terminal {
+                height: 300px;
+                overflow-y: scroll;
+            }
+            .terminal pre {
+                padding: 0;
+                margin: 2px;
+                white-space: pre-wrap;
+                word-wrap: break-word;
+                background-color: #F5F5F5;
+            }
+            .align-right {
+                padding: 10px 2px 10px 10px;
+                float: right;
+            }
+            .term-container {
+                width: 100%;
+                padding: 25px 0;
+                margin: 0;
+            }
+        </style>
+    <title>Bastillion - Session Terminals</title>
 </head>
-<body>
-<div class="navbar navbar-default navbar-fixed-top" role="navigation">
-    <div class="container">
 
-        <div class="navbar-header">
-            <div class="navbar-brand">
-                <div class="nav-img"><img src="/img/bastillion_40x40.png" th:src="@{/img/bastillion_40x40.png}" alt="bastillion"/>
-                </div>
-                Bastillion
-            </div>
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-        </div>
+<body>
+<div class="navbar navbar-light bg-light fixed-top navbar-expand-md" role="navigation">
+    <div class="container">
+        <div class="navbar-brand">
+            <div class="nav-img">
+                <img src="/img/bastillion_40x40.png" th:src="@{/img/bastillion_40x40.png}"
+                     alt="bastillion">
+            </div>Bastillion</div>
+        <button type="button" class="navbar-toggler" data-bs-toggle="collapse"
+                data-bs-target=".navbar-collapse"> <span class="sr-only">Toggle navigation</span>
+            &#x2630;</button>
         <div class="collapse navbar-collapse">
             <template th:if="${pendingSystemStatus == null}" th:remove="tag">
-
                 <ul class="nav navbar-nav">
-                    <li><a th:href="'viewSessions.ktrl?_csrf=' + ${session._csrf}">Exit Audit</a></li>
+                    <li class="nav-item"><a th:href="'viewSessions.ktrl?_csrf=' + ${session._csrf}" class="nav-link">Exit Audit</a>
+                    </li>
                 </ul>
-
-
                 <div class="align-right">
-                    <input type="text" id="filter" name="filter" title="Filter" class="spacer spacer-left"/>
-                    <div class="btn btn-default submit_btn spacer spacer-middle">Filter</div>
-                    <div class="btn btn-default clear_btn spacer spacer-right">Clear</div>
+                    <input type="text" id="filter" name="filter" title="Filter" class="spacer spacer-left form-control">
+                    <div class="btn btn-secondary submit_btn spacer spacer-middle">Filter</div>
+                    <div class="btn btn-secondary clear_btn spacer spacer-right">Clear</div>
                 </div>
                 <div class="align-right" style="padding-top: 15px">
-                    <label>
-                        <b>Audit ( <span th:text="${sessionAudit.username}"></span>
-                        <span th:if="${sessionAudit.lastNm != null}"
-                              th:text="' - ' + ${sessionAudit.lastNm} + ', ' + ${sessionAudit.firstNm}"></span>
+                    <label> <b>Audit ( <span th:text="${sessionAudit.username}"></span>
+
+                        <span th:if="${sessionAudit.lastNm != null}" th:text="' - ' + ${sessionAudit.lastNm} + ', ' + ${sessionAudit.firstNm}"></span>
+
                         ) </b>
                     </label>
                 </div>
@@ -160,21 +146,14 @@
         <!--/.nav-collapse -->
     </div>
 </div>
-
-
 <div class="term-container container">
-
     <div class="termwrapper" th:if="${sessionAudit != null}">
         <template th:each=" s : ${sessionAudit.hostSystemList}" th:remove="tag">
-
             <div th:id="'run_cmd_' + ${s.instanceId}" class="run_cmd_active run_cmd">
-
                 <h5 class="term-header" th:text="${s.displayLabel}"></h5>
-
                 <div id="term" class="term">
                     <div th:id="'output_' + ${s.instanceId}" class="output">
-                        <div class="terminal">
-                        </div>
+                        <div class="terminal"></div>
                     </div>
                 </div>
             </div>
@@ -182,11 +161,8 @@
     </div>
 </div>
 <div class="container" th:if="${sessionAudit == null || sessionAudit.hostSystemList.empty}">
-    <div class="error">No terms are associated with
-        this session (<a th:href="'../manage/viewSessions.ktrl?_csrf=' + ${session._csrf}">Audit Sessions</a>).
-    </div>
+    <div class="error">No terms are associated with this session (<a th:href="'../manage/viewSessions.ktrl?_csrf=' + ${session._csrf}">Audit Sessions</a>).</div>
 </div>
-
-
 </body>
+
 </html>
