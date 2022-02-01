@@ -75,13 +75,35 @@
                     <p class="mb-1">Set additional public SSH keys for current user.</p>
                 </a>
             </template>
-            <a th:href="'../admin/userSettings.ktrl?_csrf=' + ${session._csrf}"
-               class="list-group-item list-group-item-action list-group-item-light">
-                <div class="d-flex w-100 justify-content-between">
-                    <h5 class="mb-1">Settings</h5>
-                </div>
-                <p class="mb-1">Administrative settings.</p>
-            </a>
+            <template
+                    th:if="${@io.bastillion.manage.util.SessionOutputUtil@enableInternalAudit &&  #strings.equals(session.userType,'M')}"
+                    th:remove="tag">
+                <a th:href="'../manage/viewSessions.ktrl?_csrf=' + ${session._csrf}"
+                   class="list-group-item list-group-item-action list-group-item-light">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Audit Sessions</h5>
+                    </div>
+                    <p class="mb-1">Audit administrator's sessions and terminal history.</p>
+                </a>
+                <a th:href="'../admin/userSettings.ktrl?_csrf=' + ${session._csrf}"
+                   class="list-group-item list-group-item-action list-group-item-secondary">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Settings</h5>
+                    </div>
+                    <p class="mb-1">Administrative settings.</p>
+                </a>
+            </template>
+            <template
+                    th:if="${@io.bastillion.manage.util.SessionOutputUtil@enableInternalAudit == false ||  #strings.equals(session.userType,'A')}"
+                    th:remove="tag">
+                <a th:href="'../admin/userSettings.ktrl?_csrf=' + ${session._csrf}"
+                   class="list-group-item list-group-item-action list-group-item-light">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Settings</h5>
+                    </div>
+                    <p class="mb-1">Administrative settings.</p>
+                </a>
+            </template>
         </div>
     </div>
 </div>
