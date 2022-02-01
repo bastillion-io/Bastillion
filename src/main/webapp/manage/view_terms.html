@@ -78,9 +78,9 @@
         });
         /*]]>*/
     </script>
-    <style type="text/css">
+    <style>
             .run_cmd {
-                width: 50%
+                width: 45%
             }
             .term {
                 background-color: rgb(240, 240, 240);
@@ -118,29 +118,34 @@
                 <img src="/img/bastillion_40x40.png" th:src="@{/img/bastillion_40x40.png}"
                      alt="bastillion">
             </div>Bastillion</div>
-        <button type="button" class="navbar-toggler" data-bs-toggle="collapse"
-                data-bs-target=".navbar-collapse"> <span class="sr-only">Toggle navigation</span>
-            &#x2630;</button>
-        <div class="collapse navbar-collapse">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
             <template th:if="${pendingSystemStatus == null}" th:remove="tag">
-                <ul class="nav navbar-nav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item"><a th:href="'viewSessions.ktrl?_csrf=' + ${session._csrf}" class="nav-link">Exit Audit</a>
                     </li>
                 </ul>
-                <div class="align-right">
-                    <input type="text" id="filter" name="filter" title="Filter" class="spacer spacer-left form-control">
-                    <div class="btn btn-secondary submit_btn spacer spacer-middle">Filter</div>
-                    <div class="btn btn-secondary clear_btn spacer spacer-right">Clear</div>
-                </div>
-                <div class="align-right" style="padding-top: 15px">
-                    <label> <b>Audit ( <span th:text="${sessionAudit.username}"></span>
 
-                        <span th:if="${sessionAudit.lastNm != null}" th:text="' - ' + ${sessionAudit.lastNm} + ', ' + ${sessionAudit.firstNm}"></span>
-
-                        ) </b>
-                    </label>
-                </div>
-                <div class="clear"></div>
+                <ul class="navbar-nav mb-2 mb-lg-0" style="float:right">
+                    <li class="nav-item">
+                        <label> <b>Audit ( <span th:text="${sessionAudit.username}"></span>
+                            <span th:if="${sessionAudit.lastNm != null}" th:text="' - ' + ${sessionAudit.lastNm} + ', ' + ${sessionAudit.firstNm}"></span> ) </b>
+                        </label>
+                    </li>
+                    <li class="nav-item">&nbsp;&nbsp;&nbsp;&nbsp;</li>
+                    <li class="nav-item">
+                        <input type="text" id="filter" name="filter" title="Filter" class="spacer spacer-left form-control">
+                    </li>
+                    <li class="nav-item">&nbsp;</li>
+                    <li class="nav-item">
+                        <div class="btn btn-secondary submit_btn spacer spacer-middle">Filter</div>
+                    </li>
+                    <li class="nav-item">
+                        <div class="btn btn-secondary clear_btn spacer spacer-right">Clear</div>
+                    </li>
+                </ul>
             </template>
         </div>
         <!--/.nav-collapse -->
@@ -150,7 +155,7 @@
     <div class="termwrapper" th:if="${sessionAudit != null}">
         <template th:each=" s : ${sessionAudit.hostSystemList}" th:remove="tag">
             <div th:id="'run_cmd_' + ${s.instanceId}" class="run_cmd_active run_cmd">
-                <h5 class="term-header" th:text="${s.displayLabel}"></h5>
+                <h6 class="term-header" th:text="${s.displayLabel}"></h6>
                 <div id="term" class="term">
                     <div th:id="'output_' + ${s.instanceId}" class="output">
                         <div class="terminal"></div>
