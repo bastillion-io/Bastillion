@@ -1,7 +1,7 @@
 /**
- *    Copyright (C) 2013 Loophole, LLC
- *
- *    Licensed under The Prosperity Public License 3.0.0
+ * Copyright (C) 2013 Loophole, LLC
+ * <p>
+ * Licensed under The Prosperity Public License 3.0.0
  */
 package io.bastillion.manage.model;
 
@@ -17,19 +17,19 @@ public class HostSystem {
     String host;
     Integer port = 22;
     String displayLabel;
-    String authorizedKeys="~/.ssh/authorized_keys";
-    Boolean checked=false;
-    String statusCd=INITIAL_STATUS;
+    String authorizedKeys = "~/.ssh/authorized_keys";
+    Boolean checked = false;
+    String statusCd = INITIAL_STATUS;
     String errorMsg;
     List<String> publicKeyList;
     Integer instanceId;
 
-    public static final String INITIAL_STATUS="INITIAL";
-    public static final String AUTH_FAIL_STATUS="AUTHFAIL";
-    public static final String PUBLIC_KEY_FAIL_STATUS="KEYAUTHFAIL";
-    public static final String GENERIC_FAIL_STATUS="GENERICFAIL";
-    public static final String SUCCESS_STATUS="SUCCESS";
-    public static final String HOST_FAIL_STATUS="HOSTFAIL";
+    public static final String INITIAL_STATUS = "INITIAL";
+    public static final String AUTH_FAIL_STATUS = "AUTHFAIL";
+    public static final String PUBLIC_KEY_FAIL_STATUS = "KEYAUTHFAIL";
+    public static final String GENERIC_FAIL_STATUS = "GENERICFAIL";
+    public static final String SUCCESS_STATUS = "SUCCESS";
+    public static final String HOST_FAIL_STATUS = "HOSTFAIL";
 
 
     public Long getId() {
@@ -61,12 +61,12 @@ public class HostSystem {
         return host;
     }
 
-    public void setHost(String host){
+    public void setHost(String host) {
         this.host = host;
     }
 
     public String getDisplayLabel() {
-        return getDisplayNm() +" - ( " +getUser() +"@"+getHost()+":"+getPort()+" )";
+        return getDisplayNm() + " - ( " + getUser() + "@" + getHost() + ":" + getPort() + " )";
     }
 
     public void setDisplayLabel(String displayLabel) {

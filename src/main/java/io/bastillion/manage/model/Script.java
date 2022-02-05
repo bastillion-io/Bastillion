@@ -1,7 +1,7 @@
 /**
- *    Copyright (C) 2013 Loophole, LLC
- *
- *    Licensed under The Prosperity Public License 3.0.0
+ * Copyright (C) 2013 Loophole, LLC
+ * <p>
+ * Licensed under The Prosperity Public License 3.0.0
  */
 package io.bastillion.manage.model;
 
@@ -10,7 +10,7 @@ package io.bastillion.manage.model;
  */
 public class Script {
     Long id;
-    String script="#!/bin/bash\n\n";
+    String script = "#!/bin/bash\n\n";
     String displayNm;
 
     public Long getId() {

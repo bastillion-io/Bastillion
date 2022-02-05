@@ -1,7 +1,7 @@
 /**
  * Copyright (C) 2013 Loophole, LLC
- *
- *    Licensed under The Prosperity Public License 3.0.0
+ * <p>
+ * Licensed under The Prosperity Public License 3.0.0
  */
 package io.bastillion.manage.control;
 
@@ -17,9 +17,14 @@ import loophole.mvc.annotation.MethodType;
 import loophole.mvc.annotation.Model;
 import loophole.mvc.annotation.Validate;
 import loophole.mvc.base.BaseKontroller;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.security.GeneralSecurityException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +32,8 @@ import java.util.List;
  * Action to manage systems
  */
 public class SystemKtrl extends BaseKontroller {
+
+    private static final Logger log = LoggerFactory.getLogger(SystemKtrl.class);
 
     public static final String REQUIRED = "Required";
     @Model(name = "sortedSet")
@@ -47,41 +54,57 @@ public class SystemKtrl extends BaseKontroller {
     }
 
     @Kontrol(path = "/admin/viewSystems", method = MethodType.GET)
-    public String viewAdminSystems() {
-        Long userId = AuthUtil.getUserId(getRequest().getSession());
+    public String viewAdminSystems() throws ServletException {
 
-        if (Auth.MANAGER.equals(AuthUtil.getUserType(getRequest().getSession()))) {
-            sortedSet = SystemDB.getSystemSet(sortedSet);
-            profileList = ProfileDB.getAllProfiles();
-        } else {
-            sortedSet = SystemDB.getUserSystemSet(sortedSet, userId);
-            profileList = UserProfileDB.getProfilesByUser(userId);
-        }
-        if (script != null && script.getId() != null) {
-            script = ScriptDB.getScript(script.getId(), userId);
+        try {
+            Long userId = AuthUtil.getUserId(getRequest().getSession());
+            if (Auth.MANAGER.equals(AuthUtil.getUserType(getRequest().getSession()))) {
+                sortedSet = SystemDB.getSystemSet(sortedSet);
+                profileList = ProfileDB.getAllProfiles();
+            } else {
+                sortedSet = SystemDB.getUserSystemSet(sortedSet, userId);
+                profileList = UserProfileDB.getProfilesByUser(userId);
+            }
+            if (script != null && script.getId() != null) {
+                script = ScriptDB.getScript(script.getId(), userId);
+            }
+        } catch (SQLException | GeneralSecurityException ex) {
+            log.error(ex.toString(), ex);
+            throw new ServletException(ex.toString(), ex);
         }
 
         return "/admin/view_systems.html";
     }
 
     @Kontrol(path = "/manage/viewSystems", method = MethodType.GET)
-    public String viewManageSystems() {
-        sortedSet = SystemDB.getSystemSet(sortedSet);
+    public String viewManageSystems() throws ServletException {
+        try {
+            sortedSet = SystemDB.getSystemSet(sortedSet);
+        } catch (SQLException | GeneralSecurityException ex) {
+            log.error(ex.toString(), ex);
+            throw new ServletException(ex.toString(), ex);
+        }
         return "/manage/view_systems.html";
     }
 
     @Kontrol(path = "/manage/saveSystem", method = MethodType.POST)
-    public String saveSystem() {
+    public String saveSystem() throws ServletException {
         String retVal = "redirect:/manage/viewSystems.ktrl?sortedSet.orderByDirection=" + sortedSet.getOrderByDirection() + "&sortedSet.orderByField=" + sortedSet.getOrderByField();
 
         hostSystem = SSHUtil.authAndAddPubKey(hostSystem, passphrase, password);
 
-        if (hostSystem.getId() != null) {
-            SystemDB.updateSystem(hostSystem);
-        } else {
-            hostSystem.setId(SystemDB.insertSystem(hostSystem));
+        try {
+            if (hostSystem.getId() != null) {
+                SystemDB.updateSystem(hostSystem);
+            } else {
+                hostSystem.setId(SystemDB.insertSystem(hostSystem));
+            }
+            sortedSet = SystemDB.getSystemSet(sortedSet);
+        } catch (SQLException | GeneralSecurityException ex) {
+            log.error(ex.toString(), ex);
+            throw new ServletException(ex.toString(), ex);
         }
-        sortedSet = SystemDB.getSystemSet(sortedSet);
+
 
         if (!HostSystem.SUCCESS_STATUS.equals(hostSystem.getStatusCd())) {
             retVal = "/manage/view_systems.html";
@@ -90,12 +113,17 @@ public class SystemKtrl extends BaseKontroller {
     }
 
     @Kontrol(path = "/manage/deleteSystem", method = MethodType.GET)
-    public String deleteSystem() {
+    public String deleteSystem() throws ServletException {
 
         if (hostSystem.getId() != null) {
-            SystemDB.deleteSystem(hostSystem.getId());
+            try {
+                SystemDB.deleteSystem(hostSystem.getId());
+            } catch (SQLException | GeneralSecurityException ex) {
+                log.error(ex.toString(), ex);
+                throw new ServletException(ex.toString(), ex);
+            }
+
         }
-        ;
         return "redirect:/manage/viewSystems.ktrl?sortedSet.orderByDirection=" + sortedSet.getOrderByDirection() + "&sortedSet.orderByField=" + sortedSet.getOrderByField();
     }
 
@@ -103,7 +131,7 @@ public class SystemKtrl extends BaseKontroller {
      * Validates all fields for adding a host system
      */
     @Validate(input = "/manage/view_systems.html")
-    public void validateSaveSystem() {
+    public void validateSaveSystem() throws ServletException {
         if (hostSystem == null
                 || hostSystem.getDisplayNm() == null
                 || hostSystem.getDisplayNm().trim().equals("")) {
@@ -134,7 +162,13 @@ public class SystemKtrl extends BaseKontroller {
 
         if (!this.getFieldErrors().isEmpty()) {
 
-            sortedSet = SystemDB.getSystemSet(sortedSet);
+            try {
+                sortedSet = SystemDB.getSystemSet(sortedSet);
+            } catch (SQLException | GeneralSecurityException ex) {
+                log.error(ex.toString(), ex);
+                throw new ServletException(ex.toString(), ex);
+            }
+
         }
 
     }

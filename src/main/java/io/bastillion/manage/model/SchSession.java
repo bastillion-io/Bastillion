@@ -1,12 +1,13 @@
 /**
- *    Copyright (C) 2013 Loophole, LLC
- *
- *    Licensed under The Prosperity Public License 3.0.0
+ * Copyright (C) 2013 Loophole, LLC
+ * <p>
+ * Licensed under The Prosperity Public License 3.0.0
  */
 package io.bastillion.manage.model;
 
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.Session;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;

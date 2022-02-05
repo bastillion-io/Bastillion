@@ -1,7 +1,7 @@
 /**
- *    Copyright (C) 2013 Loophole, LLC
- *
- *    Licensed under The Prosperity Public License 3.0.0
+ * Copyright (C) 2013 Loophole, LLC
+ * <p>
+ * Licensed under The Prosperity Public License 3.0.0
  */
 package io.bastillion.manage.control;
 
@@ -25,9 +25,12 @@ import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.security.GeneralSecurityException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
@@ -35,8 +38,8 @@ import java.util.List;
 
 public class UploadAndPushKtrl extends BaseKontroller {
 
+    private static final Logger log = LoggerFactory.getLogger(UploadAndPushKtrl.class);
     public static final String UPLOAD_PATH = DBUtils.class.getClassLoader().getResource(".").getPath() + "../upload";
-    private static Logger log = LoggerFactory.getLogger(UploadAndPushKtrl.class);
 
     @Model(name = "upload")
     File upload;
@@ -73,31 +76,30 @@ public class UploadAndPushKtrl extends BaseKontroller {
     public String uploadSubmit() {
 
         String retVal = "/admin/upload_result.html";
-        Long userId = AuthUtil.getUserId(getRequest().getSession());
         try {
+
+            Long userId = AuthUtil.getUserId(getRequest().getSession());
 
             List<FileItem> multiparts = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(getRequest());
             for (FileItem item : multiparts) {
                 if (!item.isFormField()) {
                     uploadFileName = new File(item.getName()).getName();
                     File path = new File(UPLOAD_PATH);
-                    if(!path.exists()) {
+                    if (!path.exists()) {
                         path.mkdirs();
                     }
                     upload = new File(UPLOAD_PATH + File.separator + uploadFileName);
                     item.write(upload);
                 } else {
-                    pushDir =  item.getString();
+                    pushDir = item.getString();
                 }
             }
 
             pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
-
             hostSystemList = SystemStatusDB.getAllSystemStatus(userId);
 
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
+        } catch (Exception ex) {
+            log.error(ex.toString(), ex);
             retVal = "/admin/upload.html";
         }
         //reset csrf token back since it's already set on page load
@@ -108,11 +110,12 @@ public class UploadAndPushKtrl extends BaseKontroller {
     }
 
     @Kontrol(path = "/admin/push", method = MethodType.POST)
-    public String push() {
+    public String push() throws ServletException {
 
-        Long userId = AuthUtil.getUserId(getRequest().getSession());
-        Long sessionId = AuthUtil.getSessionId(getRequest().getSession());
         try {
+
+            Long userId = AuthUtil.getUserId(getRequest().getSession());
+            Long sessionId = AuthUtil.getSessionId(getRequest().getSession());
 
             //get next pending system
             pendingSystemStatus = SystemStatusDB.getNextPendingSystem(userId);
@@ -165,9 +168,9 @@ public class UploadAndPushKtrl extends BaseKontroller {
             }
             hostSystemList = SystemStatusDB.getAllSystemStatus(userId);
 
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
+        } catch (SQLException | GeneralSecurityException ex) {
+            log.error(ex.toString(), ex);
+            throw new ServletException(ex.toString(), ex);
         }
 
         //reset csrf token back since it's already set on page load

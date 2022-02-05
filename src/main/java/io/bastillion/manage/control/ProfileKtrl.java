@@ -1,7 +1,7 @@
 /**
- *    Copyright (C) 2013 Loophole, LLC
- *
- *    Licensed under The Prosperity Public License 3.0.0
+ * Copyright (C) 2013 Loophole, LLC
+ * <p>
+ * Licensed under The Prosperity Public License 3.0.0
  */
 package io.bastillion.manage.control;
 
@@ -13,15 +13,22 @@ import loophole.mvc.annotation.MethodType;
 import loophole.mvc.annotation.Model;
 import loophole.mvc.annotation.Validate;
 import loophole.mvc.base.BaseKontroller;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.security.GeneralSecurityException;
+import java.sql.SQLException;
 
 
 /**
  * Action to manage profiles
  */
 public class ProfileKtrl extends BaseKontroller {
+
+    private static final Logger log = LoggerFactory.getLogger(ProfileKtrl.class);
 
     @Model(name = "sortedSet")
     SortedSet sortedSet = new SortedSet();
@@ -34,30 +41,45 @@ public class ProfileKtrl extends BaseKontroller {
 
 
     @Kontrol(path = "/manage/viewProfiles", method = MethodType.GET)
-    public String viewSystems() {
+    public String viewSystems() throws ServletException {
 
-        sortedSet = ProfileDB.getProfileSet(sortedSet);
+        try {
+            sortedSet = ProfileDB.getProfileSet(sortedSet);
+        } catch (SQLException | GeneralSecurityException ex) {
+            log.error(ex.toString(), ex);
+            throw new ServletException(ex.toString(), ex);
+        }
 
         return "/manage/view_profiles.html";
     }
 
     @Kontrol(path = "/manage/saveProfile", method = MethodType.POST)
-    public String saveProfile() {
+    public String saveProfile() throws ServletException {
 
-        if (profile.getId() != null) {
-            ProfileDB.updateProfile(profile);
-        } else {
-            ProfileDB.insertProfile(profile);
+        try {
+            if (profile.getId() != null) {
+                ProfileDB.updateProfile(profile);
+            } else {
+                ProfileDB.insertProfile(profile);
+            }
+        } catch (SQLException | GeneralSecurityException ex) {
+            log.error(ex.toString(), ex);
+            throw new ServletException(ex.toString(), ex);
         }
         return "redirect:/manage/viewProfiles.ktrl?sortedSet.orderByDirection=" + sortedSet.getOrderByDirection() + "&sortedSet.orderByField=" + sortedSet.getOrderByField();
     }
 
 
     @Kontrol(path = "/manage/deleteProfile", method = MethodType.GET)
-    public String deleteProfile() {
+    public String deleteProfile() throws ServletException {
 
         if (profile.getId() != null) {
-            ProfileDB.deleteProfile(profile.getId());
+            try {
+                ProfileDB.deleteProfile(profile.getId());
+            } catch (SQLException | GeneralSecurityException ex) {
+                log.error(ex.toString(), ex);
+                throw new ServletException(ex.toString(), ex);
+            }
         }
         return "redirect:/manage/viewProfiles.ktrl?sortedSet.orderByDirection=" + sortedSet.getOrderByDirection() + "&sortedSet.orderByField=" + sortedSet.getOrderByField();
     }
@@ -66,7 +88,7 @@ public class ProfileKtrl extends BaseKontroller {
      * validate save profile
      */
     @Validate(input = "/manage/view_profiles.html")
-    public void validateSaveProfile() {
+    public void validateSaveProfile() throws ServletException {
         if (profile == null
                 || profile.getNm() == null
                 || profile.getNm().trim().equals("")) {
@@ -74,10 +96,12 @@ public class ProfileKtrl extends BaseKontroller {
         }
 
         if (!this.getFieldErrors().isEmpty()) {
-            sortedSet = ProfileDB.getProfileSet(sortedSet);
+            try {
+                sortedSet = ProfileDB.getProfileSet(sortedSet);
+            } catch (SQLException | GeneralSecurityException ex) {
+                log.error(ex.toString(), ex);
+                throw new ServletException(ex.toString(), ex);
+            }
         }
-
     }
-
-
 }

@@ -1,7 +1,7 @@
 /**
- *    Copyright (C) 2013 Loophole, LLC
- *
- *    Licensed under The Prosperity Public License 3.0.0
+ * Copyright (C) 2013 Loophole, LLC
+ * <p>
+ * Licensed under The Prosperity Public License 3.0.0
  */
 package io.bastillion.manage.model;
 
@@ -13,11 +13,11 @@ import java.util.Date;
 public class Auth {
 
 
-    public static final String ADMINISTRATOR="A";
-    public static final String MANAGER="M";
-    
-    public static final String AUTH_BASIC="BASIC";
-    public static final String AUTH_EXTERNAL="EXTERNAL";
+    public static final String ADMINISTRATOR = "A";
+    public static final String MANAGER = "M";
+
+    public static final String AUTH_BASIC = "BASIC";
+    public static final String AUTH_EXTERNAL = "EXTERNAL";
 
     Long id;
     String username;
@@ -28,11 +28,11 @@ public class Auth {
     String otpSecret;
     Long otpToken;
     String salt;
-    String userType=ADMINISTRATOR;
-    String authType=AUTH_BASIC;
+    String userType = ADMINISTRATOR;
+    String authType = AUTH_BASIC;
     Date lastLoginTm;
     Date expirationTm;
-    boolean expired=false;
+    boolean expired = false;
 
     public String getUsername() {
         return username;

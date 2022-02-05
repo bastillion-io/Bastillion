@@ -18,6 +18,8 @@ import javax.servlet.http.HttpSession;
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,21 +31,19 @@ import java.util.Map;
 @SuppressWarnings("unchecked")
 public class SecureShellWS {
 
-    private static Logger log = LoggerFactory.getLogger(SecureShellWS.class);
+    private static final Logger log = LoggerFactory.getLogger(SecureShellWS.class);
 
     private HttpSession httpSession = null;
     private Session session = null;
     private Long sessionId = null;
-    private Long count = 0L;
-
 
     @OnOpen
     public void onOpen(Session session, EndpointConfig config) {
 
 
         //set websocket timeout
-        if(StringUtils.isNotEmpty(AppConfig.getProperty("websocketTimeout"))){
-            session.setMaxIdleTimeout( Long.parseLong(AppConfig.getProperty("websocketTimeout"))* 60000);
+        if (StringUtils.isNotEmpty(AppConfig.getProperty("websocketTimeout"))) {
+            session.setMaxIdleTimeout(Long.parseLong(AppConfig.getProperty("websocketTimeout")) * 60000);
         } else {
             session.setMaxIdleTimeout(0);
         }
@@ -51,10 +51,15 @@ public class SecureShellWS {
         if (this.httpSession == null) {
             this.httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
         }
-        this.sessionId = AuthUtil.getSessionId(httpSession);
-        this.session = session;
+        Runnable run = null;
+        try {
+            this.sessionId = AuthUtil.getSessionId(httpSession);
+            this.session = session;
 
-        Runnable run=new SentOutputTask(sessionId, session, UserDB.getUser(AuthUtil.getUserId(httpSession)));
+            run = new SentOutputTask(sessionId, session, UserDB.getUser(AuthUtil.getUserId(httpSession)));
+        } catch (GeneralSecurityException | SQLException ex) {
+            log.error(ex.toString(), ex);
+        }
         Thread thread = new Thread(run);
         thread.start();
 

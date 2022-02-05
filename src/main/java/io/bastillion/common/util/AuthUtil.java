@@ -1,7 +1,7 @@
 /**
- *    Copyright (C) 2013 Loophole, LLC
- *
- *    Licensed under The Prosperity Public License 3.0.0
+ * Copyright (C) 2013 Loophole, LLC
+ * <p>
+ * Licensed under The Prosperity Public License 3.0.0
  */
 package io.bastillion.common.util;
 
@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -34,7 +35,7 @@ public class AuthUtil {
      * @param session http session
      * @return shared secret
      */
-    public static String getOTPSecret(HttpSession session) {
+    public static String getOTPSecret(HttpSession session) throws GeneralSecurityException {
         String secret = (String) session.getAttribute("otp_secret");
         secret = EncryptionUtil.decrypt(secret);
         return secret;
@@ -92,7 +93,7 @@ public class AuthUtil {
      * @param session   http session
      * @param sessionId session id
      */
-    public static void setSessionId(HttpSession session, Long sessionId) {
+    public static void setSessionId(HttpSession session, Long sessionId) throws GeneralSecurityException {
         if (sessionId != null) {
             session.setAttribute(SESSION_ID, EncryptionUtil.encrypt(sessionId.toString()));
         }
@@ -104,7 +105,7 @@ public class AuthUtil {
      * @param session http session
      * @return session id
      */
-    public static Long getSessionId(HttpSession session) {
+    public static Long getSessionId(HttpSession session) throws GeneralSecurityException {
         Long sessionId = null;
         String sessionIdStr = EncryptionUtil.decrypt((String) session.getAttribute(SESSION_ID));
         if (sessionIdStr != null && !sessionIdStr.trim().equals("")) {
@@ -119,7 +120,7 @@ public class AuthUtil {
      * @param session http session
      * @return user id
      */
-    public static Long getUserId(HttpSession session) {
+    public static Long getUserId(HttpSession session) throws GeneralSecurityException {
         Long userId = null;
         String userIdStr = EncryptionUtil.decrypt((String) session.getAttribute(USER_ID));
         if (userIdStr != null && !userIdStr.trim().equals("")) {
@@ -144,7 +145,7 @@ public class AuthUtil {
      * @param session http session
      * @return authentication token
      */
-    public static String getAuthToken(HttpSession session) {
+    public static String getAuthToken(HttpSession session) throws GeneralSecurityException {
         String authToken = (String) session.getAttribute(AUTH_TOKEN);
         authToken = EncryptionUtil.decrypt(authToken);
         return authToken;
@@ -167,7 +168,7 @@ public class AuthUtil {
      * @param session http session
      * @param secret  shared secret
      */
-    public static void setOTPSecret(HttpSession session, String secret) {
+    public static void setOTPSecret(HttpSession session, String secret) throws GeneralSecurityException {
         if (secret != null && !secret.trim().equals("")) {
             session.setAttribute("otp_secret", EncryptionUtil.encrypt(secret));
         }
@@ -180,7 +181,7 @@ public class AuthUtil {
      * @param session http session
      * @param userId  user id
      */
-    public static void setUserId(HttpSession session, Long userId) {
+    public static void setUserId(HttpSession session, Long userId) throws GeneralSecurityException {
         if (userId != null) {
             session.setAttribute(USER_ID, EncryptionUtil.encrypt(userId.toString()));
         }
@@ -206,7 +207,7 @@ public class AuthUtil {
      * @param session   http session
      * @param authToken authentication token
      */
-    public static void setAuthToken(HttpSession session, String authToken) {
+    public static void setAuthToken(HttpSession session, String authToken) throws GeneralSecurityException {
         if (authToken != null && !authToken.trim().equals("")) {
             session.setAttribute(AUTH_TOKEN, EncryptionUtil.encrypt(authToken));
         }

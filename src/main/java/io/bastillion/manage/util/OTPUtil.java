@@ -1,12 +1,14 @@
 /**
- *    Copyright (C) 2014 Loophole, LLC
- *
- *    Licensed under The Prosperity Public License 3.0.0
+ * Copyright (C) 2014 Loophole, LLC
+ * <p>
+ * Licensed under The Prosperity Public License 3.0.0
  */
 package io.bastillion.manage.util;
 
 
 import org.apache.commons.codec.binary.Base32;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -15,8 +17,6 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  */
 public class OTPUtil {
 
-    private static Logger log = LoggerFactory.getLogger(OTPUtil.class);
+    private static final Logger log = LoggerFactory.getLogger(OTPUtil.class);
 
     //sizes to generate OTP secret
     private static final int SECRET_SIZE = 10;

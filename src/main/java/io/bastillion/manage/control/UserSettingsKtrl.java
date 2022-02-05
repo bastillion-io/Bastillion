@@ -1,7 +1,7 @@
 /**
- *    Copyright (C) 2015 Loophole, LLC
- *
- *    Licensed under The Prosperity Public License 3.0.0
+ * Copyright (C) 2015 Loophole, LLC
+ * <p>
+ * Licensed under The Prosperity Public License 3.0.0
  */
 package io.bastillion.manage.control;
 
@@ -17,9 +17,14 @@ import loophole.mvc.annotation.MethodType;
 import loophole.mvc.annotation.Model;
 import loophole.mvc.annotation.Validate;
 import loophole.mvc.base.BaseKontroller;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.security.GeneralSecurityException;
+import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -29,6 +34,8 @@ import static java.util.Map.entry;
  * Action for user settings
  */
 public class UserSettingsKtrl extends BaseKontroller {
+
+    private static final Logger log = LoggerFactory.getLogger(UserSettingsKtrl.class);
 
     public static final String REQUIRED = "Required";
     @Model(name = "themeMap")
@@ -45,7 +52,7 @@ public class UserSettingsKtrl extends BaseKontroller {
             entry("White on black", "#000000,#FFFFFF")
     ));
     @Model(name = "publicKey")
-    static String publicKey = PrivateKeyDB.getApplicationKey().getPublicKey();
+    String publicKey;
 
     @Model(name = "auth")
     Auth auth;
@@ -53,19 +60,26 @@ public class UserSettingsKtrl extends BaseKontroller {
     UserSettings userSettings;
 
 
-
     public UserSettingsKtrl(HttpServletRequest request, HttpServletResponse response) {
         super(request, response);
     }
 
     @Kontrol(path = "/admin/userSettings", method = MethodType.GET)
-    public String userSettings() {
-        userSettings = UserThemeDB.getTheme(AuthUtil.getUserId(getRequest().getSession()));
+    public String userSettings() throws ServletException {
+
+        try {
+            publicKey = PrivateKeyDB.getApplicationKey().getPublicKey();
+            userSettings = UserThemeDB.getTheme(AuthUtil.getUserId(getRequest().getSession()));
+        } catch (SQLException | GeneralSecurityException ex) {
+            log.error(ex.toString(), ex);
+            throw new ServletException(ex.toString(), ex);
+        }
+
         return "/admin/user_settings.html";
     }
 
     @Kontrol(path = "/admin/passwordSubmit", method = MethodType.POST)
-    public String passwordSubmit() {
+    public String passwordSubmit() throws ServletException {
         String retVal = "/admin/user_settings.html";
 
         if (!auth.getPassword().equals(auth.getPasswordConfirm())) {
@@ -75,23 +89,35 @@ public class UserSettingsKtrl extends BaseKontroller {
             addError(PasswordUtil.PASSWORD_REQ_ERROR_MSG);
 
         } else {
-            auth.setAuthToken(AuthUtil.getAuthToken(getRequest().getSession()));
+            try {
+                auth.setAuthToken(AuthUtil.getAuthToken(getRequest().getSession()));
 
-            if (AuthDB.updatePassword(auth)) {
-                retVal = "redirect:/admin/menu.html";
-            } else {
-                addError("Current password is invalid");
+                if (AuthDB.updatePassword(auth)) {
+                    retVal = "redirect:/admin/menu.html";
+                } else {
+                    addError("Current password is invalid");
+                }
+            } catch (SQLException | GeneralSecurityException ex) {
+                log.error(ex.toString(), ex);
+                throw new ServletException(ex.toString(), ex);
             }
+
         }
 
         return retVal;
     }
 
     @Kontrol(path = "/admin/themeSubmit", method = MethodType.POST)
-    public String themeSubmit() {
+    public String themeSubmit() throws ServletException {
         userSettings.setTheme(userSettings.getTheme());
         userSettings.setPlane(userSettings.getPlane());
-        UserThemeDB.saveTheme(AuthUtil.getUserId(getRequest().getSession()), userSettings);
+        try {
+            UserThemeDB.saveTheme(AuthUtil.getUserId(getRequest().getSession()), userSettings);
+        } catch (SQLException | GeneralSecurityException ex) {
+            log.error(ex.toString(), ex);
+            throw new ServletException(ex.toString(), ex);
+        }
+
 
         return "redirect:/admin/menu.html";
     }

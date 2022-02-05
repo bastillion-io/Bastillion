@@ -1,7 +1,7 @@
 /**
- *    Copyright (C) 2017 Loophole, LLC
- *
- *    Licensed under The Prosperity Public License 3.0.0
+ * Copyright (C) 2017 Loophole, LLC
+ * <p>
+ * Licensed under The Prosperity Public License 3.0.0
  */
 package io.bastillion.manage.util;
 
@@ -12,12 +12,11 @@ import io.bastillion.manage.db.UserProfileDB;
 import io.bastillion.manage.model.Auth;
 import io.bastillion.manage.model.User;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.eclipse.jetty.jaas.callback.ObjectCallback;
 import org.eclipse.jetty.jaas.spi.LdapLoginModule;
 import org.eclipse.jetty.jaas.spi.UserInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -27,7 +26,11 @@ import javax.naming.directory.DirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.security.auth.Subject;
-import javax.security.auth.callback.*;
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
@@ -46,7 +49,7 @@ import java.util.UUID;
  */
 public class ExternalAuthUtil {
 
-    private static Logger log = LoggerFactory.getLogger(ExternalAuthUtil.class);
+    private static final Logger log = LoggerFactory.getLogger(ExternalAuthUtil.class);
 
     public static final boolean externalAuthEnabled = StringUtils.isNotEmpty(AppConfig.getProperty("jaasModule"));
     private static final String JAAS_CONF = "jaas.conf";
@@ -238,7 +241,7 @@ public class ExternalAuthUtil {
                         }
 
                     }
-                    if(StringUtils.isNotEmpty(DEFAULT_LDAP_PROFILE)) {
+                    if (StringUtils.isNotEmpty(DEFAULT_LDAP_PROFILE)) {
                         UserProfileDB.assignProfileToUser(con, user.getId(), DEFAULT_LDAP_PROFILE);
                     }
 
@@ -248,14 +251,13 @@ public class ExternalAuthUtil {
                     //set auth token
                     AuthDB.updateLogin(con, user);
                 }
+                DBUtils.closeConn(con);
             } catch (LoginException le) {
                 authToken = null;
                 log.debug(le.toString(), le);
-            } catch (Exception e) {
+            } catch (Exception ex) {
                 authToken = null;
-                log.error(e.toString(), e);
-            } finally {
-                DBUtils.closeConn(con);
+                log.error(ex.toString(), ex);
             }
         }
         return authToken;

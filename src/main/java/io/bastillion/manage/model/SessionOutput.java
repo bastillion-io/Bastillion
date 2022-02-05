@@ -1,7 +1,7 @@
 /**
- *    Copyright (C) 2013 Loophole, LLC
- *
- *    Licensed under The Prosperity Public License 3.0.0
+ * Copyright (C) 2013 Loophole, LLC
+ * <p>
+ * Licensed under The Prosperity Public License 3.0.0
  */
 package io.bastillion.manage.model;
 
@@ -17,8 +17,9 @@ public class SessionOutput extends HostSystem {
 
 
     }
+
     public SessionOutput(Long sessionId, HostSystem hostSystem) {
-        this.sessionId=sessionId;
+        this.sessionId = sessionId;
         this.setId(hostSystem.getId());
         this.setInstanceId(hostSystem.getInstanceId());
         this.setUser(hostSystem.getUser());
@@ -28,6 +29,7 @@ public class SessionOutput extends HostSystem {
         this.setAuthorizedKeys(hostSystem.getAuthorizedKeys());
 
     }
+
     public Long getSessionId() {
         return sessionId;
     }

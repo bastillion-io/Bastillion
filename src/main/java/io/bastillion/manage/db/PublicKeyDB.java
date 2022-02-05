@@ -1,7 +1,7 @@
 /**
- *    Copyright (C) 2013 Loophole, LLC
- *
- *    Licensed under The Prosperity Public License 3.0.0
+ * Copyright (C) 2013 Loophole, LLC
+ * <p>
+ * Licensed under The Prosperity Public License 3.0.0
  */
 package io.bastillion.manage.db;
 
@@ -11,16 +11,16 @@ import io.bastillion.manage.util.DBUtils;
 import io.bastillion.manage.util.SSHUtil;
 import org.apache.commons.lang3.StringUtils;
 
+import java.security.GeneralSecurityException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * DAO to manage public keys
@@ -28,21 +28,20 @@ import org.slf4j.LoggerFactory;
 public class PublicKeyDB {
 
     public static final String PUBLIC_KEY = "public_key";
-    private static Logger log = LoggerFactory.getLogger(PublicKeyDB.class);
 
     public static final String FILTER_BY_USER_ID = "user_id";
     public static final String PROFILE_ID = "profile_id";
     public static final String FILTER_BY_PROFILE_ID = PROFILE_ID;
-    public static final String FILTER_BY_ENABLED= "enabled";
+    public static final String FILTER_BY_ENABLED = "enabled";
 
     public static final String KEY_NM = "key_nm";
     public static final String SORT_BY_KEY_NM = KEY_NM;
     public static final String SORT_BY_PROFILE = PROFILE_ID;
-    public static final String SORT_BY_TYPE= "type";
-    public static final String SORT_BY_FINGERPRINT= "fingerprint";
+    public static final String SORT_BY_TYPE = "type";
+    public static final String SORT_BY_FINGERPRINT = "fingerprint";
     public static final String CREATE_DT = "create_dt";
-    public static final String SORT_BY_CREATE_DT= CREATE_DT;
-    public static final String SORT_BY_USERNAME= "username";
+    public static final String SORT_BY_CREATE_DT = CREATE_DT;
+    public static final String SORT_BY_USERNAME = "username";
 
     private PublicKeyDB() {
     }
@@ -50,117 +49,85 @@ public class PublicKeyDB {
     /**
      * Deletes all SSH keys for users that are not assigned in a profile
      *
-     * @param con DB connection
+     * @param con    DB connection
      * @param userId user id
      */
-    public static void deleteUnassignedKeysByUser(Connection con, Long userId){
+    public static void deleteUnassignedKeysByUser(Connection con, Long userId) throws SQLException {
 
-        try {
-            PreparedStatement stmt = con.prepareStatement("delete from public_keys where (profile_id is null or profile_id not in (select profile_id from user_map where user_id=?)) and user_id=?");
-            stmt.setLong(1, userId);
-            stmt.setLong(2, userId);
-            stmt.execute();
-            DBUtils.closeStmt(stmt);
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
-        }
+        PreparedStatement stmt = con.prepareStatement("delete from public_keys where (profile_id is null or profile_id not in (select profile_id from user_map where user_id=?)) and user_id=?");
+        stmt.setLong(1, userId);
+        stmt.setLong(2, userId);
+        stmt.execute();
+        DBUtils.closeStmt(stmt);
     }
 
     /**
      * Deletes all SSH keys for users that are not assigned in a profile
      *
-     * @param con DB connection
+     * @param con       DB connection
      * @param profileId profile id
      */
-    public static void deleteUnassignedKeysByProfile(Connection con, Long profileId){
+    public static void deleteUnassignedKeysByProfile(Connection con, Long profileId) throws SQLException {
 
-        try {
-            PreparedStatement stmt = con.prepareStatement("delete from public_keys where profile_id=? and user_id not in (select id from users where user_type = 'M' union select user_id from user_map where profile_id=?)");
-            stmt.setLong(1, profileId);
-            stmt.setLong(2, profileId);
-            stmt.execute();
-            DBUtils.closeStmt(stmt);
+        PreparedStatement stmt = con.prepareStatement("delete from public_keys where profile_id=? and user_id not in (select id from users where user_type = 'M' union select user_id from user_map where profile_id=?)");
+        stmt.setLong(1, profileId);
+        stmt.setLong(2, profileId);
+        stmt.execute();
+        DBUtils.closeStmt(stmt);
 
-        } catch (Exception e) {
-            log.error(e.toString(), e);
-        }
     }
-    
+
     /**
      * disables SSH key
      *
      * @param id key id
      */
-    public static void disableKey(Long id){
+    public static void disableKey(Long id) throws SQLException, GeneralSecurityException {
 
-        Connection con = null;
-        try {
-            con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("update public_keys set enabled=false where id=?");
-            stmt.setLong(1, id);
-            stmt.execute();
-            DBUtils.closeStmt(stmt);
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
-        }
-        finally {
-            DBUtils.closeConn(con);
-        }
+        Connection con = DBUtils.getConn();
+        PreparedStatement stmt = con.prepareStatement("update public_keys set enabled=false where id=?");
+        stmt.setLong(1, id);
+        stmt.execute();
+        DBUtils.closeStmt(stmt);
+        DBUtils.closeConn(con);
     }
 
     /**
-      * re-enables SSH key
-      * 
-      * @param id key id
+     * re-enables SSH key
+     *
+     * @param id key id
      */
-    public static void enableKey(Long id){
+    public static void enableKey(Long id) throws SQLException, GeneralSecurityException {
 
-        Connection con = null;
-        try {
-            con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("update public_keys set enabled=true where id=?");
-            stmt.setLong(1, id);
-            stmt.execute();
-            DBUtils.closeStmt(stmt);
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
-        }
-        finally {
-            DBUtils.closeConn(con);
-        }
+        Connection con = DBUtils.getConn();
+        PreparedStatement stmt = con.prepareStatement("update public_keys set enabled=true where id=?");
+        stmt.setLong(1, id);
+        stmt.execute();
+        DBUtils.closeStmt(stmt);
+        DBUtils.closeConn(con);
     }
 
     /**
      * checks fingerprint to determine if key is disabled
-     * 
+     *
      * @param fingerprint public key fingerprint
      * @return true if disabled
      */
-    public static boolean isKeyDisabled(String fingerprint) {
-        boolean isDisabled=false;
+    public static boolean isKeyDisabled(String fingerprint) throws SQLException, GeneralSecurityException {
+        boolean isDisabled = false;
 
-        Connection con = null;
-        try {
-            con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("select * from  public_keys where fingerprint like ? and enabled=false");
-            stmt.setString(1, fingerprint);
-            ResultSet rs = stmt.executeQuery();
-            
-            if (rs.next()) {
-                isDisabled=true;
-            }
-            
-            DBUtils.closeRs(rs);
-            DBUtils.closeStmt(stmt);
-        } catch (Exception e) {
-            log.error(e.toString(), e);
+        Connection con = DBUtils.getConn();
+        PreparedStatement stmt = con.prepareStatement("select * from  public_keys where fingerprint like ? and enabled=false");
+        stmt.setString(1, fingerprint);
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs.next()) {
+            isDisabled = true;
         }
-        finally {
-            DBUtils.closeConn(con);
-        }
+
+        DBUtils.closeRs(rs);
+        DBUtils.closeStmt(stmt);
+        DBUtils.closeConn(con);
 
         return isDisabled;
     }
@@ -172,10 +139,9 @@ public class PublicKeyDB {
      * @param sortedSet object that defines sort order
      * @return sorted script list
      */
-    public static SortedSet getPublicKeySet(SortedSet sortedSet) {
+    public static SortedSet getPublicKeySet(SortedSet sortedSet) throws SQLException, GeneralSecurityException {
 
         ArrayList<PublicKey> publicKeysList = new ArrayList<>();
-
 
         String orderBy = "";
         if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
@@ -183,52 +149,44 @@ public class PublicKeyDB {
         }
         String sql = "select p.*, u.username from public_keys p, users u where u.id=p.user_id  ";
 
-        sql+= StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_USER_ID)) ? " and p.user_id=? " : "";
-        sql+= StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID)) ? " and p.profile_id=? " : "";
-        sql+= StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_ENABLED)) ? " and p.enabled=? " : " and p.enabled=true";
-        sql=sql+orderBy;
+        sql += StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_USER_ID)) ? " and p.user_id=? " : "";
+        sql += StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID)) ? " and p.profile_id=? " : "";
+        sql += StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_ENABLED)) ? " and p.enabled=? " : " and p.enabled=true";
+        sql = sql + orderBy;
 
-        Connection con = null;
-        try {
-            con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement(sql);
-            int i=1;
-            //set filters in prepared statement
-            if(StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_USER_ID))){
-                stmt.setLong(i++, Long.parseLong(sortedSet.getFilterMap().get(FILTER_BY_USER_ID)));
-            }
-            if(StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID))){
-                stmt.setLong(i++, Long.parseLong(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID)));
-            }
-            if(StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_ENABLED))){
-                stmt.setBoolean(i, Boolean.valueOf(sortedSet.getFilterMap().get(FILTER_BY_ENABLED)));
-            }
-            ResultSet rs = stmt.executeQuery();
-
-            while (rs.next()) {
-                PublicKey publicKey = new PublicKey();
-                publicKey.setId(rs.getLong("id"));
-                publicKey.setKeyNm(rs.getString(KEY_NM));
-                publicKey.setPublicKey(rs.getString(PUBLIC_KEY));
-                publicKey.setProfile(ProfileDB.getProfile(con, rs.getLong(PROFILE_ID)));
-                publicKey.setType(SSHUtil.getKeyType(publicKey.getPublicKey()));
-                publicKey.setFingerprint(SSHUtil.getFingerprint(publicKey.getPublicKey()));
-                publicKey.setCreateDt(rs.getTimestamp(CREATE_DT));
-                publicKey.setUsername(rs.getString("username"));
-                publicKey.setUserId(rs.getLong("user_id"));
-                publicKey.setEnabled(rs.getBoolean("enabled"));
-                publicKeysList.add(publicKey);
-
-            }
-            DBUtils.closeRs(rs);
-            DBUtils.closeStmt(stmt);
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
+        Connection con = DBUtils.getConn();
+        PreparedStatement stmt = con.prepareStatement(sql);
+        int i = 1;
+        //set filters in prepared statement
+        if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_USER_ID))) {
+            stmt.setLong(i++, Long.parseLong(sortedSet.getFilterMap().get(FILTER_BY_USER_ID)));
         }
-        finally {
-            DBUtils.closeConn(con);
+        if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID))) {
+            stmt.setLong(i++, Long.parseLong(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID)));
         }
+        if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_ENABLED))) {
+            stmt.setBoolean(i, Boolean.parseBoolean(sortedSet.getFilterMap().get(FILTER_BY_ENABLED)));
+        }
+        ResultSet rs = stmt.executeQuery();
+
+        while (rs.next()) {
+            PublicKey publicKey = new PublicKey();
+            publicKey.setId(rs.getLong("id"));
+            publicKey.setKeyNm(rs.getString(KEY_NM));
+            publicKey.setPublicKey(rs.getString(PUBLIC_KEY));
+            publicKey.setProfile(ProfileDB.getProfile(con, rs.getLong(PROFILE_ID)));
+            publicKey.setType(SSHUtil.getKeyType(publicKey.getPublicKey()));
+            publicKey.setFingerprint(SSHUtil.getFingerprint(publicKey.getPublicKey()));
+            publicKey.setCreateDt(rs.getTimestamp(CREATE_DT));
+            publicKey.setUsername(rs.getString("username"));
+            publicKey.setUserId(rs.getLong("user_id"));
+            publicKey.setEnabled(rs.getBoolean("enabled"));
+            publicKeysList.add(publicKey);
+
+        }
+        DBUtils.closeRs(rs);
+        DBUtils.closeStmt(stmt);
+        DBUtils.closeConn(con);
 
         sortedSet.setItemList(publicKeysList);
         return sortedSet;
@@ -238,10 +196,10 @@ public class PublicKeyDB {
      * returns public keys based on sort order defined
      *
      * @param sortedSet object that defines sort order
-     * @param userId user id
+     * @param userId    user id
      * @return sorted script list
      */
-    public static SortedSet getPublicKeySet(SortedSet sortedSet, Long userId) {
+    public static SortedSet getPublicKeySet(SortedSet sortedSet, Long userId) throws SQLException, GeneralSecurityException {
 
         ArrayList<PublicKey> publicKeysList = new ArrayList<>();
 
@@ -252,34 +210,26 @@ public class PublicKeyDB {
         }
         String sql = "select * from public_keys where user_id = ? and enabled=true " + orderBy;
 
-        Connection con = null;
-        try {
-            con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement(sql);
-            stmt.setLong(1, userId);
-            ResultSet rs = stmt.executeQuery();
+        Connection con = DBUtils.getConn();
+        PreparedStatement stmt = con.prepareStatement(sql);
+        stmt.setLong(1, userId);
+        ResultSet rs = stmt.executeQuery();
 
-            while (rs.next()) {
-                PublicKey publicKey = new PublicKey();
-                publicKey.setId(rs.getLong("id"));
-                publicKey.setKeyNm(rs.getString(KEY_NM));
-                publicKey.setPublicKey(rs.getString(PUBLIC_KEY));
-                publicKey.setProfile(ProfileDB.getProfile(con, rs.getLong(PROFILE_ID)));
-                publicKey.setType(SSHUtil.getKeyType(publicKey.getPublicKey()));
-                publicKey.setFingerprint(SSHUtil.getFingerprint(publicKey.getPublicKey()));
-                publicKey.setCreateDt(rs.getTimestamp(CREATE_DT));
-                publicKeysList.add(publicKey);
+        while (rs.next()) {
+            PublicKey publicKey = new PublicKey();
+            publicKey.setId(rs.getLong("id"));
+            publicKey.setKeyNm(rs.getString(KEY_NM));
+            publicKey.setPublicKey(rs.getString(PUBLIC_KEY));
+            publicKey.setProfile(ProfileDB.getProfile(con, rs.getLong(PROFILE_ID)));
+            publicKey.setType(SSHUtil.getKeyType(publicKey.getPublicKey()));
+            publicKey.setFingerprint(SSHUtil.getFingerprint(publicKey.getPublicKey()));
+            publicKey.setCreateDt(rs.getTimestamp(CREATE_DT));
+            publicKeysList.add(publicKey);
 
-            }
-            DBUtils.closeRs(rs);
-            DBUtils.closeStmt(stmt);
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
         }
-        finally {
-            DBUtils.closeConn(con);
-        }
+        DBUtils.closeRs(rs);
+        DBUtils.closeStmt(stmt);
+        DBUtils.closeConn(con);
 
         sortedSet.setItemList(publicKeysList);
         return sortedSet;
@@ -292,21 +242,11 @@ public class PublicKeyDB {
      * @param publicKeyId key id
      * @return script object
      */
-    public static PublicKey getPublicKey(Long publicKeyId) {
+    public static PublicKey getPublicKey(Long publicKeyId) throws SQLException, GeneralSecurityException {
 
-        PublicKey publicKey = null;
-        Connection con = null;
-        try {
-            con = DBUtils.getConn();
-            publicKey = getPublicKey(con, publicKeyId);
-
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
-        }
-        finally {
-            DBUtils.closeConn(con);
-        }
+        Connection con = DBUtils.getConn();
+        PublicKey publicKey = getPublicKey(con, publicKeyId);
+        DBUtils.closeConn(con);
 
         return publicKey;
     }
@@ -318,30 +258,25 @@ public class PublicKeyDB {
      * @param publicKeyId key id
      * @return script object
      */
-    public static PublicKey getPublicKey(Connection con, Long publicKeyId) {
+    public static PublicKey getPublicKey(Connection con, Long publicKeyId) throws SQLException {
 
         PublicKey publicKey = null;
-        try {
-            PreparedStatement stmt = con.prepareStatement("select * from  public_keys where id=?");
-            stmt.setLong(1, publicKeyId);
-            ResultSet rs = stmt.executeQuery();
+        PreparedStatement stmt = con.prepareStatement("select * from  public_keys where id=?");
+        stmt.setLong(1, publicKeyId);
+        ResultSet rs = stmt.executeQuery();
 
-            while (rs.next()) {
-                publicKey = new PublicKey();
-                publicKey.setId(rs.getLong("id"));
-                publicKey.setKeyNm(rs.getString(KEY_NM));
-                publicKey.setPublicKey(rs.getString(PUBLIC_KEY));
-                publicKey.setProfile(ProfileDB.getProfile(con, rs.getLong(PROFILE_ID)));
-                publicKey.setType(rs.getString("type"));
-                publicKey.setFingerprint(rs.getString("fingerprint"));
-                publicKey.setCreateDt(rs.getTimestamp(CREATE_DT));
-            }
-            DBUtils.closeRs(rs);
-            DBUtils.closeStmt(stmt);
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
+        while (rs.next()) {
+            publicKey = new PublicKey();
+            publicKey.setId(rs.getLong("id"));
+            publicKey.setKeyNm(rs.getString(KEY_NM));
+            publicKey.setPublicKey(rs.getString(PUBLIC_KEY));
+            publicKey.setProfile(ProfileDB.getProfile(con, rs.getLong(PROFILE_ID)));
+            publicKey.setType(rs.getString("type"));
+            publicKey.setFingerprint(rs.getString("fingerprint"));
+            publicKey.setCreateDt(rs.getTimestamp(CREATE_DT));
         }
+        DBUtils.closeRs(rs);
+        DBUtils.closeStmt(stmt);
 
         return publicKey;
     }
@@ -351,33 +286,24 @@ public class PublicKeyDB {
      *
      * @param publicKey key object
      */
-    public static void insertPublicKey(PublicKey publicKey) {
-        
-        Connection con = null;
-        try {
-            con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("insert into public_keys(key_nm, type, fingerprint, public_key, profile_id, user_id) values (?,?,?,?,?,?)");
-            stmt.setString(1, publicKey.getKeyNm());
-            stmt.setString(2, SSHUtil.getKeyType(publicKey.getPublicKey()));
-            stmt.setString(3, SSHUtil.getFingerprint(publicKey.getPublicKey()));
-            stmt.setString(4, publicKey.getPublicKey().trim());
-            if (publicKey.getProfile() == null || publicKey.getProfile().getId() == null) {
-                stmt.setNull(5, Types.NULL);
-            } else {
-                stmt.setLong(5, publicKey.getProfile().getId());
-            }
-            stmt.setLong(6, publicKey.getUserId());
-            stmt.execute();
+    public static void insertPublicKey(PublicKey publicKey) throws SQLException, GeneralSecurityException {
 
-            DBUtils.closeStmt(stmt);
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
+        Connection con = DBUtils.getConn();
+        PreparedStatement stmt = con.prepareStatement("insert into public_keys(key_nm, type, fingerprint, public_key, profile_id, user_id) values (?,?,?,?,?,?)");
+        stmt.setString(1, publicKey.getKeyNm());
+        stmt.setString(2, SSHUtil.getKeyType(publicKey.getPublicKey()));
+        stmt.setString(3, SSHUtil.getFingerprint(publicKey.getPublicKey()));
+        stmt.setString(4, publicKey.getPublicKey().trim());
+        if (publicKey.getProfile() == null || publicKey.getProfile().getId() == null) {
+            stmt.setNull(5, Types.NULL);
+        } else {
+            stmt.setLong(5, publicKey.getProfile().getId());
         }
-        finally {
-            DBUtils.closeConn(con);
-        }
+        stmt.setLong(6, publicKey.getUserId());
+        stmt.execute();
 
+        DBUtils.closeStmt(stmt);
+        DBUtils.closeConn(con);
     }
 
 
@@ -386,33 +312,24 @@ public class PublicKeyDB {
      *
      * @param publicKey key object
      */
-    public static void updatePublicKey(PublicKey publicKey) {
+    public static void updatePublicKey(PublicKey publicKey) throws SQLException, GeneralSecurityException {
 
-
-        Connection con = null;
-        try {
-            con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("update public_keys set key_nm=?, type=?, fingerprint=?, public_key=?, profile_id=? where id=? and user_id=? and enabled=true");
-            stmt.setString(1, publicKey.getKeyNm());
-            stmt.setString(2, SSHUtil.getKeyType(publicKey.getPublicKey()));
-            stmt.setString(3, SSHUtil.getFingerprint(publicKey.getPublicKey()));
-            stmt.setString(4, publicKey.getPublicKey().trim());
-            if (publicKey.getProfile() == null || publicKey.getProfile().getId() == null) {
-                stmt.setNull(5, Types.NULL);
-            } else {
-                stmt.setLong(5, publicKey.getProfile().getId());
-            }
-            stmt.setLong(6, publicKey.getId());
-            stmt.setLong(7, publicKey.getUserId());
-            stmt.execute();
-            DBUtils.closeStmt(stmt);
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
+        Connection con = DBUtils.getConn();
+        PreparedStatement stmt = con.prepareStatement("update public_keys set key_nm=?, type=?, fingerprint=?, public_key=?, profile_id=? where id=? and user_id=? and enabled=true");
+        stmt.setString(1, publicKey.getKeyNm());
+        stmt.setString(2, SSHUtil.getKeyType(publicKey.getPublicKey()));
+        stmt.setString(3, SSHUtil.getFingerprint(publicKey.getPublicKey()));
+        stmt.setString(4, publicKey.getPublicKey().trim());
+        if (publicKey.getProfile() == null || publicKey.getProfile().getId() == null) {
+            stmt.setNull(5, Types.NULL);
+        } else {
+            stmt.setLong(5, publicKey.getProfile().getId());
         }
-        finally {
-            DBUtils.closeConn(con);
-        }
+        stmt.setLong(6, publicKey.getId());
+        stmt.setLong(7, publicKey.getUserId());
+        stmt.execute();
+        DBUtils.closeStmt(stmt);
+        DBUtils.closeConn(con);
     }
 
 
@@ -420,50 +337,34 @@ public class PublicKeyDB {
      * deletes public key
      *
      * @param publicKeyId key id
-     * @param userId  user id
+     * @param userId      user id
      */
-    public static void deletePublicKey(Long publicKeyId, Long userId) {
+    public static void deletePublicKey(Long publicKeyId, Long userId) throws SQLException, GeneralSecurityException {
 
 
-        Connection con = null;
-        try {
-            con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("delete from public_keys where id=? and user_id=? and enabled=true");
-            stmt.setLong(1, publicKeyId);
-            stmt.setLong(2, userId);
-            stmt.execute();
-            DBUtils.closeStmt(stmt);
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
-        }
-        finally {
-            DBUtils.closeConn(con);
-        }
+        Connection con = DBUtils.getConn();
+        PreparedStatement stmt = con.prepareStatement("delete from public_keys where id=? and user_id=? and enabled=true");
+        stmt.setLong(1, publicKeyId);
+        stmt.setLong(2, userId);
+        stmt.execute();
+        DBUtils.closeStmt(stmt);
+        DBUtils.closeConn(con);
     }
 
     /**
      * deletes all public keys for user
      *
-     * @param userId  user id
+     * @param userId user id
      */
-    public static void deleteUserPublicKeys(Long userId) {
+    public static void deleteUserPublicKeys(Long userId) throws SQLException, GeneralSecurityException {
 
 
-        Connection con = null;
-        try {
-            con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("delete from public_keys where user_id=? and enabled=true");
-            stmt.setLong(1, userId);
-            stmt.execute();
-            DBUtils.closeStmt(stmt);
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
-        }
-        finally {
-            DBUtils.closeConn(con);
-        }
+        Connection con = DBUtils.getConn();
+        PreparedStatement stmt = con.prepareStatement("delete from public_keys where user_id=? and enabled=true");
+        stmt.setLong(1, userId);
+        stmt.execute();
+        DBUtils.closeStmt(stmt);
+        DBUtils.closeConn(con);
     }
 
     /**
@@ -471,112 +372,76 @@ public class PublicKeyDB {
      *
      * @param profileId profile id
      */
-    public static void deleteProfilePublicKeys(Long profileId) {
+    public static void deleteProfilePublicKeys(Long profileId) throws SQLException, GeneralSecurityException {
 
-
-        Connection con = null;
-        try {
-            con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("delete from public_keys where profile_id=?");
-            stmt.setLong(1, profileId);
-            stmt.execute();
-            DBUtils.closeStmt(stmt);
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
-        }
-        finally {
-            DBUtils.closeConn(con);
-        }
+        Connection con = DBUtils.getConn();
+        PreparedStatement stmt = con.prepareStatement("delete from public_keys where profile_id=?");
+        stmt.setLong(1, profileId);
+        stmt.execute();
+        DBUtils.closeStmt(stmt);
+        DBUtils.closeConn(con);
     }
 
 
-    public static List<String> getPublicKeysForSystem(Long systemId) {
+    public static List<String> getPublicKeysForSystem(Long systemId) throws SQLException, GeneralSecurityException {
 
-        Connection con = null;
-        List<String> publicKeyList = new ArrayList<>();
-        try {
-            con = DBUtils.getConn();
+        Connection con = DBUtils.getConn();
 
-            publicKeyList = getPublicKeysForSystem(con, systemId);
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
-        }
-        finally {
-            DBUtils.closeConn(con);
-        }
+        List<String> publicKeyList = getPublicKeysForSystem(con, systemId);
+        DBUtils.closeConn(con);
 
         return publicKeyList;
-
-
     }
 
-    public static List<String> getPublicKeysForSystem(Connection con, Long systemId) {
+    public static List<String> getPublicKeysForSystem(Connection con, Long systemId) throws SQLException {
         List<String> publicKeyList = new ArrayList<>();
 
-        if(systemId==null){
-            systemId=-99L;
+        if (systemId == null) {
+            systemId = -99L;
         }
-        try {
-            PreparedStatement stmt = con.prepareStatement("select * from public_keys where (profile_id is null or profile_id in (select profile_id from system_map where system_id=?)) and enabled=true");
-            stmt.setLong(1, systemId);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                publicKeyList.add(rs.getString(PUBLIC_KEY));
-            }
-            DBUtils.closeStmt(stmt);
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
+        PreparedStatement stmt = con.prepareStatement("select * from public_keys where (profile_id is null or profile_id in (select profile_id from system_map where system_id=?)) and enabled=true");
+        stmt.setLong(1, systemId);
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            publicKeyList.add(rs.getString(PUBLIC_KEY));
         }
+        DBUtils.closeStmt(stmt);
 
         return publicKeyList;
-
-
     }
-    
+
     /**
      * checks if key has already been registered under user's profile
      *
-     * @param userId user id
-     * @param publicKey public key 
+     * @param userId    user id
+     * @param publicKey public key
      * @return true if duplicate
      */
-    public static boolean isKeyRegistered(Long userId, PublicKey publicKey) {
-        boolean isDuplicate=false;
-        PreparedStatement stmt;
-        Connection con = null;
-        try {
-          con = DBUtils.getConn();
+    public static boolean isKeyRegistered(Long userId, PublicKey publicKey) throws SQLException, GeneralSecurityException {
+        boolean isDuplicate = false;
+        Connection con = DBUtils.getConn();
 
-          stmt = con.prepareStatement("select * from public_keys where user_id=? and fingerprint like ? and profile_id is ? and id is not ?");
-          stmt.setLong(1, userId);
-          stmt.setString(2, SSHUtil.getFingerprint(publicKey.getPublicKey()));
-          if(publicKey.getProfile()!=null && publicKey.getProfile().getId()!=null){
+        PreparedStatement stmt = con.prepareStatement("select * from public_keys where user_id=? and fingerprint like ? and profile_id is ? and id is not ?");
+        stmt.setLong(1, userId);
+        stmt.setString(2, SSHUtil.getFingerprint(publicKey.getPublicKey()));
+        if (publicKey.getProfile() != null && publicKey.getProfile().getId() != null) {
             stmt.setLong(3, publicKey.getProfile().getId());
-          } else {
-            stmt.setNull(3,Types.NULL);
-          }
-          if(publicKey.getId()!=null ){
+        } else {
+            stmt.setNull(3, Types.NULL);
+        }
+        if (publicKey.getId() != null) {
             stmt.setLong(4, publicKey.getId());
-          } else {
-            stmt.setNull(4,Types.NULL);
-          }
-
-          ResultSet rs = stmt.executeQuery();
-          if (rs.next()) {
-              isDuplicate=true;
-          }
-          DBUtils.closeRs(rs);
-          DBUtils.closeStmt(stmt);
-
-        } catch (Exception ex) {
-            log.error(ex.toString(), ex);
+        } else {
+            stmt.setNull(4, Types.NULL);
         }
-        finally {
-            DBUtils.closeConn(con);
+
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            isDuplicate = true;
         }
+        DBUtils.closeRs(rs);
+        DBUtils.closeStmt(stmt);
+        DBUtils.closeConn(con);
 
         return isDuplicate;
     }
@@ -587,40 +452,30 @@ public class PublicKeyDB {
      * @param userId user id
      * @return public  key list for user
      */
-    public static List<PublicKey> getUniquePublicKeysForUser(Long userId) {
+    public static List getUniquePublicKeysForUser(Long userId) throws SQLException, GeneralSecurityException {
 
+        Map<String, PublicKey> keyMap = new LinkedHashMap<>();
+        Connection con = DBUtils.getConn();
+        PreparedStatement stmt = con.prepareStatement("select * from public_keys where user_id=? and enabled=true order by key_nm asc");
+        stmt.setLong(1, userId);
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
 
-        Connection con = null;
-        Map<String, PublicKey> keyMap = new LinkedHashMap();
-        try {
-            con = DBUtils.getConn();
-            PreparedStatement stmt = con.prepareStatement("select * from public_keys where user_id=? and enabled=true order by key_nm asc");
-            stmt.setLong(1, userId);
-            ResultSet rs = stmt.executeQuery();
-            while(rs.next()){
+            PublicKey publicKey = new PublicKey();
+            publicKey.setId(rs.getLong("id"));
+            publicKey.setKeyNm(rs.getString(KEY_NM));
+            publicKey.setPublicKey(rs.getString(PUBLIC_KEY));
+            publicKey.setProfile(ProfileDB.getProfile(con, rs.getLong(PROFILE_ID)));
+            publicKey.setType(SSHUtil.getKeyType(publicKey.getPublicKey()));
+            publicKey.setFingerprint(SSHUtil.getFingerprint(publicKey.getPublicKey()));
+            publicKey.setCreateDt(rs.getTimestamp(CREATE_DT));
+            keyMap.put(publicKey.getKeyNm() + " (" + publicKey.getFingerprint() + ")", publicKey);
 
-                PublicKey publicKey = new PublicKey();
-                publicKey.setId(rs.getLong("id"));
-                publicKey.setKeyNm(rs.getString(KEY_NM));
-                publicKey.setPublicKey(rs.getString(PUBLIC_KEY));
-                publicKey.setProfile(ProfileDB.getProfile(con, rs.getLong(PROFILE_ID)));
-                publicKey.setType(SSHUtil.getKeyType(publicKey.getPublicKey()));
-                publicKey.setFingerprint(SSHUtil.getFingerprint(publicKey.getPublicKey()));
-                publicKey.setCreateDt(rs.getTimestamp(CREATE_DT));
-                keyMap.put(publicKey.getKeyNm() + " (" + publicKey.getFingerprint() + ")", publicKey);
-                
-            }
-            DBUtils.closeRs(rs);
-            DBUtils.closeStmt(stmt);
-
-        } catch (Exception e) {
-            log.error(e.toString(), e);
         }
-        finally {
-            DBUtils.closeConn(con);
-        }
+        DBUtils.closeRs(rs);
+        DBUtils.closeStmt(stmt);
+        DBUtils.closeConn(con);
 
         return new ArrayList(keyMap.values());
-
     }
 }

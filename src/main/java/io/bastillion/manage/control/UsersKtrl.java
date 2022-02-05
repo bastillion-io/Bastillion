@@ -1,7 +1,7 @@
 /**
- *    Copyright (C) 2013 Loophole, LLC
- *
- *    Licensed under The Prosperity Public License 3.0.0
+ * Copyright (C) 2013 Loophole, LLC
+ * <p>
+ * Licensed under The Prosperity Public License 3.0.0
  */
 package io.bastillion.manage.control;
 
@@ -18,9 +18,14 @@ import loophole.mvc.annotation.MethodType;
 import loophole.mvc.annotation.Model;
 import loophole.mvc.annotation.Validate;
 import loophole.mvc.base.BaseKontroller;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.security.GeneralSecurityException;
+import java.sql.SQLException;
 
 /**
  * Action to manage users
@@ -28,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 public class UsersKtrl extends BaseKontroller {
 
     public static final String REQUIRED = "Required";
+    private static final Logger log = LoggerFactory.getLogger(UsersKtrl.class);
     @Model(name = "sortedSet")
     SortedSet sortedSet = new SortedSet();
     @Model(name = "user")
@@ -43,48 +49,70 @@ public class UsersKtrl extends BaseKontroller {
     }
 
     @Kontrol(path = "/manage/viewUsers", method = MethodType.GET)
-    public String viewUsers() {
-        userId = AuthUtil.getUserId(getRequest().getSession());
-        sortedSet = UserDB.getUserSet(sortedSet);
+    public String viewUsers() throws ServletException {
+        try {
+            userId = AuthUtil.getUserId(getRequest().getSession());
+            sortedSet = UserDB.getUserSet(sortedSet);
+        } catch (SQLException | GeneralSecurityException ex) {
+            log.error(ex.toString(), ex);
+            throw new ServletException(ex.toString(), ex);
+        }
+
         return "/manage/view_users.html";
     }
 
     @Kontrol(path = "/manage/saveUser", method = MethodType.POST)
-    public String saveUser() {
+    public String saveUser() throws ServletException {
         String retVal = "redirect:/manage/viewUsers.ktrl?sortedSet.orderByDirection=" + sortedSet.getOrderByDirection() + "&sortedSet.orderByField=" + sortedSet.getOrderByField();
 
-        if (user.getId() != null) {
-            if (user.getPassword() == null || user.getPassword().trim().equals("")) {
-                UserDB.updateUserNoCredentials(user);
+        try {
+            if (user.getId() != null) {
+                if (user.getPassword() == null || user.getPassword().trim().equals("")) {
+                    UserDB.updateUserNoCredentials(user);
+                } else {
+                    UserDB.updateUserCredentials(user);
+                }
+                //check if reset is set
+                if (resetSharedSecret) {
+                    UserDB.resetSharedSecret(user.getId());
+                }
             } else {
-                UserDB.updateUserCredentials(user);
+                UserDB.insertUser(user);
             }
-            //check if reset is set
-            if (resetSharedSecret) {
-                UserDB.resetSharedSecret(user.getId());
-            }
-        } else {
-            UserDB.insertUser(user);
+        } catch (SQLException | GeneralSecurityException ex) {
+            log.error(ex.toString(), ex);
+            throw new ServletException(ex.toString(), ex);
         }
-        return  retVal;
+
+        return retVal;
     }
 
     @Kontrol(path = "/manage/deleteUser", method = MethodType.GET)
-    public String deleteUser() {
+    public String deleteUser() throws ServletException {
 
-        if (user.getId() != null && !user.getId().equals(AuthUtil.getUserId(getRequest().getSession()))) {
-            UserDB.deleteUser(user.getId());
-            PublicKeyDB.deleteUserPublicKeys(user.getId());
-            RefreshAuthKeyUtil.refreshAllSystems();
+        try {
+            if (user.getId() != null && !user.getId().equals(AuthUtil.getUserId(getRequest().getSession()))) {
+                UserDB.deleteUser(user.getId());
+                PublicKeyDB.deleteUserPublicKeys(user.getId());
+                RefreshAuthKeyUtil.refreshAllSystems();
+            }
+        } catch (SQLException | GeneralSecurityException ex) {
+            log.error(ex.toString(), ex);
+            throw new ServletException(ex.toString(), ex);
         }
         return "redirect:/manage/viewUsers.ktrl?sortedSet.orderByDirection=" + sortedSet.getOrderByDirection() + "&sortedSet.orderByField=" + sortedSet.getOrderByField();
     }
 
     @Kontrol(path = "/manage/unlockUser", method = MethodType.GET)
-    public String unlockUser() {
+    public String unlockUser() throws ServletException {
 
-        if (user.getId() != null && !user.getId().equals(AuthUtil.getUserId(getRequest().getSession()))) {
-            UserDB.unlockAccount(user.getId());
+        try {
+            if (user.getId() != null && !user.getId().equals(AuthUtil.getUserId(getRequest().getSession()))) {
+                UserDB.unlockAccount(user.getId());
+            }
+        } catch (SQLException | GeneralSecurityException ex) {
+            log.error(ex.toString(), ex);
+            throw new ServletException(ex.toString(), ex);
         }
         return "redirect:/manage/viewUsers.ktrl?sortedSet.orderByDirection=" + sortedSet.getOrderByDirection() + "&sortedSet.orderByField=" + sortedSet.getOrderByField();
     }
@@ -93,7 +121,7 @@ public class UsersKtrl extends BaseKontroller {
      * Validates all fields for adding a user
      */
     @Validate(input = "/manage/view_users.html")
-    public void validateSaveUser() {
+    public void validateSaveUser() throws ServletException {
         if (user == null
                 || user.getUsername() == null
                 || user.getUsername().trim().equals("")) {
@@ -124,13 +152,17 @@ public class UsersKtrl extends BaseKontroller {
             addError("Password is required");
         }
 
-        if (user != null && !UserDB.isUnique(user.getId(), user.getUsername())) {
-            addError("Username has been taken");
-        }
-        if (!this.getFieldErrors().isEmpty() || !this.getErrors().isEmpty()) {
-            userId = AuthUtil.getUserId(getRequest().getSession());
-            sortedSet = UserDB.getUserSet(sortedSet);
+        try {
+            if (user != null && !UserDB.isUnique(user.getId(), user.getUsername())) {
+                addError("Username has been taken");
+            }
+            if (!this.getFieldErrors().isEmpty() || !this.getErrors().isEmpty()) {
+                userId = AuthUtil.getUserId(getRequest().getSession());
+                sortedSet = UserDB.getUserSet(sortedSet);
+            }
+        } catch (SQLException | GeneralSecurityException ex) {
+            log.error(ex.toString(), ex);
+            throw new ServletException(ex.toString(), ex);
         }
     }
-
 }

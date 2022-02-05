@@ -1,7 +1,7 @@
 /**
- *    Copyright (C) 2013 Loophole, LLC
- *
- *    Licensed under The Prosperity Public License 3.0.0
+ * Copyright (C) 2013 Loophole, LLC
+ * <p>
+ * Licensed under The Prosperity Public License 3.0.0
  */
 package io.bastillion.manage.model;
 
@@ -20,7 +20,7 @@ public class PublicKey {
     String fingerprint;
     Boolean enabled;
     Date createDt;
-    Profile profile ;
+    Profile profile;
     String passphrase;
     String passphraseConfirm;
 

@@ -1,7 +1,7 @@
 /**
- *    Copyright (C) 2013 Loophole, LLC
- *
- *    Licensed under The Prosperity Public License 3.0.0
+ * Copyright (C) 2013 Loophole, LLC
+ * <p>
+ * Licensed under The Prosperity Public License 3.0.0
  */
 package io.bastillion.manage.util;
 
@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -26,12 +27,12 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SessionOutputUtil {
 
-    private static Logger log = LoggerFactory.getLogger(SessionOutputUtil.class);
+    private static final Logger log = LoggerFactory.getLogger(SessionOutputUtil.class);
 
-    private static Map<Long, UserSessionsOutput> userSessionsOutputMap = new ConcurrentHashMap<>();
+    private static final Map<Long, UserSessionsOutput> userSessionsOutputMap = new ConcurrentHashMap<>();
     public final static boolean enableInternalAudit = "true".equals(AppConfig.getProperty("enableInternalAudit"));
-    private static Gson gson = new GsonBuilder().registerTypeAdapter(AuditWrapper.class, new SessionOutputSerializer()).create();
-    private static Logger systemAuditLogger = LoggerFactory.getLogger("io.bastillion.manage.util.SystemAudit");
+    private static final Gson gson = new GsonBuilder().registerTypeAdapter(AuditWrapper.class, new SessionOutputSerializer()).create();
+    private static final Logger systemAuditLogger = LoggerFactory.getLogger("io.bastillion.manage.util.SystemAudit");
 
     private SessionOutputUtil() {
     }
@@ -53,7 +54,7 @@ public class SessionOutputUtil {
     /**
      * removes session output for host system
      *
-     * @param sessionId    session id
+     * @param sessionId  session id
      * @param instanceId id of host system instance
      */
     public static void removeOutput(Long sessionId, Integer instanceId) {
@@ -85,13 +86,13 @@ public class SessionOutputUtil {
     /**
      * adds a new output
      *
-     * @param sessionId    session id
+     * @param sessionId  session id
      * @param instanceId id of host system instance
-     * @param value        Array that is the source of characters
-     * @param offset       The initial offset
-     * @param count        The length
+     * @param value      Array that is the source of characters
+     * @param offset     The initial offset
+     * @param count      The length
      */
-    public static void addToOutput(Long sessionId, Integer instanceId, char value[], int offset, int count) {
+    public static void addToOutput(Long sessionId, Integer instanceId, char[] value, int offset, int count) {
 
         UserSessionsOutput userSessionsOutput = userSessionsOutputMap.get(sessionId);
         if (userSessionsOutput != null) {
@@ -105,10 +106,10 @@ public class SessionOutputUtil {
      * returns list of output lines
      *
      * @param sessionId session id object
-     * @param user user auth object
+     * @param user      user auth object
      * @return session output list
      */
-    public static List<SessionOutput> getOutput(Connection con, Long sessionId, User user) {
+    public static List<SessionOutput> getOutput(Connection con, Long sessionId, User user) throws SQLException {
         List<SessionOutput> outputList = new ArrayList<>();
 
         UserSessionsOutput userSessionsOutput = userSessionsOutputMap.get(sessionId);
@@ -117,26 +118,21 @@ public class SessionOutputUtil {
             for (Integer key : userSessionsOutput.getSessionOutputMap().keySet()) {
 
                 //get output chars and set to output
-                try {
-                    SessionOutput sessionOutput = userSessionsOutput.getSessionOutputMap().get(key);
-                    if (sessionOutput!=null && sessionOutput.getOutput() != null
-                            && StringUtils.isNotEmpty(sessionOutput.getOutput())) {
+                SessionOutput sessionOutput = userSessionsOutput.getSessionOutputMap().get(key);
+                if (sessionOutput != null && sessionOutput.getOutput() != null
+                        && StringUtils.isNotEmpty(sessionOutput.getOutput())) {
 
-                        outputList.add(sessionOutput);
+                    outputList.add(sessionOutput);
 
-                        //send to audit logger
-                        systemAuditLogger.info(gson.toJson(new AuditWrapper(user, sessionOutput)));
+                    //send to audit logger
+                    systemAuditLogger.info(gson.toJson(new AuditWrapper(user, sessionOutput)));
 
-                        if(enableInternalAudit) {
-                            SessionAuditDB.insertTerminalLog(con, sessionOutput);
-                        }
-
-                        userSessionsOutput.getSessionOutputMap().put(key, new SessionOutput(sessionId, sessionOutput));
+                    if (enableInternalAudit) {
+                        SessionAuditDB.insertTerminalLog(con, sessionOutput);
                     }
-                } catch (Exception ex) {
-                    log.error(ex.toString(), ex);
-                }
 
+                    userSessionsOutput.getSessionOutputMap().put(key, new SessionOutput(sessionId, sessionOutput));
+                }
             }
 
         }

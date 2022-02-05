@@ -1,7 +1,7 @@
 /**
- *    Copyright (C) 2013 Loophole, LLC
- *
- *    Licensed under The Prosperity Public License 3.0.0
+ * Copyright (C) 2013 Loophole, LLC
+ * <p>
+ * Licensed under The Prosperity Public License 3.0.0
  */
 package io.bastillion.manage.control;
 
@@ -14,14 +14,21 @@ import loophole.mvc.annotation.MethodType;
 import loophole.mvc.annotation.Model;
 import loophole.mvc.annotation.Validate;
 import loophole.mvc.base.BaseKontroller;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.security.GeneralSecurityException;
+import java.sql.SQLException;
 
 /**
  * Action to manage scripts
  */
 public class ScriptKtrl extends BaseKontroller {
+
+    private static final Logger log = LoggerFactory.getLogger(ScriptKtrl.class);
 
     @Model(name = "sortedSet")
     SortedSet sortedSet = new SortedSet();
@@ -33,31 +40,46 @@ public class ScriptKtrl extends BaseKontroller {
     }
 
     @Kontrol(path = "/admin/viewScripts", method = MethodType.GET)
-    public String viewScripts() {
-        Long userId = AuthUtil.getUserId(getRequest().getSession());
-        sortedSet = ScriptDB.getScriptSet(sortedSet, userId);
+    public String viewScripts() throws ServletException {
+        try {
+            Long userId = AuthUtil.getUserId(getRequest().getSession());
+            sortedSet = ScriptDB.getScriptSet(sortedSet, userId);
+        } catch (SQLException | GeneralSecurityException ex) {
+            log.error(ex.toString(), ex);
+            throw new ServletException(ex.toString(), ex);
+        }
 
         return "/admin/view_scripts.html";
     }
 
 
     @Kontrol(path = "/admin/saveScript", method = MethodType.POST)
-    public String saveScript() {
-        Long userId = AuthUtil.getUserId(getRequest().getSession());
-        if (script.getId() != null) {
-            ScriptDB.updateScript(script, userId);
-        } else {
-            ScriptDB.insertScript(script, userId);
+    public String saveScript() throws ServletException {
+        try {
+            Long userId = AuthUtil.getUserId(getRequest().getSession());
+            if (script.getId() != null) {
+                ScriptDB.updateScript(script, userId);
+            } else {
+                ScriptDB.insertScript(script, userId);
+            }
+        } catch (SQLException | GeneralSecurityException ex) {
+            log.error(ex.toString(), ex);
+            throw new ServletException(ex.toString(), ex);
         }
         return "redirect:/admin/viewScripts.ktrl?sortedSet.orderByDirection=" + sortedSet.getOrderByDirection() + "&sortedSet.orderByField=" + sortedSet.getOrderByField();
     }
 
     @Kontrol(path = "/admin/deleteScript", method = MethodType.GET)
-    public String deleteScript() {
+    public String deleteScript() throws ServletException {
 
-        Long userId = AuthUtil.getUserId(getRequest().getSession());
         if (script.getId() != null) {
-            ScriptDB.deleteScript(script.getId(), userId);
+            try {
+                Long userId = AuthUtil.getUserId(getRequest().getSession());
+                ScriptDB.deleteScript(script.getId(), userId);
+            } catch (SQLException | GeneralSecurityException ex) {
+                log.error(ex.toString(), ex);
+                throw new ServletException(ex.toString(), ex);
+            }
         }
         return "redirect:/admin/viewScripts.ktrl?sortedSet.orderByDirection=" + sortedSet.getOrderByDirection() + "&sortedSet.orderByField=" + sortedSet.getOrderByField();
     }
@@ -67,7 +89,7 @@ public class ScriptKtrl extends BaseKontroller {
      * Validates all fields for adding a user
      */
     @Validate(input = "/admin/view_scripts.html")
-    public void validateSaveScript() {
+    public void validateSaveScript() throws ServletException {
         if (script == null
                 || script.getDisplayNm() == null
                 || script.getDisplayNm().trim().equals("")) {
@@ -77,17 +99,18 @@ public class ScriptKtrl extends BaseKontroller {
         if (script == null
                 || script.getScript() == null
                 || script.getScript().trim().equals("")
-                || (new Script()).getScript().trim().equals(script.getScript().trim())
-                ) {
+                || (new Script()).getScript().trim().equals(script.getScript().trim())) {
             addFieldError("script.script", "Required");
         }
 
         if (!this.getFieldErrors().isEmpty()) {
-            Long userId = AuthUtil.getUserId(getRequest().getSession());
-            sortedSet = ScriptDB.getScriptSet(sortedSet, userId);
+            try {
+                Long userId = AuthUtil.getUserId(getRequest().getSession());
+                sortedSet = ScriptDB.getScriptSet(sortedSet, userId);
+            } catch (SQLException | GeneralSecurityException ex) {
+                log.error(ex.toString(), ex);
+                throw new ServletException(ex.toString(), ex);
+            }
         }
-
     }
-
-
 }

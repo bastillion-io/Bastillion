@@ -1,19 +1,19 @@
 /**
- *    Copyright (C) 2013 Loophole, LLC
- *
- *    Licensed under The Prosperity Public License 3.0.0
+ * Copyright (C) 2013 Loophole, LLC
+ * <p>
+ * Licensed under The Prosperity Public License 3.0.0
  */
 package io.bastillion.manage.task;
 
-import io.bastillion.manage.util.SessionOutputUtil;
 import io.bastillion.manage.model.SessionOutput;
-
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
+import io.bastillion.manage.util.SessionOutputUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 
 /**
@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SecureShellTask implements Runnable {
 
-    private static Logger log = LoggerFactory.getLogger(SecureShellTask.class);
+    private static final Logger log = LoggerFactory.getLogger(SecureShellTask.class);
 
     InputStream outFromChannel;
     SessionOutput sessionOutput;
@@ -35,21 +35,19 @@ public class SecureShellTask implements Runnable {
     public void run() {
         InputStreamReader isr = new InputStreamReader(outFromChannel);
         BufferedReader br = new BufferedReader(isr);
+
+        SessionOutputUtil.addOutput(sessionOutput);
+
+        char[] buff = new char[1024];
+        int read;
         try {
-
-            SessionOutputUtil.addOutput(sessionOutput);
-
-            char[] buff = new char[1024];
-            int read;
-            while((read = br.read(buff)) != -1) {
-
-                SessionOutputUtil.addToOutput(sessionOutput.getSessionId(), sessionOutput.getInstanceId(), buff,0,read);
+            while ((read = br.read(buff)) != -1) {
+                SessionOutputUtil.addToOutput(sessionOutput.getSessionId(), sessionOutput.getInstanceId(), buff, 0, read);
                 Thread.sleep(50);
             }
-
             SessionOutputUtil.removeOutput(sessionOutput.getSessionId(), sessionOutput.getInstanceId());
 
-        } catch (Exception ex) {
+        } catch (IOException | InterruptedException ex) {
             log.error(ex.toString(), ex);
         }
     }

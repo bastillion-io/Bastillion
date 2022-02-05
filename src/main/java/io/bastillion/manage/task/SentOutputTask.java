@@ -1,7 +1,7 @@
 /**
- *    Copyright (C) 2013 Loophole, LLC
- *
- *    Licensed under The Prosperity Public License 3.0.0
+ * Copyright (C) 2013 Loophole, LLC
+ * <p>
+ * Licensed under The Prosperity Public License 3.0.0
  */
 package io.bastillion.manage.task;
 
@@ -10,20 +10,22 @@ import io.bastillion.manage.model.SessionOutput;
 import io.bastillion.manage.model.User;
 import io.bastillion.manage.util.DBUtils;
 import io.bastillion.manage.util.SessionOutputUtil;
-
-import javax.websocket.Session;
-import java.sql.Connection;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.websocket.Session;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  * class to send output to web socket client
  */
 public class SentOutputTask implements Runnable {
 
-    private static Logger log = LoggerFactory.getLogger(SentOutputTask.class);
+    private static final Logger log = LoggerFactory.getLogger(SentOutputTask.class);
 
     Session session;
     Long sessionId;
@@ -36,24 +38,20 @@ public class SentOutputTask implements Runnable {
     }
 
     public void run() {
-
         Gson gson = new Gson();
-
         while (session.isOpen()) {
-            Connection con = DBUtils.getConn();
-            List<SessionOutput> outputList = SessionOutputUtil.getOutput(con, sessionId, user);
             try {
-                if (outputList != null && !outputList.isEmpty()) {
+                Connection con = DBUtils.getConn();
+                List<SessionOutput> outputList = SessionOutputUtil.getOutput(con, sessionId, user);
+                if (!outputList.isEmpty()) {
                     String json = gson.toJson(outputList);
                     //send json to session
                     this.session.getBasicRemote().sendText(json);
                 }
                 Thread.sleep(25);
-            } catch (Exception ex) {
-                log.error(ex.toString(), ex);
-            }
-            finally {
                 DBUtils.closeConn(con);
+            } catch (SQLException | GeneralSecurityException | IOException | InterruptedException ex) {
+                log.error(ex.toString(), ex);
             }
         }
     }
