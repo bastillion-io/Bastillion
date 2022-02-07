@@ -27,8 +27,6 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SessionOutputUtil {
 
-    private static final Logger log = LoggerFactory.getLogger(SessionOutputUtil.class);
-
     private static final Map<Long, UserSessionsOutput> userSessionsOutputMap = new ConcurrentHashMap<>();
     public final static boolean enableInternalAudit = "true".equals(AppConfig.getProperty("enableInternalAudit"));
     private static final Gson gson = new GsonBuilder().registerTypeAdapter(AuditWrapper.class, new SessionOutputSerializer()).create();

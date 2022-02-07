@@ -52,12 +52,20 @@ public class UserSettingsKtrl extends BaseKontroller {
             entry("White on black", "#000000,#FFFFFF")
     ));
     @Model(name = "publicKey")
-    String publicKey;
+    static String publicKey;
 
     @Model(name = "auth")
     Auth auth;
     @Model(name = "userSettings")
     UserSettings userSettings;
+
+    static {
+        try {
+            publicKey = PrivateKeyDB.getApplicationKey().getPublicKey();
+        } catch (SQLException | GeneralSecurityException ex) {
+            log.error(ex.toString(), ex);
+        }
+    }
 
 
     public UserSettingsKtrl(HttpServletRequest request, HttpServletResponse response) {
@@ -68,7 +76,6 @@ public class UserSettingsKtrl extends BaseKontroller {
     public String userSettings() throws ServletException {
 
         try {
-            publicKey = PrivateKeyDB.getApplicationKey().getPublicKey();
             userSettings = UserThemeDB.getTheme(AuthUtil.getUserId(getRequest().getSession()));
         } catch (SQLException | GeneralSecurityException ex) {
             log.error(ex.toString(), ex);

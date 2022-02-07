@@ -32,8 +32,9 @@ import java.sql.SQLException;
  */
 public class UsersKtrl extends BaseKontroller {
 
-    public static final String REQUIRED = "Required";
     private static final Logger log = LoggerFactory.getLogger(UsersKtrl.class);
+    public static final String REQUIRED = "Required";
+
     @Model(name = "sortedSet")
     SortedSet sortedSet = new SortedSet();
     @Model(name = "user")

@@ -83,7 +83,7 @@ public class UserThemeDB {
         stmt.execute();
         DBUtils.closeStmt(stmt);
 
-        if (org.apache.commons.lang.StringUtils.isNotEmpty(theme.getPlane()) || org.apache.commons.lang.StringUtils.isNotEmpty(theme.getTheme())) {
+        if (StringUtils.isNotEmpty(theme.getPlane()) || StringUtils.isNotEmpty(theme.getTheme())) {
 
             stmt = con.prepareStatement("insert into user_theme(user_id, bg, fg, d1, d2, d3, d4, d5, d6, d7, d8, b1, b2, b3, b4, b5, b6, b7, b8) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
             stmt.setLong(1, userId);
