@@ -421,7 +421,7 @@ public class PublicKeyDB {
         boolean isDuplicate = false;
         Connection con = DBUtils.getConn();
 
-        PreparedStatement stmt = con.prepareStatement("select * from public_keys where user_id=? and fingerprint like ? and profile_id is ? and id is not ?");
+        PreparedStatement stmt = con.prepareStatement("select * from public_keys where user_id=? and fingerprint like ? and profile_id = ? and id <> ?");
         stmt.setLong(1, userId);
         stmt.setString(2, SSHUtil.getFingerprint(publicKey.getPublicKey()));
         if (publicKey.getProfile() != null && publicKey.getProfile().getId() != null) {
