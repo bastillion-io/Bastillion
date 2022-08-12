@@ -6,7 +6,7 @@
     "url": "git+https://github.com/bastillion-io/Bastillion.git"
   },
   "dependencies": {
-    "@popperjs/core": "^2.11.5",
+    "@popperjs/core": "^2.11.6",
     "bootstrap": "^5.2.0",
     "floatthead": "^2.2.4",
     "jquery": "^3.6.0",
