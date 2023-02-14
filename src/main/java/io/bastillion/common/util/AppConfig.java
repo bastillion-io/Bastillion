@@ -15,6 +15,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermission;
 import java.security.GeneralSecurityException;
 import java.util.Map;
 import java.util.Set;
@@ -182,5 +186,22 @@ public class AppConfig {
         }
     }
 
+    /**
+     * check if the config file is writable.
+     *
+     * if the configuration file is world readable, we still try to update it so the user has an error and deals with it
+     */
+    public static boolean isWritableOrInsecure() {
+        Path path = prop.getFile().toPath();
+        try {
+            return Files.isWritable(path)
+                || Files.getPosixFilePermissions(path).contains(PosixFilePermission.OTHERS_READ);
+        } catch (UnsupportedOperationException e) {
+            // if the filesystem doesn't support checking permissions, assume it's writable
+            return true;
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
 
 }
