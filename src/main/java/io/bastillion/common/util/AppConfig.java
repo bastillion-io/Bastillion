@@ -32,18 +32,18 @@ public class AppConfig {
         try {
             //move configuration to specified dir
             if (StringUtils.isNotEmpty(System.getProperty("CONFIG_DIR"))) {
-                File configFile = new File(CONFIG_DIR + "BastillionConfig.properties");
+                File configFile = new File(CONFIG_DIR + "/BastillionConfig.properties");
                 if (!configFile.exists()) {
                     File oldConfig = new File(AppConfig.class.getClassLoader().getResource(".").getPath() + "BastillionConfig.properties");
                     FileUtils.moveFile(oldConfig, configFile);
                 }
-                configFile = new File(CONFIG_DIR + "jaas.conf");
+                configFile = new File(CONFIG_DIR + "/jaas.conf");
                 if (!configFile.exists()) {
                     File oldConfig = new File(AppConfig.class.getClassLoader().getResource(".").getPath() + "jaas.conf");
                     FileUtils.moveFile(oldConfig, configFile);
                 }
             }
-            prop = new PropertiesConfiguration(CONFIG_DIR + "BastillionConfig.properties");
+            prop = new PropertiesConfiguration(CONFIG_DIR + "/BastillionConfig.properties");
         } catch (IOException | ConfigurationException ex) {
             log.error(ex.toString(), ex);
         }
