@@ -277,14 +277,6 @@
 
             function createTermMap(id, output) {
 
-                termMap[id] = new Terminal({
-                    fontSize: 14,
-                    fontFamily: 'DejaVu Sans Mono, Liberation Mono, monospace'
-                });
-
-                fitMap[id] = new FitAddon.FitAddon()
-                termMap[id].loadAddon(fitMap[id])
-
                 var  CUSTOM_THEME =
                     {
                     [# th:if= "${userSettings != null && userSettings.bg != null}"]
@@ -315,7 +307,18 @@
                     [/]
                     };
 
-                termMap[id].setOption('theme', CUSTOM_THEME);
+                termMap[id] = new Terminal({
+                    fontSize: 14,
+                    'theme': CUSTOM_THEME,
+                    'cursorStyle' : 'bar',
+                    'cursorWidth' : '10',
+                    'cursorInactiveStyle' : 'bar',
+                    fontFamily: 'DejaVu Sans Mono, Liberation Mono, monospace'
+                });
+
+                fitMap[id] = new FitAddon.FitAddon()
+                termMap[id].loadAddon(fitMap[id])
+
                 termMap[id].open($("#run_cmd_" + id).find('.output').get(0));
 
 
