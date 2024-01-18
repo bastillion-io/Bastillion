@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
-    "bootstrap": "^5.3.1",
+    "bootstrap": "^5.3.2",
     "floatthead": "^2.2.5",
     "jquery": "^3.7.1",
     "jquery-ui": "^1.13.2",
