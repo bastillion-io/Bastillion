@@ -25,7 +25,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.9</maven.compiler.source>
         <maven.compiler.target>1.9</maven.compiler.target>
-        <jetty-version>9.4.53.v20231009</jetty-version>
+        <jetty-version>9.4.54.v20240208</jetty-version>
     </properties>
     <dependencies>
         <dependency>
