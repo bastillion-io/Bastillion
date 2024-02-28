@@ -41,7 +41,7 @@
         <dependency>
             <groupId>com.github.mwiede</groupId>
             <artifactId>jsch</artifactId>
-            <version>0.2.16</version>
+            <version>0.2.17</version>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
