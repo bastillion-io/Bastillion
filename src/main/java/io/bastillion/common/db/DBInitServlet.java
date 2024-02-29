@@ -89,7 +89,7 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
                     AppConfig.encryptProperty("dbPassword", RandomStringUtils.random(32, true, true));
                 }
                 //else encrypt password if plain-text
-            } else if (!AppConfig.isPropertyEncrypted("dbPassword")) {
+            } else if (!AppConfig.isPropertyEncrypted("dbPassword") && AppConfig.isWritableOrInsecure()) {
                 AppConfig.encryptProperty("dbPassword", AppConfig.getProperty("dbPassword"));
             }
 
