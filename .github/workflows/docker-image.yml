@@ -25,7 +25,7 @@ jobs:
     - name: Checkout Bastillion Repository
       uses: actions/checkout@v4
       with:
-        repository: bastillion-io/Bastillion
+        repository: lusky3/Bastillion
         path: Bastillion
 
     - name: Build with Maven
