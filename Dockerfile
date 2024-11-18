@@ -1,14 +1,17 @@
-# Use an official OpenJDK runtime as a parent image
-FROM openjdk:17-jdk-slim
+# Use tomcat as the parent image
+FROM tomcat:10-jre17
+
+# Set the environment variable to configure Tomcat
+ENV CATALINA_HOME /usr/local/tomcat
 
 # Set the working directory
-WORKDIR /app
+WORKDIR $CATALINA_HOME/webapps
 
-# Copy the compiled jar file to the container
-COPY target/Bastillion-*.jar Bastillion.jar
+# Copy the compiled war file to the container
+COPY target/bastillion-*.war bastillion.war
 
 # Expose the application port
 EXPOSE 8080
 
-# Run the jar file
-ENTRYPOINT ["java", "-jar", "Bastillion.jar"]
+# Run Tomcat
+CMD ["catalina.sh", "run"]
