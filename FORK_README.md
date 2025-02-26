@@ -26,7 +26,7 @@ Due to this limitation, we've implemented a hybrid approach:
    sshKeyLength=4096
    ```
 
-2. Updated `AuthKeysKtrl.java` to handle Ed25519 and Ed448 key types when generating keys:
+2. Updated `AuthKeysKtrl.java` to handle Ed25519 and Ed448 key types when generating user keys:
    ```java
    //set key type
    int type = KeyPair.RSA;
@@ -41,7 +41,25 @@ Due to this limitation, we've implemented a hybrid approach:
    }
    ```
 
-3. Updated the JSch library to version 0.2.23:
+3. Updated `SSHUtil.java` to implement a workaround for Ed25519 application key generation:
+   ```java
+   //set key type
+   int type = KeyPair.RSA;
+   if ("dsa".equals(SSHUtil.KEY_TYPE)) {
+       type = KeyPair.DSA;
+   } else if ("ecdsa".equals(SSHUtil.KEY_TYPE)) {
+       type = KeyPair.ECDSA;
+   } else if ("ed25519".equals(SSHUtil.KEY_TYPE)) {
+       // For application keys, use RSA instead of Ed25519 due to JSch limitations
+       // The getPrivateKey() method in KeyPairEdDSA is not implemented
+       type = KeyPair.RSA;
+   } else if ("ed448".equals(SSHUtil.KEY_TYPE)) {
+       // For application keys, use RSA instead of Ed448 due to JSch limitations
+       type = KeyPair.RSA;
+   }
+   ```
+
+4. Updated the JSch library to version 0.2.23:
    ```xml
    <dependency>
        <groupId>com.github.mwiede</groupId>

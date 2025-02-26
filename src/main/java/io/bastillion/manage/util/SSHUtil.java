@@ -187,10 +187,13 @@ public class SSHUtil {
                 type = KeyPair.DSA;
             } else if ("ecdsa".equals(SSHUtil.KEY_TYPE)) {
                 type = KeyPair.ECDSA;
-            } else if ("ed448".equals(SSHUtil.KEY_TYPE)) {
-                type = KeyPair.ED448;
             } else if ("ed25519".equals(SSHUtil.KEY_TYPE)) {
-                type = KeyPair.ED25519;
+                // For application keys, use RSA instead of Ed25519 due to JSch limitations
+                // The getPrivateKey() method in KeyPairEdDSA is not implemented
+                type = KeyPair.RSA;
+            } else if ("ed448".equals(SSHUtil.KEY_TYPE)) {
+                // For application keys, use RSA instead of Ed448 due to JSch limitations
+                type = KeyPair.RSA;
             }
             String comment = "bastillion@global_key";
 
