@@ -247,6 +247,10 @@ public class AuthKeysKtrl extends BaseKontroller {
             type = KeyPair.DSA;
         } else if ("ecdsa".equals(SSHUtil.KEY_TYPE)) {
             type = KeyPair.ECDSA;
+        } else if ("ed25519".equals(SSHUtil.KEY_TYPE)) {
+            type = KeyPair.ED25519;
+        } else if ("ed448".equals(SSHUtil.KEY_TYPE)) {
+            type = KeyPair.ED448;
         }
 
         JSch jsch = new JSch();
