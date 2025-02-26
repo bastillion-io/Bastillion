@@ -7,8 +7,9 @@ This fork of [Bastillion](https://github.com/bastillion-io/Bastillion) adds full
 1. Updated `BastillionConfig.properties` to include Ed25519 as a valid option for SSH key type:
    ```properties
    #SSH key type 'rsa', 'ecdsa', 'ed25519', 'ed448', (deprecated 'dsa') for generated keys
-   sshKeyType=rsa
+   sshKeyType=ed25519
    #SSH key length for generated keys. 4096 => 'rsa', 521 => 'ecdsa', 256 => 'ed25519', (deprecated 2048 => 'dsa')
+   sshKeyLength=256
    ```
 
 2. Updated `AuthKeysKtrl.java` to handle Ed25519 and Ed448 key types when generating keys:
@@ -24,6 +25,15 @@ This fork of [Bastillion](https://github.com/bastillion-io/Bastillion) adds full
    } else if ("ed448".equals(SSHUtil.KEY_TYPE)) {
        type = KeyPair.ED448;
    }
+   ```
+
+3. Updated the JSch library to version 0.2.23 to fix issues with Ed25519 key generation:
+   ```xml
+   <dependency>
+       <groupId>com.github.mwiede</groupId>
+       <artifactId>jsch</artifactId>
+       <version>0.2.23</version>
+   </dependency>
    ```
 
 ## Using Ed25519 Keys
