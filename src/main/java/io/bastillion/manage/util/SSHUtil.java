@@ -181,28 +181,59 @@ public class SSHUtil {
 
         if (StringUtils.isEmpty(AppConfig.getProperty(PRIVATE_KEY)) || StringUtils.isEmpty(AppConfig.getProperty(PUBLIC_KEY))) {
 
-            //set key type
-            int type = KeyPair.RSA;
-            if ("dsa".equals(SSHUtil.KEY_TYPE)) {
-                type = KeyPair.DSA;
-            } else if ("ecdsa".equals(SSHUtil.KEY_TYPE)) {
-                type = KeyPair.ECDSA;
-            } else if ("ed25519".equals(SSHUtil.KEY_TYPE)) {
-                // For application keys, use RSA instead of Ed25519 due to JSch limitations
-                // The getPrivateKey() method in KeyPairEdDSA is not implemented
-                type = KeyPair.RSA;
-            } else if ("ed448".equals(SSHUtil.KEY_TYPE)) {
-                // For application keys, use RSA instead of Ed448 due to JSch limitations
-                type = KeyPair.RSA;
-            }
             String comment = "bastillion@global_key";
-
-            JSch jsch = new JSch();
-            KeyPair keyPair = KeyPair.genKeyPair(jsch, type, KEY_LENGTH);
-            keyPair.writePrivateKey(PVT_KEY, passphrase.getBytes());
-            keyPair.writePublicKey(PUB_KEY, comment);
-            System.out.println("Finger print: " + keyPair.getFingerPrint());
-            keyPair.dispose();
+            
+            // For Ed25519 and Ed448 keys, use ssh-keygen command to generate keys
+            // This is a workaround for JSch limitations with Ed25519/Ed448 key generation
+            if ("ed25519".equals(SSHUtil.KEY_TYPE) || "ed448".equals(SSHUtil.KEY_TYPE)) {
+                try {
+                    // Create a temporary file for the passphrase
+                    File passphraseFile = File.createTempFile("passphrase", ".tmp");
+                    FileUtils.writeStringToFile(passphraseFile, passphrase, "UTF-8");
+                    
+                    // Build the ssh-keygen command
+                    String keyTypeArg = "ed25519".equals(SSHUtil.KEY_TYPE) ? "ed25519" : "ed448";
+                    String[] cmd = {
+                        "ssh-keygen", 
+                        "-t", keyTypeArg,
+                        "-f", PVT_KEY,
+                        "-N", passphrase,
+                        "-C", comment
+                    };
+                    
+                    // Execute the command
+                    Process process = Runtime.getRuntime().exec(cmd);
+                    int exitCode = process.waitFor();
+                    
+                    // Check if the command was successful
+                    if (exitCode != 0) {
+                        throw new IOException("Failed to generate " + keyTypeArg + " key pair. Exit code: " + exitCode);
+                    }
+                    
+                    // Delete the temporary passphrase file
+                    passphraseFile.delete();
+                    
+                    System.out.println("Generated " + keyTypeArg + " key pair using ssh-keygen");
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new IOException("Key generation was interrupted", e);
+                }
+            } else {
+                // For other key types, use JSch's built-in key generation
+                int type = KeyPair.RSA;
+                if ("dsa".equals(SSHUtil.KEY_TYPE)) {
+                    type = KeyPair.DSA;
+                } else if ("ecdsa".equals(SSHUtil.KEY_TYPE)) {
+                    type = KeyPair.ECDSA;
+                }
+                
+                JSch jsch = new JSch();
+                KeyPair keyPair = KeyPair.genKeyPair(jsch, type, KEY_LENGTH);
+                keyPair.writePrivateKey(PVT_KEY, passphrase.getBytes());
+                keyPair.writePublicKey(PUB_KEY, comment);
+                System.out.println("Finger print: " + keyPair.getFingerPrint());
+                keyPair.dispose();
+            }
         }
 
 
