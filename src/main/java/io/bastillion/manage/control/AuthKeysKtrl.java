@@ -295,7 +295,7 @@ public class AuthKeysKtrl extends BaseKontroller {
                 passphraseFile.delete();
                 
                 System.out.println("Generated " + keyTypeArg + " user key pair using ssh-keygen");
-            } catch (IOException | InterruptedException | GeneralSecurityException ex) {
+            } catch (IOException | InterruptedException ex) {
                 log.error(ex.toString(), ex);
                 if (ex instanceof InterruptedException) {
                     Thread.currentThread().interrupt();
@@ -331,7 +331,7 @@ public class AuthKeysKtrl extends BaseKontroller {
                 pubKey = os.toString();
 
                 keyPair.dispose();
-            } catch (JSchException | GeneralSecurityException ex) {
+            } catch (JSchException ex) {
                 log.error(ex.toString(), ex);
                 throw new ServletException(ex.toString(), ex);
             }
