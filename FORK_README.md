@@ -1,15 +1,29 @@
 # Bastillion with Ed25519 SSH Key Support
 
-This fork of [Bastillion](https://github.com/bastillion-io/Bastillion) adds full support for Ed25519 SSH keys, which offer stronger security with shorter key lengths compared to RSA and DSA.
+This fork of [Bastillion](https://github.com/bastillion-io/Bastillion) adds support for Ed25519 SSH keys, which offer stronger security with shorter key lengths compared to RSA and DSA.
+
+## Current Limitations
+
+While we've added code to support Ed25519 keys, we've discovered a limitation in the JSch library that prevents full Ed25519 key generation. The `getPrivateKey()` method in the `KeyPairEdDSA` class is not implemented, which causes an `UnsupportedOperationException` when Bastillion tries to generate Ed25519 keys.
+
+```
+java.lang.UnsupportedOperationException
+    at com.jcraft.jsch.KeyPairEdDSA.getPrivateKey (KeyPairEdDSA.java:75)
+```
+
+Due to this limitation, we've implemented a hybrid approach:
+
+1. **For Application Keys**: Use RSA keys for Bastillion's own key pair (the one generated at startup)
+2. **For User Authentication**: Ed25519 keys can still be used for authentication
 
 ## Changes Made
 
 1. Updated `BastillionConfig.properties` to include Ed25519 as a valid option for SSH key type:
    ```properties
    #SSH key type 'rsa', 'ecdsa', 'ed25519', 'ed448', (deprecated 'dsa') for generated keys
-   sshKeyType=ed25519
+   sshKeyType=rsa
    #SSH key length for generated keys. 4096 => 'rsa', 521 => 'ecdsa', 256 => 'ed25519', (deprecated 2048 => 'dsa')
-   sshKeyLength=256
+   sshKeyLength=4096
    ```
 
 2. Updated `AuthKeysKtrl.java` to handle Ed25519 and Ed448 key types when generating keys:
@@ -27,7 +41,7 @@ This fork of [Bastillion](https://github.com/bastillion-io/Bastillion) adds full
    }
    ```
 
-3. Updated the JSch library to version 0.2.23 to fix issues with Ed25519 key generation:
+3. Updated the JSch library to version 0.2.23:
    ```xml
    <dependency>
        <groupId>com.github.mwiede</groupId>
