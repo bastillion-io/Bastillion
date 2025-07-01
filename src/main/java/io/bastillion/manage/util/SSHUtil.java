@@ -63,9 +63,14 @@ public class SSHUtil {
     //system path to public/private key
     public static final String KEY_PATH = AppConfig.CONFIG_DIR + "/keydb";
 
-    //key type - rsa or dsa
+    //key type - rsa, ecdsa, ed25519, or dsa (deprecated)
     public static final String KEY_TYPE = AppConfig.getProperty("sshKeyType");
     public static final int KEY_LENGTH = StringUtils.isNumeric(AppConfig.getProperty("sshKeyLength")) ? Integer.parseInt(AppConfig.getProperty("sshKeyLength")) : 4096;
+    
+    //default key type for user-generated keys
+    public static final String DEFAULT_USER_KEY_TYPE = AppConfig.getProperty("defaultUserKeyType", "rsa");
+    //whether users can select their key type
+    public static final boolean ALLOW_USER_KEY_TYPE_SELECTION = "true".equals(AppConfig.getProperty("allowUserKeyTypeSelection", "false"));
 
     //private key name
     public static final String PVT_KEY = KEY_PATH + "/id_" + KEY_TYPE;
@@ -642,6 +647,10 @@ public class SSHUtil {
                         keyType = "RSA";
                     } else if (KeyPair.ECDSA == type) {
                         keyType = "ECDSA";
+                    } else if (KeyPair.ED25519 == type) {
+                        keyType = "ED25519";
+                    } else if (KeyPair.ED448 == type) {
+                        keyType = "ED448";
                     } else if (KeyPair.UNKNOWN == type) {
                         keyType = "UNKNOWN";
                     } else if (KeyPair.ERROR == type) {

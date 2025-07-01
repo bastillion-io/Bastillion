@@ -11,6 +11,13 @@ import java.util.Date;
  * public key value object
  */
 public class PublicKey {
+    
+    // SSH Key Type Constants
+    public static final String KEY_TYPE_RSA = "RSA";
+    public static final String KEY_TYPE_DSA = "DSA";
+    public static final String KEY_TYPE_ECDSA = "ECDSA";
+    public static final String KEY_TYPE_ED25519 = "ED25519";
+    public static final String KEY_TYPE_ED448 = "ED448";
     Long id;
     Long userId;
     String username;
@@ -23,6 +30,7 @@ public class PublicKey {
     Profile profile;
     String passphrase;
     String passphraseConfirm;
+    String keyType; // For form binding - user selected key type during generation
 
 
     public String getKeyNm() {
@@ -119,5 +127,13 @@ public class PublicKey {
 
     public void setPassphrase(String passphrase) {
         this.passphrase = passphrase;
+    }
+
+    public String getKeyType() {
+        return keyType;
+    }
+
+    public void setKeyType(String keyType) {
+        this.keyType = keyType;
     }
 }
