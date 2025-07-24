@@ -240,6 +240,21 @@
                                                         th:text="${fieldErrors.get('publicKey.profile.id')}"></span>
                                     </td>
                                 </tr>
+                                <template th:if="${forceUserKeyGenEnabled && allowUserKeyTypeSelection}" th:remove="tag">
+                                    <tr>
+                                        <td>Key Type
+                                        </td>
+                                        <td>
+                                            <select name="publicKey.keyType" class="new_key form-select" title="SSH Key Type">
+                                                <option value="rsa" th:selected="${publicKey.type == null || #strings.equalsIgnoreCase(publicKey.type, 'RSA')}">RSA</option>
+                                                <option value="ecdsa" th:selected="${#strings.equalsIgnoreCase(publicKey.type, 'ECDSA')}">ECDSA</option>
+                                                <option value="ed25519" th:selected="${#strings.equalsIgnoreCase(publicKey.type, 'ED25519')}">ED25519</option>
+                                                <option value="ed448" th:selected="${#strings.equalsIgnoreCase(publicKey.type, 'ED448')}">ED448</option>
+                                            </select> <span class="error"
+                                                            th:text="${fieldErrors.get('publicKey.keyType')}"></span>
+                                        </td>
+                                    </tr>
+                                </template>
                                 <template th:if="${forceUserKeyGenEnabled}" th:remove="tag">
                                     <tr>
                                         <td>Passphrase
@@ -355,6 +370,21 @@
                                                                 th:text="${fieldErrors.get('publicKey.profile.id')}"></span>
                                             </td>
                                         </tr>
+                                        <template th:if="${forceUserKeyGenEnabled && allowUserKeyTypeSelection}" th:remove="tag">
+                                            <tr>
+                                                <td>Key Type
+                                                </td>
+                                                <td>
+                                                    <select name="publicKey.keyType" class="new_key form-select" title="SSH Key Type">
+                                                        <option value="rsa" th:selected="${p.type == null || #strings.equalsIgnoreCase(p.type, 'RSA')}">RSA</option>
+                                                        <option value="ecdsa" th:selected="${#strings.equalsIgnoreCase(p.type, 'ECDSA')}">ECDSA</option>
+                                                        <option value="ed25519" th:selected="${#strings.equalsIgnoreCase(p.type, 'ED25519')}">ED25519</option>
+                                                        <option value="ed448" th:selected="${#strings.equalsIgnoreCase(p.type, 'ED448')}">ED448</option>
+                                                    </select> <span class="error"
+                                                                    th:text="${fieldErrors.get('publicKey.keyType')}"></span>
+                                                </td>
+                                            </tr>
+                                        </template>
                                         <template th:if="${forceUserKeyGenEnabled}" th:remove="tag">
                                             <tr>
                                                 <td>Passphrase

@@ -66,6 +66,8 @@ public class AuthKeysKtrl extends BaseKontroller {
     SortedSet sortedSet = new SortedSet();
     @Model(name = "forceUserKeyGenEnabled")
     boolean forceUserKeyGenEnabled = "true".equals(AppConfig.getProperty("forceUserKeyGeneration"));
+    @Model(name = "allowUserKeyTypeSelection")
+    boolean allowUserKeyTypeSelection = SSHUtil.ALLOW_USER_KEY_TYPE_SELECTION;
     @Model(name = "hostSystem")
     HostSystem hostSystem = new HostSystem();
     @Model(name = "userPublicKeyList")
@@ -240,13 +242,38 @@ public class AuthKeysKtrl extends BaseKontroller {
      * @return public key
      */
     public String generateUserKey(String username, String keyname) throws ServletException {
+        return generateUserKey(username, keyname, null);
+    }
 
-        //set key type
+    /**
+     * generates public private key from passphrase with specified key type
+     *
+     * @param username username to set in public key comment
+     * @param keyname  keyname to set in public key comment
+     * @param userSelectedKeyType key type selected by user (null to use default)
+     * @return public key
+     */
+    public String generateUserKey(String username, String keyname, String userSelectedKeyType) throws ServletException {
+
+        //set key type based on user selection or configuration
         int type = KeyPair.RSA;
-        if ("dsa".equals(SSHUtil.KEY_TYPE)) {
+        String keyType;
+        
+        // Use user-selected type if allowed and provided, otherwise use default
+        if (SSHUtil.ALLOW_USER_KEY_TYPE_SELECTION && StringUtils.isNotEmpty(userSelectedKeyType)) {
+            keyType = userSelectedKeyType.toLowerCase();
+        } else {
+            keyType = SSHUtil.DEFAULT_USER_KEY_TYPE.toLowerCase();
+        }
+        
+        if ("dsa".equals(keyType)) {
             type = KeyPair.DSA;
-        } else if ("ecdsa".equals(SSHUtil.KEY_TYPE)) {
+        } else if ("ecdsa".equals(keyType)) {
             type = KeyPair.ECDSA;
+        } else if ("ed25519".equals(keyType)) {
+            type = KeyPair.ED25519;
+        } else if ("ed448".equals(keyType)) {
+            type = KeyPair.ED448;
         }
 
         JSch jsch = new JSch();
@@ -317,7 +344,7 @@ public class AuthKeysKtrl extends BaseKontroller {
                     } else if (!PasswordUtil.isValid(publicKey.getPassphrase())) {
                         addError(PasswordUtil.PASSWORD_REQ_ERROR_MSG);
                     } else {
-                        publicKey.setPublicKey(generateUserKey(UserDB.getUser(userId).getUsername(), publicKey.getKeyNm()));
+                        publicKey.setPublicKey(generateUserKey(UserDB.getUser(userId).getUsername(), publicKey.getKeyNm(), publicKey.getKeyType()));
                     }
                 }
 
