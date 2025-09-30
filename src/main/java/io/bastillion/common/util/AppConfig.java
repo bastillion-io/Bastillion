@@ -15,8 +15,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.FileSystems;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -26,9 +30,14 @@ public class AppConfig {
 
     private static final Logger log = LoggerFactory.getLogger(AppConfig.class);
     private static PropertiesConfiguration prop;
-    public static final String CONFIG_DIR = StringUtils.isNotEmpty(System.getProperty("CONFIG_DIR")) ? System.getProperty("CONFIG_DIR").trim() : AppConfig.class.getClassLoader().getResource(".").getPath();
+    public static final String CONFIG_DIR;
 
     static {
+        try {
+            CONFIG_DIR = StringUtils.isNotEmpty(System.getProperty("CONFIG_DIR")) ? System.getProperty("CONFIG_DIR").trim() : Paths.get( Objects.requireNonNull(AppConfig.class.getClassLoader().getResource(".")).toURI()) + FileSystems.getDefault().getSeparator();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
         try {
             //move configuration to specified dir
             if (StringUtils.isNotEmpty(System.getProperty("CONFIG_DIR"))) {
