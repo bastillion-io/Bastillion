@@ -28,7 +28,7 @@ import io.bastillion.manage.model.SchSession;
 import io.bastillion.manage.model.SessionOutput;
 import io.bastillion.manage.model.UserSchSessions;
 import io.bastillion.manage.task.SecureShellTask;
-import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
