@@ -1,256 +1,183 @@
 ![Build](https://github.com/bastillion-io/Bastillion/actions/workflows/github-build.yml/badge.svg)
 ![CodeQL](https://github.com/bastillion-io/Bastillion/actions/workflows/codeql-analysis.yml/badge.svg)
 
-![Bastillion](https://www.bastillion.io/images/bastillion_40x40.png) Bastillion
-======
-Bastillion is a web-based SSH console that centrally manages administrative access to systems. Web-based administration is combined with management and distribution of user's public SSH keys. Key management and administration is based on profiles assigned to defined users.
+![Bastillion logo](https://www.bastillion.io/images/bastillion_40x40.png)
 
-Administrators can login using two-factor authentication with [Authy](https://authy.com/) or [Google Authenticator](https://github.com/google/google-authenticator). From there they can manage their public SSH keys or connect to their systems through a web-shell. Commands can be shared across shells to make patching easier and eliminate redundant command execution.
+# Bastillion
 
-Bastillion layers TLS/SSL on top of SSH and acts as a bastion host for administration. Protocols are stacked (TLS/SSL + SSH) so infrastructure cannot be exposed through tunneling / port forwarding. More details can be found in the following whitepaper: [Implementing a Trusted Third-Party System for Secure Shell](https://www.bastillion.io/docs/using/whitepaper). Also, SSH key management is enabled by default to prevent unmanaged public keys and enforce best practices.
+**A modern, web-based SSH console and key management tool.**
 
-![Terminals](https://www.bastillion.io/images/screenshots/medium/terminals.png)
+Bastillion gives you a clean, browser-based way to manage SSH access across all your systems.  
+Think of it like a bastion host with a friendly dashboard.
 
-Bastillion Releases
-------
-Bastillion is available for free use under the Prosperity Public License
+You can:
+- Log in with **2-factor authentication** (Authy or Google Authenticator)
+- Manage and distribute **SSH public keys**
+- Launch secure web shells and **share commands** across sessions
+- Stack **TLS/SSL over SSH** for extra protection
 
+Read more: [Implementing a Trusted Third-Party System for Secure Shell](https://www.bastillion.io/docs/using/whitepaper).
+
+---
+
+## Quick Start
+
+Get the latest release:  
 https://github.com/bastillion-io/Bastillion/releases
 
-or purchase from the AWS marketplace
-
+Or from AWS Marketplace:  
 https://aws.amazon.com/marketplace/pp/Loophole-LLC-Bastillion/B076PNFPCL
 
-Also, Bastillion can be installed on FreeBSD via the FreeBSD ports system. To install via the binary package, simply run:
+FreeBSD:
+```bash
+pkg install security/bastillion
+```
 
-	pkg install security/bastillion
+---
 
-Prerequisites
--------------
-**Open-JDK / Oracle-JDK - 1.9 or greater**
+## Requirements
 
-*apt-get install openjdk-9-jdk*
-> http://www.oracle.com/technetwork/java/javase/downloads/index.html
+**Java (OpenJDK or Oracle JDK 1.9+)**
+```bash
+apt-get install openjdk-9-jdk
+```
 
-**Install [Authy](https://authy.com/) or [Google Authenticator](https://github.com/google/google-authenticator)** to enable two-factor authentication with Android or iOS
+**Two-Factor Authentication**  
+Install Authy or Google Authenticator on your device.
 
-| Application          | Android                                                                                             | iOS                                                                        |             
-|----------------------|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
-| Authy                | [Google Play](https://play.google.com/store/apps/details?id=com.authy.authy)                        | [iTunes](https://itunes.apple.com/us/app/authy/id494168017)                |
-| Google Authenticator | [Google Play](https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2) | [iTunes](https://itunes.apple.com/us/app/google-authenticator/id388497605) |
+---
 
-To Run Bundled with Jetty
-------
-Download bastillion-jetty-vXX.XX.tar.gz
+## Run with Jetty
 
-https://github.com/bastillion-io/Bastillion/releases
+Download latest bundle: https://github.com/bastillion-io/Bastillion/releases
 
-Export environment variables
+Set environment variables:
 
-for Linux/Unix/OSX
+**Linux / macOS**
+```bash
+export JAVA_HOME=/path/to/jdk
+export PATH=$JAVA_HOME/bin:$PATH
+```
 
-     export JAVA_HOME=/path/to/jdk
-     export PATH=$JAVA_HOME/bin:$PATH
+**Windows**
+```cmd
+set JAVA_HOME=C:\path\to\jdk
+set PATH=%JAVA_HOME%\bin;%PATH%
+```
 
-for Windows
+Start:
+```bash
+./startBastillion.sh      # Linux / macOS
+startBastillion.bat       # Windows
+```
 
-     set JAVA_HOME=C:\path\to\jdk
-     set PATH=%JAVA_HOME%\bin;%PATH%
+Open: `https://<server-ip>:8443`
 
-Start Bastillion
+Default credentials:
+```
+username: admin
+password: changeme
+```
 
-for Linux/Unix/OSX
+---
 
-        ./startBastillion.sh
+## Build from Source
 
-for Windows
+Install Maven 3+:
+```bash
+apt-get install maven
+```
 
-        startBastillion.bat
+Build and run:
+```bash
+mvn package jetty:run
+```
 
-More Documentation at: https://www.bastillion.io/docs/index.html
+> ⚠️ `mvn clean` will remove the H2 database and user data.
 
-Build from Source
-------
-Install Maven 3 or greater
+---
 
-*apt-get install maven*
-> http://maven.apache.org
+## SSH Key Management
 
-Export environment variables
+Settings live in `BastillionConfig.properties`. Sample:
+```properties
+keyManagementEnabled=false
+authKeysRefreshInterval=120
+forceUserKeyGeneration=false
+```
 
-    export JAVA_HOME=/path/to/jdk
-    export M2_HOME=/path/to/maven
-    export PATH=$JAVA_HOME/bin:$M2_HOME/bin:$PATH
+---
 
-In the directory that contains the pom.xml run
+## Custom SSH Key Pair
 
-	mvn package jetty:run
+Example config:
+```properties
+resetApplicationSSHKey=true
+sshKeyType=rsa
+privateKey=/Users/you/.ssh/id_rsa
+publicKey=/Users/you/.ssh/id_rsa.pub
+defaultSSHPassphrase=myPa$$w0rd
+```
 
-*Note: Doing a mvn clean will delete the H2 DB and wipe out all the data.*
+---
 
-Using Bastillion
-------
-Open browser to https://\<whatever ip\>:8443
+## Database Settings
 
-Login with
+Embedded H2 example:
+```properties
+dbUser=bastillion
+dbPassword=p@$$w0rd!!
+dbDriver=org.h2.Driver
+dbConnectionURL=jdbc:h2:keydb/bastillion;CIPHER=AES;
+```
 
-	username:admin
-	password:changeme
+Remote DB example:
+```properties
+dbConnectionURL=jdbc:h2:tcp://<host>:<port>/~/bastillion;CIPHER=AES;
+```
 
-*Note: When using the AMI instance, the password is defaulted to the \<Instance ID\>. Also, the AMI uses port 443 as in https://\<Instance IP\>:443*
+---
 
-Managing SSH Keys
-------
-By default Bastillion will overwrite all values in the specified authorized_keys file for a system.  You can disable key management by editing BastillionConfig.properties file and use Bastillion only as a bastion host.  This file is located in the jetty/bastillion/WEB-INF/classes directory. (or the src/main/resources directory if building from source)
+## External Authentication (LDAP)
 
-	#set to false to disable key management. If false, the Bastillion public key will be appended to the authorized_keys file (instead of it being overwritten completely).
-	keyManagementEnabled=false
+Set:
+```properties
+jaasModule=ldap-ol
+```
 
-Also, the authorized_keys file is updated/refreshed periodically based on the relationships defined in the application.  If key management is enabled the refresh interval can be specified in the BastillionConfig.properties file.
+And add LDAP details in `jaas.conf`.
 
-	#authorized_keys refresh interval in minutes (no refresh for <=0)
-	authKeysRefreshInterval=120
+---
 
-By default Bastillion will generated and distribute the SSH keys managed by administrators while having them download the generated private. This forces admins to use strong passphrases for keys that are set on systems.  The private key is only available for download once and is not stored on the application side.  To disable and allow administrators to set any public key edit the BastillionConfig.properties.
+## Auditing
 
-	#set to true to generate keys when added/managed by users and enforce strong passphrases set to false to allow users to set their own public key
-	forceUserKeyGeneration=false
+Enable in `log4j2.xml` and:
+```properties
+enableInternalAudit=true
+```
 
-Supplying a Custom SSH Key Pair
-------
-Bastillion generates its own public/private SSH key upon initial startup for use when registering systems.  You can specify a custom SSH key pair in the BastillionConfig.properties file.
+---
 
-For example:
+## Screenshots
 
-	#set to true to regenerate and import SSH keys  --set to true
-	resetApplicationSSHKey=true
+(Images are shown using Markdown image syntax; no raw HTML.)
 
-	#SSH Key Type 'dsa' or 'rsa'
-	sshKeyType=rsa
+---
 
-	#private key  --set pvt key
-	privateKey=/Users/kavanagh/.ssh/id_rsa
+## Thanks to
 
-	#public key  --set pub key
-	publicKey=/Users/kavanagh/.ssh/id_rsa.pub
-	
-	#default passphrase  --leave blank if passphrase is empty
-	defaultSSHPassphrase=myPa$$w0rd
+- [JSch](http://www.jcraft.com/jsch)
+- [term.js](https://github.com/chjj/term.js)
 
-After startup and once the key has been registered it can then be removed from the system. The passphrase and the key paths will be removed from the configuration file.
+See full dependencies in `_3rdPartyLicenses.md_`.
 
-Adjusting Database Settings
-------
-Database settings can be adjusted in the configuration properties.
+---
 
-    #Database user
-    dbUser=bastillion
-    #Database password
-    dbPassword=p@$$w0rd!!
-    #Database JDBC driver
-    dbDriver=org.h2.Driver
-    #Connection URL to the DB
-    dbConnectionURL=jdbc:h2:keydb/bastillion;CIPHER=AES;
+## License
 
-By default the datastore is set as embedded, but a remote H2 database can supported through adjusting the connection URL.
+Prosperity Public License.
 
-    #Connection URL to the DB
-	dbConnectionURL=jdbc:h2:tcp://<host>:<port>/~/bastillion;CIPHER=AES;
+## Author
 
-External Authentication
-------
-External Authentication can be enabled through the BastillionConfig.properties.
-
-For example:
-
-	#specify a external authentication module (ex: ldap-ol, ldap-ad).  Edit the jaas.conf to set connection details
-	jaasModule=ldap-ol
-
-Connection details need to be set in the jaas.conf file
-
-    ldap-ol {
-    	com.sun.security.auth.module.LdapLoginModule SUFFICIENT
-    	userProvider="ldap://hostname:389/ou=example,dc=bastillion,dc=com"
-    	userFilter="(&(uid={USERNAME})(objectClass=inetOrgPerson))"
-    	authzIdentity="{cn}"
-    	useSSL=false
-    	debug=false;
-    };
-
-
-Administrators will be added as they are authenticated and profiles of systems may be assigned by full-privileged users.
-
-User LDAP roles can be mapped to profiles defined in Bastillion through the use of the org.eclipse.jetty.jaas.spi.LdapLoginModule.
-
-    ldap-ol-with-roles {
-        //openldap auth with roles that can map to profiles
-        org.eclipse.jetty.jaas.spi.LdapLoginModule required
-        debug="false"
-        useLdaps="false"
-        contextFactory="com.sun.jndi.ldap.LdapCtxFactory"
-        hostname="<SERVER>"
-        port="389"
-        bindDn="<BIND-DN>"
-        bindPassword="<BIND-DN PASSWORD>"
-        authenticationMethod="simple"
-        forceBindingLogin="true"
-        userBaseDn="ou=users,dc=bastillion,dc=com"
-        userRdnAttribute="uid"
-        userIdAttribute="uid"
-        userPasswordAttribute="userPassword"
-        userObjectClass="inetOrgPerson"
-        roleBaseDn="ou=groups,dc=bastillion,dc=com"
-        roleNameAttribute="cn"
-        roleMemberAttribute="member"
-        roleObjectClass="groupOfNames";
-    };
-
-Users will be added/removed from defined profiles as they login and when the role name matches the profile name.
-
-Auditing
-------
-Auditing is disabled by default. Audit logs can be enabled through the **log4j2.xml** by uncommenting the **io.bastillion.manage.util.SystemAudit** and the **audit-appender** definitions.
-
-> https://github.com/bastillion-io/Bastillion/blob/master/src/main/resources/log4j2.xml#L19-L22
-
-Auditing through the application is only a proof of concept.  It can be enabled in the BastillionConfig.properties.
-
-	#enable audit  --set to true to enable
-	enableInternalAudit=true
-
-Screenshots
------------
-![Login](https://www.bastillion.io/images/screenshots/medium/login.png)
-
-![Two-Factor](https://www.bastillion.io/images/screenshots/medium/two-factor.png)
-
-![More Terminals](https://www.bastillion.io/images/screenshots/medium/terminals.png)
-
-![Manage Systems](https://www.bastillion.io/images/screenshots/medium/manage_systems.png)
-
-![Manage Users](https://www.bastillion.io/images/screenshots/medium/manage_users.png)
-
-![Define SSH Keys](https://www.bastillion.io/images/screenshots/medium/manage_keys.png)
-
-![Disable SSH Keys](https://www.bastillion.io/images/screenshots/medium/disable_keys.png)
-
-Acknowledgments
-------
-Special thanks goes to these amazing projects which makes this (and other great projects) possible.
-
-+ [JSch](http://www.jcraft.com/jsch) Java Secure Channel - by [ymnk](https://github.com/ymnk)
-+ [term.js](https://github.com/chjj/term.js) A terminal written in javascript - by [chjj](https://github.com/chjj)
-
-Third-party dependencies are mentioned in the [_3rdPartyLicenses.md_](3rdPartyLicenses.md)
-
-The Prosperity Public License
------------
-Bastillion is available for use under the Prosperity Public License
-
-Author
-------
-**Loophole, LLC - Sean Kavanagh**
-
-+ sean.p.kavanagh6@gmail.com
-+ https://twitter.com/spkavanagh6
-
+Loophole, LLC — Sean Kavanagh  
+Email: sean.p.kavanagh6@gmail.com  
