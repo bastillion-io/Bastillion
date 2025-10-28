@@ -34,14 +34,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -171,12 +164,11 @@ public class SSHUtil {
             FileUtils.forceDelete(file);
         }
 
-
     }
 
     /**
-     * generates system's public/private key par and returns passphrase
-     *
+     * Generates the system's public/private key pair and returns the passphrase.
+     * Works around mwiede JSch's unsupported Ed25519 private key serialization.
      * @return passphrase for system generated key
      */
     public static String keyGen(String passphrase) throws IOException, JSchException {
@@ -186,27 +178,56 @@ public class SSHUtil {
 
         if (StringUtils.isEmpty(AppConfig.getProperty(PRIVATE_KEY)) || StringUtils.isEmpty(AppConfig.getProperty(PUBLIC_KEY))) {
 
-            //set key type
-            int type = KeyPair.RSA;
-            if ("dsa".equals(SSHUtil.KEY_TYPE)) {
+            // Determine SSH key type
+            int type = KeyPair.ED25519;
+            if ("rsa".equalsIgnoreCase(KEY_TYPE)) {
+                type = KeyPair.RSA;
+            } else if ("dsa".equalsIgnoreCase(KEY_TYPE)) {
                 type = KeyPair.DSA;
-            } else if ("ecdsa".equals(SSHUtil.KEY_TYPE)) {
+            } else if ("ecdsa".equalsIgnoreCase(KEY_TYPE)) {
                 type = KeyPair.ECDSA;
-            } else if ("ed448".equals(SSHUtil.KEY_TYPE)) {
+            } else if ("ed448".equalsIgnoreCase(KEY_TYPE)) {
                 type = KeyPair.ED448;
-            } else if ("ed25519".equals(SSHUtil.KEY_TYPE)) {
-                type = KeyPair.ED25519;
             }
-            String comment = "bastillion@global_key";
 
+            String comment = "bastillion@global_key";
             JSch jsch = new JSch();
             KeyPair keyPair = KeyPair.genKeyPair(jsch, type, KEY_LENGTH);
-            keyPair.writePrivateKey(PVT_KEY, passphrase.getBytes());
+
+            // --- Write public key
             keyPair.writePublicKey(PUB_KEY, comment);
-            System.out.println("Finger print: " + keyPair.getFingerPrint());
+
+            try {
+                // Try the standard PEM private key first
+                keyPair.writePrivateKey(PVT_KEY, passphrase != null ? passphrase.getBytes() : null);
+
+            } catch (UnsupportedOperationException ex) {
+                // Ed25519/Ed448 fall back to OpenSSH v1 format (supported public API)
+                log.warn("Falling back to OpenSSH v1 key serialization for type: {}", KEY_TYPE);
+
+                try (FileOutputStream fos = new FileOutputStream(PVT_KEY)) {
+                    keyPair.writeOpenSSHv1PrivateKey(fos, passphrase != null ? passphrase.getBytes() : null);
+                }
+            }
+
+            // Set restrictive file permissions (600)
+            File pvt = new File(PVT_KEY);
+            pvt.setReadable(false, false);
+            pvt.setWritable(false, false);
+            pvt.setExecutable(false, false);
+            pvt.setReadable(true, true);
+            pvt.setWritable(true, true);
+
+            File pub = new File(PUB_KEY);
+            pub.setReadable(false, false);
+            pub.setWritable(false, false);
+            pub.setExecutable(false, false);
+            pub.setReadable(true, true);
+            pub.setWritable(true, true);
+
+            log.info("Generated {} SSH key — fingerprint: {}", KEY_TYPE, keyPair.getFingerPrint());
             keyPair.dispose();
         }
-
 
         return passphrase;
     }
