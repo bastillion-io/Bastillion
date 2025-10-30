@@ -7,6 +7,7 @@ package io.bastillion.manage.util;
 
 import io.bastillion.common.util.AppConfig;
 
+import java.security.GeneralSecurityException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,4 +38,19 @@ public class PasswordUtil {
         return matcher.matches();
 
     }
+
+    public static byte[] generateSalt() {
+        byte[] salt = new byte[16];
+        new java.security.SecureRandom().nextBytes(salt);
+        return salt;
+    }
+
+    public static javax.crypto.SecretKey deriveAESKeyFromPassphrase(String passphrase, byte[] salt)
+            throws GeneralSecurityException {
+        javax.crypto.SecretKeyFactory factory = javax.crypto.SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+        javax.crypto.spec.PBEKeySpec spec = new javax.crypto.spec.PBEKeySpec(passphrase.toCharArray(), salt, 65536, 256);
+        javax.crypto.SecretKey tmp = factory.generateSecret(spec);
+        return new javax.crypto.spec.SecretKeySpec(tmp.getEncoded(), "AES");
+    }
+
 }

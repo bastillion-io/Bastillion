@@ -200,7 +200,6 @@ public class SSHUtil {
             try {
                 // Try the standard PEM private key first
                 keyPair.writePrivateKey(PVT_KEY, passphrase != null ? passphrase.getBytes() : null);
-
             } catch (UnsupportedOperationException ex) {
                 // Ed25519/Ed448 fall back to OpenSSH v1 format (supported public API)
                 log.warn("Falling back to OpenSSH v1 key serialization for type: {}", KEY_TYPE);
