@@ -5,28 +5,10 @@
  */
 package io.bastillion.manage.util;
 
-import com.jcraft.jsch.Channel;
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.ChannelShell;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.KeyPair;
-import com.jcraft.jsch.Session;
-import com.jcraft.jsch.SftpException;
+import com.jcraft.jsch.*;
 import io.bastillion.common.util.AppConfig;
-import io.bastillion.manage.db.PrivateKeyDB;
-import io.bastillion.manage.db.ProfileSystemsDB;
-import io.bastillion.manage.db.PublicKeyDB;
-import io.bastillion.manage.db.SystemDB;
-import io.bastillion.manage.db.SystemStatusDB;
-import io.bastillion.manage.db.UserProfileDB;
-import io.bastillion.manage.model.ApplicationKey;
-import io.bastillion.manage.model.HostSystem;
-import io.bastillion.manage.model.Profile;
-import io.bastillion.manage.model.SchSession;
-import io.bastillion.manage.model.SessionOutput;
-import io.bastillion.manage.model.UserSchSessions;
+import io.bastillion.manage.db.*;
+import io.bastillion.manage.model.*;
 import io.bastillion.manage.task.SecureShellTask;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.io.FileUtils;
@@ -35,12 +17,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermission;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * SSH utility class used to create public/private key for system and distribute authorized key files
@@ -684,6 +668,162 @@ public class SSHUtil {
         }
         return keyType;
 
+    }
+
+    /**
+     * Build an unencrypted OpenSSH private key (openssh-key-v1, cipher=none).
+     */
+    public static String buildOpenSSHPrivateKey(java.security.KeyPair kp, int type) throws IOException {
+        String keyType = (type == KeyPair.ED25519) ? "ssh-ed25519" : "ssh-ed448";
+
+        ByteArrayOutputStream outer = new ByteArrayOutputStream();
+        outer.write("openssh-key-v1\0".getBytes(StandardCharsets.US_ASCII));
+        writeSSHString(outer, "none".getBytes(StandardCharsets.US_ASCII)); // ciphername
+        writeSSHString(outer, "none".getBytes(StandardCharsets.US_ASCII)); // kdfname
+        writeSSHString(outer, new byte[0]);                                 // kdfoptions
+        outer.write(ByteBuffer.allocate(4).putInt(1).array());              // number of keys
+
+        // ----- public key blob -----
+        ByteArrayOutputStream pubBlob = new ByteArrayOutputStream();
+        writeSSHString(pubBlob, keyType.getBytes(StandardCharsets.UTF_8));
+        byte[] pubRaw = extractRawKeyFromX509(kp.getPublic().getEncoded());
+        writeSSHBytes(pubBlob, pubRaw);
+        byte[] pubBlobBytes = pubBlob.toByteArray();
+        writeSSHBytes(outer, pubBlobBytes);
+
+        // ----- private key section -----
+        ByteArrayOutputStream privBlob = new ByteArrayOutputStream();
+
+        int checkInt = new java.util.Random().nextInt();
+        privBlob.write(ByteBuffer.allocate(4).putInt(checkInt).array());
+        privBlob.write(ByteBuffer.allocate(4).putInt(checkInt).array());
+
+        writeSSHString(privBlob, keyType.getBytes(StandardCharsets.UTF_8));
+        writeSSHBytes(privBlob, pubRaw);
+
+        byte[] privRaw = extractRawKeyFromX509(kp.getPrivate().getEncoded());
+
+        // For Ed25519: private key = 32 bytes seed, concatenate with public key (32 bytes)
+        if (keyType.equals("ssh-ed25519") && privRaw.length > 32) {
+            privRaw = Arrays.copyOfRange(privRaw, privRaw.length - 32, privRaw.length);
+        }
+
+        ByteArrayOutputStream privConcat = new ByteArrayOutputStream();
+        privConcat.write(privRaw);
+        privConcat.write(pubRaw);
+        writeSSHBytes(privBlob, privConcat.toByteArray());
+
+        writeSSHString(privBlob, "".getBytes(StandardCharsets.UTF_8)); // comment (empty)
+
+        // padding to 8-byte boundary
+        int padLen = 8 - (privBlob.size() % 8);
+        for (int i = 1; i <= padLen; i++) privBlob.write(i);
+
+        writeSSHBytes(outer, privBlob.toByteArray());
+
+        String base64 = Base64.getMimeEncoder(70, "\n".getBytes(StandardCharsets.US_ASCII))
+                .encodeToString(outer.toByteArray());
+        return "-----BEGIN OPENSSH PRIVATE KEY-----\n" + base64 + "\n-----END OPENSSH PRIVATE KEY-----\n";
+    }
+
+    public static String buildOpenSSHPrivateKey(Long userId, java.security.KeyPair kp, int type, String passphrase) throws IOException, GeneralSecurityException, InterruptedException {
+        return buildOpenSSHPrivateKey(userId != null ? userId.toString() : UUID.randomUUID().toString(), kp, type, passphrase);
+    }
+
+    /**
+     * Build an OpenSSH private key; if passphrase provided, rewrap with ssh-keygen to use bcrypt KDF.
+     */
+    public static String buildOpenSSHPrivateKey(String userId, java.security.KeyPair kp, int type, String passphrase) throws IOException, GeneralSecurityException, InterruptedException {
+        String unencryptedPEM = buildOpenSSHPrivateKey(kp, type);
+
+        if (StringUtils.isBlank(passphrase)) {
+            return unencryptedPEM;
+        }
+
+        return rewrapWithOpenSSHKeygen(userId, unencryptedPEM, passphrase);
+    }
+
+
+    /**
+     * Use system ssh-keygen to convert an unencrypted OpenSSH key into bcrypt-encrypted OpenSSH key.
+     */
+    public static String rewrapWithOpenSSHKeygen(String userId, String pem, String passphrase) throws IOException, InterruptedException, GeneralSecurityException {
+        Path tmp = Files.createTempFile("bastillion_key_" + userId + "_", ".key");
+        Files.write(tmp, pem.getBytes(StandardCharsets.US_ASCII));
+        try {
+            // chmod 600 (ignore if unsupported FS)
+            try {
+                Files.setPosixFilePermissions(tmp, EnumSet.of(
+                        PosixFilePermission.OWNER_READ,
+                        PosixFilePermission.OWNER_WRITE));
+            } catch (UnsupportedOperationException ignored) {
+                // Windows or FS without POSIX perms
+            }
+
+            // ssh-keygen -p -P "" -N <passphrase> -f <file> -o -a 16
+            ProcessBuilder pb = new ProcessBuilder(
+                    "ssh-keygen", "-p",
+                    "-P", "",
+                    "-N", passphrase,
+                    "-f", tmp.toAbsolutePath().toString(),
+                    "-o",
+                    "-a", "16"
+            );
+            pb.redirectErrorStream(true);
+            Process proc = pb.start();
+
+            try (BufferedReader r = new BufferedReader(
+                    new InputStreamReader(proc.getInputStream(), StandardCharsets.UTF_8))) {
+                String line;
+                while ((line = r.readLine()) != null) {
+                    log.debug("[ssh-keygen] {}", line);
+                }
+            }
+
+            int rc = proc.waitFor();
+            if (rc != 0) {
+                throw new IOException("ssh-keygen exited with code " + rc);
+            }
+
+            byte[] out = Files.readAllBytes(tmp);
+            return new String(out, StandardCharsets.US_ASCII);
+        } finally {
+            try {
+                Files.deleteIfExists(tmp);
+            } catch (IOException e) {
+                log.warn("Unable to delete temp key {}", tmp);
+            }
+        }
+    }
+
+    public static byte[] extractRawKeyFromX509(byte[] x509Encoded) {
+        // DER structure: SubjectPublicKeyInfo -> BIT STRING
+        // Find the BIT STRING header 0x03, then skip 2–3 bytes
+        for (int i = 0; i < x509Encoded.length - 3; i++) {
+            if (x509Encoded[i] == 0x03 && x509Encoded[i + 2] == 0x00) {
+                return Arrays.copyOfRange(x509Encoded, i + 3, x509Encoded.length);
+            }
+        }
+        // fallback: assume already raw
+        return x509Encoded;
+    }
+
+    public static byte[] encodeSSHPublicKey(String keyType, byte[] rawPubBytes) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        writeSSHString(out, keyType.getBytes(StandardCharsets.UTF_8));
+        byte[] keyPart = extractRawKeyFromX509(rawPubBytes);
+        writeSSHBytes(out, keyPart);
+        return out.toByteArray();
+    }
+
+    public static void writeSSHString(ByteArrayOutputStream out, byte[] str) throws IOException {
+        out.write(ByteBuffer.allocate(4).putInt(str.length).array());
+        out.write(str);
+    }
+
+    public static void writeSSHBytes(ByteArrayOutputStream out, byte[] bytes) throws IOException {
+        out.write(ByteBuffer.allocate(4).putInt(bytes.length).array());
+        out.write(bytes);
     }
 
 

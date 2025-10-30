@@ -323,12 +323,13 @@ public class AuthKeysKtrl extends BaseKontroller {
 
                 byte[] pubBytes = kp.getPublic().getEncoded();
                 String sshKeyType = (type == KeyPair.ED25519) ? "ssh-ed25519" : "ssh-ed448";
-                String base64Pub = Base64.getEncoder().encodeToString(encodeSSHPublicKey(sshKeyType, pubBytes));
+                String base64Pub = Base64.getEncoder().encodeToString(SSHUtil.encodeSSHPublicKey(sshKeyType, pubBytes));
                 pubKey = sshKeyType + " " + base64Pub + " " + username + "@" + keyname;
 
                 // Build an OpenSSH private key (unencrypted), then rewrap with ssh-keygen if passphrase provided
+                Long userId = AuthUtil.getUserId(getRequest().getSession());
                 String passphrase = publicKey.getPassphrase();
-                String privateKeyPEM = buildOpenSSHPrivateKey(kp, type, passphrase);
+                String privateKeyPEM = SSHUtil.buildOpenSSHPrivateKey(userId, kp, type, passphrase);
 
                 // Store (internally encrypted for session)
                 getRequest().getSession().setAttribute(PVT_KEY, EncryptionUtil.encrypt(privateKeyPEM));
@@ -353,163 +354,7 @@ public class AuthKeysKtrl extends BaseKontroller {
         return pubKey;
     }
 
-    /**
-     * Build an unencrypted OpenSSH private key (openssh-key-v1, cipher=none).
-     */
-    private String buildOpenSSHPrivateKey(java.security.KeyPair kp, int type) throws IOException {
-        String keyType = (type == KeyPair.ED25519) ? "ssh-ed25519" : "ssh-ed448";
 
-        ByteArrayOutputStream outer = new ByteArrayOutputStream();
-        outer.write("openssh-key-v1\0".getBytes(StandardCharsets.US_ASCII));
-        writeSSHString(outer, "none".getBytes(StandardCharsets.US_ASCII)); // ciphername
-        writeSSHString(outer, "none".getBytes(StandardCharsets.US_ASCII)); // kdfname
-        writeSSHString(outer, new byte[0]);                                 // kdfoptions
-        outer.write(ByteBuffer.allocate(4).putInt(1).array());              // number of keys
-
-        // ----- public key blob -----
-        ByteArrayOutputStream pubBlob = new ByteArrayOutputStream();
-        writeSSHString(pubBlob, keyType.getBytes(StandardCharsets.UTF_8));
-        byte[] pubRaw = extractRawKeyFromX509(kp.getPublic().getEncoded());
-        writeSSHBytes(pubBlob, pubRaw);
-        byte[] pubBlobBytes = pubBlob.toByteArray();
-        writeSSHBytes(outer, pubBlobBytes);
-
-        // ----- private key section -----
-        ByteArrayOutputStream privBlob = new ByteArrayOutputStream();
-
-        int checkInt = new java.util.Random().nextInt();
-        privBlob.write(ByteBuffer.allocate(4).putInt(checkInt).array());
-        privBlob.write(ByteBuffer.allocate(4).putInt(checkInt).array());
-
-        writeSSHString(privBlob, keyType.getBytes(StandardCharsets.UTF_8));
-        writeSSHBytes(privBlob, pubRaw);
-
-        byte[] privRaw = extractRawKeyFromX509(kp.getPrivate().getEncoded());
-
-        // For Ed25519: private key = 32 bytes seed, concatenate with public key (32 bytes)
-        if (keyType.equals("ssh-ed25519") && privRaw.length > 32) {
-            privRaw = Arrays.copyOfRange(privRaw, privRaw.length - 32, privRaw.length);
-        }
-
-        ByteArrayOutputStream privConcat = new ByteArrayOutputStream();
-        privConcat.write(privRaw);
-        privConcat.write(pubRaw);
-        writeSSHBytes(privBlob, privConcat.toByteArray());
-
-        writeSSHString(privBlob, "".getBytes(StandardCharsets.UTF_8)); // comment (empty)
-
-        // padding to 8-byte boundary
-        int padLen = 8 - (privBlob.size() % 8);
-        for (int i = 1; i <= padLen; i++) privBlob.write(i);
-
-        writeSSHBytes(outer, privBlob.toByteArray());
-
-        String base64 = Base64.getMimeEncoder(70, "\n".getBytes(StandardCharsets.US_ASCII))
-                .encodeToString(outer.toByteArray());
-        return "-----BEGIN OPENSSH PRIVATE KEY-----\n" + base64 + "\n-----END OPENSSH PRIVATE KEY-----\n";
-    }
-
-    /**
-     * Build an OpenSSH private key; if passphrase provided, rewrap with ssh-keygen to use bcrypt KDF.
-     */
-    private String buildOpenSSHPrivateKey(java.security.KeyPair kp, int type, String passphrase) throws IOException {
-        String unencryptedPEM = buildOpenSSHPrivateKey(kp, type);
-
-        if (StringUtils.isBlank(passphrase)) {
-            return unencryptedPEM;
-        }
-
-        try {
-            return rewrapWithOpenSSHKeygen(unencryptedPEM, passphrase);
-        } catch (Exception ex) {
-            log.error("Failed to rewrap key with OpenSSH bcrypt KDF", ex);
-            addError("Passphrase could not be applied with OpenSSH format; returning unencrypted key.");
-            return unencryptedPEM;
-        }
-    }
-
-    /**
-     * Use system ssh-keygen to convert an unencrypted OpenSSH key into bcrypt-encrypted OpenSSH key.
-     */
-    private String rewrapWithOpenSSHKeygen(String pem, String passphrase) throws IOException, InterruptedException, GeneralSecurityException {
-        Long userId = AuthUtil.getUserId(getRequest().getSession());
-        Path tmp = Files.createTempFile("bastillion_key_" + userId + "_", ".key");
-        Files.write(tmp, pem.getBytes(StandardCharsets.US_ASCII));
-        try {
-            // chmod 600 (ignore if unsupported FS)
-            try {
-                Files.setPosixFilePermissions(tmp, EnumSet.of(
-                        PosixFilePermission.OWNER_READ,
-                        PosixFilePermission.OWNER_WRITE));
-            } catch (UnsupportedOperationException ignored) {
-                // Windows or FS without POSIX perms
-            }
-
-            // ssh-keygen -p -P "" -N <passphrase> -f <file> -o -a 16
-            ProcessBuilder pb = new ProcessBuilder(
-                    "ssh-keygen", "-p",
-                    "-P", "",
-                    "-N", passphrase,
-                    "-f", tmp.toAbsolutePath().toString(),
-                    "-o",
-                    "-a", "16"
-            );
-            pb.redirectErrorStream(true);
-            Process proc = pb.start();
-
-            try (BufferedReader r = new BufferedReader(
-                    new InputStreamReader(proc.getInputStream(), StandardCharsets.UTF_8))) {
-                String line;
-                while ((line = r.readLine()) != null) {
-                    log.debug("[ssh-keygen] {}", line);
-                }
-            }
-
-            int rc = proc.waitFor();
-            if (rc != 0) {
-                throw new IOException("ssh-keygen exited with code " + rc);
-            }
-
-            byte[] out = Files.readAllBytes(tmp);
-            return new String(out, StandardCharsets.US_ASCII);
-        } finally {
-            try {
-                Files.deleteIfExists(tmp);
-            } catch (IOException e) {
-                log.warn("Unable to delete temp key {}", tmp);
-            }
-        }
-    }
-
-    private byte[] extractRawKeyFromX509(byte[] x509Encoded) {
-        // DER structure: SubjectPublicKeyInfo -> BIT STRING
-        // Find the BIT STRING header 0x03, then skip 2–3 bytes
-        for (int i = 0; i < x509Encoded.length - 3; i++) {
-            if (x509Encoded[i] == 0x03 && x509Encoded[i + 2] == 0x00) {
-                return Arrays.copyOfRange(x509Encoded, i + 3, x509Encoded.length);
-            }
-        }
-        // fallback: assume already raw
-        return x509Encoded;
-    }
-
-    private byte[] encodeSSHPublicKey(String keyType, byte[] rawPubBytes) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        writeSSHString(out, keyType.getBytes(StandardCharsets.UTF_8));
-        byte[] keyPart = extractRawKeyFromX509(rawPubBytes);
-        writeSSHBytes(out, keyPart);
-        return out.toByteArray();
-    }
-
-    private void writeSSHString(ByteArrayOutputStream out, byte[] str) throws IOException {
-        out.write(ByteBuffer.allocate(4).putInt(str.length).array());
-        out.write(str);
-    }
-
-    private void writeSSHBytes(ByteArrayOutputStream out, byte[] bytes) throws IOException {
-        out.write(ByteBuffer.allocate(4).putInt(bytes.length).array());
-        out.write(bytes);
-    }
 
     public String generateUserKey(String username, String keyname) throws ServletException {
         return generateUserKey(username, keyname, null);
