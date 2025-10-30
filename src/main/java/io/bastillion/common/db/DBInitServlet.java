@@ -186,7 +186,7 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
             DBUtils.closeStmt(statement);
             DBUtils.closeConn(connection);
 
-        } catch (SQLException | ConfigurationException | IOException | GeneralSecurityException | JSchException ex) {
+        } catch (SQLException | ConfigurationException | InterruptedException| IOException | GeneralSecurityException | JSchException ex) {
             log.error(ex.toString(), ex);
             throw new ServletException(ex.toString(), ex);
         }
