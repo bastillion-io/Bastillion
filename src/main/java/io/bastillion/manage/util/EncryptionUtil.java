@@ -11,7 +11,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
@@ -62,14 +68,13 @@ public class EncryptionUtil {
      * @return hash value of string
      */
     public static String hash(String str, String salt) throws NoSuchAlgorithmException {
-        String hash = null;
+        String hash;
         MessageDigest md = MessageDigest.getInstance(HASH_ALGORITHM);
         if (StringUtils.isNotEmpty(salt)) {
             md.update(Base64.decodeBase64(salt.getBytes()));
         }
         md.update(str.getBytes(StandardCharsets.UTF_8));
         hash = new String(Base64.encodeBase64(md.digest()));
-
         return hash;
     }
 
@@ -91,15 +96,12 @@ public class EncryptionUtil {
      * @return encrypted string
      */
     public static String encrypt(byte[] key, String str) throws GeneralSecurityException {
-
         String retVal = null;
         if (str != null && str.length() > 0) {
             Cipher c = Cipher.getInstance(CRYPT_ALGORITHM);
             c.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, CRYPT_ALGORITHM));
             byte[] encVal = c.doFinal(str.getBytes());
             retVal = new String(Base64.encodeBase64(encVal));
-
-
         }
         return retVal;
     }
@@ -142,5 +144,55 @@ public class EncryptionUtil {
         return decrypt(key, str);
     }
 
+    /**
+     * Encrypts a PEM-formatted private key using a user-supplied passphrase.
+     * This is not Bastillion's internal encryption, but an optional wrapper
+     * to protect exported private keys with AES-CBC and PBKDF2-HMAC-SHA256.
+     *
+     * @param privateKeyPEM PEM text to encrypt
+     * @param passphrase    user-supplied passphrase
+     * @return PEM with AES-encrypted contents
+     */
+    public static String encryptPrivateKeyPEM(String privateKeyPEM, String passphrase)
+            throws GeneralSecurityException, IOException {
 
+        if (passphrase == null || passphrase.isEmpty()) {
+            return privateKeyPEM;
+        }
+
+        // Generate random salt and IV
+        byte[] salt = new byte[16];
+        byte[] iv = new byte[16];
+        SecureRandom random = new SecureRandom();
+        random.nextBytes(salt);
+        random.nextBytes(iv);
+
+        // Derive AES key from passphrase
+        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+        PBEKeySpec spec = new PBEKeySpec(passphrase.toCharArray(), salt, 65536, 256);
+        SecretKey tmp = factory.generateSecret(spec);
+        SecretKeySpec aesKey = new SecretKeySpec(tmp.getEncoded(), "AES");
+
+        // Encrypt the PEM contents
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.ENCRYPT_MODE, aesKey, new IvParameterSpec(iv));
+        byte[] ciphertext = cipher.doFinal(privateKeyPEM.getBytes(StandardCharsets.UTF_8));
+
+        // Combine salt + iv + ciphertext for storage
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        out.write("-----BEGIN ENCRYPTED PRIVATE KEY-----\n".getBytes(StandardCharsets.US_ASCII));
+        out.write(java.util.Base64.getMimeEncoder(70, "\n".getBytes(StandardCharsets.US_ASCII))
+                .encode(concat(salt, iv, ciphertext)));
+        out.write("\n-----END ENCRYPTED PRIVATE KEY-----\n".getBytes(StandardCharsets.US_ASCII));
+
+        return out.toString(StandardCharsets.US_ASCII);
+    }
+
+    private static byte[] concat(byte[]... arrays) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        for (byte[] arr : arrays) {
+            out.write(arr);
+        }
+        return out.toByteArray();
+    }
 }

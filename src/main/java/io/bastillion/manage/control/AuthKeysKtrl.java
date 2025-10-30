@@ -1,25 +1,17 @@
 /**
  * Copyright (C) 2013 Loophole, LLC
- * <p>
+ *
  * Licensed under The Prosperity Public License 3.0.0
  */
+
 package io.bastillion.manage.control;
 
 import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.KeyPair;
 import io.bastillion.common.util.AppConfig;
 import io.bastillion.common.util.AuthUtil;
-import io.bastillion.manage.db.ProfileDB;
-import io.bastillion.manage.db.PublicKeyDB;
-import io.bastillion.manage.db.SessionAuditDB;
-import io.bastillion.manage.db.UserDB;
-import io.bastillion.manage.db.UserProfileDB;
-import io.bastillion.manage.model.Auth;
-import io.bastillion.manage.model.HostSystem;
-import io.bastillion.manage.model.Profile;
-import io.bastillion.manage.model.PublicKey;
-import io.bastillion.manage.model.SortedSet;
+import io.bastillion.manage.db.*;
+import io.bastillion.manage.model.*;
 import io.bastillion.manage.util.EncryptionUtil;
 import io.bastillion.manage.util.PasswordUtil;
 import io.bastillion.manage.util.RefreshAuthKeyUtil;
@@ -42,14 +34,22 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermission;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.EnumSet;
 import java.util.List;
 import org.apache.commons.io.FileUtils;
 
 /**
- * Action to generate and distribute auth keys for systems or users
+ * Controller to manage SSH key generation, validation, and distribution.
  */
 public class AuthKeysKtrl extends BaseKontroller {
 
@@ -62,105 +62,98 @@ public class AuthKeysKtrl extends BaseKontroller {
 
     @Model(name = "profileList")
     List<Profile> profileList = new ArrayList<>();
+
     @Model(name = "userList")
-    List userList = new ArrayList<>();
+    List<User> userList = new ArrayList<>();
+
     @Model(name = "publicKey")
     PublicKey publicKey;
+
     @Model(name = "sortedSet")
     SortedSet sortedSet = new SortedSet();
+
     @Model(name = "forceUserKeyGenEnabled")
     boolean forceUserKeyGenEnabled = "true".equals(AppConfig.getProperty("forceUserKeyGeneration"));
+
+    @Model(name = "allowUserKeyTypeSelection")
+    boolean allowUserKeyTypeSelection = SSHUtil.ALLOW_USER_KEY_TYPE_SELECTION;
+
     @Model(name = "hostSystem")
     HostSystem hostSystem = new HostSystem();
+
     @Model(name = "userPublicKeyList")
     List<PublicKey> userPublicKeyList = new ArrayList<>();
+
     @Model(name = "existingKeyId")
     Long existingKeyId;
-
 
     public AuthKeysKtrl(HttpServletRequest request, HttpServletResponse response) {
         super(request, response);
     }
 
+    /* ------------------------- Public Key Enable/Disable ------------------------- */
+
     @Kontrol(path = "/manage/enablePublicKey", method = MethodType.GET)
     public String enablePublicKey() throws ServletException {
-
         try {
             publicKey = PublicKeyDB.getPublicKey(publicKey.getId());
             PublicKeyDB.enableKey(publicKey.getId());
-
-            profileList = ProfileDB.getAllProfiles();
-            userList = UserDB.getUserSet(new SortedSet(SessionAuditDB.SORT_BY_USERNAME)).getItemList();
-
-            sortedSet = PublicKeyDB.getPublicKeySet(sortedSet);
+            reloadKeyViewData();
+            distributePublicKeys(publicKey);
         } catch (SQLException | GeneralSecurityException ex) {
-            log.error(ex.toString(), ex);
-            throw new ServletException(ex.toString(), ex);
+            handleException(ex);
         }
-
-        distributePublicKeys(publicKey);
-
         return "/manage/view_keys.html";
     }
 
     @Kontrol(path = "/manage/disablePublicKey", method = MethodType.GET)
     public String disablePublicKey() throws ServletException {
-
         try {
             publicKey = PublicKeyDB.getPublicKey(publicKey.getId());
-
             PublicKeyDB.disableKey(publicKey.getId());
-
-            profileList = ProfileDB.getAllProfiles();
-            userList = UserDB.getUserSet(new SortedSet(SessionAuditDB.SORT_BY_USERNAME)).getItemList();
-
-            sortedSet = PublicKeyDB.getPublicKeySet(sortedSet);
+            reloadKeyViewData();
+            distributePublicKeys(publicKey);
         } catch (SQLException | GeneralSecurityException ex) {
-            log.error(ex.toString(), ex);
-            throw new ServletException(ex.toString(), ex);
+            handleException(ex);
         }
-
-        distributePublicKeys(publicKey);
-
         return "/manage/view_keys.html";
     }
 
+    /* ------------------------- Key View Pages ------------------------- */
+
     @Kontrol(path = "/manage/viewKeys", method = MethodType.GET)
     public String manageViewKeys() throws ServletException {
-
         try {
             profileList = ProfileDB.getAllProfiles();
             userList = UserDB.getUserSet(new SortedSet(SessionAuditDB.SORT_BY_USERNAME)).getItemList();
             sortedSet = PublicKeyDB.getPublicKeySet(sortedSet);
         } catch (SQLException | GeneralSecurityException ex) {
-            log.error(ex.toString(), ex);
-            throw new ServletException(ex.toString(), ex);
+            handleException(ex);
         }
-
         return "/manage/view_keys.html";
     }
 
     @Kontrol(path = "/admin/viewKeys", method = MethodType.GET)
     public String adminViewKeys() throws ServletException {
-
         try {
             Long userId = AuthUtil.getUserId(getRequest().getSession());
             String userType = AuthUtil.getUserType(getRequest().getSession());
+
             if (Auth.MANAGER.equals(userType)) {
                 profileList = ProfileDB.getAllProfiles();
             } else {
                 profileList = UserProfileDB.getProfilesByUser(userId);
             }
-            sortedSet = PublicKeyDB.getPublicKeySet(sortedSet, userId);
 
+            sortedSet = PublicKeyDB.getPublicKeySet(sortedSet, userId);
             userPublicKeyList = PublicKeyDB.getUniquePublicKeysForUser(userId);
         } catch (SQLException | GeneralSecurityException ex) {
-            log.error(ex.toString(), ex);
-            throw new ServletException(ex.toString(), ex);
+            handleException(ex);
         }
-
         return "/admin/view_keys.html";
     }
+
+    /* ------------------------- Key Save/Delete/Download ------------------------- */
 
     @Kontrol(path = "/admin/savePublicKey", method = MethodType.POST)
     public String savePublicKeys() throws ServletException {
@@ -178,60 +171,48 @@ public class AuthKeysKtrl extends BaseKontroller {
                 distributePublicKeys(publicKey);
             }
         } catch (SQLException | GeneralSecurityException ex) {
-            log.error(ex.toString(), ex);
-            throw new ServletException(ex.toString(), ex);
+            handleException(ex);
         }
 
-        return "redirect:/admin/viewKeys.ktrl?sortedSet.orderByDirection=" + sortedSet.getOrderByDirection() + "&sortedSet.orderByField=" + sortedSet.getOrderByField() + "&keyNm=" + publicKey.getKeyNm();
+        return "redirect:/admin/viewKeys.ktrl?sortedSet.orderByDirection=" +
+                sortedSet.getOrderByDirection() + "&sortedSet.orderByField=" +
+                sortedSet.getOrderByField() + "&keyNm=" + publicKey.getKeyNm();
     }
 
     @Kontrol(path = "/admin/deletePublicKey", method = MethodType.GET)
     public String deletePublicKey() throws ServletException {
-        if (publicKey.getId() != null) {
-
-            try {
-                //get public key then delete
+        try {
+            if (publicKey.getId() != null) {
                 publicKey = PublicKeyDB.getPublicKey(publicKey.getId());
                 PublicKeyDB.deletePublicKey(publicKey.getId(), AuthUtil.getUserId(getRequest().getSession()));
-            } catch (SQLException | GeneralSecurityException ex) {
-                log.error(ex.toString(), ex);
-                throw new ServletException(ex.toString(), ex);
             }
+            distributePublicKeys(publicKey);
+        } catch (SQLException | GeneralSecurityException ex) {
+            handleException(ex);
         }
-
-        distributePublicKeys(publicKey);
-
-        return "redirect:/admin/viewKeys.ktrl?sortedSet.orderByDirection=" + sortedSet.getOrderByDirection() + "&sortedSet.orderByField=" + sortedSet.getOrderByField();
+        return "redirect:/admin/viewKeys.ktrl?sortedSet.orderByDirection=" +
+                sortedSet.getOrderByDirection() + "&sortedSet.orderByField=" +
+                sortedSet.getOrderByField();
     }
 
     @Kontrol(path = "/admin/downloadPvtKey", method = MethodType.GET)
     public String downloadPvtKey() throws ServletException {
-
-        String privateKey = null;
         try {
-            privateKey = EncryptionUtil.decrypt((String) getRequest().getSession().getAttribute(PVT_KEY));
-        } catch (GeneralSecurityException ex) {
-            log.error(ex.toString(), ex);
-            throw new ServletException(ex.toString(), ex);
-        }
+            String privateKey = EncryptionUtil.decrypt((String) getRequest().getSession().getAttribute(PVT_KEY));
 
-        if (StringUtils.isNotEmpty(publicKey.getKeyNm()) && StringUtils.isNotEmpty(privateKey)) {
-
-            try {
+            if (StringUtils.isNotEmpty(publicKey.getKeyNm()) && StringUtils.isNotEmpty(privateKey)) {
                 getResponse().setContentType("application/octet-stream");
                 getResponse().setHeader("Content-Disposition", "attachment;filename=" + publicKey.getKeyNm() + ".key");
-                getResponse().getOutputStream().write(privateKey.getBytes());
-                getResponse().getOutputStream().flush();
-                getResponse().getOutputStream().close();
-            } catch (IOException ex) {
-                log.error(ex.toString(), ex);
-                throw new ServletException(ex.toString(), ex);
+                try (OutputStream out = getResponse().getOutputStream()) {
+                    out.write(privateKey.getBytes());
+                    out.flush();
+                }
             }
 
+            getRequest().getSession().removeAttribute(PVT_KEY);
+        } catch (IOException | GeneralSecurityException ex) {
+            handleException(ex);
         }
-        //remove pvt key
-        getRequest().getSession().setAttribute(PVT_KEY, null);
-        getRequest().getSession().removeAttribute(PVT_KEY);
 
         return null;
     }
@@ -375,25 +356,18 @@ public class AuthKeysKtrl extends BaseKontroller {
         return pubKey;
     }
 
-    /**
-     * Validates all fields for adding a public key
-     */
     @Validate(input = "/admin/view_keys.html")
     public void validateSavePublicKeys() throws ServletException {
-
-        Long userId = null;
+        Long userId;
         try {
             userId = AuthUtil.getUserId(getRequest().getSession());
         } catch (GeneralSecurityException ex) {
-            log.error(ex.toString(), ex);
-            throw new ServletException(ex.toString(), ex);
+            handleException(ex);
+            return;
         }
 
-        if (publicKey == null
-                || publicKey.getKeyNm() == null
-                || publicKey.getKeyNm().trim().equals("")) {
+        if (publicKey == null || StringUtils.isBlank(publicKey.getKeyNm())) {
             addFieldError("publicKey.keyNm", REQUIRED);
-
         }
 
         try {
@@ -401,71 +375,157 @@ public class AuthKeysKtrl extends BaseKontroller {
                 if (existingKeyId != null) {
                     publicKey.setPublicKey(PublicKeyDB.getPublicKey(existingKeyId).getPublicKey());
                 } else if ("true".equals(AppConfig.getProperty("forceUserKeyGeneration"))) {
-                    if (publicKey.getPassphrase() == null ||
-                            publicKey.getPassphrase().trim().equals("")) {
-                        addFieldError("publicKey.passphrase", REQUIRED);
-                    } else if (publicKey.getPassphraseConfirm() == null ||
-                            publicKey.getPassphraseConfirm().trim().equals("")) {
-                        addFieldError("publicKey.passphraseConfirm", REQUIRED);
-                    } else if (!publicKey.getPassphrase().equals(publicKey.getPassphraseConfirm())) {
-                        addError("Passphrases do not match");
-                    } else if (!PasswordUtil.isValid(publicKey.getPassphrase())) {
-                        addError(PasswordUtil.PASSWORD_REQ_ERROR_MSG);
-                    } else {
-                        publicKey.setPublicKey(generateUserKey(UserDB.getUser(userId).getUsername(), publicKey.getKeyNm()));
-                    }
+                    validateAndGenerateKey(userId);
                 }
-
-                if (publicKey.getPublicKey() == null || publicKey.getPublicKey().trim().equals("")) {
-                    addFieldError(PUBLIC_KEY_PUBLIC_KEY, REQUIRED);
-
-                } else if (SSHUtil.getFingerprint(publicKey.getPublicKey()) == null || SSHUtil.getKeyType(publicKey.getPublicKey()) == null) {
-                    addFieldError(PUBLIC_KEY_PUBLIC_KEY, INVALID);
-
-                } else if (PublicKeyDB.isKeyDisabled(SSHUtil.getFingerprint(publicKey.getPublicKey()))) {
-                    addError("This key has been disabled. Please generate and set a new public key.");
-                    addFieldError(PUBLIC_KEY_PUBLIC_KEY, INVALID);
-
-                } else if (PublicKeyDB.isKeyRegistered(userId, publicKey)) {
-                    addError("This key has already been registered under selected profile.");
-                    addFieldError(PUBLIC_KEY_PUBLIC_KEY, INVALID);
-
-                }
+                validatePublicKey(userId);
             }
 
             if (!this.getFieldErrors().isEmpty()) {
-
-                String userType = AuthUtil.getUserType(getRequest().getSession());
-
-                if (Auth.MANAGER.equals(userType)) {
-                    profileList = ProfileDB.getAllProfiles();
-                } else {
-                    profileList = UserProfileDB.getProfilesByUser(userId);
-                }
-
-                sortedSet = PublicKeyDB.getPublicKeySet(sortedSet, userId);
-                userPublicKeyList = PublicKeyDB.getUniquePublicKeysForUser(userId);
+                reloadUserKeyViewData(userId);
             }
         } catch (SQLException | GeneralSecurityException ex) {
-            log.error(ex.toString(), ex);
-            throw new ServletException(ex.toString(), ex);
+            handleException(ex);
         }
+    }
 
+    private void validateAndGenerateKey(Long userId) throws ServletException, SQLException, GeneralSecurityException {
+        if (StringUtils.isBlank(publicKey.getPassphrase())) {
+            addFieldError("publicKey.passphrase", REQUIRED);
+        } else if (StringUtils.isBlank(publicKey.getPassphraseConfirm())) {
+            addFieldError("publicKey.passphraseConfirm", REQUIRED);
+        } else if (!publicKey.getPassphrase().equals(publicKey.getPassphraseConfirm())) {
+            addError("Passphrases do not match");
+        } else if (!PasswordUtil.isValid(publicKey.getPassphrase())) {
+            addError(PasswordUtil.PASSWORD_REQ_ERROR_MSG);
+        } else {
+            publicKey.setPublicKey(generateUserKey(
+                    UserDB.getUser(userId).getUsername(),
+                    publicKey.getKeyNm(),
+                    publicKey.getKeyType()
+            ));
+        }
+    }
+
+    private void validatePublicKey(Long userId) throws ServletException, SQLException, GeneralSecurityException {
+        if (StringUtils.isBlank(publicKey.getPublicKey())) {
+            addFieldError(PUBLIC_KEY_PUBLIC_KEY, REQUIRED);
+        } else if (SSHUtil.getFingerprint(publicKey.getPublicKey()) == null ||
+                SSHUtil.getKeyType(publicKey.getPublicKey()) == null) {
+            addFieldError(PUBLIC_KEY_PUBLIC_KEY, INVALID);
+        } else if (PublicKeyDB.isKeyDisabled(SSHUtil.getFingerprint(publicKey.getPublicKey()))) {
+            addError("This key has been disabled. Please generate and set a new public key.");
+            addFieldError(PUBLIC_KEY_PUBLIC_KEY, INVALID);
+        } else if (PublicKeyDB.isKeyRegistered(userId, publicKey)) {
+            addError("This key has already been registered under the selected profile.");
+            addFieldError(PUBLIC_KEY_PUBLIC_KEY, INVALID);
+        }
     }
 
 
-    /**
-     * distribute public keys to all systems or to profile
-     *
-     * @param publicKey public key to distribute
-     */
-    private void distributePublicKeys(PublicKey publicKey) {
+    /* ------------------------- Key Generation ------------------------- */
 
+    public String generateUserKey(String username, String keyname, String userSelectedKeyType) throws ServletException {
+        int type;
+        String keyType;
+
+        if (SSHUtil.ALLOW_USER_KEY_TYPE_SELECTION && StringUtils.isNotEmpty(userSelectedKeyType)) {
+            keyType = userSelectedKeyType.toLowerCase();
+        } else {
+            keyType = SSHUtil.DEFAULT_USER_KEY_TYPE.toLowerCase();
+        }
+
+        switch (keyType) {
+            case "dsa":
+                type = KeyPair.DSA;
+                break;
+            case "ecdsa":
+                type = KeyPair.ECDSA;
+                break;
+            case "rsa":
+                type = KeyPair.RSA;
+                break;
+            case "ed448":
+                type = KeyPair.ED448;
+                break;
+            default:
+                type = KeyPair.ED25519;
+        }
+
+        JSch jsch = new JSch();
+        String pubKey;
+
+        try {
+            if (type == KeyPair.ED25519 || type == KeyPair.ED448) {
+                String algorithm = (type == KeyPair.ED25519) ? "Ed25519" : "Ed448";
+                java.security.KeyPairGenerator kpg = java.security.KeyPairGenerator.getInstance(algorithm);
+                java.security.KeyPair kp = kpg.generateKeyPair();
+
+                byte[] pubBytes = kp.getPublic().getEncoded();
+                String sshKeyType = (type == KeyPair.ED25519) ? "ssh-ed25519" : "ssh-ed448";
+                String base64Pub = Base64.getEncoder().encodeToString(SSHUtil.encodeSSHPublicKey(sshKeyType, pubBytes));
+                pubKey = sshKeyType + " " + base64Pub + " " + username + "@" + keyname;
+
+                // Build an OpenSSH private key (unencrypted), then rewrap with ssh-keygen if passphrase provided
+                Long userId = AuthUtil.getUserId(getRequest().getSession());
+                String passphrase = publicKey.getPassphrase();
+                String privateKeyPEM = SSHUtil.buildOpenSSHPrivateKey(userId, kp, type, passphrase);
+
+                // Store (internally encrypted for session)
+                getRequest().getSession().setAttribute(PVT_KEY, EncryptionUtil.encrypt(privateKeyPEM));
+            } else {
+                KeyPair keyPair = KeyPair.genKeyPair(jsch, type, SSHUtil.KEY_LENGTH);
+
+                ByteArrayOutputStream privOs = new ByteArrayOutputStream();
+                keyPair.writePrivateKey(privOs, publicKey.getPassphrase().getBytes());
+                getRequest().getSession().setAttribute(PVT_KEY, EncryptionUtil.encrypt(privOs.toString()));
+
+                ByteArrayOutputStream pubOs = new ByteArrayOutputStream();
+                keyPair.writePublicKey(pubOs, username + "@" + keyname);
+                pubKey = pubOs.toString();
+
+                keyPair.dispose();
+            }
+        } catch (Exception ex) {
+            handleException(ex);
+            return null;
+        }
+
+        return pubKey;
+    }
+
+
+
+    public String generateUserKey(String username, String keyname) throws ServletException {
+        return generateUserKey(username, keyname, null);
+    }
+
+    /* ------------------------- Utility ------------------------- */
+
+    private void distributePublicKeys(PublicKey publicKey) {
         if (publicKey.getProfile() != null && publicKey.getProfile().getId() != null) {
             RefreshAuthKeyUtil.refreshProfileSystems(publicKey.getProfile().getId());
         } else {
             RefreshAuthKeyUtil.refreshAllSystems();
         }
+    }
 
+    private void reloadKeyViewData() throws SQLException, GeneralSecurityException {
+        profileList = ProfileDB.getAllProfiles();
+        userList = UserDB.getUserSet(new SortedSet(SessionAuditDB.SORT_BY_USERNAME)).getItemList();
+        sortedSet = PublicKeyDB.getPublicKeySet(sortedSet);
+    }
+
+    private void reloadUserKeyViewData(Long userId) throws SQLException, GeneralSecurityException {
+        String userType = AuthUtil.getUserType(getRequest().getSession());
+        profileList = Auth.MANAGER.equals(userType)
+                ? ProfileDB.getAllProfiles()
+                : UserProfileDB.getProfilesByUser(userId);
+        sortedSet = PublicKeyDB.getPublicKeySet(sortedSet, userId);
+        userPublicKeyList = PublicKeyDB.getUniquePublicKeysForUser(userId);
+    }
+
+    private void handleException(Exception ex) throws ServletException {
+        log.error(ex.toString(), ex);
+        throw new ServletException(ex.toString(), ex);
     }
 }

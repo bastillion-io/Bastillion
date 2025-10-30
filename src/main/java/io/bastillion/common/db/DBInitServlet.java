@@ -12,7 +12,7 @@ import io.bastillion.manage.util.DBUtils;
 import io.bastillion.manage.util.EncryptionUtil;
 import io.bastillion.manage.util.RefreshAuthKeyUtil;
 import io.bastillion.manage.util.SSHUtil;
-import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -186,7 +186,7 @@ public class DBInitServlet extends javax.servlet.http.HttpServlet {
             DBUtils.closeStmt(statement);
             DBUtils.closeConn(connection);
 
-        } catch (SQLException | ConfigurationException | IOException | GeneralSecurityException | JSchException ex) {
+        } catch (SQLException | ConfigurationException | InterruptedException| IOException | GeneralSecurityException | JSchException ex) {
             log.error(ex.toString(), ex);
             throw new ServletException(ex.toString(), ex);
         }
