@@ -18,6 +18,7 @@ You can:
 
 Read more: [Implementing a Trusted Third-Party System for Secure Shell](https://www.bastillion.io/docs/using/whitepaper).
 
+![Terminals](https://www.bastillion.io/images/screenshots/medium/terminals.png)
 ---
 
 ## Quick Start
@@ -138,29 +139,83 @@ dbConnectionURL=jdbc:h2:tcp://<host>:<port>/~/bastillion;CIPHER=AES;
 
 ---
 
-## External Authentication (LDAP)
+External Authentication
+------
+External Authentication can be enabled through the BastillionConfig.properties.
 
-Set:
-```properties
-jaasModule=ldap-ol
-```
+For example:
 
-And add LDAP details in `jaas.conf`.
+	#specify a external authentication module (ex: ldap-ol, ldap-ad).  Edit the jaas.conf to set connection details
+	jaasModule=ldap-ol
 
----
+Connection details need to be set in the jaas.conf file
 
-## Auditing
+    ldap-ol {
+    	com.sun.security.auth.module.LdapLoginModule SUFFICIENT
+    	userProvider="ldap://hostname:389/ou=example,dc=bastillion,dc=com"
+    	userFilter="(&(uid={USERNAME})(objectClass=inetOrgPerson))"
+    	authzIdentity="{cn}"
+    	useSSL=false
+    	debug=false;
+    };
 
-Enable in `log4j2.xml` and:
-```properties
-enableInternalAudit=true
-```
 
----
+Administrators will be added as they are authenticated and profiles of systems may be assigned by full-privileged users.
 
-## Screenshots
+User LDAP roles can be mapped to profiles defined in Bastillion through the use of the org.eclipse.jetty.jaas.spi.LdapLoginModule.
 
-(Images are shown using Markdown image syntax; no raw HTML.)
+    ldap-ol-with-roles {
+        //openldap auth with roles that can map to profiles
+        org.eclipse.jetty.jaas.spi.LdapLoginModule required
+        debug="false"
+        useLdaps="false"
+        contextFactory="com.sun.jndi.ldap.LdapCtxFactory"
+        hostname="<SERVER>"
+        port="389"
+        bindDn="<BIND-DN>"
+        bindPassword="<BIND-DN PASSWORD>"
+        authenticationMethod="simple"
+        forceBindingLogin="true"
+        userBaseDn="ou=users,dc=bastillion,dc=com"
+        userRdnAttribute="uid"
+        userIdAttribute="uid"
+        userPasswordAttribute="userPassword"
+        userObjectClass="inetOrgPerson"
+        roleBaseDn="ou=groups,dc=bastillion,dc=com"
+        roleNameAttribute="cn"
+        roleMemberAttribute="member"
+        roleObjectClass="groupOfNames";
+    };
+
+Users will be added/removed from defined profiles as they login and when the role name matches the profile name.
+
+Auditing
+------
+Auditing is disabled by default. Audit logs can be enabled through the **log4j2.xml** by uncommenting the **io.bastillion.manage.util.SystemAudit** and the **audit-appender** definitions.
+
+> https://github.com/bastillion-io/Bastillion/blob/master/src/main/resources/log4j2.xml#L19-L22
+
+Auditing through the application is only a proof of concept.  It can be enabled in the BastillionConfig.properties.
+
+	#enable audit  --set to true to enable
+	enableInternalAudit=true
+
+
+Screenshots
+-----------
+![Login](https://www.bastillion.io/images/screenshots/medium/login.png)
+
+![Two-Factor](https://www.bastillion.io/images/screenshots/medium/two-factor.png)
+
+![More Terminals](https://www.bastillion.io/images/screenshots/medium/terminals.png)
+
+![Manage Systems](https://www.bastillion.io/images/screenshots/medium/manage_systems.png)
+
+![Manage Users](https://www.bastillion.io/images/screenshots/medium/manage_users.png)
+
+![Define SSH Keys](https://www.bastillion.io/images/screenshots/medium/manage_keys.png)
+
+![Disable SSH Keys](https://www.bastillion.io/images/screenshots/medium/disable_keys.png)
 
 ---
 
