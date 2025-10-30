@@ -27,12 +27,6 @@
         <Logger name="io.bastillion.manage.control.LoginAudit" level="info" additivity="false">
             <AppenderRef ref="console"/>
         </Logger>
-        <Logger name="io.bastillion.manage.control.AuthKeysKtrl" level="debug" additivity="false">
-            <AppenderRef ref="console"/>
-        </Logger>
-        <Logger name="io.bastillion.manage.util.SSHUtil" level="debug" additivity="false">
-            <AppenderRef ref="console"/>
-        </Logger>
         <Root level="warn">
             <AppenderRef ref="console"/>
         </Root>
