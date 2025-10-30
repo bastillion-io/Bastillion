@@ -40,7 +40,7 @@ public class SSHUtil {
     public static final int KEY_LENGTH = StringUtils.isNumeric(AppConfig.getProperty("sshKeyLength"))
             ? Integer.parseInt(AppConfig.getProperty("sshKeyLength")) : 4096;
 
-    public static final String DEFAULT_USER_KEY_TYPE = AppConfig.getProperty("defaultUserKeyType", "rsa");
+    public static final String DEFAULT_USER_KEY_TYPE = AppConfig.getProperty("defaultUserKeyType", "ed25519");
     public static final boolean ALLOW_USER_KEY_TYPE_SELECTION =
             "true".equals(AppConfig.getProperty("allowUserKeyTypeSelection", "false"));
 
