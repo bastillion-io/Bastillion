@@ -1,9 +1,8 @@
 ![Build](https://github.com/bastillion-io/Bastillion/actions/workflows/github-build.yml/badge.svg)
 ![CodeQL](https://github.com/bastillion-io/Bastillion/actions/workflows/codeql-analysis.yml/badge.svg)
 
-![Bastillion logo](https://www.bastillion.io/images/bastillion_40x40.png)
-
-# Bastillion
+![Bastillion](https://www.bastillion.io/images/bastillion_40x40.png) Bastillion
+======
 
 **A modern, web-based SSH console and key management tool.**
 
