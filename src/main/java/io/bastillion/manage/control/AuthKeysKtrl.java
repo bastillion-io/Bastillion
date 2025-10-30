@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -45,6 +46,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.EnumSet;
 import java.util.List;
+import org.apache.commons.io.FileUtils;
 
 /**
  * Controller to manage SSH key generation, validation, and distribution.
@@ -215,7 +217,144 @@ public class AuthKeysKtrl extends BaseKontroller {
         return null;
     }
 
-    /* ------------------------- Validation ------------------------- */
+    /**
+     * generates public private key from passphrase
+     *
+     * @param username username to set in public key comment
+     * @param keyname  keyname to set in public key comment
+     * @return public key
+     */
+    public String generateUserKey(String username, String keyname) throws ServletException {
+        String pubKey;
+        String comment = username + "@" + keyname;
+        
+        // For Ed25519 and Ed448 keys, use ssh-keygen command to generate keys
+        // This is a workaround for JSch limitations with Ed25519/Ed448 key generation
+        if ("ed25519".equals(SSHUtil.KEY_TYPE) || "ed448".equals(SSHUtil.KEY_TYPE)) {
+            try {
+                log.debug("Starting Ed25519/Ed448 key generation using ssh-keygen");
+                
+                // Create temporary files for the keys and passphrase
+                File tempDir = new File(System.getProperty("java.io.tmpdir"));
+                log.debug("Using temp directory: " + tempDir.getAbsolutePath());
+                
+                File privateKeyFile = File.createTempFile("bastillion_user_", ".key", tempDir);
+                File publicKeyFile = new File(privateKeyFile.getAbsolutePath() + ".pub");
+                File passphraseFile = File.createTempFile("passphrase", ".tmp", tempDir);
+                
+                log.debug("Created temp files: " + 
+                          "privateKey=" + privateKeyFile.getAbsolutePath() + ", " +
+                          "publicKey=" + publicKeyFile.getAbsolutePath());
+                
+                // Write passphrase to file
+                FileUtils.writeStringToFile(passphraseFile, publicKey.getPassphrase(), "UTF-8");
+                
+                // Build the ssh-keygen command
+                String keyTypeArg = "ed25519".equals(SSHUtil.KEY_TYPE) ? "ed25519" : "ed448";
+                String[] cmd = {
+                    "ssh-keygen", 
+                    "-t", keyTypeArg,
+                    "-f", privateKeyFile.getAbsolutePath(),
+                    "-N", publicKey.getPassphrase(),
+                    "-C", comment
+                };
+                
+                log.debug("Executing ssh-keygen command: " + String.join(" ", cmd));
+                
+                // Execute the command
+                Process process = Runtime.getRuntime().exec(cmd);
+                
+                // Capture error output
+                StringBuilder errorOutput = new StringBuilder();
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        errorOutput.append(line).append("\n");
+                    }
+                }
+                
+                int exitCode = process.waitFor();
+                log.debug("ssh-keygen exit code: " + exitCode);
+                
+                // Check if the command was successful
+                if (exitCode != 0) {
+                    log.error("ssh-keygen error output: " + errorOutput.toString());
+                    throw new IOException("Failed to generate " + keyTypeArg + " key pair. Exit code: " + exitCode);
+                }
+                
+                // Check if files were created
+                log.debug("Checking if key files were created: " + 
+                          "privateKey exists=" + privateKeyFile.exists() + ", " +
+                          "publicKey exists=" + publicKeyFile.exists());
+                
+                // Read the generated keys
+                String privateKey = FileUtils.readFileToString(privateKeyFile, "UTF-8");
+                pubKey = FileUtils.readFileToString(publicKeyFile, "UTF-8");
+                
+                log.debug("Read key files: " + 
+                          "privateKey length=" + privateKey.length() + ", " +
+                          "publicKey length=" + pubKey.length());
+                
+                // Set private key in session
+                try {
+                    getRequest().getSession().setAttribute(PVT_KEY, EncryptionUtil.encrypt(privateKey));
+                    log.debug("Private key encrypted and stored in session");
+                } catch (GeneralSecurityException ex) {
+                    log.error(ex.toString(), ex);
+                    throw new ServletException(ex.toString(), ex);
+                }
+                
+                // Clean up temporary files
+                privateKeyFile.delete();
+                publicKeyFile.delete();
+                passphraseFile.delete();
+                
+                log.debug("Temporary files deleted");
+                log.info("Generated " + keyTypeArg + " user key pair using ssh-keygen");
+            } catch (IOException | InterruptedException ex) {
+                log.error(ex.toString(), ex);
+                if (ex instanceof InterruptedException) {
+                    Thread.currentThread().interrupt();
+                }
+                throw new ServletException(ex.toString(), ex);
+            }
+        } else {
+            // For other key types, use JSch's built-in key generation
+            try {
+                //set key type
+                int type = KeyPair.RSA;
+                if ("dsa".equals(SSHUtil.KEY_TYPE)) {
+                    type = KeyPair.DSA;
+                } else if ("ecdsa".equals(SSHUtil.KEY_TYPE)) {
+                    type = KeyPair.ECDSA;
+                }
+                
+                JSch jsch = new JSch();
+                KeyPair keyPair = KeyPair.genKeyPair(jsch, type, SSHUtil.KEY_LENGTH);
+
+                OutputStream os = new ByteArrayOutputStream();
+                keyPair.writePrivateKey(os, publicKey.getPassphrase().getBytes());
+                //set private key
+                try {
+                    getRequest().getSession().setAttribute(PVT_KEY, EncryptionUtil.encrypt(os.toString()));
+                } catch (GeneralSecurityException ex) {
+                    log.error(ex.toString(), ex);
+                    throw new ServletException(ex.toString(), ex);
+                }
+
+                os = new ByteArrayOutputStream();
+                keyPair.writePublicKey(os, comment);
+                pubKey = os.toString();
+
+                keyPair.dispose();
+            } catch (JSchException ex) {
+                log.error(ex.toString(), ex);
+                throw new ServletException(ex.toString(), ex);
+            }
+        }
+
+        return pubKey;
+    }
 
     @Validate(input = "/admin/view_keys.html")
     public void validateSavePublicKeys() throws ServletException {
