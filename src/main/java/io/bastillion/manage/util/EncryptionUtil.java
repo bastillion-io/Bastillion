@@ -233,27 +233,13 @@ public class EncryptionUtil {
 
         // Legacy CBC (v1) with serialized salt+iv+ciphertext under the classic headers.
         if (pem.contains(PEM_BEGIN_V1)) {
-            try {
-                String b64 = between(pem, PEM_BEGIN_V1, PEM_END_V1);
-                byte[] all = java.util.Base64.getMimeDecoder().decode(b64);
-                if (all.length < 16 + 16 + 16) throw new GeneralSecurityException("Invalid v1 envelope");
-
-                byte[] salt = new byte[16];
-                byte[] iv = new byte[16];
-                byte[] ct = new byte[all.length - 32];
-
-                System.arraycopy(all, 0, salt, 0, 16);
-                System.arraycopy(all, 16, iv, 0, 16);
-                System.arraycopy(all, 32, ct, 0, ct.length);
-
-                SecretKeySpec aesKey = deriveAesKey(passphrase, salt);
-                Cipher cipher = Cipher.getInstance(T_CBC);
-                cipher.init(Cipher.DECRYPT_MODE, aesKey, new IvParameterSpec(iv));
-                byte[] pt = cipher.doFinal(ct);
-                return new String(pt, StandardCharsets.UTF_8);
-            } catch (GeneralSecurityException e) {
-                throw new GeneralSecurityException("Failed to decrypt legacy CBC PEM", e);
-            }
+            // Deprecated: v1 pem envelopes used AES/CBC/PKCS5Padding, which is insecure.
+            // For security, legacy CBC-encrypted PEMs are no longer supported.
+            // Please migrate legacy PEM data to a supported format (e.g., using AES/GCM/NoPadding).
+            throw new GeneralSecurityException(
+                "Legacy PEM envelopes encrypted with AES/CBC/PKCS5Padding are no longer supported due to security risks. " +
+                "Please migrate data to a supported format (AES/GCM/NoPadding)."
+            );
         }
 
         throw new GeneralSecurityException("Unrecognized PEM envelope");
