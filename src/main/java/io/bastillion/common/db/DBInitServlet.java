@@ -19,9 +19,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -39,7 +39,7 @@ import java.util.Scanner;
 @WebServlet(name = "DBInitServlet",
         urlPatterns = {"/config"},
         loadOnStartup = 1)
-public class DBInitServlet extends javax.servlet.http.HttpServlet {
+public class DBInitServlet extends jakarta.servlet.http.HttpServlet {
 
     private static final Logger log = LoggerFactory.getLogger(DBInitServlet.class);
 

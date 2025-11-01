@@ -12,9 +12,10 @@ import io.bastillion.manage.db.UserProfileDB;
 import io.bastillion.manage.model.Auth;
 import io.bastillion.manage.model.User;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jetty.jaas.callback.ObjectCallback;
-import org.eclipse.jetty.jaas.spi.LdapLoginModule;
-import org.eclipse.jetty.jaas.spi.UserInfo;
+
+import org.eclipse.jetty.ee10.jaas.callback.ObjectCallback;
+import org.eclipse.jetty.ee10.jaas.spi.AbstractLoginModule;
+import org.eclipse.jetty.ee10.jaas.spi.LdapLoginModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -136,7 +137,7 @@ public class ExternalAuthUtil {
 
                         LdapLoginModule loginModule = (LdapLoginModule) module;
                         loginModule.initialize(loginContext.getSubject(), callbackHandler, state, appEntry.getOptions());
-                        UserInfo userInfo = loginModule.getUserInfo(auth.getUsername());
+                        AbstractLoginModule.JAASUser userInfo = loginModule.getUser(auth.getUsername());
 
                         //fetch assigned roles
                         userInfo.fetchRoles();
@@ -162,7 +163,7 @@ public class ExternalAuthUtil {
                         String roleObjectClass = (String) field.get(loginModule);
 
                         //all attributes for user
-                        field = LdapLoginModule.LDAPUserInfo.class.getDeclaredField("attributes");
+                        field = LdapLoginModule.LDAPBindingUser.class.getDeclaredField("attributes");
                         field.setAccessible(true);
                         Attributes userAttributes = (Attributes) field.get(userInfo);
 
@@ -207,7 +208,7 @@ public class ExternalAuthUtil {
                         }
 
                         //assign profiles for user
-                        UserProfileDB.assignProfilesToUser(con, user.getId(), allRoles, userInfo.getRoleNames());
+                        UserProfileDB.assignProfilesToUser(con, user.getId(), allRoles, userInfo.doFetchRoles());
 
                         dirContext.close();
                         loginModule.commit();

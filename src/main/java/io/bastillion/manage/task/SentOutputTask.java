@@ -13,7 +13,7 @@ import io.bastillion.manage.util.SessionOutputUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.websocket.Session;
+import jakarta.websocket.Session;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.sql.Connection;

@@ -11,24 +11,25 @@ import io.bastillion.manage.model.HostSystem;
 import io.bastillion.manage.model.SchSession;
 import io.bastillion.manage.util.DBUtils;
 import io.bastillion.manage.util.SSHUtil;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import loophole.mvc.annotation.Kontrol;
 import loophole.mvc.annotation.MethodType;
 import loophole.mvc.annotation.Model;
 import loophole.mvc.base.BaseKontroller;
 import loophole.mvc.filter.SecurityFilter;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload2.core.DiskFileItemFactory;
+import org.apache.commons.fileupload2.core.FileItem;
+import org.apache.commons.fileupload2.jakarta.JakartaServletFileUpload;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.AgeFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -74,22 +75,39 @@ public class UploadAndPushKtrl extends BaseKontroller {
 
     @Kontrol(path = "/admin/uploadSubmit", method = MethodType.POST)
     public String uploadSubmit() {
-
         String retVal = "/admin/upload_result.html";
-        try {
 
+        try {
             Long userId = AuthUtil.getUserId(getRequest().getSession());
 
-            List<FileItem> multiparts = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(getRequest());
-            for (FileItem item : multiparts) {
+            // Factory for handling disk-based file items
+            DiskFileItemFactory factory = DiskFileItemFactory.builder().get();
+
+            // Jakarta-compatible file upload handler
+            JakartaServletFileUpload uploadHandler = new JakartaServletFileUpload(factory);
+
+            // Parse the request
+            List<FileItem> items = uploadHandler.parseRequest(getRequest());
+
+            for (FileItem item : items) {
                 if (!item.isFormField()) {
                     uploadFileName = new File(item.getName()).getName();
+
                     File path = new File(UPLOAD_PATH);
-                    if (!path.exists()) {
-                        path.mkdirs();
+                    if (!path.exists() && !path.mkdirs()) {
+                        throw new IOException("Failed to create upload directory: " + path);
                     }
-                    upload = new File(UPLOAD_PATH + File.separator + uploadFileName);
-                    item.write(upload);
+
+                    upload = new File(path, uploadFileName);
+
+                    // Use NIO stream copy
+                    try (var input = item.getInputStream()) {
+                        java.nio.file.Files.copy(
+                                input,
+                                upload.toPath(),
+                                java.nio.file.StandardCopyOption.REPLACE_EXISTING
+                        );
+                    }
                 } else {
                     pushDir = item.getString();
                 }
@@ -99,15 +117,17 @@ public class UploadAndPushKtrl extends BaseKontroller {
             hostSystemList = SystemStatusDB.getAllSystemStatus(userId);
 
         } catch (Exception ex) {
-            log.error(ex.toString(), ex);
+            log.error("Upload failed", ex);
             retVal = "/admin/upload.html";
         }
-        //reset csrf token back since it's already set on page load
+
+        // reset csrf token since it's already set on page load
         getRequest().getSession().setAttribute(SecurityFilter._CSRF,
                 getRequest().getParameter(SecurityFilter._CSRF));
 
         return retVal;
     }
+
 
     @Kontrol(path = "/admin/push", method = MethodType.POST)
     public String push() throws ServletException {
