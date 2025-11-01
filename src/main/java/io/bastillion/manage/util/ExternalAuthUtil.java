@@ -13,9 +13,9 @@ import io.bastillion.manage.model.Auth;
 import io.bastillion.manage.model.User;
 import org.apache.commons.lang3.StringUtils;
 
-import org.eclipse.jetty.ee10.jaas.callback.ObjectCallback;
-import org.eclipse.jetty.ee10.jaas.spi.AbstractLoginModule;
-import org.eclipse.jetty.ee10.jaas.spi.LdapLoginModule;
+import org.eclipse.jetty.jaas.callback.ObjectCallback;
+import org.eclipse.jetty.jaas.spi.AbstractLoginModule;
+import org.eclipse.jetty.jaas.spi.LdapLoginModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,71 +1,21 @@
-<?xml version="1.0"?>
-<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_0.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN"
+        "http://www.eclipse.org/jetty/configure_10_0.dtd">
 
-<!-- ============================================================= -->
-<!-- Configure a TLS (SSL) Context Factory                         -->
-<!-- This configuration must be used in conjunction with jetty.xml -->
-<!-- and either jetty-https.xml or jetty-spdy.xml (but not both)   -->
-<!-- ============================================================= -->
-<Configure id="sslContextFactory" class="org.eclipse.jetty.util.ssl.SslContextFactory">
-  <Set name="KeyStorePath"><Property name="jetty.base" default="." />/<Property name="jetty.keystore" default="src/test/resources/keystore"/></Set>
-  <Set name="KeyStorePassword"><Property name="jetty.keystore.password" default="OBF:1ini1l4t1mfb1x8616dq20zj16cw1x8o1mbb1l8h1ikw"/></Set>
-  <Set name="KeyManagerPassword"><Property name="jetty.keymanager.password" default="OBF:1ini1l4t1mfb1x8616dq20zj16cw1x8o1mbb1l8h1ikw"/></Set>
-  <Set name="EndpointIdentificationAlgorithm">HTTPS</Set>
-  <Set name="NeedClientAuth"><Property name="jetty.ssl.needClientAuth" default="false"/></Set>
-  <Set name="WantClientAuth"><Property name="jetty.ssl.wantClientAuth" default="false"/></Set>
-  <Set name="ExcludeCipherSuites">
-    <Array type="String">
-      <Item>TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA</Item>
-      <Item>TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA</Item>
-      <Item>SSL_RSA_WITH_3DES_EDE_CBC_SHA</Item>
-      <Item>TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA</Item>
-      <Item>TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA</Item>
-      <Item>SSL_RSA_WITH_DES_CBC_SHA</Item>
-      <Item>SSL_DHE_RSA_WITH_DES_CBC_SHA</Item>
-      <Item>SSL_DHE_DSS_WITH_DES_CBC_SHA</Item>
-      <Item>SSL_RSA_EXPORT_WITH_RC4_40_MD5</Item>
-      <Item>SSL_RSA_EXPORT_WITH_DES40_CBC_SHA</Item>
-      <Item>SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA</Item>
-      <Item>SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA</Item>
-      <Item>SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA</Item>
-      <Item>TLS_DHE_RSA_WITH_AES_256_CBC_SHA256</Item>
-      <Item>TLS_DHE_DSS_WITH_AES_256_CBC_SHA256</Item>
-      <Item>TLS_DHE_RSA_WITH_AES_256_CBC_SHA</Item>
-      <Item>TLS_DHE_DSS_WITH_AES_256_CBC_SHA</Item>
-      <Item>TLS_DHE_RSA_WITH_AES_128_CBC_SHA256</Item>
-      <Item>TLS_DHE_DSS_WITH_AES_128_CBC_SHA256</Item>
-      <Item>TLS_DHE_RSA_WITH_AES_128_CBC_SHA</Item>
-      <Item>TLS_DHE_DSS_WITH_AES_128_CBC_SHA</Item>
-      <Item>TLS_RSA_WITH_AES_256_GCM_SHA384</Item>
-      <Item>TLS_RSA_WITH_AES_128_GCM_SHA256</Item>
-      <Item>TLS_RSA_WITH_AES_256_CBC_SHA256</Item>
-      <Item>TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA</Item>
-      <Item>TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA</Item>
-      <Item>TLS_RSA_WITH_AES_256_CBC_SHA</Item>
-      <Item>TLS_RSA_WITH_AES_256_CBC_SHA</Item>
-      <Item>TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA</Item>
-      <Item>TLS_ECDH_RSA_WITH_AES_256_CBC_SHA</Item>
-      <Item>TLS_RSA_WITH_AES_128_CBC_SHA256</Item>
-      <Item>TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA</Item>
-      <Item>TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA</Item>
-      <Item>TLS_RSA_WITH_AES_128_CBC_SHA</Item>
-      <Item>TLS_RSA_WITH_AES_128_CBC_SHA</Item>
-      <Item>TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA</Item>
-      <Item>TLS_ECDH_RSA_WITH_AES_128_CBC_SHA</Item>
-    </Array>
-  </Set>
+<Configure id="sslContextFactory" class="org.eclipse.jetty.util.ssl.SslContextFactory$Server">
+    <Set name="keyStorePath"><Property name="jetty.base" default="." />/<Property name="jetty.keystore" default="src/test/resources/keystore"/></Set>
+    <Set name="KeyStorePassword">OBF:1xtv1wu61y0q1wnl1w1s1v901wu61saj1xtt1t331xtp1sar1wu81v9m1w1q1wml1y101wu81xtn</Set>
+    <Set name="KeyManagerPassword">OBF:1xtv1wu61y0q1wnl1w1s1v901wu61saj1xtt1t331xtp1sar1wu81v9m1w1q1wml1y101wu81xtn</Set>
 
-  <!-- =========================================================== -->
-  <!-- Create a TLS specific HttpConfiguration based on the        -->
-  <!-- common HttpConfiguration defined in jetty.xml               -->
-  <!-- Add a SecureRequestCustomizer to extract certificate and    -->
-  <!-- session information                                         -->
-  <!-- =========================================================== -->
-  <New id="sslHttpConfig" class="org.eclipse.jetty.server.HttpConfiguration">
-    <Arg><Ref refid="httpConfig"/></Arg>
-    <Call name="addCustomizer">
-      <Arg><New class="org.eclipse.jetty.server.SecureRequestCustomizer"/></Arg>
-    </Call>
-  </New>
+    <Set name="endpointIdentificationAlgorithm">HTTPS</Set>
+    <Set name="needClientAuth"><Property name="jetty.ssl.needClientAuth" default="false"/></Set>
+    <Set name="wantClientAuth"><Property name="jetty.ssl.wantClientAuth" default="false"/></Set>
 
+
+    <New id="sslHttpConfig" class="org.eclipse.jetty.server.HttpConfiguration">
+        <Arg><Ref refid="httpConfig"/></Arg>
+        <Call name="addCustomizer">
+            <Arg><New class="org.eclipse.jetty.server.SecureRequestCustomizer"/></Arg>
+        </Call>
+    </New>
 </Configure>
