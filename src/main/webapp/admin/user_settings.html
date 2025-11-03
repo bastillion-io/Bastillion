@@ -6,7 +6,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta th:replace="_res/inc/header">
+    <meta th:replace="~{_res/inc/header}">
     <style>
             form table {
                 width: 350px;
@@ -17,12 +17,12 @@
 </head>
 
 <body>
-<div th:replace="_res/inc/navigation"></div>
+<div th:replace="~{_res/inc/navigation}"></div>
 <div class="container">
     <div th:if="${!@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled || #strings.equals(session.authType,'BASIC')}">
         <h3>Set Admin Password</h3>
         <p>Change your administrative password below</p>
-        <div th:replace="_res/inc/errors"></div>
+        <div th:replace="~{_res/inc/errors}"></div>
         <form th:action="@{/admin/passwordSubmit.ktrl}" method="post" autocomplete="off">
             <table>
                 <tr>

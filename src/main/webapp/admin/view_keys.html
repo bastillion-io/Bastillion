@@ -7,7 +7,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <meta th:replace="_res/inc/header">
+    <meta th:replace="~{_res/inc/header}">
 
     <script th:inline="javascript">
         /*<![CDATA[*/
@@ -115,7 +115,7 @@
 </head>
 
 <body>
-<div th:replace="_res/inc/navigation"></div>
+<div th:replace="~{_res/inc/navigation}"></div>
 <div class="container">
     <form id="viewKeys" th:action="@{/admin/viewKeys.ktrl}" method="get">
         <input type="hidden" name="_csrf" th:value="${session._csrf}">
@@ -211,7 +211,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <div th:replace="_res/inc/errors"></div>
+                        <div th:replace="~{_res/inc/errors}"></div>
                         <form th:action="@{/admin/savePublicKey.ktrl}" id="save_public_key_form_add"
                               method="post" autocomplete="off">
                             <input type="hidden" name="_csrf" th:value="${session._csrf}">
@@ -338,7 +338,7 @@
                         </div>
                         <div class="modal-body">
                             <div class="row">
-                                <div th:replace="_res/inc/errors"></div>
+                                <div th:replace="~{_res/inc/errors}"></div>
                                 <form th:action="@{/admin/savePublicKey.ktrl}"
                                       th:id="'save_public_key_form_edit_' + ${p.id}"
                                       method="post" autocomplete="off">

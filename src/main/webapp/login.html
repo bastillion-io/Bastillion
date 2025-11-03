@@ -7,7 +7,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <meta th:replace="_res/inc/header">
+    <meta th:replace="~{_res/inc/header}">
     <title>Bastillion - Login</title>
 </head>
 
@@ -26,7 +26,7 @@
 </div>
 <div class="container">
     <h3></h3>
-    <div th:replace="_res/inc/errors"></div>
+    <div th:replace="~{_res/inc/errors}"></div>
     <form id="loginSubmit" th:action="@{/loginSubmit.ktrl}" method="post"
           autocomplete="off">
         <table>

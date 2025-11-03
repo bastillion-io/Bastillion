@@ -7,7 +7,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head th:with="isFrame=true">
-    <meta th:replace="_res/inc/header">
+    <meta th:replace="~{_res/inc/header}">
 
     <script th:inline="javascript">
         /*<![CDATA[*/
@@ -31,7 +31,7 @@
 
 <body>
 <template th:if="${idList!= null && !idList.empty}" th:remove="tag">
-    <div th:replace="_res/inc/errors"></div>
+    <div th:replace="~{_res/inc/errors}"></div>
     <form id="upload" th:action="@{/admin/uploadSubmit.ktrl} + '?_csrf=' + ${session._csrf}"
           method="post" enctype="multipart/form-data">
         <table>

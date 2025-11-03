@@ -7,7 +7,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <meta th:replace="_res/inc/header">
+    <meta th:replace="~{_res/inc/header}">
     <meta http-equiv="refresh" th:attr="content='0;url=' + @{'/login.ktrl?_csrf=' +  ${session._csrf}}">
     <title>Bastillion</title>
 </head>

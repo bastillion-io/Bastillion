@@ -8,7 +8,7 @@
 
 <head>
 
-    <meta th:replace="_res/inc/header">
+    <meta th:replace="~{_res/inc/header}">
 
     <script th:inline="javascript">
         /*<![CDATA[*/
@@ -69,7 +69,7 @@
 </head>
 
 <body>
-<div th:replace="_res/inc/navigation"></div>
+<div th:replace="~{_res/inc/navigation}"></div>
 <div class="container">
     <form id="viewScripts" th:action="@{/admin/viewScripts.ktrl}" method="get">
         <input type="hidden" name="_csrf" th:value="${session._csrf}">
@@ -131,7 +131,7 @@
                 </div>
                 <div class="modal-body">
                     <div class="row">
-                        <div th:replace="_res/inc/errors"></div>
+                        <div th:replace="~{_res/inc/errors}"></div>
                         <form th:action="@{/admin/saveScript.ktrl}" method="post" class="save_script_form_add">
                             <input type="hidden" name="_csrf" th:value="${session._csrf}">
                             <table>
@@ -178,7 +178,7 @@
                     </div>
                     <div class="modal-body">
                         <div class="row">
-                            <div th:replace="_res/inc/errors"></div>
+                            <div th:replace="~{_res/inc/errors}"></div>
                             <form th:action="@{/admin/saveScript.ktrl}" method="post"
                                   th:id="'save_script_form_edit_' + ${s.id}">
                                 <input type="hidden" name="_csrf" th:value="${session._csrf}">

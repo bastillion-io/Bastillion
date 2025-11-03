@@ -7,7 +7,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <meta th:replace="_res/inc/header">
+    <meta th:replace="~{_res/inc/header}">
     <script th:inline="javascript">
         /*<![CDATA[*/
 
@@ -531,7 +531,7 @@
 </template>
 <template th:if="${(systemList == null || systemList.empty) && pendingSystemStatus.id == null}"
           th:remove="tag">
-    <div th:replace="_res/inc/navigation"></div>
+    <div th:replace="~{_res/inc/navigation}"></div>
     <div class="container">
         <h3>Terminals</h3>
         <p class="error">No sessions could be created</p>
