@@ -214,7 +214,7 @@
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-                <version>11.0.15</version>
+                <version>11.0.26</version>
                 <configuration>
                     <jettyXmls>
                         <jettyXml>${basedir}/src/test/resources/jetty.xml</jettyXml>
