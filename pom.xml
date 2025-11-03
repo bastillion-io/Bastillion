@@ -109,12 +109,12 @@
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>11.0.24</version>
+            <version>11.0.26</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-webapp</artifactId>
-            <version>11.0.25</version>
+            <version>11.0.26</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
