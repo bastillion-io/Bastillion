@@ -38,11 +38,10 @@ pkg install security/bastillion
 
 ## Requirements
 
-**Java (OpenJDK or Oracle JDK 21+)**
+**Java (OpenJDK or Oracle JDK 21+) — Now built for Java 21 and Jakarta EE 11**
 ```bash
 apt-get install openjdk-21-jdk
 ```
-
 (Oracle JDK downloads: http://www.oracle.com/technetwork/java/javase/downloads/index.html)
 
 **Install an authenticator** for 2-factor authentication:
@@ -159,8 +158,13 @@ Specify a custom SSH key pair or let Bastillion generate its own on startup:
 # Regenerate and import SSH keys
 resetApplicationSSHKey=true
 
-# SSH key type ('rsa', 'ecdsa', 'ed25519')
-sshKeyType=rsa
+# SSH key type ('rsa', 'ecdsa', 'ed25519', or 'ed448')
+# Supported options:
+#   rsa    - Classic, widely compatible (configurable length, default 4096)
+#   ecdsa  - Faster, smaller keys (P-256/384/521 curves)
+#   ed25519 - Default and recommended (≈ RSA-4096, secure and fast)
+#   ed448  - Extra-strong (≈ RSA-8192, slower and less supported)
+sshKeyType=ed25519
 
 # Private key
 privateKey=/Users/you/.ssh/id_rsa
