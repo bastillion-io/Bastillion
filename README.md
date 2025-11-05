@@ -73,10 +73,39 @@ set JAVA_HOME=C:\path\to\jdk
 set PATH=%JAVA_HOME%\bin;%PATH%
 ```
 
-Start:
+### Start Bastillion
+
+Start in **foreground (interactive)** mode:
 ```bash
-./startBastillion.sh      # Linux / macOS
-startBastillion.bat       # Windows
+./startBastillion.sh
+```
+- Runs Bastillion directly in your terminal.
+- Keeps `stdin` active (so database password prompts work).
+- Logs are shown only in the terminal — not written to file.
+- Stop with **Ctrl + C**.
+
+Start in **daemon (background)** mode:
+```bash
+./startBastillion.sh --daemon
+```
+- Runs Bastillion as a background service.
+- Enables Jetty’s built-in **console-capture** module — logs are written automatically to  
+  `jetty/logs/YYYY_MM_DD.jetty.log`.
+- The app continues running after you close the terminal.
+
+Enable debug output:
+```bash
+./startBastillion.sh -d
+```
+
+Combine options:
+```bash
+./startBastillion.sh --daemon -d
+```
+
+Stop Bastillion:
+```bash
+./stopBastillion.sh
 ```
 
 Open: `https://<server-ip>:8443`
