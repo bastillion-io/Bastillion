@@ -31,7 +31,7 @@ Read more: [Implementing a Trusted Third-Party System for Secure Shell](https://
 ---
 ## Installation Options
 **Free:** https://github.com/bastillion-io/Bastillion/releases  
-**AWS Marketplace:** https://aws.amazon.com/marketplace/pp/Loophole-LLC-Bastillion/B076PNFPCL
+**AWS Marketplace:** https://aws.amazon.com/marketplace/pp/prodview-x2imjupuydrj6
 
 ---
 
