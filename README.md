@@ -21,51 +21,47 @@ Read more: [Implementing a Trusted Third-Party System for Secure Shell](https://
 
 ---
 
-## Quick Start
+## 🚀 What’s New
+- Upgraded to **Java 21** and **Jakarta EE 11**
+- Full support for **Ed25519** (default) and **Ed448** SSH keys
+- New **daemon mode** for Jetty startup (`--daemon`)
+- Updated dependencies for improved security and performance
 
-Get the latest release:  
-https://github.com/bastillion-io/Bastillion/releases
 
-Or from AWS Marketplace:  
-https://aws.amazon.com/marketplace/pp/Loophole-LLC-Bastillion/B076PNFPCL
-
-FreeBSD:
-```bash
-pkg install security/bastillion
-```
+---
+## Installation Options
+**Free:** https://github.com/bastillion-io/Bastillion/releases  
+**AWS Marketplace:** https://aws.amazon.com/marketplace/pp/Loophole-LLC-Bastillion/B076PNFPCL
 
 ---
 
-## Requirements
+## Prerequisites
 
-**Java (OpenJDK or Oracle JDK 21+) — Now built for Java 21 and Jakarta EE 11**
+### Java 21 (OpenJDK or Oracle JDK)
 ```bash
 apt-get install openjdk-21-jdk
 ```
-(Oracle JDK downloads: http://www.oracle.com/technetwork/java/javase/downloads/index.html)
+> Oracle JDK download: http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
-**Install an authenticator** for 2-factor authentication:
+### Authenticator (for 2FA)
 
-| Application          | Android                                                                                             | iOS                                                                        |
-|----------------------|-----------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------|
-| Authy                | [Google Play](https://play.google.com/store/apps/details?id=com.authy.authy)                        | [iTunes](https://itunes.apple.com/us/app/authy/id494168017)                |
-| Google Authenticator | [Google Play](https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2) | [iTunes](https://itunes.apple.com/us/app/google-authenticator/id388497605) |
+| Application | Android | iOS |
+|--------------|----------|-----|
+| **Authy** | [Google Play](https://play.google.com/store/apps/details?id=com.authy.authy) | [iTunes](https://itunes.apple.com/us/app/authy/id494168017) |
+| **Google Authenticator** | [Google Play](https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2) | [iTunes](https://itunes.apple.com/us/app/google-authenticator/id388497605) |
 
 ---
 
-## Run with Jetty
+## Run with Jetty (Bundled)
 
-Download the latest bundle:  
-https://github.com/bastillion-io/Bastillion/releases
+Download: https://github.com/bastillion-io/Bastillion/releases
 
-Set environment variables:
-
+### Set Environment Variables
 **Linux / macOS**
 ```bash
 export JAVA_HOME=/path/to/jdk
 export PATH=$JAVA_HOME/bin:$PATH
 ```
-
 **Windows**
 ```cmd
 set JAVA_HOME=C:\path\to\jdk
@@ -73,41 +69,29 @@ set PATH=%JAVA_HOME%\bin;%PATH%
 ```
 
 ### Start Bastillion
-
-Start in **foreground (interactive)** mode:
+Foreground (interactive):
 ```bash
 ./startBastillion.sh
 ```
-- Runs Bastillion directly in your terminal.
-- Keeps `stdin` active (so database password prompts work).
-- Logs are shown only in the terminal — not written to file.
-- Stop with **Ctrl + C**.
 
-Start in **daemon (background)** mode:
+Daemon (background):
 ```bash
 ./startBastillion.sh --daemon
 ```
-- Runs Bastillion as a background service.
-- Enables Jetty’s built-in **console-capture** module — logs are written automatically to  
-  `jetty/logs/YYYY_MM_DD.jetty.log`.
-- The app continues running after you close the terminal.
+Logs are stored in `jetty/logs/YYYY_MM_DD.jetty.log`.
 
 Enable debug output:
 ```bash
 ./startBastillion.sh -d
 ```
 
-Combine options:
-```bash
-./startBastillion.sh --daemon -d
-```
-
-Stop Bastillion:
+Stop:
 ```bash
 ./stopBastillion.sh
 ```
 
-Open: `https://<server-ip>:8443`
+Access in browser:  
+`https://<server-ip>:8443` (or for AMI instances: `https://<instance-ip>:443`)
 
 Default credentials:
 ```
