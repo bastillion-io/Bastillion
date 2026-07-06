@@ -173,6 +173,7 @@
             </tbody>
         </table>
     </div>
+    <p class="error" th:if="${sortedSet.itemList == null || sortedSet.itemList.empty}">No systems defined yet</p>
     <button class="btn btn-secondary add_btn spacer spacer-bottom"  data-bs-toggle="modal"
             data-bs-target="#add_dialog">Add System
     </button>

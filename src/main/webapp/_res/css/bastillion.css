@@ -7,6 +7,26 @@
 html {
     font-size: 16px;
     font-weight: 500;
+    scrollbar-color: var(--bs-border-color) transparent;
+}
+
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--bs-border-color);
+    border-radius: 6px;
+}
+
+::selection {
+    background: var(--bastillion-accent);
+    color: #0d1117;
 }
 
 body {
@@ -334,6 +354,11 @@ a.btn {
     background-color: var(--bs-tertiary-bg);
 }
 
+.scrollableTable tbody tr:hover, .uploadScrollableTable tbody tr:hover {
+    /* !important needed: even rows get an inline background-color from JS zebra-striping */
+    background-color: #33393f !important;
+}
+
 table.floatThead-table {
     border-top: none;
     border-bottom: none;
@@ -403,7 +428,24 @@ table.floatThead-table {
     text-decoration: none;
 }
 
+/* tone down Bootstrap's light/secondary subtle-bg contrast for a gentler stripe */
+.list-group-item-light {
+    background-color: var(--bs-tertiary-bg);
+}
+
+.list-group-item-secondary {
+    background-color: #1a1d20;
+}
+
+.list-group-item-action:hover {
+    background-color: #33393f;
+}
+
 .modal-body .modal-content .row {
     width: 75%;
     margin-left: 15px;
+}
+
+.modal-content {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .55);
 }
