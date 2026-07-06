@@ -4,7 +4,7 @@
  *    Licensed under The Prosperity Public License 3.0.0
  */-->
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" data-bs-theme="dark">
 
 <head th:with="isFrame=true">
     <meta th:replace="~{_res/inc/header}">
@@ -28,7 +28,7 @@
                         }
                     });
                 }
-                $(".uploadScrollableTable tr:even").css("background-color", "#e0e0e0");
+                $(".uploadScrollableTable tr:even").css("background-color", "#2b3035");
 
                 [# th:if="${pendingSystemStatus != null && pendingSystemStatus.id != null}"]
                     //set scroll
@@ -51,7 +51,6 @@
     <style>
             body {
                 padding: 10px;
-                background: #FFFFFF;
             }
 
     </style>

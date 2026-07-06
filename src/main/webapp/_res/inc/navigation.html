@@ -3,7 +3,7 @@
  *
  *    Licensed under The Prosperity Public License 3.0.0
  */-->
-<div class="navbar navbar-light bg-light fixed-top navbar-expand-md" role="navigation"
+<div class="navbar navbar-dark bg-dark fixed-top navbar-expand" role="navigation"
      xmlns:th="http://www.thymeleaf.org">
     <div class="container">
         <div class="navbar-brand">
@@ -13,10 +13,7 @@
             </div>
             Bastillion
         </div>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarCollapse">
+        <div class="navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item"><a th:href="'../admin/menu.html?_csrf=' + ${session._csrf}"
                                         class="nav-link">Home</a>
