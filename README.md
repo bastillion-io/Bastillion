@@ -1,23 +1,37 @@
 ![Build](https://github.com/bastillion-io/Bastillion/actions/workflows/github-build.yml/badge.svg)
 ![CodeQL](https://github.com/bastillion-io/Bastillion/actions/workflows/codeql-analysis.yml/badge.svg)
 
-![Bastillion](https://www.bastillion.io/images/bastillion_40x40.png)
+![Bastillion](src/main/webapp/img/bastillion_40x40.png)
 
 # Bastillion
 
-**A modern, web-based SSH console and key management tool.**
+**A modern, web-based SSH console and SSH key management tool.**
 
-Bastillion gives you a clean, browser-based way to manage SSH access across all your systems—like a bastion host with a friendly dashboard.
+Bastillion gives you a clean, browser-based way to manage SSH access across all your systems—like a bastion host with a friendly dashboard. It does two things:
+
+1. **SSH key management** — Bastillion holds its own SSH keypair and pushes/rotates public keys across the hosts you register, so individual users never need to hold or manage long-lived keys to those systems themselves.
+2. **Web-based SSH terminal** — once a host is registered, authorized users can open one or more live terminal sessions to it directly from the browser, with commands optionally broadcast across every open session at once.
 
 You can:
 - Log in with **2-factor authentication** (Authy or Google Authenticator)
-- Manage and distribute **SSH public keys**
-- Launch secure web shells and **share commands** across sessions
+- Manage and distribute **SSH public keys**, and disable/rotate them centrally
+- Launch secure multi-session web shells and **share commands** across sessions
 - Stack **TLS/SSL over SSH** for extra protection
 
-Read more: [Implementing a Trusted Third-Party System for Secure Shell](https://www.bastillion.io/docs/using/whitepaper).
+![Terminals](docs/screenshots/web-terminal.png)
 
-![Terminals](https://www.bastillion.io/images/screenshots/medium/terminals.png)
+---
+
+## How It Works
+
+Bastillion sits between your users and the systems they need to reach, acting as a trusted third party rather than a simple password vault:
+
+1. **Bastillion generates its own SSH keypair** on first startup (see the console output, or `Settings` in the UI).
+2. An **admin registers a host system** (user, host, port, and the path to that host's `authorized_keys` file) under **Manage → Systems**.
+3. Bastillion authenticates to the host **once** with a password or passphrase you supply, then **pushes its own public key** into that host's `authorized_keys`. From then on it connects using that key — no stored passwords.
+4. Admins group systems into **Profiles**, then assign **Users** to those profiles under **Manage → Profiles**, controlling exactly who can reach which hosts.
+5. Assigned users open **Secure Shell → Terminals**, pick one or more systems, and get live, resizable, xterm-based terminals in the browser — with the option to broadcast the same keystrokes to every open terminal at once, or run a saved **Composite Script** across all of them.
+6. Keys can be centrally **disabled or rotated** at any time under **Manage SSH Keys**, immediately revoking access without touching the target systems by hand.
 
 ---
 
@@ -249,19 +263,59 @@ enableInternalAudit=true
 
 ## Screenshots
 
-![Login](https://www.bastillion.io/images/screenshots/medium/login.png)
+### Login & Access
 
-![Two-Factor](https://www.bastillion.io/images/screenshots/medium/two-factor.png)
+**Login** — username/password, with an optional OTP access code field for 2FA.
 
-![Terminals](https://www.bastillion.io/images/screenshots/medium/terminals.png)
+![Login](docs/screenshots/login.png)
 
-![Manage Systems](https://www.bastillion.io/images/screenshots/medium/manage_systems.png)
+**Two-Factor Setup** — scan the QR code with Authy or Google Authenticator to enable 2FA for an account.
 
-![Manage Users](https://www.bastillion.io/images/screenshots/medium/manage_users.png)
+![Two-Factor Setup](docs/screenshots/two-factor-setup.png)
 
-![Define SSH Keys](https://www.bastillion.io/images/screenshots/medium/manage_keys.png)
+**Main Menu** — the landing page after login, linking to system/profile/user management, terminals, scripts, and key management, scoped to what the logged-in user is allowed to see.
 
-![Disable SSH Keys](https://www.bastillion.io/images/screenshots/medium/disable_keys.png)
+![Main Menu](docs/screenshots/main-menu.png)
+
+### SSH Key Management
+
+**Manage Systems** — register a host (user, host, port, `authorized_keys` path). Bastillion authenticates once with a password/passphrase you provide, then pushes its own public key to the host — status flips to **Success** once the key is in place and subsequent connections are key-based only.
+
+![Manage Systems](docs/screenshots/manage-systems.png)
+
+**Manage Profiles** — group systems into named profiles that control access.
+
+![Manage Profiles](docs/screenshots/manage-profiles.png)
+
+**Assign Systems to a Profile** — pick which registered hosts belong to a profile.
+
+![Assign Systems](docs/screenshots/assign-systems.png)
+
+**Manage Users** — create accounts and assign them a user type; users are then linked to profiles to grant them access to specific systems.
+
+![Manage Users](docs/screenshots/manage-users.png)
+
+**View / Disable SSH Keys** — see every key in use across systems and users, and disable/rotate a key everywhere at once, forcing re-registration.
+
+![Manage SSH Keys](docs/screenshots/manage-ssh-keys.png)
+
+### Web-Based SSH Terminal
+
+**Terminals** — pick one or more systems (optionally filtered by profile) to open simultaneously.
+
+![Terminals](docs/screenshots/terminals-select.png)
+
+**Web Terminal** — a live, resizable xterm-based session per host; keystrokes can be broadcast to every open terminal at once for running the same command across multiple systems.
+
+![Web Terminal](docs/screenshots/web-terminal.png)
+
+**Composite Scripts** — save a script once and execute it across every selected terminal session.
+
+![Composite Scripts](docs/screenshots/composite-scripts.png)
+
+**User Settings** — change your password, customize the terminal color theme, and view the public key Bastillion uses to authenticate to registered systems.
+
+![User Settings](docs/screenshots/user-settings.png)
 
 ---
 
