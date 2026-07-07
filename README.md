@@ -1,47 +1,117 @@
 ![Build](https://github.com/bastillion-io/Bastillion/actions/workflows/github-build.yml/badge.svg)
 ![CodeQL](https://github.com/bastillion-io/Bastillion/actions/workflows/codeql-analysis.yml/badge.svg)
+![License](https://img.shields.io/badge/license-Prosperity%203.0.0-blue)
+![Java](https://img.shields.io/badge/Java-21-orange)
 
-![Bastillion](src/main/webapp/img/bastillion_40x40.png)
+<p align="center">
+  <img src="src/main/webapp/img/bastillion_40x40.png" alt="Bastillion">
+</p>
 
-# Bastillion
+<h1 align="center">Bastillion</h1>
+<p align="center"><strong>A modern, web-based SSH console and SSH key management tool.</strong></p>
 
-**A modern, web-based SSH console and SSH key management tool.**
+Bastillion gives you a clean, browser-based way to manage SSH access across all your
+systems — like a bastion host with a friendly dashboard. It does two things:
 
-Bastillion gives you a clean, browser-based way to manage SSH access across all your systems—like a bastion host with a friendly dashboard. It does two things:
+1. **SSH key management** — Bastillion holds its own SSH keypair and pushes/rotates public
+   keys across the hosts you register, so individual users never need to hold or manage
+   long-lived keys to those systems themselves.
+2. **Web-based SSH terminal** — once a host is registered, authorized users can open one or
+   more live terminal sessions to it directly from the browser, with commands optionally
+   broadcast across every open session at once (think tmux's synchronized panes, but for a
+   fleet of remote hosts instead of local panes).
 
-1. **SSH key management** — Bastillion holds its own SSH keypair and pushes/rotates public keys across the hosts you register, so individual users never need to hold or manage long-lived keys to those systems themselves.
-2. **Web-based SSH terminal** — once a host is registered, authorized users can open one or more live terminal sessions to it directly from the browser, with commands optionally broadcast across every open session at once (think tmux's synchronized panes, but for a fleet of remote hosts instead of local panes).
-
-You can:
 - Log in with **2-factor authentication** (Authy or Google Authenticator)
 - Manage and distribute **SSH public keys**, and disable/rotate them centrally
 - Launch secure multi-session web shells and **share commands** across sessions
+- Group systems into **Profiles** and control exactly who can reach what
+- Save and re-run **Composite Scripts** across a whole fleet at once
 - Stack **TLS/SSL over SSH** for extra protection
 
-![Terminals](docs/screenshots/web-terminal.png)
+![Multiple terminals broadcasting the same command to three hosts at once](docs/screenshots/web-terminal.png)
+<p align="center"><sub>Three real, independent SSH sessions — one command, typed once, run everywhere.</sub></p>
+
+---
+
+## Contents
+
+- [How It Works](#how-it-works)
+- [What's New](#-whats-new)
+- [Licensing](#licensing)
+- [Installation Options](#installation-options)
+- [Prerequisites](#prerequisites)
+- [Download and Run](#download-and-run)
+- [Build from Source](#build-from-source)
+- [TLS / HTTPS](#tls--https)
+- [Configuration](#configuration)
+- [More Screenshots](#more-screenshots)
+- [License](#license)
 
 ---
 
 ## How It Works
 
-Bastillion sits between your users and the systems they need to reach, acting as a trusted third party rather than a simple password vault:
+Bastillion sits between your users and the systems they need to reach, acting as a trusted
+third party rather than a simple password vault. Here's the whole lifecycle, end to end.
 
-1. **Bastillion generates its own SSH keypair** on first startup (see the console output, or `Settings` in the UI).
-2. An **admin registers a host system** (user, host, port, and the path to that host's `authorized_keys` file) under **Manage → Systems**.
-3. Bastillion authenticates to the host **once** with a password or passphrase you supply, then **pushes its own public key** into that host's `authorized_keys`. From then on it connects using that key — no stored passwords.
-4. Admins group systems into **Profiles**, then assign **Users** to those profiles under **Manage → Profiles**, controlling exactly who can reach which hosts.
-5. Assigned users open **Secure Shell → Terminals**, pick one or more systems, and get live, resizable, xterm-based terminals in the browser — with the option to broadcast the same keystrokes to every open terminal at once, or run a saved **Composite Script** across all of them.
-6. Keys can be centrally **disabled or rotated** at any time under **Manage SSH Keys**, immediately revoking access without touching the target systems by hand.
+### 1. Bastillion generates its own SSH keypair
+
+On first startup, before anything else, Bastillion generates an Ed25519 keypair for
+itself — this is the *one* key that ever gets pushed to your hosts. It's shown in the
+console output and always visible under **Settings**.
+
+### 2. Register a system
+
+An admin adds a host under **Manage → Systems** (user, host, port, and the path to that
+host's `authorized_keys` file). Bastillion authenticates **once** with a password or
+passphrase you supply, then pushes its own public key into that host's `authorized_keys`.
+From then on it connects using that key — no stored passwords, ever. Status flips to
+**Success** the moment the key is in place.
+
+![Manage Systems — three hosts registered, all showing Success status](docs/screenshots/manage-systems.png)
+
+### 3. Group systems into Profiles, assign Users
+
+Systems get grouped into named **Profiles** — think "Production," "Staging," "Database
+Tier." Users are then linked to profiles under **Manage → Users**, which is the only thing
+that controls who can reach what. Revoke a profile assignment and that access is gone
+immediately, no key rotation needed.
+
+![Assigning three systems to a Production profile](docs/screenshots/assign-systems.png)
+
+### 4. Open terminals — and broadcast to all of them at once
+
+Assigned users open **Secure Shell → Terminals**, pick one or more systems, and get live,
+resizable, xterm-based terminals in the browser, side by side. Type once, and it goes to
+every terminal marked active — the same keystroke, the same command, the same output shape,
+across as many hosts as you selected.
+
+![A health-check command broadcast to three terminals simultaneously, same output shape across all three](docs/screenshots/web-terminal.png)
+
+### 5. Save it as a Composite Script
+
+Anything you'd type interactively can be saved as a **Composite Script** and re-run later
+across a whole fleet with one click — no more pasting the same five commands into five
+terminals by hand.
+
+![A saved health-check script executing live across all three terminals](docs/screenshots/composite-scripts-running.png)
+
+### 6. Rotate or revoke keys centrally
+
+Because every host trusts the *same* application key (not one key per user), disabling it
+once under **Manage SSH Keys** revokes access everywhere immediately — no need to touch
+target systems by hand, no hunting down which server has which stale key.
+
+![Every SSH key in use, with a one-click Disable per key](docs/screenshots/manage-ssh-keys.png)
 
 ---
 
-## 🚀 What’s New
+## 🚀 What's New
 - **Licensing** — free at up to 3 systems, paid tiers available at [loophole.company/pricing.html](https://loophole.company/pricing.html) (see [Licensing](#licensing) below)
+- Runs as a **self-contained jar** (`java -jar`) with HTTPS out of the box — see [Download and Run](#download-and-run)
 - Upgraded to **Java 21** and **Jakarta EE 11**
 - Full support for **Ed25519** (default) and **Ed448** SSH keys
-- New **daemon mode** for Jetty startup (`--daemon`)
 - Updated dependencies for improved security and performance
-
 
 ---
 
@@ -54,12 +124,12 @@ before buying. A license raises that cap.
    (Starter/Team/Business — priced by system count). Payment redirects back and downloads a
    `.lic` file automatically.
 2. Open the `.lic` file and copy its contents (one line).
-3. Paste it into `licenseKey` in `BastillionConfig.properties`:
-   ```properties
-   licenseKey=<paste license file contents here>
+3. Set it via the `LICENSE_KEY` environment variable:
+   ```bash
+   export LICENSE_KEY=<paste license file contents here>
    ```
-   or set it via the `LICENSE_KEY` environment variable instead — useful for containers, and
-   takes precedence over the properties file.
+   or paste it into `licenseKey` in `BastillionConfig.properties` instead — the environment
+   variable takes precedence if both are set.
 4. Restart Bastillion. **Settings** shows the licensee, system cap, and expiry, with a
    warning starting 90 days before it expires.
 
@@ -67,6 +137,7 @@ Licenses are annual and don't auto-renew — no card kept on file. Buy again fro
 pricing page when you get the expiry warning.
 
 ---
+
 ## Installation Options
 **Free:** https://github.com/bastillion-io/Bastillion/releases
 
@@ -89,52 +160,25 @@ apt-get install openjdk-21-jdk
 
 ---
 
-## Run with Jetty (Bundled)
+## Download and Run
 
-Download: https://github.com/bastillion-io/Bastillion/releases
-
-### Set Environment Variables
-**Linux / macOS**
+Download the latest jar from [Releases](https://github.com/bastillion-io/Bastillion/releases):
 ```bash
-export JAVA_HOME=/path/to/jdk
-export PATH=$JAVA_HOME/bin:$PATH
-```
-**Windows**
-```cmd
-set JAVA_HOME=C:\path\to\jdk
-set PATH=%JAVA_HOME%\bin;%PATH%
+java -jar bastillion-<version>.jar
 ```
 
-### Start Bastillion
-Foreground (interactive):
-```bash
-./startBastillion.sh
-```
-
-Daemon (background):
-```bash
-./startBastillion.sh --daemon
-```
-Logs are stored in `jetty/logs/YYYY_MM_DD.jetty.log`.
-
-Enable debug output:
-```bash
-./startBastillion.sh -d
-```
-
-Stop:
-```bash
-./stopBastillion.sh
-```
-
-Access in browser:  
-`https://<server-ip>:8443` (or for AMI instances: `https://<instance-ip>:443`)
+Access in browser: `https://<server-ip>:8443` — see [TLS / HTTPS](#tls--https) below for the
+self-signed certificate Bastillion generates on first run.
 
 Default credentials:
 ```
 username: admin
 password: changeme
 ```
+
+Runs in the foreground; stop with Ctrl+C. For background/daemon operation use whatever your
+platform normally uses for a long-running Java process — `nohup java -jar ... &`, a systemd
+unit, a container, etc.
 
 ---
 
@@ -157,7 +201,7 @@ Or for local dev without repackaging on every change:
 mvn compile exec:java
 ```
 
-Listens on `https://localhost:8443` by default, same as the bundled release — see
+Listens on `https://localhost:8443` by default, same as the downloaded release above — see
 [TLS / HTTPS](#tls--https) below for how that certificate gets set up and how to use your
 own instead.
 
@@ -204,9 +248,8 @@ set), and is where any value Bastillion generates for you at first startup — l
 DB password — gets persisted. See `src/main/resources/BastillionConfig.properties` for the
 full list of settings and their defaults.
 
----
-
-## SSH Key Management
+<details>
+<summary><strong>SSH Key Management</strong></summary>
 
 ```bash
 # Disable key management (append instead of overwrite)
@@ -218,10 +261,10 @@ export AUTH_KEYS_REFRESH_INTERVAL=120
 # Force user key generation and strong passphrases
 export FORCE_USER_KEY_GENERATION=false
 ```
+</details>
 
----
-
-## Custom SSH Key Pair
+<details>
+<summary><strong>Custom SSH Key Pair</strong></summary>
 
 Specify a custom SSH key pair or let Bastillion generate its own on startup:
 
@@ -248,10 +291,10 @@ export DEFAULT_SSH_PASSPHRASE=myPa$$w0rd
 ```
 
 Once registered, you can drop these — the key pair is already stored in the database.
+</details>
 
----
-
-## Database Settings
+<details>
+<summary><strong>Database Settings</strong></summary>
 
 Embedded H2 example:
 ```bash
@@ -265,10 +308,10 @@ Remote H2 example:
 ```bash
 export DB_CONNECTION_URL=jdbc:h2:tcp://<host>:<port>/~/bastillion;CIPHER=AES;
 ```
+</details>
 
----
-
-## External Authentication (LDAP)
+<details>
+<summary><strong>External Authentication (LDAP)</strong></summary>
 
 Enable external auth:
 ```bash
@@ -312,12 +355,12 @@ ldap-ol-with-roles {
 };
 ```
 
-Admins are added upon first login and can be assigned system profiles.  
+Admins are added upon first login and can be assigned system profiles.
 Users are synced with profiles when their LDAP role names match Bastillion profiles.
+</details>
 
----
-
-## Auditing
+<details>
+<summary><strong>Auditing</strong></summary>
 
 Auditing is disabled by default.
 
@@ -327,68 +370,88 @@ Enable it in **log4j2.xml** by uncommenting:
 
 > https://github.com/bastillion-io/Bastillion/blob/master/src/main/resources/log4j2.xml#L19-L22
 
-Also enable in `BastillionConfig.properties`:
-```properties
-enableInternalAudit=true
+Also enable it:
+```bash
+export ENABLE_INTERNAL_AUDIT=true
 ```
+</details>
 
 ---
 
-## Screenshots
+## More Screenshots
 
-### Login & Access
+Login, 2FA enrollment, the main menu, and a few other screens not already shown in
+[How It Works](#how-it-works) above.
+
+<table>
+<tr>
+<td width="50%">
 
 **Login** — username/password, with an optional OTP access code field for 2FA.
 
 ![Login](docs/screenshots/login.png)
 
-**Two-Factor Setup** — scan the QR code with Authy or Google Authenticator to enable 2FA for an account.
+</td>
+<td width="50%">
+
+**Two-Factor Setup** — scan the QR code with Authy or Google Authenticator.
 
 ![Two-Factor Setup](docs/screenshots/two-factor-setup.png)
 
-**Main Menu** — the landing page after login, linking to system/profile/user management, terminals, scripts, and key management, scoped to what the logged-in user is allowed to see.
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+**Main Menu** — scoped to what the logged-in user is allowed to see.
 
 ![Main Menu](docs/screenshots/main-menu.png)
 
-### SSH Key Management
-
-**Manage Systems** — register a host (user, host, port, `authorized_keys` path). Bastillion authenticates once with a password/passphrase you provide, then pushes its own public key to the host — status flips to **Success** once the key is in place and subsequent connections are key-based only.
-
-![Manage Systems](docs/screenshots/manage-systems.png)
+</td>
+<td width="50%">
 
 **Manage Profiles** — group systems into named profiles that control access.
 
 ![Manage Profiles](docs/screenshots/manage-profiles.png)
 
-**Assign Systems to a Profile** — pick which registered hosts belong to a profile.
+</td>
+</tr>
+<tr>
+<td width="50%">
 
-![Assign Systems](docs/screenshots/assign-systems.png)
-
-**Manage Users** — create accounts and assign them a user type; users are then linked to profiles to grant them access to specific systems.
+**Manage Users** — create accounts and assign them a user type; users are then linked to
+profiles to grant access to specific systems.
 
 ![Manage Users](docs/screenshots/manage-users.png)
 
-**View / Disable SSH Keys** — see every key in use across systems and users, and disable/rotate a key everywhere at once, forcing re-registration.
+</td>
+<td width="50%">
 
-![Manage SSH Keys](docs/screenshots/manage-ssh-keys.png)
-
-### Web-Based SSH Terminal
-
-**Terminals** — pick one or more systems (optionally filtered by profile) to open simultaneously.
+**Terminals** — pick one or more systems (optionally filtered by profile) to open
+simultaneously.
 
 ![Terminals](docs/screenshots/terminals-select.png)
 
-**Web Terminal** — a live, resizable xterm-based session per host; keystrokes can be broadcast to every open terminal at once for running the same command across multiple systems.
+</td>
+</tr>
+<tr>
+<td width="50%">
 
-![Web Terminal](docs/screenshots/web-terminal.png)
-
-**Composite Scripts** — save a script once and execute it across every selected terminal session.
+**Composite Scripts** — save a script once and execute it across every selected terminal.
 
 ![Composite Scripts](docs/screenshots/composite-scripts.png)
 
-**User Settings** — change your password, customize the terminal color theme, and view the public key Bastillion uses to authenticate to registered systems.
+</td>
+<td width="50%">
+
+**User Settings** — change your password, pick a terminal theme, and view the public key
+Bastillion uses to authenticate to registered systems.
 
 ![User Settings](docs/screenshots/user-settings.png)
+
+</td>
+</tr>
+</table>
 
 ---
 
@@ -410,5 +473,5 @@ Bastillion is available under the **Prosperity Public License**.
 ## Author
 
 **Loophole, LLC**
-Sean Kavanagh 
+Sean Kavanagh
 [sean@loophole.company](mailto:sean@loophole.company)
