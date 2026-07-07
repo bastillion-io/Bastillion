@@ -24,7 +24,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,8 +32,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
 /**
  * Base controller class that initializes all controllers and is called through
@@ -50,44 +47,20 @@ public class BaseKontroller {
     // Load scan packages for controllers that have the Kontrol method annotation
     static {
         for (String packageNm : PACKAGES.split(",")) {
-            if (packageNm.isEmpty()) {
-                continue;
-            }
             ClassLoader classLoader = BaseKontroller.class.getClassLoader();
             String path = packageNm.replace('.', '/');
             try {
                 Enumeration<URL> resources = classLoader.getResources(path);
+                List<File> dirs = new ArrayList<>();
                 while (resources.hasMoreElements()) {
                     URL resource = resources.nextElement();
-                    if ("jar".equals(resource.getProtocol())) {
-                        // Running from a packaged jar: this package's .class files are jar
-                        // entries, not files on disk - walk the jar instead of File.listFiles().
-                        loadKontrollersFromJar(resource, path);
-                    } else {
-                        loadKontrollers(new File(resource.getFile()), packageNm);
-                    }
+                    dirs.add(new File(resource.getFile()));
+                }
+                for (File directory : dirs) {
+                    loadKontrollers(directory, packageNm);
                 }
             } catch (ClassNotFoundException | IOException ex) {
                 log.error(ex.toString(), ex);
-            }
-        }
-    }
-
-    private static void loadKontrollersFromJar(URL resource, String path) throws IOException, ClassNotFoundException {
-        JarURLConnection conn = (JarURLConnection) resource.openConnection();
-        try (JarFile jarFile = conn.getJarFile()) {
-            Enumeration<JarEntry> entries = jarFile.entries();
-            while (entries.hasMoreElements()) {
-                JarEntry entry = entries.nextElement();
-                String name = entry.getName();
-                if (entry.isDirectory() || !name.startsWith(path + "/") || !name.endsWith(".class")) {
-                    continue;
-                }
-                String className = name.substring(0, name.length() - ".class".length()).replace('/', '.');
-                Class<?> clazz = Class.forName(className);
-                if (BaseKontroller.class.equals(clazz.getSuperclass())) {
-                    ktrlList.add(clazz);
-                }
             }
         }
     }

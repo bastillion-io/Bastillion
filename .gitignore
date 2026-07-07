@@ -26,6 +26,10 @@ licensing/*.lic
 # Local/prod secrets #
 .env-prod
 .env-local
+bastillion.jceks
+
+# Build artifact left at repo root by maven-shade-plugin #
+/dependency-reduced-pom.xml
 
 licensing
 .claude

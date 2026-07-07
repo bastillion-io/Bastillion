@@ -12,11 +12,17 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.util.Map;
+import java.util.Properties;
 
 /**
- * Utility to look up configurable commands and resources
+ * Utility to look up configurable commands and resources. Environment variables are
+ * preferred (see getProperty) - BastillionConfig.properties / CONFIG_DIR exist mainly for
+ * backward compatibility and for values that get persisted at runtime (e.g. a
+ * DBInitServlet-generated dbPassword).
  */
 public class AppConfig {
 
@@ -25,9 +31,26 @@ public class AppConfig {
 
     public static final String CONFIG_DIR = StringUtils.isNotEmpty(System.getProperty("CONFIG_DIR"))
             ? System.getProperty("CONFIG_DIR").trim()
-            : AppConfig.class.getClassLoader().getResource(".").getPath();
+            : defaultConfigDir();
 
     private static FileBasedConfigurationBuilder<PropertiesConfiguration> builder;
+
+    // Bundled defaults (BastillionConfig.properties as shipped on the classpath - always
+    // present, read-only). Final fallback in getProperty() so unset-anywhere properties
+    // (e.g. maxActive) still resolve without requiring a file on disk.
+    private static final Properties DEFAULTS = loadDefaults();
+
+    private static Properties loadDefaults() {
+        Properties defaults = new Properties();
+        try (InputStream in = AppConfig.class.getClassLoader().getResourceAsStream("BastillionConfig.properties")) {
+            if (in != null) {
+                defaults.load(in);
+            }
+        } catch (IOException ex) {
+            log.error("Error loading bundled default configuration", ex);
+        }
+        return defaults;
+    }
 
     static {
         try {
@@ -37,9 +60,12 @@ public class AppConfig {
                 moveIfAbsent("jaas.conf");
             }
 
-            // Build Commons Configuration 2.x-compatible builder
+            // Build Commons Configuration 2.x-compatible builder. allowFailOnInit=true so a
+            // missing BastillionConfig.properties (the expected case when running purely
+            // off environment variables) starts an empty in-memory config instead of
+            // throwing - getProperty() falls back to env vars regardless.
             Parameters params = new Parameters();
-            builder = new FileBasedConfigurationBuilder<>(PropertiesConfiguration.class)
+            builder = new FileBasedConfigurationBuilder<>(PropertiesConfiguration.class, null, true)
                     .configure(params.properties()
                             .setFileName(CONFIG_DIR + "BastillionConfig.properties")
                             .setEncoding("UTF-8"));
@@ -51,13 +77,31 @@ public class AppConfig {
         }
     }
 
+    /**
+     * Running unshaded (mvn compile exec:java), classpath resources sit in a real directory
+     * on disk and that's used as-is, matching historical target/classes behavior. Running
+     * from the packaged jar there's no "." classpath entry (nothing to resolve a path
+     * against), so this falls back to the current working directory - fine given
+     * getProperty() prefers environment variables anyway; a properties file here is opt-in.
+     */
+    private static String defaultConfigDir() {
+        URL classpathDir = AppConfig.class.getClassLoader().getResource(".");
+        return classpathDir != null ? classpathDir.getPath() : System.getProperty("user.dir") + File.separator;
+    }
+
     private static void moveIfAbsent(String filename) throws IOException {
         File newFile = new File(CONFIG_DIR, filename);
-        if (!newFile.exists()) {
-            File oldFile = new File(AppConfig.class.getClassLoader().getResource(".").getPath(), filename);
-            if (oldFile.exists()) {
-                FileUtils.moveFile(oldFile, newFile);
-            }
+        if (newFile.exists()) {
+            return;
+        }
+        URL classpathDir = AppConfig.class.getClassLoader().getResource(".");
+        if (classpathDir == null) {
+            // Running from a jar: no on-disk "old location" to migrate from.
+            return;
+        }
+        File oldFile = new File(classpathDir.getPath(), filename);
+        if (oldFile.exists()) {
+            FileUtils.moveFile(oldFile, newFile);
         }
     }
 
@@ -76,9 +120,12 @@ public class AppConfig {
             property = System.getenv(toScreamingSnakeCase(name));
         }
 
-        // Fallback to properties file
+        // Fallback to properties file, then to the bundled defaults
         if (StringUtils.isEmpty(property)) {
             property = prop.getString(name);
+        }
+        if (StringUtils.isEmpty(property)) {
+            property = DEFAULTS.getProperty(name);
         }
 
         return property;

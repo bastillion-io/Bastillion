@@ -7,7 +7,7 @@
     <groupId>io.bastillion</groupId>
     <artifactId>bastillion</artifactId>
     <version>5.0.0-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <name>Bastillion</name>
 
     <licenses>
@@ -30,6 +30,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
+        <!-- Default for exec:java; override with -Dexec.mainClass=... -->
+        <exec.mainClass>io.bastillion.Main</exec.mainClass>
     </properties>
 
     <repositories>
@@ -109,6 +111,14 @@
             <artifactId>jsch</artifactId>
             <version>2.28.3</version>
         </dependency>
+        <!-- jsch needs BouncyCastle at runtime for Ed25519/Ed448 key generation
+             (com.jcraft.jsch.bc.KeyPairGenEdDSA); not a transitive dependency of jsch
+             itself, so it has to be declared explicitly. -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
+            <version>1.78.1</version>
+        </dependency>
 
         <!-- JSON -->
         <dependency>
@@ -151,38 +161,35 @@
             <version>3.5.4</version>
         </dependency>
 
-        <!-- Jetty 11 (Jakarta EE 9) -->
+        <!-- Jetty 11 (Jakarta EE 9), embedded - the app is its own server now (see
+             io.bastillion.Main), not a WAR deployed into an external container, so these
+             are compile-scope (bundled into the runnable jar) rather than provided. -->
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>12.1.10</version>
-            <scope>provided</scope>
+            <version>11.0.26</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-webapp</artifactId>
             <version>11.0.26</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-jaas</artifactId>
             <version>11.0.26</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty.websocket</groupId>
             <artifactId>websocket-jakarta-server</artifactId>
             <version>11.0.26</version>
-            <scope>provided</scope>
         </dependency>
 
-        <!-- Jakarta Servlet API (provided by Jetty 11) -->
+        <!-- Jakarta Servlet API -->
         <dependency>
             <groupId>org.eclipse.jetty.toolchain</groupId>
             <artifactId>jetty-jakarta-servlet-api</artifactId>
             <version>5.0.2</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -198,6 +205,12 @@
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>false</filtering>
+            </resource>
+            <!-- Served by io.bastillion.Main's embedded Jetty (WebAppContext resource base
+                 resolved from this classpath root), not a WAR - see that class for why. -->
+            <resource>
+                <directory>src/main/webapp</directory>
+                <targetPath>webapp</targetPath>
             </resource>
         </resources>
 
@@ -262,32 +275,51 @@
                 </configuration>
             </plugin>
 
-            <!-- WAR -->
+            <!-- Bundles all dependencies + io.bastillion.Main into one runnable jar, which
+                 is what `java -jar` (and Google Cloud Buildpacks) expect to run. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
+                <artifactId>maven-shade-plugin</artifactId>
                 <version>3.5.1</version>
-                <configuration>
-                    <failOnMissingWebXml>false</failOnMissingWebXml>
-                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>io.bastillion.Main</mainClass>
+                                </transformer>
+                                <!-- Jetty's Configuration classes are discovered via
+                                     META-INF/services; without this transformer, shading
+                                     would let one dependency's services file clobber another's. -->
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                            </transformers>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
-            <!-- Jetty 11 plugin for development -->
+            <!-- mvn compile exec:java — runs io.bastillion.Main directly for local dev, the
+                 same embedded-Jetty code path used in the packaged jar. -->
             <plugin>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-maven-plugin</artifactId>
-                <version>11.0.26</version>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.2.0</version>
                 <configuration>
-                    <jettyXmls>
-                        <jettyXml>${basedir}/src/test/resources/jetty.xml</jettyXml>
-                        <jettyXml>${basedir}/src/test/resources/jetty-ssl.xml</jettyXml>
-                        <jettyXml>${basedir}/src/test/resources/jetty-https.xml</jettyXml>
-                    </jettyXmls>
-                    <scan>-1</scan>
-                    <webApp>
-                        <contextPath>/</contextPath>
-                        <war>${project.build.directory}/${project.build.finalName}.war</war>
-                    </webApp>
+                    <mainClass>${exec.mainClass}</mainClass>
                 </configuration>
             </plugin>
         </plugins>

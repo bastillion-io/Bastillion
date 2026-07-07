@@ -10,7 +10,7 @@
 Bastillion gives you a clean, browser-based way to manage SSH access across all your systems—like a bastion host with a friendly dashboard. It does two things:
 
 1. **SSH key management** — Bastillion holds its own SSH keypair and pushes/rotates public keys across the hosts you register, so individual users never need to hold or manage long-lived keys to those systems themselves.
-2. **Web-based SSH terminal** — once a host is registered, authorized users can open one or more live terminal sessions to it directly from the browser, with commands optionally broadcast across every open session at once.
+2. **Web-based SSH terminal** — once a host is registered, authorized users can open one or more live terminal sessions to it directly from the browser, with commands optionally broadcast across every open session at once (think tmux's synchronized panes, but for a fleet of remote hosts instead of local panes).
 
 You can:
 - Log in with **2-factor authentication** (Authy or Google Authenticator)
@@ -145,28 +145,78 @@ Install Maven 3+:
 apt-get install maven
 ```
 
-Build and run:
+Build and run (packages a self-contained jar with an embedded Jetty server — see
+`io.bastillion.Main` — and runs it):
 ```bash
-mvn package jetty:run
+mvn package
+java -jar target/bastillion-5.0.0-SNAPSHOT.jar
 ```
+
+Or for local dev without repackaging on every change:
+```bash
+mvn compile exec:java
+```
+
+Listens on `https://localhost:8443` by default, same as the bundled release — see
+[TLS / HTTPS](#tls--https) below for how that certificate gets set up and how to use your
+own instead.
 
 > ⚠️ `mvn clean` will remove the H2 database and user data.
 
 ---
 
+## TLS / HTTPS
+
+Bastillion generates its own self-signed certificate on first startup and serves HTTPS —
+nothing to configure. Browsers will show a warning once (it's self-signed, not issued by a
+CA); click through it, same as you would for any other self-hosted appliance. The
+certificate and its password persist across restarts (`keystore/bastillion.p12` next to
+where you run it, password stored the same encrypted way as the database password).
+
+**Use your own certificate** (e.g. one from Let's Encrypt/certbot) by converting it to
+PKCS12 and pointing Bastillion at it:
+```bash
+openssl pkcs12 -export -in fullchain.pem -inkey privkey.pem \
+  -out bastillion.p12 -name bastillion -passout pass:changeit
+
+export KEYSTORE_PATH=/path/to/bastillion.p12
+export KEYSTORE_PASSWORD=changeit
+```
+
+**Behind a reverse proxy or load balancer that already terminates TLS** (nginx, Cloud
+Run, etc.) — disable Bastillion's own HTTPS and let it serve plain HTTP instead:
+```bash
+export TLS_ENABLED=false
+```
+Defaults to port 8080 in this mode; set `PORT` to change it.
+
+---
+
+## Configuration
+
+Every setting below can be set as an **environment variable** — take the property name and
+insert an underscore before each capital letter, then uppercase it: `licenseKey` →
+`LICENSE_KEY`, `dbUser` → `DB_USER`, `sshKeyType` → `SSH_KEY_TYPE`. This is the recommended
+way to configure Bastillion, especially in containers — no file to mount or bake in.
+
+`BastillionConfig.properties` still works as a fallback (env vars always win if both are
+set), and is where any value Bastillion generates for you at first startup — like a random
+DB password — gets persisted. See `src/main/resources/BastillionConfig.properties` for the
+full list of settings and their defaults.
+
+---
+
 ## SSH Key Management
 
-Settings live in `BastillionConfig.properties`:
-
-```properties
+```bash
 # Disable key management (append instead of overwrite)
-keyManagementEnabled=false
+export KEY_MANAGEMENT_ENABLED=false
 
 # authorized_keys refresh interval in minutes (no refresh for <=0)
-authKeysRefreshInterval=120
+export AUTH_KEYS_REFRESH_INTERVAL=120
 
 # Force user key generation and strong passphrases
-forceUserKeyGeneration=false
+export FORCE_USER_KEY_GENERATION=false
 ```
 
 ---
@@ -175,9 +225,9 @@ forceUserKeyGeneration=false
 
 Specify a custom SSH key pair or let Bastillion generate its own on startup:
 
-```properties
+```bash
 # Regenerate and import SSH keys
-resetApplicationSSHKey=true
+export RESET_APPLICATION_SSH_KEY=true
 
 # SSH key type ('rsa', 'ecdsa', 'ed25519', or 'ed448')
 # Supported options:
@@ -185,44 +235,44 @@ resetApplicationSSHKey=true
 #   ecdsa  - Faster, smaller keys (P-256/384/521 curves)
 #   ed25519 - Default and recommended (≈ RSA-4096, secure and fast)
 #   ed448  - Extra-strong (≈ RSA-8192, slower and less supported)
-sshKeyType=ed25519
+export SSH_KEY_TYPE=ed25519
 
 # Private key
-privateKey=/Users/you/.ssh/id_rsa
+export PRIVATE_KEY=/Users/you/.ssh/id_rsa
 
 # Public key
-publicKey=/Users/you/.ssh/id_rsa.pub
+export PUBLIC_KEY=/Users/you/.ssh/id_rsa.pub
 
 # Passphrase (leave blank if none)
-defaultSSHPassphrase=myPa$$w0rd
+export DEFAULT_SSH_PASSPHRASE=myPa$$w0rd
 ```
 
-Once registered, you can remove the key files and passphrase from the configuration.
+Once registered, you can drop these — the key pair is already stored in the database.
 
 ---
 
 ## Database Settings
 
 Embedded H2 example:
-```properties
-dbUser=bastillion
-dbPassword=p@$$w0rd!!
-dbDriver=org.h2.Driver
-dbConnectionURL=jdbc:h2:keydb/bastillion;CIPHER=AES;
+```bash
+export DB_USER=bastillion
+export DB_PASSWORD=p@$$w0rd!!
+export DB_DRIVER=org.h2.Driver
+export DB_CONNECTION_URL=jdbc:h2:keydb/bastillion;CIPHER=AES;
 ```
 
 Remote H2 example:
-```properties
-dbConnectionURL=jdbc:h2:tcp://<host>:<port>/~/bastillion;CIPHER=AES;
+```bash
+export DB_CONNECTION_URL=jdbc:h2:tcp://<host>:<port>/~/bastillion;CIPHER=AES;
 ```
 
 ---
 
 ## External Authentication (LDAP)
 
-Enable external auth in `BastillionConfig.properties`:
-```properties
-jaasModule=ldap-ol
+Enable external auth:
+```bash
+export JAAS_MODULE=ldap-ol
 ```
 
 Configure `jaas.conf`:
@@ -359,6 +409,6 @@ Bastillion is available under the **Prosperity Public License**.
 
 ## Author
 
-**Loophole, LLC — Sean Kavanagh**  
-Email: [sean.p.kavanagh6@gmail.com](mailto:sean.p.kavanagh6@gmail.com)  
-Instagram: [@spkavanagh6](https://www.instagram.com/spkavanagh6/)
+**Loophole, LLC**
+Sean Kavanagh 
+[sean@loophole.company](mailto:sean@loophole.company)
