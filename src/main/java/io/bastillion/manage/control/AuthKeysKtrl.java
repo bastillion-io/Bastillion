@@ -28,22 +28,13 @@ import org.slf4j.LoggerFactory;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.attribute.PosixFilePermission;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Base64;
-import java.util.EnumSet;
 import java.util.List;
 
 /**
@@ -296,9 +287,6 @@ public class AuthKeysKtrl extends BaseKontroller {
         }
 
         switch (keyType) {
-            case "dsa":
-                type = KeyPair.DSA;
-                break;
             case "ecdsa":
                 type = KeyPair.ECDSA;
                 break;

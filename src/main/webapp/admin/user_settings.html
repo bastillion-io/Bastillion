@@ -7,16 +7,10 @@
 <html xmlns:th="http://www.thymeleaf.org" data-bs-theme="dark">
 <head>
     <meta th:replace="~{_res/inc/header}">
-    <style>
-            form table {
-                width: 350px;
-            }
-
-    </style>
     <title>Bastillion - Set Admin Password</title>
 </head>
 
-<body>
+<body class="user-settings">
 <div th:replace="~{_res/inc/navigation}"></div>
 <div class="container">
     <div th:if="${!@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled || #strings.equals(session.authType,'BASIC')}">
@@ -98,6 +92,36 @@
     <h3>Public Key</h3>
     <p>Public SSH Key used for application authentication when registering systems</p>
     <pre style="white-space:pre-wrap;" class="form-control" th:text="${publicKey}"></pre>
+
+    <template th:if="${#strings.equals(session.userType,'M')}" th:remove="tag">
+        <h3>License</h3>
+        <template th:if="${@io.bastillion.manage.util.LicenseUtil@isLicensed()}" th:remove="tag">
+            <p>Licensed to <strong th:text="${@io.bastillion.manage.util.LicenseUtil@getLicensee()}"></strong>
+                &mdash; up to <strong th:text="${@io.bastillion.manage.util.LicenseUtil@getMaxSystems()}"></strong> systems.</p>
+            <p th:if="${@io.bastillion.manage.util.LicenseUtil@getExpiryDate() == null}">This license does not expire.</p>
+            <p th:unless="${@io.bastillion.manage.util.LicenseUtil@getExpiryDate() == null}"
+               th:class="${@io.bastillion.manage.util.LicenseUtil@isExpiringWithinDays(90)} ? 'warning' : ''">
+                Expires <span th:text="${@io.bastillion.manage.util.LicenseUtil@getExpiryDate()}"></span>
+                (<span th:text="${@io.bastillion.manage.util.LicenseUtil@getDaysUntilExpiry()}"></span> days remaining)
+                <span th:if="${@io.bastillion.manage.util.LicenseUtil@isExpiringWithinDays(90)}">&mdash; renew soon to avoid losing the ability to add new systems.</span>
+            </p>
+        </template>
+        <template th:unless="${@io.bastillion.manage.util.LicenseUtil@isLicensed()}" th:remove="tag">
+            <p th:if="${@io.bastillion.manage.util.LicenseUtil@isExpired()}" class="error">
+                Your license for <strong th:text="${@io.bastillion.manage.util.LicenseUtil@getLicensee()}"></strong>
+                expired on <span th:text="${@io.bastillion.manage.util.LicenseUtil@getExpiryDate()}"></span>.
+                Running unlicensed, capped at <span th:text="${@io.bastillion.manage.util.LicenseUtil@getMaxSystems()}"></span> systems.
+            </p>
+            <p th:unless="${@io.bastillion.manage.util.LicenseUtil@isExpired()}">
+                Unlicensed &mdash; capped at <strong th:text="${@io.bastillion.manage.util.LicenseUtil@getMaxSystems()}"></strong> systems.
+            </p>
+        </template>
+        <p>
+            <a class="btn btn-secondary" href="https://loophole.company/pricing.html" target="_blank" rel="noopener">
+                <span th:text="${@io.bastillion.manage.util.LicenseUtil@isLicensed()} ? 'Upgrade or Renew License' : 'Purchase a License'"></span>
+            </a>
+        </p>
+    </template>
 </div>
 </body>
 

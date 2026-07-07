@@ -6,7 +6,6 @@
 package io.bastillion.manage.util;
 
 import io.bastillion.common.util.AppConfig;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,17 +78,6 @@ public class KeyStoreUtil {
     }
 
     /**
-     * get secret entry for alias
-     *
-     * @param alias keystore secret alias
-     * @return secret string
-     */
-    public static String getSecretString(String alias) throws GeneralSecurityException {
-        KeyStore.SecretKeyEntry entry = (KeyStore.SecretKeyEntry) keyStore.getEntry(alias, new KeyStore.PasswordProtection(KEYSTORE_PASS));
-        return new String(entry.getSecretKey().getEncoded());
-    }
-
-    /**
      * set secret in keystore
      *
      * @param alias  keystore secret alias
@@ -113,19 +101,6 @@ public class KeyStoreUtil {
      */
     public static void setSecret(String alias, String secret) throws KeyStoreException {
         setSecret(alias, secret.getBytes());
-    }
-
-    /**
-     * delete existing and create new keystore
-     */
-    public static void resetKeyStore() throws IOException, GeneralSecurityException {
-        File file = new File(keyStoreFile);
-        if (file.exists()) {
-            FileUtils.forceDelete(file);
-        }
-
-        //create new keystore
-        initializeKeyStore();
     }
 
     /**

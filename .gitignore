@@ -18,3 +18,14 @@ src/main/webapp/_res/node/*
 .classpath
 .project
 .settings/*
+
+# Bastillion license signing key material - never commit #
+licensing/*.b64
+licensing/*.lic
+
+# Local/prod secrets #
+.env-prod
+.env-local
+
+licensing
+.claude

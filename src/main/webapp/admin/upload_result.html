@@ -48,15 +48,9 @@
             /*]]>*/
 
     </script>
-    <style>
-            body {
-                padding: 10px;
-            }
-
-    </style>
 </head>
 
-<body>
+<body class="iframe-body">
 
 <h4 th:text="'Pushing File: ' + ${uploadFileName}"></h4>
 <div class="uploadScrollWrapper" th:if="${hostSystemList!= null && !hostSystemList.empty}">

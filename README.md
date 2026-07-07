@@ -36,6 +36,7 @@ Bastillion sits between your users and the systems they need to reach, acting as
 ---
 
 ## 🚀 What’s New
+- **Licensing** — free at up to 3 systems, paid tiers available at [loophole.company/pricing.html](https://loophole.company/pricing.html) (see [Licensing](#licensing) below)
 - Upgraded to **Java 21** and **Jakarta EE 11**
 - Full support for **Ed25519** (default) and **Ed448** SSH keys
 - New **daemon mode** for Jetty startup (`--daemon`)
@@ -43,9 +44,31 @@ Bastillion sits between your users and the systems they need to reach, acting as
 
 
 ---
+
+## Licensing
+
+Bastillion runs unlicensed at up to **3 registered systems** — enough to try it for real
+before buying. A license raises that cap.
+
+1. Buy a license at **[loophole.company/pricing.html](https://loophole.company/pricing.html)**
+   (Starter/Team/Business — priced by system count). Payment redirects back and downloads a
+   `.lic` file automatically.
+2. Open the `.lic` file and copy its contents (one line).
+3. Paste it into `licenseKey` in `BastillionConfig.properties`:
+   ```properties
+   licenseKey=<paste license file contents here>
+   ```
+   or set it via the `LICENSE_KEY` environment variable instead — useful for containers, and
+   takes precedence over the properties file.
+4. Restart Bastillion. **Settings** shows the licensee, system cap, and expiry, with a
+   warning starting 90 days before it expires.
+
+Licenses are annual and don't auto-renew — no card kept on file. Buy again from the same
+pricing page when you get the expiry warning.
+
+---
 ## Installation Options
-**Free:** https://github.com/bastillion-io/Bastillion/releases  
-**AWS Marketplace:** https://aws.amazon.com/marketplace/pp/prodview-x2imjupuydrj6
+**Free:** https://github.com/bastillion-io/Bastillion/releases
 
 ---
 

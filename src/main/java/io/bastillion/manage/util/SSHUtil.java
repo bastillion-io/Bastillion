@@ -108,7 +108,6 @@ public class SSHUtil {
 
             int type = KeyPair.ED25519;
             if ("rsa".equalsIgnoreCase(KEY_TYPE)) type = KeyPair.RSA;
-            else if ("dsa".equalsIgnoreCase(KEY_TYPE)) type = KeyPair.DSA;
             else if ("ecdsa".equalsIgnoreCase(KEY_TYPE)) type = KeyPair.ECDSA;
             else if ("ed448".equalsIgnoreCase(KEY_TYPE)) type = KeyPair.ED448;
 
@@ -116,7 +115,7 @@ public class SSHUtil {
             JSch jsch = new JSch();
             KeyPair keyPair = KeyPair.genKeyPair(jsch, type, KEY_LENGTH);
 
-            if (type == KeyPair.RSA || type == KeyPair.DSA || type == KeyPair.ECDSA) {
+            if (type == KeyPair.RSA || type == KeyPair.ECDSA) {
                 keyPair.writePublicKey(tmpPub.toString(), comment);
                 keyPair.writePrivateKey(tmpPvt.toString(),
                         StringUtils.isNotBlank(passphrase) ? passphrase.getBytes(StandardCharsets.UTF_8) : null);
@@ -268,7 +267,7 @@ public class SSHUtil {
                     passphrase.getBytes());
 
             Session session = jsch.getSession(hostSystem.getUser(), hostSystem.getHost(), hostSystem.getPort());
-            if (StringUtils.isNotBlank(password)) session.setPassword(password);
+            if (StringUtils.isNotBlank(password)) session.setPassword(password.getBytes(StandardCharsets.UTF_8));
             session.setConfig("StrictHostKeyChecking", "no");
             session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
             session.setServerAliveInterval(SERVER_ALIVE_INTERVAL);
@@ -338,7 +337,7 @@ public class SSHUtil {
                     passphrase.getBytes());
 
             session = jsch.getSession(hostSystem.getUser(), hostSystem.getHost(), hostSystem.getPort());
-            if (password != null && !password.isEmpty()) session.setPassword(password);
+            if (password != null && !password.isEmpty()) session.setPassword(password.getBytes(StandardCharsets.UTF_8));
             session.setConfig("StrictHostKeyChecking", "no");
             session.setConfig("PreferredAuthentications", "publickey,keyboard-interactive,password");
             session.setServerAliveInterval(SERVER_ALIVE_INTERVAL);
@@ -431,17 +430,6 @@ public class SSHUtil {
             for (HostSystem s : ProfileSystemsDB.getSystemsByProfile(profileId)) {
                 s = SSHUtil.authAndAddPubKey(s, null, null);
                 SystemDB.updateSystem(s);
-            }
-        }
-    }
-
-    public static void distributePubKeysToUser(Long userId) throws SQLException, GeneralSecurityException {
-        if (keyManagementEnabled) {
-            for (Profile profile : UserProfileDB.getProfilesByUser(userId)) {
-                for (HostSystem s : ProfileSystemsDB.getSystemsByProfile(profile.getId())) {
-                    s = SSHUtil.authAndAddPubKey(s, null, null);
-                    SystemDB.updateSystem(s);
-                }
             }
         }
     }

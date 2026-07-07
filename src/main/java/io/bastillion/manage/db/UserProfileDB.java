@@ -84,11 +84,7 @@ public class UserProfileDB {
         ResultSet rs = stmt.executeQuery();
 
         while (rs.next()) {
-            Profile profile = new Profile();
-            profile.setId(rs.getLong("id"));
-            profile.setNm(rs.getString("nm"));
-            profile.setDesc(rs.getString("desc"));
-            profileList.add(profile);
+            profileList.add(ProfileDB.mapProfile(rs));
         }
         DBUtils.closeRs(rs);
         DBUtils.closeStmt(stmt);

@@ -367,22 +367,6 @@ public class PublicKeyDB {
         DBUtils.closeConn(con);
     }
 
-    /**
-     * deletes all public keys for a profile
-     *
-     * @param profileId profile id
-     */
-    public static void deleteProfilePublicKeys(Long profileId) throws SQLException, GeneralSecurityException {
-
-        Connection con = DBUtils.getConn();
-        PreparedStatement stmt = con.prepareStatement("delete from public_keys where profile_id=?");
-        stmt.setLong(1, profileId);
-        stmt.execute();
-        DBUtils.closeStmt(stmt);
-        DBUtils.closeConn(con);
-    }
-
-
     public static List<String> getPublicKeysForSystem(Long systemId) throws SQLException, GeneralSecurityException {
 
         Connection con = DBUtils.getConn();

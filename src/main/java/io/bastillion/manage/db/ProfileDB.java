@@ -69,12 +69,7 @@ public class ProfileDB {
         ResultSet rs = stmt.executeQuery();
 
         while (rs.next()) {
-            Profile profile = new Profile();
-            profile.setId(rs.getLong("id"));
-            profile.setNm(rs.getString("nm"));
-            profile.setDesc(rs.getString("desc"));
-            profileList.add(profile);
-
+            profileList.add(mapProfile(rs));
         }
         DBUtils.closeRs(rs);
         DBUtils.closeStmt(stmt);
@@ -98,12 +93,7 @@ public class ProfileDB {
         ResultSet rs = stmt.executeQuery();
 
         while (rs.next()) {
-            Profile profile = new Profile();
-            profile.setId(rs.getLong("id"));
-            profile.setNm(rs.getString("nm"));
-            profile.setDesc(rs.getString("desc"));
-            profileList.add(profile);
-
+            profileList.add(mapProfile(rs));
         }
         DBUtils.closeRs(rs);
         DBUtils.closeStmt(stmt);
@@ -142,16 +132,24 @@ public class ProfileDB {
         ResultSet rs = stmt.executeQuery();
 
         while (rs.next()) {
-            profile = new Profile();
-            profile.setId(rs.getLong("id"));
-            profile.setNm(rs.getString("nm"));
-            profile.setDesc(rs.getString("desc"));
+            profile = mapProfile(rs);
             profile.setHostSystemList(ProfileSystemsDB.getSystemsByProfile(con, profileId));
 
         }
         DBUtils.closeRs(rs);
         DBUtils.closeStmt(stmt);
 
+        return profile;
+    }
+
+    /**
+     * maps the current row of a profiles ResultSet to a Profile (id, nm, desc only)
+     */
+    static Profile mapProfile(ResultSet rs) throws SQLException {
+        Profile profile = new Profile();
+        profile.setId(rs.getLong("id"));
+        profile.setNm(rs.getString("nm"));
+        profile.setDesc(rs.getString("desc"));
         return profile;
     }
 

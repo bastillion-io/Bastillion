@@ -8,27 +8,11 @@
 
 <head th:with="isFrame=true">
     <meta th:replace="~{_res/inc/header}">
-
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        $(document).ready(function () {
-
-            $("#upload_btn").button().click(function () {
-                $('#upload').submit();
-            });
-        });
-        /*]]>*/
-    </script>
-    <style>
-            body {
-                padding: 10px;
-            }
-
-    </style>
+    <script th:src="@{/_res/js/upload.js}"></script>
     <title>Bastillion - Upload &amp; Push</title>
 </head>
 
-<body>
+<body class="iframe-body">
 <template th:if="${idList!= null && !idList.empty}" th:remove="tag">
     <div th:replace="~{_res/inc/errors}"></div>
     <form id="upload" th:action="@{/admin/uploadSubmit.ktrl} + '?_csrf=' + ${session._csrf}"

@@ -69,10 +69,11 @@ public class AppConfig {
             return null;
         }
 
-        // First check environment variables
+        // First check environment variables: exact name, then camelCase converted to
+        // SCREAMING_SNAKE_CASE (licenseKey -> LICENSE_KEY, dbUser -> DB_USER, ...)
         String property = System.getenv(name);
         if (StringUtils.isEmpty(property)) {
-            property = System.getenv(name.toUpperCase());
+            property = System.getenv(toScreamingSnakeCase(name));
         }
 
         // Fallback to properties file
@@ -81,6 +82,14 @@ public class AppConfig {
         }
 
         return property;
+    }
+
+    /**
+     * Converts a camelCase property name to the SCREAMING_SNAKE_CASE convention used for
+     * its environment variable override, e.g. licenseKey -> LICENSE_KEY, dbUser -> DB_USER.
+     */
+    static String toScreamingSnakeCase(String camelCase) {
+        return camelCase.replaceAll("([a-z0-9])([A-Z])", "$1_$2").toUpperCase();
     }
 
     public static String getProperty(String name, String defaultValue) {
@@ -96,11 +105,6 @@ public class AppConfig {
             }
         }
         return value;
-    }
-
-    public static void removeProperty(String name) throws ConfigurationException {
-        prop.clearProperty(name);
-        builder.save();
     }
 
     public static void updateProperty(String name, String value) throws ConfigurationException {

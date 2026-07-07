@@ -187,6 +187,7 @@ div.termwrapper div h6 {
 .term-header {
     font-size: 15px;
     white-space: nowrap;
+    cursor: move;
 }
 
 .top_nav {
@@ -448,4 +449,13 @@ table.floatThead-table {
 
 .modal-content {
     box-shadow: 0 12px 32px rgba(0, 0, 0, .55);
+}
+
+/* pages rendered inside an iframe (upload/push) don't need room for the fixed navbar */
+.iframe-body {
+    padding: 10px;
+}
+
+.user-settings table {
+    width: 350px;
 }

@@ -9,6 +9,7 @@ import io.bastillion.common.util.AppConfig;
 import org.apache.commons.dbcp2.BasicDataSource;
 
 import java.security.GeneralSecurityException;
+import java.time.Duration;
 
 /**
  * Class to create a pooling data source object using commons DBCP
@@ -68,7 +69,7 @@ public class DSPool {
         dataSource.setMaxTotal(MAX_ACTIVE);
         dataSource.setTestOnBorrow(TEST_ON_BORROW);
         dataSource.setMinIdle(MIN_IDLE);
-        dataSource.setMaxWaitMillis(MAX_WAIT);
+        dataSource.setMaxWait(Duration.ofMillis(MAX_WAIT));
         dataSource.setValidationQuery(validationQuery);
         dataSource.setUsername(user);
         dataSource.setPassword(password);

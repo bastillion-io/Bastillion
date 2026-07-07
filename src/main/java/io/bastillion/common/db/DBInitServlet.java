@@ -120,14 +120,14 @@ public class DBInitServlet extends jakarta.servlet.http.HttpServlet {
 
                 //if exists readfile to set default password
                 String salt = EncryptionUtil.generateSalt();
-                String defaultPassword = EncryptionUtil.hash("changeme" + salt);
+                String defaultPassword = EncryptionUtil.hashV2("changeme", salt);
 
                 //set password if running in EC2
                 File file = new File("/opt/bastillion/instance_id");
                 if (file.exists()) {
                     String str = FileUtils.readFileToString(file, "UTF-8");
                     if (StringUtils.isNotEmpty(str)) {
-                        defaultPassword = EncryptionUtil.hash(str.trim() + salt);
+                        defaultPassword = EncryptionUtil.hashV2(str.trim(), salt);
                     }
                 }
 
