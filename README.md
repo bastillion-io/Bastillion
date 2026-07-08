@@ -13,13 +13,14 @@
 Bastillion gives you a clean, browser-based way to manage SSH access across all your
 systems — like a bastion host with a friendly dashboard. It does two things:
 
-1. **SSH key management** — Bastillion holds its own SSH keypair and pushes/rotates public
-   keys across the hosts you register, so individual users never need to hold or manage
-   long-lived keys to those systems themselves.
-2. **Web-based SSH terminal** — once a host is registered, authorized users can open one or
+1. **Web-based SSH terminal** — once a host is registered, authorized users can open one or
    more live terminal sessions to it directly from the browser, with commands optionally
    broadcast across every open session at once (think tmux's synchronized panes, but for a
    fleet of remote hosts instead of local panes).
+
+2. **SSH key management** — Bastillion holds its own SSH keypair and pushes/rotates public
+      keys across the hosts you register, so individual users never need to hold or manage
+      long-lived keys to those systems themselves.
 
 - Log in with **2-factor authentication** (Authy or Google Authenticator)
 - Manage and distribute **SSH public keys**, and disable/rotate them centrally
