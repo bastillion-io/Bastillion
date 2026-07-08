@@ -103,7 +103,8 @@ target systems by hand, no hunting down which server has which stale key.
 - Runs as a **self-contained jar** (`java -jar`) with HTTPS out of the box — see [Download and Run](#download-and-run)
 - Upgraded to **Java 21** and **Jakarta EE 11**
 - Full support for **Ed25519** (default) and **Ed448** SSH keys
-- Updated dependencies for improved security and performance
+- **v4 → v5 migration tool** to bring over users, systems, keys, and audit logs from an existing instance — see [`tools/migrate`](tools/migrate/README.md)
+- Hardened with a **CSRF filter** and app-wide **security headers**
 
 ---
 
