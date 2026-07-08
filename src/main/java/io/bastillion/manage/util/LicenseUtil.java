@@ -136,8 +136,10 @@ public class LicenseUtil {
      * Verifies the Ed25519 signature on a license blob and parses its payload.
      * Returns null (rather than throwing) for a structurally malformed blob so a corrupt
      * config value degrades to the free tier instead of preventing startup.
+     * Package-private (not private) so tests can exercise the malformed-input paths without
+     * the real signing key (see tools/licensing/), which never ships with the source.
      */
-    private static ParsedLicense verifyAndParse(String blob) throws Exception {
+    static ParsedLicense verifyAndParse(String blob) throws Exception {
         int dot = blob.indexOf('.');
         if (dot < 0) {
             log.warn("Bastillion license key is malformed (missing signature separator)");
@@ -164,6 +166,16 @@ public class LicenseUtil {
             return null;
         }
 
+        return parsePayload(payloadBytes);
+    }
+
+    /**
+     * Parses an already signature-verified payload's "|"-delimited fields. Split out from
+     * {@link #verifyAndParse} so this pure field-parsing logic (field count, numeric/date
+     * parsing, the "none" perpetual-license sentinel) is directly testable without needing
+     * a real signed blob.
+     */
+    static ParsedLicense parsePayload(byte[] payloadBytes) {
         String[] fields = new String(payloadBytes, StandardCharsets.UTF_8).split("\\|", -1);
         if (fields.length != 5) {
             log.warn("Bastillion license key payload is malformed");
@@ -190,7 +202,7 @@ public class LicenseUtil {
         return parsed;
     }
 
-    private static class ParsedLicense {
+    static class ParsedLicense {
         String licenseId;
         String licensee;
         int maxSystems;

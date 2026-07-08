@@ -5,27 +5,12 @@
  */
 package io.bastillion.manage.util;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
-import java.nio.file.Files;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/**
- * AppConfig.CONFIG_DIR is a static final field resolved at class-load time, so it must be
- * pointed at a scratch directory before anything in this JVM run first touches AppConfig -
- * hence setting the system property here, before any @Test method references EncryptionUtil.
- */
 class EncryptionUtilTest {
-
-    @BeforeAll
-    static void useScratchConfigDir() throws IOException {
-        System.setProperty("CONFIG_DIR", Files.createTempDirectory("bastillion-test-config-")
-                .toAbsolutePath() + "/");
-    }
 
     @Test
     void verifyHashAcceptsCurrentPbkdf2Format() throws Exception {

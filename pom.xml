@@ -271,6 +271,11 @@
                 <configuration>
                     <systemPropertyVariables>
                         <MVC_CONTROLLER_PKGS>loophole.mvc.testctrl</MVC_CONTROLLER_PKGS>
+                        <!-- AppConfig.CONFIG_DIR is a static final field resolved at class-load
+                             time; setting it here (rather than in a test's @BeforeAll) makes
+                             it deterministic regardless of which test class first touches
+                             AppConfig/EncryptionUtil/KeyStoreUtil in the shared surefire JVM. -->
+                        <CONFIG_DIR>${project.build.directory}/test-config/</CONFIG_DIR>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
