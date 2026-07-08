@@ -35,7 +35,7 @@ public class SSHUtil {
     private static final Logger log = LoggerFactory.getLogger(SSHUtil.class);
     public static final boolean keyManagementEnabled = "true".equals(AppConfig.getProperty("keyManagementEnabled"));
 
-    public static final String KEY_PATH = AppConfig.CONFIG_DIR + "/keydb";
+    public static final String KEY_PATH = AppConfig.CONFIG_DIR + "keydb";
     public static final String KEY_TYPE = AppConfig.getProperty("sshKeyType");
     public static final int KEY_LENGTH = StringUtils.isNumeric(AppConfig.getProperty("sshKeyLength"))
             ? Integer.parseInt(AppConfig.getProperty("sshKeyLength")) : 4096;

@@ -85,6 +85,19 @@ public class EncryptionUtil {
     }
 
     /**
+     * Bastillion v4's actual login hash: AuthDB/UserDB/DBInitServlet there call
+     * {@code EncryptionUtil.hash(password + salt)} - the single-arg overload, with the
+     * stored (base64) salt string concatenated directly onto the plaintext password before
+     * a single SHA-256 digest, rather than digesting salt and password as separate updates
+     * like {@link #hash(String, String)} does. Same digest algorithm, different byte layout
+     * - so it needs its own formula to verify passwords migrated from a real v4 database
+     * (see tools/migrate/).
+     */
+    private static String hashV4Concat(String str, String salt) throws NoSuchAlgorithmException {
+        return hash(str + (salt == null ? "" : salt));
+    }
+
+    /**
      * Current password hash: PBKDF2WithHmacSHA256, 210k iterations, prefixed "pbkdf2:" so it can be
      * told apart from a legacy single-round SHA-256 hash at verification time.
      */
@@ -97,16 +110,24 @@ public class EncryptionUtil {
     }
 
     /**
-     * Verifies a plaintext value against a stored hash, whatever format it was stored in
-     * (PBKDF2 "pbkdf2:" v2, or legacy single-round SHA-256). Comparison is constant-time.
+     * Verifies a plaintext value against a stored hash, whatever format it was stored in:
+     * PBKDF2 "pbkdf2:" v2, this app's own legacy single-round SHA-256 (salt and password
+     * digested separately), or a real Bastillion v4 database's single-round SHA-256 (salt
+     * concatenated onto the password first - see {@link #hashV4Concat}). Comparison is
+     * constant-time.
      */
     public static boolean verifyHash(String plainText, String salt, String storedHash) throws GeneralSecurityException {
         if (StringUtils.isEmpty(storedHash) || StringUtils.isEmpty(plainText)) {
             return false;
         }
-        String candidate = storedHash.startsWith(HASH_V2_PREFIX)
-                ? hashV2(plainText, salt)
-                : hash(plainText, salt);
+        if (storedHash.startsWith(HASH_V2_PREFIX)) {
+            return constantTimeEquals(hashV2(plainText, salt), storedHash);
+        }
+        return constantTimeEquals(hash(plainText, salt), storedHash)
+                || constantTimeEquals(hashV4Concat(plainText, salt), storedHash);
+    }
+
+    private static boolean constantTimeEquals(String candidate, String storedHash) {
         return MessageDigest.isEqual(
                 candidate.getBytes(StandardCharsets.UTF_8),
                 storedHash.getBytes(StandardCharsets.UTF_8));

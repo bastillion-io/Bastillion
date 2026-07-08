@@ -55,6 +55,10 @@ public class MigrateExport {
         // serializeNulls() is required: MigrateImport derives each table's column list from
         // the first row's key set, so every row must carry every column key, null or not.
         Gson gson = new GsonBuilder().setPrettyPrinting().serializeNulls().create();
+        java.io.File parent = new java.io.File(outputPath).getAbsoluteFile().getParentFile();
+        if (parent != null) {
+            parent.mkdirs();
+        }
         try (Writer w = new FileWriter(outputPath)) {
             gson.toJson(export, w);
         }

@@ -28,7 +28,7 @@ public class KeyStoreUtil {
 
     private static KeyStore keyStore = null;
     private static final String keyStoreFile = AppConfig.CONFIG_DIR
-            + "/bastillion.jceks";
+            + "bastillion.jceks";
     private static final char[] KEYSTORE_PASS = new char[]{
             'G', '~', 'r', 'x', 'Z', 'E', 'w', 'f', 'a', '[', '!', 'f', 'Z', 'd', '*', 'L', '8', 'm', 'h', 'u', '#',
             'j', '9', ':', '~', ';', 'U', '>', 'O', 'i', '8', 'r', 'C', '}', 'f', 't', '%', '[', 'H', 'h', 'M', '&',
@@ -117,6 +117,10 @@ public class KeyStoreUtil {
         KeyStoreUtil.setSecret(KeyStoreUtil.ENCRYPTION_KEY_ALIAS, keyGenerator.generateKey().getEncoded());
 
         //write keystore
+        File parent = new File(keyStoreFile).getParentFile();
+        if (parent != null) {
+            parent.mkdirs();
+        }
         FileOutputStream fos = new FileOutputStream(keyStoreFile);
         keyStore.store(fos, KEYSTORE_PASS);
         fos.close();

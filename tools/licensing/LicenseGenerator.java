@@ -107,7 +107,11 @@ public class LicenseGenerator {
 
         String out = flags.get("out");
         if (out != null) {
-            Files.writeString(Path.of(out), blob);
+            Path outFile = Path.of(out);
+            if (outFile.getParent() != null) {
+                Files.createDirectories(outFile.getParent());
+            }
+            Files.writeString(outFile, blob);
             System.out.println("License written to: " + out);
         } else {
             System.out.println(blob);

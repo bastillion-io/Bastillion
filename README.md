@@ -201,6 +201,44 @@ own instead.
 
 ---
 
+<details>
+<summary><strong>Migrating from v4</strong></summary>
+
+Upgrading from an old Bastillion v4 install and want to keep your users, systems, profiles,
+scripts, and (most importantly) the application's existing SSH keypair instead of starting
+over? `tools/migrate/` has a standalone migration tool for exactly that — it exports every
+table from the old H2 database (decrypting the app-level-encrypted columns with the OLD
+instance's keystore) to a JSON file, then imports it into a fresh v5 instance (re-encrypting
+with the NEW instance's keystore). Existing users can log in with their current passwords
+immediately after — no forced resets.
+
+```bash
+cd tools/migrate
+
+# 1. Export the old database
+./migrate.sh export /opt/Bastillion-jetty/jetty/bastillion/WEB-INF/classes/ ~/bastillion-export.json
+
+# 2. Start the new v5 instance once against the config dir you're migrating into, then
+#    stop it (Ctrl+C) once it's finished booting - this creates the schema, jceks, and
+#    default admin user.
+cd ../..
+java -DCONFIG_DIR=/data/bastillion/ -jar target/bastillion-5.0.0-SNAPSHOT.jar
+
+# 3. Import into the new database (full replace of all 12 tables)
+cd tools/migrate
+./migrate.sh import /data/bastillion/ ~/bastillion-export.json --yes-replace-all-data
+
+# 4. Delete the export file - it contains decrypted secrets
+rm ~/bastillion-export.json
+```
+
+See **[tools/migrate/README.md](tools/migrate/README.md)** for the full details — finding
+your old install's config directory, what exactly gets migrated, and the security notes on
+the plaintext export file.
+</details>
+
+---
+
 ## TLS / HTTPS
 
 Bastillion generates its own self-signed certificate on first startup and serves HTTPS —
@@ -336,7 +374,7 @@ Embedded H2 example:
 export DB_USER=bastillion
 export DB_PASSWORD=p@$$w0rd!!
 export DB_DRIVER=org.h2.Driver
-export DB_CONNECTION_URL=jdbc:h2:keydb/bastillion;CIPHER=AES;
+export DB_CONNECTION_URL=jdbc:h2:file:keydb/bastillion;CIPHER=AES;
 ```
 
 Remote H2 example:

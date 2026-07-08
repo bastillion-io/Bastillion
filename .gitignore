@@ -23,6 +23,10 @@ src/main/webapp/_res/node/*
 **/licensing/*.b64
 **/licensing/*.lic
 
+# tools/migrate export files - contain DECRYPTED secrets (SSH private keys, passphrases,
+# OTP seeds); never commit regardless of what the user names the output file #
+tools/migrate/*.json
+
 # Local/prod secrets #
 .env-prod
 .env-local
