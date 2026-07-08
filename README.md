@@ -492,8 +492,10 @@ Bastillion uses to authenticate to registered systems.
 
 ## License
 
-Bastillion is available under the **Prosperity Public License**. Full list of third-party
-dependencies and their licenses in [3rdPartyLicenses.md](3rdPartyLicenses.md).
+Bastillion is available under the **Prosperity Public License**.
+
+Full list of third-party dependencies and their licenses in [3rdPartyLicenses.md](3rdPartyLicenses.md).
 
 **Loophole, LLC** — Sean Kavanagh
+
 [sean@loophole.company](mailto:sean@loophole.company)
