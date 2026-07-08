@@ -13,10 +13,8 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.GCMParameterSpec;
-import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
@@ -42,7 +40,6 @@ public class EncryptionUtil {
     // Algorithms / transforms
     public static final String CRYPT_ALGORITHM = "AES"; // key alg
     private static final String T_GCM = "AES/GCM/NoPadding";
-    private static final String T_CBC = "AES/CBC/PKCS5Padding";         // legacy PEM wrapper
     private static final String T_ECB = "AES/ECB/PKCS5Padding";          // legacy app encrypt (Cipher.getInstance("AES"))
     public static final String HASH_ALGORITHM = "SHA-256";
 
@@ -50,18 +47,19 @@ public class EncryptionUtil {
     private static final int GCM_IV_LEN = 12;         // 96-bit IV recommended
     private static final int GCM_TAG_LEN_BITS = 128;  // 16-byte tag
 
-    // Version markers for serialized ciphertexts
+    // Version marker for serialized ciphertexts
     private static final String V2_PREFIX = "v2:";    // GCM
-    private static final String PEM_BEGIN_V2 = "-----BEGIN ENCRYPTED PRIVATE KEY (GCM v2)-----";
-    private static final String PEM_END_V2   = "-----END ENCRYPTED PRIVATE KEY (GCM v2)-----";
-    // Legacy (kept for read-compat)
-    private static final String PEM_BEGIN_V1 = "-----BEGIN ENCRYPTED PRIVATE KEY-----";
-    private static final String PEM_END_V1   = "-----END ENCRYPTED PRIVATE KEY-----";
+
+    // Password hash versioning (PBKDF2 replaces legacy single-round SHA-256)
+    private static final String HASH_V2_PREFIX = "pbkdf2:";
+    private static final String PBKDF2_ALGORITHM = "PBKDF2WithHmacSHA256";
+    private static final int HASH_V2_ITERATIONS = 210000; // OWASP-recommended minimum for PBKDF2-HMAC-SHA256
+    private static final int HASH_V2_KEY_LEN_BITS = 256;
 
     private EncryptionUtil() {}
 
     // --------------------------------------------------------------------
-    // Salt & Hash (unchanged)
+    // Salt & Hash
     // --------------------------------------------------------------------
     public static String generateSalt() {
         byte[] salt = new byte[32];
@@ -69,6 +67,10 @@ public class EncryptionUtil {
         return new String(Base64.encodeBase64(salt));
     }
 
+    /**
+     * Legacy single-round SHA-256(password + salt) hash.
+     * Kept only to verify passwords stored before the PBKDF2 migration (see {@link #hashV2}).
+     */
     public static String hash(String str, String salt) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance(HASH_ALGORITHM);
         if (StringUtils.isNotEmpty(salt)) {
@@ -80,6 +82,62 @@ public class EncryptionUtil {
 
     public static String hash(String str) throws NoSuchAlgorithmException {
         return hash(str, null);
+    }
+
+    /**
+     * Bastillion v4's actual login hash: AuthDB/UserDB/DBInitServlet there call
+     * {@code EncryptionUtil.hash(password + salt)} - the single-arg overload, with the
+     * stored (base64) salt string concatenated directly onto the plaintext password before
+     * a single SHA-256 digest, rather than digesting salt and password as separate updates
+     * like {@link #hash(String, String)} does. Same digest algorithm, different byte layout
+     * - so it needs its own formula to verify passwords migrated from a real v4 database
+     * (see tools/migrate/).
+     */
+    private static String hashV4Concat(String str, String salt) throws NoSuchAlgorithmException {
+        return hash(str + (salt == null ? "" : salt));
+    }
+
+    /**
+     * Current password hash: PBKDF2WithHmacSHA256, 210k iterations, prefixed "pbkdf2:" so it can be
+     * told apart from a legacy single-round SHA-256 hash at verification time.
+     */
+    public static String hashV2(String str, String salt) throws GeneralSecurityException {
+        byte[] saltBytes = StringUtils.isNotEmpty(salt) ? Base64.decodeBase64(salt) : new byte[0];
+        SecretKeyFactory factory = SecretKeyFactory.getInstance(PBKDF2_ALGORITHM);
+        PBEKeySpec spec = new PBEKeySpec(str.toCharArray(), saltBytes, HASH_V2_ITERATIONS, HASH_V2_KEY_LEN_BITS);
+        SecretKey derived = factory.generateSecret(spec);
+        return HASH_V2_PREFIX + new String(Base64.encodeBase64(derived.getEncoded()), StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Verifies a plaintext value against a stored hash, whatever format it was stored in:
+     * PBKDF2 "pbkdf2:" v2, this app's own legacy single-round SHA-256 (salt and password
+     * digested separately), or a real Bastillion v4 database's single-round SHA-256 (salt
+     * concatenated onto the password first - see {@link #hashV4Concat}). Comparison is
+     * constant-time.
+     */
+    public static boolean verifyHash(String plainText, String salt, String storedHash) throws GeneralSecurityException {
+        if (StringUtils.isEmpty(storedHash) || StringUtils.isEmpty(plainText)) {
+            return false;
+        }
+        if (storedHash.startsWith(HASH_V2_PREFIX)) {
+            return constantTimeEquals(hashV2(plainText, salt), storedHash);
+        }
+        return constantTimeEquals(hash(plainText, salt), storedHash)
+                || constantTimeEquals(hashV4Concat(plainText, salt), storedHash);
+    }
+
+    private static boolean constantTimeEquals(String candidate, String storedHash) {
+        return MessageDigest.isEqual(
+                candidate.getBytes(StandardCharsets.UTF_8),
+                storedHash.getBytes(StandardCharsets.UTF_8));
+    }
+
+    /**
+     * True if the stored hash is already in the current (v2) format.
+     */
+    public static boolean isLegacyHash(String storedHash) {
+        return StringUtils.isNotEmpty(storedHash) && !storedHash.startsWith(HASH_V2_PREFIX);
     }
 
     // --------------------------------------------------------------------
@@ -152,115 +210,5 @@ public class EncryptionUtil {
 
     public static String decrypt(String str) throws GeneralSecurityException {
         return decrypt(key, str);
-    }
-
-    // --------------------------------------------------------------------
-    // PEM private key envelope (PBKDF2-HMAC-SHA256 + AES-GCM, with legacy CBC read)
-    // --------------------------------------------------------------------
-
-    /**
-     * Encrypts a PEM-formatted private key using a user-supplied passphrase.
-     * v2 format: PBKDF2-HMAC-SHA256 (65536 iters, 256-bit key) + AES-GCM(128) with 12-byte IV.
-     * Serialized as:
-     *   -----BEGIN ENCRYPTED PRIVATE KEY (GCM v2)-----
-     *   base64( 0x02 || salt(16) || iv(12) || ciphertext+tag )
-     *   -----END ENCRYPTED PRIVATE KEY (GCM v2)-----
-     */
-    public static String encryptPrivateKeyPEM(String privateKeyPEM, String passphrase)
-            throws GeneralSecurityException, IOException {
-        if (StringUtils.isEmpty(passphrase) || StringUtils.isEmpty(privateKeyPEM)) {
-            return privateKeyPEM;
-        }
-
-        SecureRandom rnd = new SecureRandom();
-        byte[] salt = new byte[16];
-        byte[] iv = new byte[GCM_IV_LEN];
-        rnd.nextBytes(salt);
-        rnd.nextBytes(iv);
-
-        SecretKeySpec aesKey = deriveAesKey(passphrase, salt);
-
-        Cipher cipher = Cipher.getInstance(T_GCM);
-        cipher.init(Cipher.ENCRYPT_MODE, aesKey, new GCMParameterSpec(GCM_TAG_LEN_BITS, iv));
-        byte[] ct = cipher.doFinal(privateKeyPEM.getBytes(StandardCharsets.UTF_8));
-
-        // versioned blob: 0x02 || salt || iv || ct
-        ByteBuffer bb = ByteBuffer.allocate(1 + salt.length + iv.length + ct.length);
-        bb.put((byte) 0x02).put(salt).put(iv).put(ct);
-
-        String body = java.util.Base64.getMimeEncoder(70, "\n".getBytes(StandardCharsets.US_ASCII))
-                .encodeToString(bb.array());
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(PEM_BEGIN_V2).append("\n")
-                .append(body).append("\n")
-                .append(PEM_END_V2).append("\n");
-        return sb.toString();
-    }
-
-    /**
-     * Decrypts either v2 (GCM) or legacy v1 (CBC) envelopes.
-     */
-    public static String decryptPrivateKeyPEM(String pem, String passphrase)
-            throws GeneralSecurityException {
-        if (StringUtils.isEmpty(passphrase) || StringUtils.isEmpty(pem)) {
-            return pem;
-        }
-
-        if (pem.contains(PEM_BEGIN_V2)) {
-            String b64 = between(pem, PEM_BEGIN_V2, PEM_END_V2);
-            byte[] blob = java.util.Base64.getMimeDecoder().decode(b64);
-
-            if (blob.length < 1 + 16 + GCM_IV_LEN + 16) {
-                throw new GeneralSecurityException("Invalid v2 envelope");
-            }
-            ByteBuffer bb = ByteBuffer.wrap(blob);
-            byte ver = bb.get();
-            if (ver != 0x02) throw new GeneralSecurityException("Unsupported envelope version");
-
-            byte[] salt = new byte[16];
-            byte[] iv = new byte[GCM_IV_LEN];
-            bb.get(salt).get(iv);
-            byte[] ct = new byte[bb.remaining()];
-            bb.get(ct);
-
-            SecretKeySpec aesKey = deriveAesKey(passphrase, salt);
-            Cipher cipher = Cipher.getInstance(T_GCM);
-            cipher.init(Cipher.DECRYPT_MODE, aesKey, new GCMParameterSpec(GCM_TAG_LEN_BITS, iv));
-            byte[] pt = cipher.doFinal(ct);
-            return new String(pt, StandardCharsets.UTF_8);
-        }
-
-        // Legacy CBC (v1) with serialized salt+iv+ciphertext under the classic headers.
-        if (pem.contains(PEM_BEGIN_V1)) {
-            // Deprecated: v1 pem envelopes used AES/CBC/PKCS5Padding, which is insecure.
-            // For security, legacy CBC-encrypted PEMs are no longer supported.
-            // Please migrate legacy PEM data to a supported format (e.g., using AES/GCM/NoPadding).
-            throw new GeneralSecurityException(
-                "Legacy PEM envelopes encrypted with AES/CBC/PKCS5Padding are no longer supported due to security risks. " +
-                "Please migrate data to a supported format (AES/GCM/NoPadding)."
-            );
-        }
-
-        throw new GeneralSecurityException("Unrecognized PEM envelope");
-    }
-
-    // --------------------------------------------------------------------
-    // Helpers
-    // --------------------------------------------------------------------
-    private static SecretKeySpec deriveAesKey(String passphrase, byte[] salt) throws GeneralSecurityException {
-        SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-        // Same work factor as before; you can raise to, say, 200k if perf allows.
-        PBEKeySpec spec = new PBEKeySpec(passphrase.toCharArray(), salt, 65536, 256);
-        SecretKey tmp = factory.generateSecret(spec);
-        return new SecretKeySpec(tmp.getEncoded(), "AES");
-    }
-
-    private static String between(String s, String begin, String end) {
-        int i = s.indexOf(begin);
-        int j = s.indexOf(end);
-        if (i < 0 || j < 0 || j <= i) return "";
-        i += begin.length();
-        return s.substring(i, j).replace("\r", "").trim();
     }
 }

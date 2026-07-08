@@ -13,7 +13,6 @@ import io.bastillion.manage.util.EncryptionUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.security.GeneralSecurityException;
-import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -208,7 +207,7 @@ public class UserDB {
      * @param con  DB connection
      * @param user user object
      */
-    public static Long insertUser(Connection con, User user) throws SQLException, NoSuchAlgorithmException {
+    public static Long insertUser(Connection con, User user) throws SQLException, GeneralSecurityException {
 
         Long userId = null;
 
@@ -221,7 +220,7 @@ public class UserDB {
         stmt.setString(6, user.getUserType());
         if (StringUtils.isNotEmpty(user.getPassword())) {
             String salt = EncryptionUtil.generateSalt();
-            stmt.setString(7, EncryptionUtil.hash(user.getPassword() + salt));
+            stmt.setString(7, EncryptionUtil.hashV2(user.getPassword(), salt));
             stmt.setString(8, salt);
         } else {
             stmt.setString(7, null);
@@ -285,7 +284,7 @@ public class UserDB {
         stmt.setString(3, user.getEmail());
         stmt.setString(4, user.getUsername());
         stmt.setString(5, user.getUserType());
-        stmt.setString(6, EncryptionUtil.hash(user.getPassword() + salt));
+        stmt.setString(6, EncryptionUtil.hashV2(user.getPassword(), salt));
         stmt.setString(7, salt);
         stmt.setLong(8, user.getId());
         stmt.execute();

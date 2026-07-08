@@ -224,6 +224,25 @@ public class SystemDB {
 
 
     /**
+     * returns the total number of registered systems, for license enforcement
+     */
+    public static int getSystemCount() throws SQLException, GeneralSecurityException {
+
+        int count = 0;
+        Connection con = DBUtils.getConn();
+        PreparedStatement stmt = con.prepareStatement("select count(*) from system");
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            count = rs.getInt(1);
+        }
+        DBUtils.closeRs(rs);
+        DBUtils.closeStmt(stmt);
+        DBUtils.closeConn(con);
+
+        return count;
+    }
+
+    /**
      * inserts host system into DB
      *
      * @param hostSystem host system object
@@ -291,29 +310,6 @@ public class SystemDB {
 
         DBUtils.closeConn(con);
     }
-
-    /**
-     * returns the host systems
-     *
-     * @param systemIdList list of host system ids
-     * @return host system with array of public keys
-     */
-    public static List<HostSystem> getSystems(List<Long> systemIdList) throws SQLException, GeneralSecurityException {
-
-        List<HostSystem> hostSystemListReturn = new ArrayList<>();
-
-        Connection con = DBUtils.getConn();
-        for (Long systemId : systemIdList) {
-            HostSystem hostSystem = getSystem(con, systemId);
-            hostSystemListReturn.add(hostSystem);
-        }
-
-        DBUtils.closeConn(con);
-
-        return hostSystemListReturn;
-
-    }
-
 
     /**
      * returns all systems

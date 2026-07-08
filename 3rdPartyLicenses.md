@@ -5,6 +5,8 @@ Apache Commons Codec : Apache License, Version 2.0 - The Apache Software Foundat
 
 Apache Commons Configuration : Apache License, Version 2.0 - The Apache Software Foundation
 
+Apache Commons BeanUtils : Apache License, Version 2.0 - The Apache Software Foundation
+
 Apache Commons DBCP2 : Apache License, Version 2.0 - The Apache Software Foundation
 
 Apache Commons FileUpload : Apache License, Version 2.0 - The Apache Software Foundation
@@ -14,6 +16,8 @@ Apache Commons Lang : Apache License, Version 2.0 - The Apache Software Foundati
 Apache Commons Log4j 2 : Apache License, Version 2.0 - The Apache Software Foundation
 
 Bootstrap : MIT License - Twitter, Inc.
+
+Bouncy Castle : Bouncy Castle License - The Legion of the Bouncy Castle Inc.
 
 Google-Gson : Apache License, Version 2.0 - Google, Inc.
 

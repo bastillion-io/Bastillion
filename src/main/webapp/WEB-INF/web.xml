@@ -5,9 +5,33 @@
     <session-config>
         <cookie-config>
             <http-only>true</http-only>
+            <secure>true</secure>
         </cookie-config>
     </session-config>
 
+
+    <filter>
+        <filter-name>SecurityHeadersFilter</filter-name>
+        <filter-class>io.bastillion.common.filter.SecurityHeadersFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>SecurityHeadersFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- lmvc framework filters/servlet/listener: registered explicitly rather than via
+         @WebFilter/@WebServlet/@WebListener scanning, since the app now runs from an
+         embedded-Jetty jar (see io.bastillion.Main) with annotation scanning off. -->
+    <filter>
+        <filter-name>MvcSecurityFilter</filter-name>
+        <filter-class>loophole.mvc.filter.SecurityFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>MvcSecurityFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
 
     <filter>
         <filter-name>AuthFilter</filter-name>
@@ -23,6 +47,61 @@
         <filter-name>AuthFilter</filter-name>
         <url-pattern>/admin/*</url-pattern>
     </filter-mapping>
+
+    <filter>
+        <filter-name>CSRFFilter</filter-name>
+        <filter-class>loophole.mvc.filter.CSRFFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>CSRFFilter</filter-name>
+        <url-pattern>/</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>CSRFFilter</filter-name>
+        <url-pattern>*.ktrl</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>CSRFFilter</filter-name>
+        <url-pattern>*.html</url-pattern>
+    </filter-mapping>
+
+    <listener>
+        <listener-class>loophole.mvc.config.TemplateConfig</listener-class>
+    </listener>
+
+    <servlet>
+        <servlet-name>DBInitServlet</servlet-name>
+        <servlet-class>io.bastillion.common.db.DBInitServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>DBInitServlet</servlet-name>
+        <url-pattern>/config</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>DispatcherServlet</servlet-name>
+        <servlet-class>loophole.mvc.base.DispatcherServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>DispatcherServlet</servlet-name>
+        <url-pattern>*.ktrl</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>TemplateServlet</servlet-name>
+        <servlet-class>loophole.mvc.base.TemplateServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>TemplateServlet</servlet-name>
+        <url-pattern>*.html</url-pattern>
+    </servlet-mapping>
 
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>

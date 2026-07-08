@@ -14,7 +14,6 @@ import io.bastillion.manage.util.ExternalAuthUtil;
 import org.apache.commons.lang3.StringUtils;
 
 import java.security.GeneralSecurityException;
-import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -48,15 +47,12 @@ public class AuthDB {
 
             Connection con = DBUtils.getConn();
 
-            //get salt for user
-            String salt = getSaltByUsername(con, auth.getUsername());
             //login
-            PreparedStatement stmt = con.prepareStatement("select * from users where username=? and password=?");
+            PreparedStatement stmt = con.prepareStatement("select * from users where username=?");
             stmt.setString(1, auth.getUsername());
-            stmt.setString(2, EncryptionUtil.hash(auth.getPassword() + salt));
             ResultSet rs = stmt.executeQuery();
 
-            if (rs.next()) {
+            if (rs.next() && EncryptionUtil.verifyHash(auth.getPassword(), rs.getString("salt"), rs.getString("password"))) {
 
                 auth.setId(rs.getLong("id"));
                 authToken = UUID.randomUUID().toString();
@@ -111,7 +107,7 @@ public class AuthDB {
      * @param con  DB connection
      * @param auth username and password object
      */
-    public static void updateLogin(Connection con, Auth auth) throws SQLException, NoSuchAlgorithmException {
+    public static void updateLogin(Connection con, Auth auth) throws SQLException, GeneralSecurityException {
 
         PreparedStatement stmt = con.prepareStatement("update users set username=?, auth_type=?, auth_token=?, password=?, salt=? where id=?");
         stmt.setString(1, auth.getUsername());
@@ -119,7 +115,7 @@ public class AuthDB {
         stmt.setString(3, auth.getAuthToken());
         if (StringUtils.isNotEmpty(auth.getPassword())) {
             String salt = EncryptionUtil.generateSalt();
-            stmt.setString(4, EncryptionUtil.hash(auth.getPassword() + salt));
+            stmt.setString(4, EncryptionUtil.hashV2(auth.getPassword(), salt));
             stmt.setString(5, salt);
         } else {
             stmt.setString(4, null);
@@ -175,16 +171,14 @@ public class AuthDB {
 
         Connection con = DBUtils.getConn();
 
-        String prevSalt = getSaltByAuthToken(con, auth.getAuthToken());
-        PreparedStatement stmt = con.prepareStatement("select * from users where auth_token like ? and password like ?");
+        PreparedStatement stmt = con.prepareStatement("select * from users where auth_token like ?");
         stmt.setString(1, auth.getAuthToken());
-        stmt.setString(2, EncryptionUtil.hash(auth.getPrevPassword() + prevSalt));
         ResultSet rs = stmt.executeQuery();
-        if (rs.next()) {
+        if (rs.next() && EncryptionUtil.verifyHash(auth.getPrevPassword(), rs.getString("salt"), rs.getString("password"))) {
 
             String salt = EncryptionUtil.generateSalt();
             PreparedStatement updateStmt = con.prepareStatement("update users set password=?, salt=? where auth_token like ?");
-            updateStmt.setString(1, EncryptionUtil.hash(auth.getPassword() + salt));
+            updateStmt.setString(1, EncryptionUtil.hashV2(auth.getPassword(), salt));
             updateStmt.setString(2, salt);
             updateStmt.setString(3, auth.getAuthToken());
             updateStmt.execute();
@@ -276,52 +270,6 @@ public class AuthDB {
         stmt.execute();
         DBUtils.closeStmt(stmt);
         DBUtils.closeConn(con);
-    }
-
-
-    /**
-     * get salt by user name
-     *
-     * @param con      DB connection
-     * @param username username
-     * @return salt
-     */
-    private static String getSaltByUsername(Connection con, String username) throws SQLException {
-
-        String salt = "";
-        PreparedStatement stmt = con.prepareStatement("select salt from users where username=?");
-        stmt.setString(1, username);
-        ResultSet rs = stmt.executeQuery();
-        if (rs.next() && rs.getString("salt") != null) {
-            salt = rs.getString("salt");
-        }
-        DBUtils.closeRs(rs);
-        DBUtils.closeStmt(stmt);
-
-        return salt;
-    }
-
-
-    /**
-     * get salt by authentication token
-     *
-     * @param con       DB connection
-     * @param authToken auth token
-     * @return salt
-     */
-    private static String getSaltByAuthToken(Connection con, String authToken) throws SQLException {
-
-        String salt = "";
-        PreparedStatement stmt = con.prepareStatement("select salt from users where auth_token=?");
-        stmt.setString(1, authToken);
-        ResultSet rs = stmt.executeQuery();
-        if (rs.next() && rs.getString("salt") != null) {
-            salt = rs.getString("salt");
-        }
-        DBUtils.closeRs(rs);
-        DBUtils.closeStmt(stmt);
-
-        return salt;
     }
 
 

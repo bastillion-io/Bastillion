@@ -63,20 +63,6 @@ public class RefreshAuthKeyUtil {
     }
 
     /**
-     *Task for distributing keys to all systems based on user
-     *
-     * @param userId user id
-     */
-    public static void refreshUserSystems(Long userId) {
-
-        Runnable run = new RefreshUserSystemsTask(userId);
-        Thread thread = new Thread(run);
-        thread.start();
-
-    }
-
-
-    /**
      * Timer task for distributing keys to all systems
      */
     private class RefreshAllSystemsTimerTask extends TimerTask {
@@ -97,31 +83,6 @@ public class RefreshAuthKeyUtil {
         }
     }
 
-}
-
-
-/**
- * Task for distributing keys to all systems based on user
- */
-class RefreshUserSystemsTask implements Runnable {
-
-    private static final Logger log = LoggerFactory.getLogger(RefreshUserSystemsTask.class);
-
-    Long userId;
-
-    public RefreshUserSystemsTask(Long userId) {
-        this.userId = userId;
-    }
-
-    @Override
-    public void run() {
-        //distribute all public keys based on user
-        try {
-            SSHUtil.distributePubKeysToUser(this.userId);
-        } catch (SQLException | GeneralSecurityException ex) {
-            log.error(ex.toString(), ex);
-        }
-    }
 }
 
 

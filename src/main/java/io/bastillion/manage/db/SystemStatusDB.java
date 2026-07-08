@@ -7,7 +7,6 @@ package io.bastillion.manage.db;
 
 import io.bastillion.manage.model.Auth;
 import io.bastillion.manage.model.HostSystem;
-import io.bastillion.manage.model.SortedSet;
 import io.bastillion.manage.util.DBUtils;
 
 import java.security.GeneralSecurityException;
@@ -121,19 +120,6 @@ public class SystemStatusDB {
         DBUtils.closeStmt(stmt);
     }
 
-
-    /**
-     * returns all key placement statuses
-     *
-     * @param userId user id
-     */
-    public static SortedSet getSortedSetStatus(Long userId) throws SQLException, GeneralSecurityException {
-
-        SortedSet sortedSet = new SortedSet();
-        sortedSet.setItemList(getAllSystemStatus(userId));
-
-        return sortedSet;
-    }
 
     /**
      * returns all key placement statuses

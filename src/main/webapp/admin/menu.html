@@ -4,7 +4,7 @@
  *    Licensed under The Prosperity Public License 3.0.0
  */-->
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" data-bs-theme="dark">
 
 <head>
     <meta th:replace="~{_res/inc/header}">
@@ -14,6 +14,18 @@
 <body>
 <div th:replace="~{_res/inc/navigation}"></div>
 <div class="container">
+    <template th:if="${#strings.equals(session.userType,'M')}" th:remove="tag">
+        <p th:if="${@io.bastillion.manage.util.LicenseUtil@isExpired()}" class="error">
+            Your Bastillion license expired on <span th:text="${@io.bastillion.manage.util.LicenseUtil@getExpiryDate()}"></span> &mdash;
+            running unlicensed, capped at <span th:text="${@io.bastillion.manage.util.LicenseUtil@getMaxSystems()}"></span> systems.
+            <a th:href="'userSettings.ktrl?_csrf=' + ${session._csrf}">Renew in Settings</a>.
+        </p>
+        <p th:if="${@io.bastillion.manage.util.LicenseUtil@isExpiringWithinDays(90)}" class="warning">
+            Your Bastillion license expires in <span th:text="${@io.bastillion.manage.util.LicenseUtil@getDaysUntilExpiry()}"></span> days
+            (<span th:text="${@io.bastillion.manage.util.LicenseUtil@getExpiryDate()}"></span>).
+            <a th:href="'userSettings.ktrl?_csrf=' + ${session._csrf}">Renew in Settings</a>.
+        </p>
+    </template>
     <h3>Main Menu</h3>
     <div class="row featurette">
         <div class="list-group">

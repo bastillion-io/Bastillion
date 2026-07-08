@@ -6,7 +6,6 @@
 package io.bastillion.manage.util;
 
 import io.bastillion.common.util.AppConfig;
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +28,7 @@ public class KeyStoreUtil {
 
     private static KeyStore keyStore = null;
     private static final String keyStoreFile = AppConfig.CONFIG_DIR
-            + "/bastillion.jceks";
+            + "bastillion.jceks";
     private static final char[] KEYSTORE_PASS = new char[]{
             'G', '~', 'r', 'x', 'Z', 'E', 'w', 'f', 'a', '[', '!', 'f', 'Z', 'd', '*', 'L', '8', 'm', 'h', 'u', '#',
             'j', '9', ':', '~', ';', 'U', '>', 'O', 'i', '8', 'r', 'C', '}', 'f', 't', '%', '[', 'H', 'h', 'M', '&',
@@ -79,17 +78,6 @@ public class KeyStoreUtil {
     }
 
     /**
-     * get secret entry for alias
-     *
-     * @param alias keystore secret alias
-     * @return secret string
-     */
-    public static String getSecretString(String alias) throws GeneralSecurityException {
-        KeyStore.SecretKeyEntry entry = (KeyStore.SecretKeyEntry) keyStore.getEntry(alias, new KeyStore.PasswordProtection(KEYSTORE_PASS));
-        return new String(entry.getSecretKey().getEncoded());
-    }
-
-    /**
      * set secret in keystore
      *
      * @param alias  keystore secret alias
@@ -116,19 +104,6 @@ public class KeyStoreUtil {
     }
 
     /**
-     * delete existing and create new keystore
-     */
-    public static void resetKeyStore() throws IOException, GeneralSecurityException {
-        File file = new File(keyStoreFile);
-        if (file.exists()) {
-            FileUtils.forceDelete(file);
-        }
-
-        //create new keystore
-        initializeKeyStore();
-    }
-
-    /**
      * create new keystore
      */
     private static void initializeKeyStore() throws GeneralSecurityException, IOException {
@@ -142,6 +117,10 @@ public class KeyStoreUtil {
         KeyStoreUtil.setSecret(KeyStoreUtil.ENCRYPTION_KEY_ALIAS, keyGenerator.generateKey().getEncoded());
 
         //write keystore
+        File parent = new File(keyStoreFile).getParentFile();
+        if (parent != null) {
+            parent.mkdirs();
+        }
         FileOutputStream fos = new FileOutputStream(keyStoreFile);
         keyStore.store(fos, KEYSTORE_PASS);
         fos.close();

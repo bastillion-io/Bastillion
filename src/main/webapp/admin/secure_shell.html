@@ -4,7 +4,7 @@
  *    Licensed under The Prosperity Public License 3.0.0
  */-->
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" data-bs-theme="dark">
 
 <head>
     <meta th:replace="~{_res/inc/header}">
@@ -119,15 +119,25 @@
             $('#dummy').focus();
             var keys = {};
 
+            //non-printable/navigation keys that should never be sent as a typed character
+            //27-ESC 37-LEFT 38-UP 39-RIGHT 40-DOWN 13-ENTER 8-BS 9-TAB 46-DEL 45-INSERT 33-PGUP 34-PGDN 35-END 36-HOME
+            var NAV_KEY_CODES = [27, 37, 38, 39, 40, 13, 8, 9, 46, 45, 33, 34, 35, 36];
+            //unix ctrl-shortcuts (s,q,t,\,z,h,w,u,r,d) the browser should not handle itself
+            var CTRL_INTERCEPT_KEY_CODES = [83, 81, 84, 220, 90, 72, 87, 85, 82, 68];
+
+            function isNavKeyDown() {
+                return NAV_KEY_CODES.some(function (code) {
+                    return keys[code];
+                });
+            }
+
             var termFocus = true;
             $(document).keypress(function (e) {
                 if (termFocus) {
                     var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
 
                     if (String.fromCharCode(keyCode) && String.fromCharCode(keyCode) !== ''
-                        && (!e.ctrlKey || e.altKey) && !e.metaKey && !keys[27] && !keys[37]
-                        && !keys[38] && !keys[39] && !keys[40] && !keys[13] && !keys[8] && !keys[9]
-                        && !keys[46] && !keys[45] && !keys[33] && !keys[34] && !keys[35] && !keys[36]) {
+                        && (!e.ctrlKey || e.altKey) && !e.metaKey && !isNavKeyDown()) {
                         var cmdStr = String.fromCharCode(keyCode);
                         connection.send(JSON.stringify({id: getActiveTermsInstanceIds(), command: cmdStr}));
                     }
@@ -140,27 +150,12 @@
                     var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
                     keys[keyCode] = true;
 
-                    //27 - ESC
-                    //37 - LEFT
-                    //38 - UP
-                    //39 - RIGHT
-                    //40 - DOWN
-                    //13 - ENTER
-                    //8 - BS
-                    //9 - TAB
-                    //17 - CTRL
-                    //46 - DEL
-                    //45 - INSERT
-                    //33 - PG UP
-                    //34 - PG DOWN
-                    //35 - END
-                    //36 - HOME
-                    if ((e.ctrlKey && !e.altKey) || keyCode === 27 || keyCode === 37 || keyCode === 38 || keyCode === 39 || keyCode === 40 || keyCode === 13 || keyCode === 8 || keyCode === 9 || keyCode === 46 || keyCode === 45 || keyCode === 33 || keyCode === 34 || keyCode === 35 || keyCode === 36) {
+                    if ((e.ctrlKey && !e.altKey) || NAV_KEY_CODES.indexOf(keyCode) !== -1) {
                         connection.send(JSON.stringify({id: getActiveTermsInstanceIds(), keyCode: keyCode}));
                     }
 
                     //prevent default for unix ctrl commands
-                    if (e.ctrlKey && (keyCode === 83 || keyCode === 81 || keyCode === 84 || keyCode === 220 || keyCode === 90 || keyCode === 72 || keyCode === 87 || keyCode === 85 || keyCode === 82 || keyCode === 68)) {
+                    if (e.ctrlKey && CTRL_INTERCEPT_KEY_CODES.indexOf(keyCode) !== -1) {
                         e.preventDefault();
                         e.stopImmediatePropagation();
                     }
@@ -247,7 +242,7 @@
 
                 // Set heartbeat interval 10,000 ms
                 setTimeout(heartbeat, 10000);
-            };
+            }
 
             // Register websocket heartbeat
             connection.onopen = function (e) {
@@ -261,7 +256,7 @@
 
             // Log messages from the server
             connection.onmessage = function (e) {
-                var json = jQuery.parseJSON(e.data);
+                var json = JSON.parse(e.data);
                 $.each(json, function (key, val) {
                     if (val.output != '') {
                         if (!termMap[val.instanceId]) {
@@ -382,44 +377,42 @@
                 return instance;
             }
 
+            //creates a new terminal element for hostId, wires up its events, inserts it via insertFn,
+            //then asks the server to create the backing session
+            function addTerminal(hostId, displayLabel, insertFn) {
+                var newInstanceId = getNextInstanceId();
+
+                insertFn($(createTermElement(newInstanceId, hostId, displayLabel)));
+
+                setTerminalEvents($("#run_cmd_" + newInstanceId));
+
+                //call server to create instances - returned the new cloned instance id
+                $.getJSON('../admin/createSession.ktrl?systemSelectId=' + hostId + '&_csrf=' + [[${session._csrf}]]);
+            }
+
             //function clones terminals based on active
-            var newInstanceId = -1;
             $('#dup_session').click(function () {
                 var instanceIds = getActiveTermsInstanceIds();
                 for (var i = 0; i < instanceIds.length; i++) {
-
                     var instanceId = instanceIds[i];
                     var hostId = $('#run_cmd_' + instanceId).find(".host").attr("data-bs-hostId");
                     var displayLabel = $('#run_cmd_' + instanceId).find(".term-header").text();
-                    var newInstanceId = getNextInstanceId();
 
-                    $(createTermElement(newInstanceId, hostId, displayLabel)).insertAfter($('#run_cmd_' + instanceId));
-
-                    setTerminalEvents($("#run_cmd_" + newInstanceId));
-
-
-                    //call server to create instances - returned the new cloned instance id
-                    $.getJSON('../admin/createSession.ktrl?systemSelectId=' + hostId + '&_csrf=' + [[${session._csrf}]]);
-
-
+                    addTerminal(hostId, displayLabel, function (element) {
+                        element.insertAfter($('#run_cmd_' + instanceId));
+                    });
                 }
 
             });
 
             //function that connects to allocated hosts
             $('.connect_btn').click(function () {
-
                 var hostId = $('#connectHostId').val();
-                var newInstanceId = getNextInstanceId();
                 var displayLabel = $('#connectHostId option:selected').text();
 
-                $(createTermElement(newInstanceId, hostId, displayLabel)).prependTo(".termwrapper");
-
-                setTerminalEvents($("#run_cmd_" + newInstanceId));
-
-                //call server to create instances - returned the new cloned instance id
-                $.getJSON('../admin/createSession.ktrl?systemSelectId=' + hostId + '&_csrf=' + [[${session._csrf}]]);
-
+                addTerminal(hostId, displayLabel, function (element) {
+                    element.prependTo(".termwrapper");
+                });
 
             });
 
@@ -468,7 +461,7 @@
 <body>
 <template th:if="${(systemList != null && !systemList.empty) || pendingSystemStatus.id != null }"
           th:remove="tag">
-    <div class="navbar navbar-light bg-light fixed-top navbar-expand-md" role="navigation">
+    <div class="navbar navbar-dark bg-dark fixed-top navbar-expand" role="navigation">
         <div class="container">
             <div class="navbar-brand">
                 <div class="nav-img">
@@ -477,10 +470,7 @@
                 </div>
                 Bastillion
             </div>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarCollapse">
+            <div class="navbar-collapse" id="navbarCollapse">
                 <template th:if="${pendingSystemStatus == null || pendingSystemStatus.id == null}"
                           th:remove="tag">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">

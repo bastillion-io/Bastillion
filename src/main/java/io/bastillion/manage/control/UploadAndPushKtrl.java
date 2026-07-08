@@ -5,6 +5,7 @@
  */
 package io.bastillion.manage.control;
 
+import io.bastillion.common.util.AppConfig;
 import io.bastillion.common.util.AuthUtil;
 import io.bastillion.manage.db.SystemStatusDB;
 import io.bastillion.manage.model.HostSystem;
@@ -40,7 +41,7 @@ import java.util.List;
 public class UploadAndPushKtrl extends BaseKontroller {
 
     private static final Logger log = LoggerFactory.getLogger(UploadAndPushKtrl.class);
-    public static final String UPLOAD_PATH = DBUtils.class.getClassLoader().getResource(".").getPath() + "../upload";
+    public static final String UPLOAD_PATH = AppConfig.CONFIG_DIR + "../upload";
 
     @Model(name = "upload")
     File upload;

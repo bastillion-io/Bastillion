@@ -11,6 +11,7 @@ import io.bastillion.manage.db.ScriptDB;
 import io.bastillion.manage.db.SystemDB;
 import io.bastillion.manage.db.UserProfileDB;
 import io.bastillion.manage.model.*;
+import io.bastillion.manage.util.LicenseUtil;
 import io.bastillion.manage.util.SSHUtil;
 import loophole.mvc.annotation.Kontrol;
 import loophole.mvc.annotation.MethodType;
@@ -91,10 +92,25 @@ public class SystemKtrl extends BaseKontroller {
     public String saveSystem() throws ServletException {
         String retVal = "redirect:/manage/viewSystems.ktrl?sortedSet.orderByDirection=" + sortedSet.getOrderByDirection() + "&sortedSet.orderByField=" + sortedSet.getOrderByField();
 
+        boolean isNewSystem = hostSystem.getId() == null;
+
+        try {
+            if (isNewSystem && SystemDB.getSystemCount() >= LicenseUtil.getMaxSystems()) {
+                addError("License limit reached: this Bastillion instance is licensed for " +
+                        LicenseUtil.getMaxSystems() + " system" + (LicenseUtil.getMaxSystems() == 1 ? "" : "s") +
+                        ". Remove a system or upgrade your license to add another.");
+                sortedSet = SystemDB.getSystemSet(sortedSet);
+                return "/manage/view_systems.html";
+            }
+        } catch (SQLException | GeneralSecurityException ex) {
+            log.error(ex.toString(), ex);
+            throw new ServletException(ex.toString(), ex);
+        }
+
         hostSystem = SSHUtil.authAndAddPubKey(hostSystem, passphrase, password);
 
         try {
-            if (hostSystem.getId() != null) {
+            if (!isNewSystem) {
                 SystemDB.updateSystem(hostSystem);
             } else {
                 hostSystem.setId(SystemDB.insertSystem(hostSystem));

@@ -1,6 +1,32 @@
+:root {
+    --bastillion-accent: #3fb950;
+    --bastillion-accent-hover: #56d364;
+    --bs-focus-ring-color: rgba(63, 185, 80, .25);
+}
+
 html {
     font-size: 16px;
     font-weight: 500;
+    scrollbar-color: var(--bs-border-color) transparent;
+}
+
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--bs-border-color);
+    border-radius: 6px;
+}
+
+::selection {
+    background: var(--bastillion-accent);
+    color: #0d1117;
 }
 
 body {
@@ -8,7 +34,15 @@ body {
 }
 
 a {
-    color: #666;
+    color: var(--bastillion-accent);
+}
+
+a:hover {
+    color: var(--bastillion-accent-hover);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--bastillion-accent);
 }
 
 table {
@@ -50,15 +84,15 @@ td {
 }
 
 .table-striped  {
-    border: 1px solid #CCCCCC;
+    border: 1px solid var(--bs-border-color);
 }
 
 .table-striped  colgroup,  .table-striped  th {
-    border-bottom: 1px solid #CCCCCC;
+    border-bottom: 1px solid var(--bs-border-color);
 }
 
 .tablescroll_head th {
-    background-color: #e0e0e0;
+    background-color: var(--bs-tertiary-bg);
 }
 
 .table-striped th, .tablescroll_head th, .table-striped td, .tablescroll_head td {
@@ -71,7 +105,7 @@ td {
 
 div.block {
     overflow: hidden;
-    border: 1px solid #CCC;
+    border: 1px solid var(--bs-border-color);
 }
 
 div.block label, div.block .inner_block {
@@ -88,38 +122,48 @@ div.block .input {
 }
 
 .error, .error a {
-    color: #b94a48;
+    color: #f85149;
 }
 
 .warning {
     font-weight: bold;
-    color: #b8b60e;
+    color: #e3b341;
 }
 
 .success {
     font-weight: bold;
-    color: #008000;
+    color: var(--bastillion-accent);
 }
 
-.sort {
-    background-position: right center;
-    background-repeat: no-repeat;
+.sort, .asc, .desc {
+    position: relative;
     cursor: pointer;
-    background-image: url('../../img/bg.gif')
+    padding-right: 16px !important;
 }
 
-.asc {
-    background-position: right center;
-    background-repeat: no-repeat;
-    cursor: pointer;
-    background-image: url('../../img/asc.gif')
+.sort::after, .asc::after, .desc::after {
+    content: "";
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
 }
 
-.desc {
-    background-position: right center;
-    background-repeat: no-repeat;
-    cursor: pointer;
-    background-image: url('../../img/desc.gif')
+.sort::after {
+    border-top: 4px solid var(--bs-secondary-color);
+    border-bottom: 4px solid var(--bs-secondary-color);
+    margin-top: -4px;
+}
+
+.asc::after {
+    border-bottom: 5px solid var(--bastillion-accent);
+    margin-top: -5px;
+}
+
+.desc::after {
+    border-top: 5px solid var(--bastillion-accent);
+    margin-top: 0;
 }
 
 .ui-button {
@@ -128,7 +172,7 @@ div.block .input {
 
 div.term {
     margin: 10px;
-    border: 1px solid #CCCCCC;
+    border: 1px solid var(--bs-border-color);
 }
 
 div.termwrapper {
@@ -143,6 +187,7 @@ div.termwrapper div h6 {
 .term-header {
     font-size: 15px;
     white-space: nowrap;
+    cursor: move;
 }
 
 .top_nav {
@@ -156,13 +201,13 @@ div.termwrapper div h6 {
 }
 
 .run_cmd {
-    background: #f0f0f0;
-    border: 1px solid #cccccc;
+    background: var(--bs-tertiary-bg);
+    border: 1px solid var(--bs-border-color);
 }
 
 .run_cmd_active {
-    background: #555753;
-    border: 1px solid #cccccc;
+    background: #12261a;
+    border: 1px solid var(--bastillion-accent);
 }
 
 .run_cmd_active h6 {
@@ -307,13 +352,18 @@ a.btn {
 }
 
 .scrollableTable th {
-    background-color: #e0e0e0;
+    background-color: var(--bs-tertiary-bg);
+}
+
+.scrollableTable tbody tr:hover, .uploadScrollableTable tbody tr:hover {
+    /* !important needed: even rows get an inline background-color from JS zebra-striping */
+    background-color: #33393f !important;
 }
 
 table.floatThead-table {
     border-top: none;
     border-bottom: none;
-    background-color: #FFF;
+    background-color: var(--bs-body-bg);
 }
 
 .show {
@@ -343,7 +393,7 @@ table.floatThead-table {
 .btn-secondary:focus, .btn-secondary.focus {
     color: #ffffff;
     background-color: #2e2f2f;
-    border-color: #080808;
+    border-color: var(--bastillion-accent);
 }
 
 .btn-secondary:hover {
@@ -379,7 +429,33 @@ table.floatThead-table {
     text-decoration: none;
 }
 
+/* tone down Bootstrap's light/secondary subtle-bg contrast for a gentler stripe */
+.list-group-item-light {
+    background-color: var(--bs-tertiary-bg);
+}
+
+.list-group-item-secondary {
+    background-color: #1a1d20;
+}
+
+.list-group-item-action:hover {
+    background-color: #33393f;
+}
+
 .modal-body .modal-content .row {
     width: 75%;
     margin-left: 15px;
+}
+
+.modal-content {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, .55);
+}
+
+/* pages rendered inside an iframe (upload/push) don't need room for the fixed navbar */
+.iframe-body {
+    padding: 10px;
+}
+
+.user-settings table {
+    width: 350px;
 }

@@ -4,7 +4,7 @@
  *    Licensed under The Prosperity Public License 3.0.0
  */-->
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" data-bs-theme="dark">
 
 <head>
 
@@ -149,6 +149,7 @@
             </tbody>
         </table>
     </div>
+    <p class="error" th:if="${sortedSet.itemList == null || sortedSet.itemList.empty}">No users defined yet</p>
     <button class="btn btn-secondary add_btn spacer spacer-bottom" data-bs-toggle="modal"
             data-bs-target="#add_dialog">Add User</button>
     <div id="add_dialog" class="modal fade">

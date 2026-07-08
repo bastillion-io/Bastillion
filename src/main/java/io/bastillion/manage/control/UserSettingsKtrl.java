@@ -5,13 +5,16 @@
  */
 package io.bastillion.manage.control;
 
+import com.jcraft.jsch.JSchException;
 import io.bastillion.common.util.AuthUtil;
 import io.bastillion.manage.db.AuthDB;
 import io.bastillion.manage.db.PrivateKeyDB;
+import io.bastillion.manage.db.SystemDB;
 import io.bastillion.manage.db.UserThemeDB;
 import io.bastillion.manage.model.Auth;
 import io.bastillion.manage.model.UserSettings;
 import io.bastillion.manage.util.PasswordUtil;
+import io.bastillion.manage.util.SSHUtil;
 import loophole.mvc.annotation.Kontrol;
 import loophole.mvc.annotation.MethodType;
 import loophole.mvc.annotation.Model;
@@ -58,6 +61,16 @@ public class UserSettingsKtrl extends BaseKontroller {
     Auth auth;
     @Model(name = "userSettings")
     UserSettings userSettings;
+    @Model(name = "importPrivateKey")
+    String importPrivateKey;
+    @Model(name = "importPublicKey")
+    String importPublicKey;
+    @Model(name = "importPassphrase")
+    String importPassphrase;
+    @Model(name = "importConfirmReplace")
+    Boolean importConfirmReplace;
+    @Model(name = "systemCount")
+    Integer systemCount;
 
     static {
         try {
@@ -77,6 +90,7 @@ public class UserSettingsKtrl extends BaseKontroller {
 
         try {
             userSettings = UserThemeDB.getTheme(AuthUtil.getUserId(getRequest().getSession()));
+            systemCount = SystemDB.getSystemCount();
         } catch (SQLException | GeneralSecurityException ex) {
             log.error(ex.toString(), ex);
             throw new ServletException(ex.toString(), ex);
@@ -127,6 +141,47 @@ public class UserSettingsKtrl extends BaseKontroller {
 
 
         return "redirect:/admin/menu.html";
+    }
+
+    /**
+     * Replaces the application's SSH keypair with a pasted one, live - no restart. Manager
+     * only (checked server-side, not just hidden in the UI, since /admin/* is reachable by
+     * non-manager account types too). If systems are already registered, requires an
+     * explicit confirmation checkbox first: this key becomes what every registered system
+     * is contacted with immediately, so an unprepared replacement locks Bastillion out of
+     * all of them until the new key is added to each one's authorized_keys by hand.
+     */
+    @Kontrol(path = "/admin/importAppKeySubmit", method = MethodType.POST)
+    public String importAppKeySubmit() throws ServletException {
+        String retVal = "/admin/user_settings.html";
+
+        try {
+            systemCount = SystemDB.getSystemCount();
+
+            if (!Auth.MANAGER.equals(AuthUtil.getUserType(getRequest().getSession()))) {
+                addError("Only managers can replace the application SSH key");
+                return retVal;
+            }
+
+            if (systemCount > 0 && !Boolean.TRUE.equals(importConfirmReplace)) {
+                addError("You have " + systemCount + " registered system(s). Check the confirmation box "
+                        + "to proceed - only do this once this key is already in authorized_keys on "
+                        + "every one of them, or Bastillion will immediately lose SSH access to all of them.");
+                return retVal;
+            }
+
+            SSHUtil.validateKeyPair(importPrivateKey, importPublicKey, importPassphrase);
+            PrivateKeyDB.updateApplicationKey(importPublicKey.trim(), importPrivateKey, importPassphrase);
+            publicKey = importPublicKey.trim();
+
+        } catch (JSchException ex) {
+            addError(ex.getMessage());
+        } catch (SQLException | GeneralSecurityException ex) {
+            log.error(ex.toString(), ex);
+            throw new ServletException(ex.toString(), ex);
+        }
+
+        return retVal;
     }
 
     /**

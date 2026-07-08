@@ -4,17 +4,40 @@
 *.jar
 *.war
 *.ear
-target/*
+**/target/*
 node/*
 node_modules/*
 src/main/webapp/_res/node/*
 .idea/*
 *.iml
 *.DS_Store
-/target/
 /bin/
 
 # Eclipse Project Setting #
 .classpath
 .project
 .settings/*
+
+# Bastillion license signing key material - never commit (LicenseGenerator.java itself
+# should still be tracked, just not its generated key/license output) #
+**/licensing/*.b64
+**/licensing/*.lic
+
+# tools/migrate export files - contain DECRYPTED secrets (SSH private keys, passphrases,
+# OTP seeds); never commit regardless of what the user names the output file #
+tools/migrate/*.json
+
+# Local/prod secrets #
+.env-prod
+.env-local
+bastillion.jceks
+
+# Runtime state generated at first startup (TLS keystore, H2 database, CONFIG_DIR) #
+/keystore/
+/keydb/
+/config/
+
+# Build artifact left by maven-shade-plugin (root and migrate/ both use it) #
+dependency-reduced-pom.xml
+
+.claude
