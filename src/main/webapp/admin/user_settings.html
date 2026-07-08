@@ -94,6 +94,66 @@
     <pre style="white-space:pre-wrap;" class="form-control" th:text="${publicKey}"></pre>
 
     <template th:if="${#strings.equals(session.userType,'M')}" th:remove="tag">
+        <h3>Replace Application SSH Key</h3>
+        <p>Import your own key pair instead of the one Bastillion generated. This is meant as a
+            <strong>one-time step when first setting up Bastillion</strong>, before you've registered any
+            systems yet.</p>
+        <p class="warning">This replaces the <em>one</em> key every registered system trusts. If you already
+            have systems registered, Bastillion will immediately lose SSH access to all of them the moment
+            you replace it &mdash; unless this exact key is already sitting in <code>authorized_keys</code>
+            on every one of them first. When in doubt, add this key to your systems by hand before
+            replacing it here, not after.</p>
+        <form th:action="@{/admin/importAppKeySubmit.ktrl}" method="post" autocomplete="off">
+            <table>
+                <tr>
+                    <td>Private Key:
+                    </td>
+                    <td>
+                        <textarea name="importPrivateKey" class="form-control" title="Private Key" rows="8"
+                                  cols="60" placeholder="-----BEGIN OPENSSH PRIVATE KEY-----"></textarea>
+                        <span class="error" th:text="${fieldErrors.get('importPrivateKey')}"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Public Key:
+                    </td>
+                    <td>
+                        <textarea name="importPublicKey" class="form-control" title="Public Key" rows="3"
+                                  cols="60" placeholder="ssh-ed25519 AAAA..."></textarea>
+                        <span class="error" th:text="${fieldErrors.get('importPublicKey')}"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Passphrase:
+                    </td>
+                    <td>
+                        <input type="password" name="importPassphrase" class="form-control"
+                               title="Passphrase (leave blank if none)">
+                    </td>
+                </tr>
+                <tr th:if="${systemCount != null and systemCount > 0}">
+                    <td>&#xA0;</td>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="importConfirmReplace" value="true"
+                                   class="form-check-input">
+                            This exact key is already in <code>authorized_keys</code> on every registered
+                            system.
+                        </label>
+                    </td>
+                </tr>
+                <tr>
+                    <td>&#xA0;</td>
+                    <td>
+                        <div id="import_key_btn" class="btn btn-secondary submit_btn">Replace Key</div>
+                    </td>
+                </tr>
+            </table>
+            <input type="hidden" name="_csrf" th:value="${session._csrf}">
+        </form>
+    </template>
+
+    <template th:if="${#strings.equals(session.userType,'M')}" th:remove="tag">
         <h3>License</h3>
         <template th:if="${@io.bastillion.manage.util.LicenseUtil@isLicensed()}" th:remove="tag">
             <p>Licensed to <strong th:text="${@io.bastillion.manage.util.LicenseUtil@getLicensee()}"></strong>

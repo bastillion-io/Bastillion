@@ -382,6 +382,32 @@ public class SSHUtil {
         return fingerprint;
     }
 
+    /**
+     * Confirms a pasted private/public key pair (and passphrase, if the key is encrypted)
+     * actually loads via JSch before it's ever written to application_key - an unvalidated
+     * bad paste there would break every future SSH connection until fixed. Throws with a
+     * message safe to show the user on any problem; returns normally if the pair is valid.
+     */
+    public static void validateKeyPair(String privateKey, String publicKey, String passphrase) throws JSchException {
+        if (StringUtils.isEmpty(privateKey) || StringUtils.isEmpty(publicKey)) {
+            throw new JSchException("Both the private and public key are required");
+        }
+        KeyPair keyPair;
+        try {
+            keyPair = KeyPair.load(new JSch(), privateKey.getBytes(StandardCharsets.UTF_8),
+                    publicKey.getBytes(StandardCharsets.UTF_8));
+        } catch (JSchException ex) {
+            throw new JSchException("Could not parse the private/public key: " + ex.getMessage());
+        }
+        try {
+            if (keyPair.isEncrypted() && !keyPair.decrypt(passphrase == null ? "" : passphrase)) {
+                throw new JSchException("Passphrase is incorrect for this private key");
+            }
+        } finally {
+            keyPair.dispose();
+        }
+    }
+
     // --- Distribution methods ---
 
     public static void distributePubKeysToAllSystems() throws SQLException, GeneralSecurityException {

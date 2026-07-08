@@ -53,4 +53,33 @@ public class PrivateKeyDB {
 
         return appKey;
     }
+
+    /**
+     * Replaces the application's SSH keypair (the one key every registered system trusts)
+     * with the given values, encrypting private_key/passphrase the same way the initial
+     * DBInitServlet-generated key is. Takes effect immediately - callers like
+     * SSHUtil.authAndAddPubKey() read this table fresh on every connection, nothing is
+     * cached, so no restart is needed. Callers must validate the keypair actually loads
+     * (see SSHUtil.validateKeyPair) before calling this - an unvalidated bad paste here
+     * would break every future SSH connection until fixed.
+     */
+    public static void updateApplicationKey(String publicKey, String privateKey, String passphrase)
+            throws SQLException, GeneralSecurityException {
+
+        Connection con = DBUtils.getConn();
+
+        PreparedStatement delStmt = con.prepareStatement("delete from application_key");
+        delStmt.execute();
+        DBUtils.closeStmt(delStmt);
+
+        PreparedStatement insStmt = con.prepareStatement(
+                "insert into application_key (public_key, private_key, passphrase) values(?,?,?)");
+        insStmt.setString(1, publicKey);
+        insStmt.setString(2, EncryptionUtil.encrypt(privateKey));
+        insStmt.setString(3, EncryptionUtil.encrypt(passphrase == null ? "" : passphrase));
+        insStmt.execute();
+        DBUtils.closeStmt(insStmt);
+
+        DBUtils.closeConn(con);
+    }
 }

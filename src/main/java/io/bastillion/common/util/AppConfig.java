@@ -29,9 +29,10 @@ public class AppConfig {
     private static final Logger log = LoggerFactory.getLogger(AppConfig.class);
     private static PropertiesConfiguration prop;
 
-    public static final String CONFIG_DIR = StringUtils.isNotEmpty(System.getProperty("CONFIG_DIR"))
-            ? System.getProperty("CONFIG_DIR").trim()
-            : defaultConfigDir();
+    public static final String CONFIG_DIR = normalizeDir(
+            StringUtils.isNotEmpty(System.getProperty("CONFIG_DIR"))
+                    ? System.getProperty("CONFIG_DIR").trim()
+                    : defaultConfigDir());
 
     private static FileBasedConfigurationBuilder<PropertiesConfiguration> builder;
 
@@ -78,15 +79,22 @@ public class AppConfig {
     }
 
     /**
-     * Running unshaded (mvn compile exec:java), classpath resources sit in a real directory
-     * on disk and that's used as-is, matching historical target/classes behavior. Running
-     * from the packaged jar there's no "." classpath entry (nothing to resolve a path
-     * against), so this falls back to the current working directory - fine given
-     * getProperty() prefers environment variables anyway; a properties file here is opt-in.
+     * Always the current working directory, whether running from the packaged jar or
+     * unshaded (mvn compile exec:java). Deliberately NOT the classpath's "." resource
+     * (target/classes when unshaded) - that's build output Maven freely overwrites on every
+     * compile, which silently wiped runtime-persisted values like a generated keystore
+     * password. getProperty() prefers environment variables anyway; a properties file here
+     * is opt-in.
      */
     private static String defaultConfigDir() {
-        URL classpathDir = AppConfig.class.getClassLoader().getResource(".");
-        return classpathDir != null ? classpathDir.getPath() : System.getProperty("user.dir") + File.separator;
+        return System.getProperty("user.dir") + File.separator;
+    }
+
+    // CONFIG_DIR is concatenated directly with filenames (see the FileBasedConfigurationBuilder
+    // setup below) - normalize here so a user-supplied -DCONFIG_DIR without a trailing slash
+    // doesn't silently merge into the filename.
+    private static String normalizeDir(String dir) {
+        return dir.endsWith(File.separator) ? dir : dir + File.separator;
     }
 
     private static void moveIfAbsent(String filename) throws IOException {

@@ -107,7 +107,7 @@ target systems by hand, no hunting down which server has which stale key.
 ---
 
 ## 🚀 What's New
-- **Licensing** — free at up to 3 systems, paid tiers available at [loophole.company/pricing.html](https://loophole.company/pricing.html) (see [Licensing](#licensing) below)
+- **Licensing** — free at up to 5 systems, paid tiers available at [loophole.company/pricing.html](https://loophole.company/pricing.html) (see [Licensing](#licensing) below)
 - Runs as a **self-contained jar** (`java -jar`) with HTTPS out of the box — see [Download and Run](#download-and-run)
 - Upgraded to **Java 21** and **Jakarta EE 11**
 - Full support for **Ed25519** (default) and **Ed448** SSH keys
@@ -117,7 +117,7 @@ target systems by hand, no hunting down which server has which stale key.
 
 ## Licensing
 
-Bastillion runs unlicensed at up to **3 registered systems** — enough to try it for real
+Bastillion runs unlicensed at up to **5 registered systems** — enough to try it for real
 before buying. A license raises that cap.
 
 1. Buy a license at **[loophole.company/pricing.html](https://loophole.company/pricing.html)**
@@ -145,11 +145,10 @@ pricing page when you get the expiry warning.
 
 ## Prerequisites
 
-### Java 21 (OpenJDK or Oracle JDK)
+### Java 21 (OpenJDK)
 ```bash
 apt-get install openjdk-21-jdk
 ```
-> Oracle JDK download: http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
 ### Authenticator (for 2FA)
 
@@ -197,6 +196,7 @@ java -jar target/bastillion-5.0.0-SNAPSHOT.jar
 ```
 
 Or for local dev without repackaging on every change:
+
 ```bash
 mvn compile exec:java
 ```
@@ -248,6 +248,17 @@ set), and is where any value Bastillion generates for you at first startup — l
 DB password — gets persisted. See `src/main/resources/BastillionConfig.properties` for the
 full list of settings and their defaults.
 
+**Consolidating everything under one directory** (e.g. a single Docker volume mount):
+Bastillion's state defaults to three independent sibling paths relative to the working
+directory — `keystore/bastillion.p12`, `keydb/bastillion` (the H2 database), and
+`BastillionConfig.properties` itself (via `CONFIG_DIR`) — rather than one shared root. Point
+them all at the same parent to keep everything in one place:
+```bash
+export CONFIG_DIR=/data/bastillion/
+export KEYSTORE_PATH=/data/bastillion/keystore/bastillion.p12
+export DB_CONNECTION_URL=jdbc:h2:file:/data/bastillion/keydb/bastillion;CIPHER=AES;
+```
+
 <details>
 <summary><strong>SSH Key Management</strong></summary>
 
@@ -266,19 +277,38 @@ export FORCE_USER_KEY_GENERATION=false
 <details>
 <summary><strong>Custom SSH Key Pair</strong></summary>
 
-Specify a custom SSH key pair or let Bastillion generate its own on startup:
+By default Bastillion generates its own Ed25519 keypair on first startup. To use your own
+instead, the easiest way is through the UI: **Settings → Replace Application SSH Key**
+(manager accounts only) — paste in a private key, public key, and passphrase if it has one,
+and it takes effect immediately, no restart needed.
+
+⚠️ This replaces the *one* key every registered system trusts. It's meant as a one-time step
+when first setting up Bastillion, **before** you've registered any systems — if you already
+have systems registered, Bastillion loses SSH access to all of them the instant you replace
+the key, unless this exact key is already sitting in `authorized_keys` on every one of them
+first. The Settings page requires an extra confirmation checkbox once you have systems
+registered, precisely because of this.
+
+**Already have systems registered and need to rotate the key anyway?** Pre-stage the new key
+through Bastillion itself rather than editing `authorized_keys` by hand everywhere:
+
+1. Set `FORCE_USER_KEY_GENERATION=false` so **Manage SSH Keys → Add SSH Key** lets you paste
+   an existing public key instead of only generating a new one.
+2. Add the new key there against a profile covering all your systems, and confirm (under
+   Manage SSH Keys, or each system's status) that it's actually landed everywhere — keep
+   `AUTH_KEYS_REFRESH_INTERVAL` in mind, since that's what pushes it out.
+3. Only once you're sure it's on every system, replace the application key in Settings.
+4. Set `FORCE_USER_KEY_GENERATION` back to its previous value, then once you've confirmed
+   the new application key has propagated to every system (again, mind
+   `AUTH_KEYS_REFRESH_INTERVAL`), remove the key you added in step 2 from Manage SSH Keys —
+   it was only staged there to pre-seed `authorized_keys` and isn't needed going forward.
+
+For scripted/headless setups, the same thing can be done via environment variables and a
+restart instead:
 
 ```bash
 # Regenerate and import SSH keys
 export RESET_APPLICATION_SSH_KEY=true
-
-# SSH key type ('rsa', 'ecdsa', 'ed25519', or 'ed448')
-# Supported options:
-#   rsa    - Classic, widely compatible (configurable length, default 4096)
-#   ecdsa  - Faster, smaller keys (P-256/384/521 curves)
-#   ed25519 - Default and recommended (≈ RSA-4096, secure and fast)
-#   ed448  - Extra-strong (≈ RSA-8192, slower and less supported)
-export SSH_KEY_TYPE=ed25519
 
 # Private key
 export PRIVATE_KEY=/Users/you/.ssh/id_rsa
@@ -291,6 +321,19 @@ export DEFAULT_SSH_PASSPHRASE=myPa$$w0rd
 ```
 
 Once registered, you can drop these — the key pair is already stored in the database.
+
+`SSH_KEY_TYPE` (`rsa`, `ecdsa`, `ed25519`, or `ed448`) only matters when Bastillion is
+*generating* a fresh key, not when importing one — the type of an imported key is read from
+the key itself:
+```bash
+# SSH key type ('rsa', 'ecdsa', 'ed25519', or 'ed448')
+# Supported options:
+#   rsa    - Classic, widely compatible (configurable length, default 4096)
+#   ecdsa  - Faster, smaller keys (P-256/384/521 curves)
+#   ed25519 - Default and recommended (≈ RSA-4096, secure and fast)
+#   ed448  - Extra-strong (≈ RSA-8192, slower and less supported)
+export SSH_KEY_TYPE=ed25519
+```
 </details>
 
 <details>
@@ -455,23 +498,10 @@ Bastillion uses to authenticate to registered systems.
 
 ---
 
-## Thanks to
-
-- [JSch](http://www.jcraft.com/jsch)
-- [term.js](https://github.com/chjj/term.js)
-
-See full dependencies in [_3rdPartyLicenses.md_](3rdPartyLicenses.md).
-
----
-
 ## License
 
-Bastillion is available under the **Prosperity Public License**.
+Bastillion is available under the **Prosperity Public License**. Full list of third-party
+dependencies and their licenses in [3rdPartyLicenses.md](3rdPartyLicenses.md).
 
----
-
-## Author
-
-**Loophole, LLC**
-Sean Kavanagh
+**Loophole, LLC** — Sean Kavanagh
 [sean@loophole.company](mailto:sean@loophole.company)

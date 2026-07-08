@@ -4,14 +4,13 @@
 *.jar
 *.war
 *.ear
-target/*
+**/target/*
 node/*
 node_modules/*
 src/main/webapp/_res/node/*
 .idea/*
 *.iml
 *.DS_Store
-/target/
 /bin/
 
 # Eclipse Project Setting #
@@ -19,17 +18,22 @@ src/main/webapp/_res/node/*
 .project
 .settings/*
 
-# Bastillion license signing key material - never commit #
-licensing/*.b64
-licensing/*.lic
+# Bastillion license signing key material - never commit (LicenseGenerator.java itself
+# should still be tracked, just not its generated key/license output) #
+**/licensing/*.b64
+**/licensing/*.lic
 
 # Local/prod secrets #
 .env-prod
 .env-local
 bastillion.jceks
 
-# Build artifact left at repo root by maven-shade-plugin #
-/dependency-reduced-pom.xml
+# Runtime state generated at first startup (TLS keystore, H2 database, CONFIG_DIR) #
+/keystore/
+/keydb/
+/config/
 
-licensing
+# Build artifact left by maven-shade-plugin (root and migrate/ both use it) #
+dependency-reduced-pom.xml
+
 .claude
