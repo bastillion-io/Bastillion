@@ -88,15 +88,7 @@ across as many hosts as you selected.
 
 ![A health-check command broadcast to three terminals simultaneously, same output shape across all three](docs/screenshots/web-terminal.png)
 
-### 5. Save it as a Composite Script
-
-Anything you'd type interactively can be saved as a **Composite Script** and re-run later
-across a whole fleet with one click — no more pasting the same five commands into five
-terminals by hand.
-
-![A saved health-check script executing live across all three terminals](docs/screenshots/composite-scripts-running.png)
-
-### 6. Rotate or revoke keys centrally
+### 5. Rotate or revoke keys centrally
 
 Because every host trusts the *same* application key (not one key per user), disabling it
 once under **Manage SSH Keys** revokes access everywhere immediately — no need to touch
