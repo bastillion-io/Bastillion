@@ -6,7 +6,7 @@
 package loophole.mvc.annotation;
 
 public enum MethodType {
-    GET("GET"), POST("POST");
+    GET("GET"), POST("POST"), PUT("PUT"), DELETE("DELETE"), PATCH("PATCH"), HEAD("HEAD"), OPTIONS("OPTIONS");
 
     private String method;
 
