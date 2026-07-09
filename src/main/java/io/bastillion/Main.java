@@ -222,6 +222,7 @@ public class Main {
     private static void copyJarWebApp(URL webAppRoot, Path targetDir) throws IOException {
         JarURLConnection conn = (JarURLConnection) webAppRoot.openConnection();
         conn.setUseCaches(false);
+        Path normalizedTargetDir = targetDir.toAbsolutePath().normalize();
         try (JarFile jarFile = conn.getJarFile()) {
             Enumeration<JarEntry> entries = jarFile.entries();
             while (entries.hasMoreElements()) {
@@ -229,7 +230,11 @@ public class Main {
                 if (entry.isDirectory() || !entry.getName().startsWith("webapp/")) {
                     continue;
                 }
-                Path target = targetDir.resolve(entry.getName().substring("webapp/".length()));
+                String relativeName = entry.getName().substring("webapp/".length());
+                Path target = normalizedTargetDir.resolve(relativeName).normalize();
+                if (!target.startsWith(normalizedTargetDir)) {
+                    throw new IOException("Blocked suspicious jar entry path: " + entry.getName());
+                }
                 Files.createDirectories(target.getParent());
                 try (InputStream in = jarFile.getInputStream(entry)) {
                     Files.copy(in, target);
