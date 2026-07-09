@@ -16,7 +16,7 @@ public class UserSessionsOutput {
 
 
     public Map<Integer, SessionOutput> getSessionOutputMap() {
-        return Collections.unmodifiableMap(new ConcurrentHashMap<>(sessionOutputMap));
+        return Collections.unmodifiableMap(sessionOutputMap);
     }
 
     public void setSessionOutputMap(Map<Integer, SessionOutput> sessionOutputMap) {
