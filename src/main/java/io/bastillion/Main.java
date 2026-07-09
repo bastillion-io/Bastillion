@@ -2,7 +2,6 @@ package io.bastillion;
 
 import io.bastillion.common.util.AppConfig;
 import io.bastillion.manage.socket.SecureShellWS;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpCookie;
 import org.eclipse.jetty.server.ForwardedRequestCustomizer;
@@ -28,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
+import java.security.SecureRandom;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
@@ -143,7 +143,13 @@ public class Main {
                     ? AppConfig.decryptProperty("keystorePassword")
                     : AppConfig.getProperty("keystorePassword");
         }
-        String generated = RandomStringUtils.random(32, true, true);
+        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        SecureRandom secureRandom = new SecureRandom();
+        StringBuilder generatedBuilder = new StringBuilder(32);
+        for (int i = 0; i < 32; i++) {
+            generatedBuilder.append(alphabet.charAt(secureRandom.nextInt(alphabet.length())));
+        }
+        String generated = generatedBuilder.toString();
         AppConfig.encryptProperty("keystorePassword", generated);
         return generated;
     }
