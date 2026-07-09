@@ -237,7 +237,10 @@ public class BaseKontroller {
 
                     String key = null;
                     if (name.contains("[")) {
-                        key = name.replaceAll(".*\\[", "").replaceAll("\\'", "").replaceAll("\\].*", "");
+                        String afterLastOpenBracket = name.substring(name.lastIndexOf("[") + 1);
+                        String withoutQuotes = afterLastOpenBracket.replace("'", "");
+                        int closeBracket = withoutQuotes.indexOf("]");
+                        key = closeBracket >= 0 ? withoutQuotes.substring(0, closeBracket) : withoutQuotes;
                         name = name.substring(0, name.indexOf("["));
                         requestMap.put(key, request.getParameter(param));
                     }

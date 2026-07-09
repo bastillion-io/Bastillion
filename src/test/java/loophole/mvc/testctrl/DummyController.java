@@ -33,6 +33,11 @@ public class DummyController extends BaseKontroller {
     @Model(name = "greeting")
     private String greeting;
 
+    @Model(name = "tags")
+    private java.util.Map<String, String> tags = new java.util.HashMap<>();
+
+    public static boolean tagsExecuted;
+
     public DummyController(HttpServletRequest request, HttpServletResponse response) {
         super(request, response);
     }
@@ -42,6 +47,7 @@ public class DummyController extends BaseKontroller {
         echoExecuted = false;
         submitExecuted = false;
         validateSubmitExecuted = false;
+        tagsExecuted = false;
     }
 
     @Kontrol(path = "/hello", method = MethodType.GET)
@@ -60,6 +66,12 @@ public class DummyController extends BaseKontroller {
         echoExecuted = true;
         greeting = "hello " + name + " (" + age + ")";
         return "forward:/echo.html";
+    }
+
+    @Kontrol(path = "/tags", method = MethodType.POST)
+    public String echoTags() {
+        tagsExecuted = true;
+        return "forward:/tags.html";
     }
 
     @Kontrol(path = "/validate", method = MethodType.POST)

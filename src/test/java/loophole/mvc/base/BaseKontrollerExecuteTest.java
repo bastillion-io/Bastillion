@@ -21,6 +21,7 @@ import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -81,6 +82,72 @@ class BaseKontrollerExecuteTest {
         assertTrue(DummyController.echoExecuted);
         assertEquals("forward:/echo.html", forward);
         verify(request).setAttribute("greeting", "hello world (42)");
+    }
+
+    // --- setFieldFromParams' bracketed-key parsing (tags[env]=prod -> Map.put("env", "prod")) ---
+    // Regression coverage for the java/polynomial-redos fix: the key extraction used to
+    // chain three replaceAll regexes (".*\\[", "\\'", "\\]. *") over the attacker-controlled
+    // parameter name, which could backtrack quadratically on crafted input. It was replaced
+    // with plain lastIndexOf/substring/literal-replace, which must preserve the exact same
+    // key extracted in each of these cases.
+
+    @Test
+    void populatesMapModelFieldFromBracketedParameterName() throws Exception {
+        when(request.getRequestURI()).thenReturn("/app/tags.ktrl");
+        when(request.getMethod()).thenReturn("POST");
+        when(request.getParameterNames()).thenReturn(Collections.enumeration(java.util.List.of("tags[env]")));
+        when(request.getParameter("tags[env]")).thenReturn("prod");
+
+        new BaseKontroller(request, response).execute();
+
+        assertTrue(DummyController.tagsExecuted);
+        ArgumentCaptor<Map> tagsCaptor = ArgumentCaptor.forClass(Map.class);
+        verify(request).setAttribute(eq("tags"), tagsCaptor.capture());
+        assertEquals("prod", tagsCaptor.getValue().get("env"));
+    }
+
+    @Test
+    void stripsQuotesFromBracketedParameterKey() throws Exception {
+        when(request.getRequestURI()).thenReturn("/app/tags.ktrl");
+        when(request.getMethod()).thenReturn("POST");
+        when(request.getParameterNames()).thenReturn(Collections.enumeration(java.util.List.of("tags['env']")));
+        when(request.getParameter("tags['env']")).thenReturn("prod");
+
+        new BaseKontroller(request, response).execute();
+
+        ArgumentCaptor<Map> tagsCaptor = ArgumentCaptor.forClass(Map.class);
+        verify(request).setAttribute(eq("tags"), tagsCaptor.capture());
+        assertEquals("prod", tagsCaptor.getValue().get("env"));
+    }
+
+    @Test
+    void handlesBracketedParameterKeyMissingClosingBracket() throws Exception {
+        when(request.getRequestURI()).thenReturn("/app/tags.ktrl");
+        when(request.getMethod()).thenReturn("POST");
+        when(request.getParameterNames()).thenReturn(Collections.enumeration(java.util.List.of("tags[env")));
+        when(request.getParameter("tags[env")).thenReturn("prod");
+
+        new BaseKontroller(request, response).execute();
+
+        ArgumentCaptor<Map> tagsCaptor = ArgumentCaptor.forClass(Map.class);
+        verify(request).setAttribute(eq("tags"), tagsCaptor.capture());
+        assertEquals("prod", tagsCaptor.getValue().get("env"));
+    }
+
+    @Test
+    void handlesAdversarialBracketedParameterNameWithoutQuadraticSlowdown() throws Exception {
+        // Shape that caused catastrophic backtracking under the old ".*\\[" regex: an
+        // opening bracket followed by a long run of a repeated character and no closing
+        // bracket, so every suffix after the last successful match previously failed to
+        // match only after an O(n) backtrack - O(n^2) overall for n this large.
+        String hugeUnclosedKey = "tags[" + "a".repeat(200_000);
+        when(request.getRequestURI()).thenReturn("/app/tags.ktrl");
+        when(request.getMethod()).thenReturn("POST");
+        when(request.getParameterNames()).thenReturn(Collections.enumeration(java.util.List.of(hugeUnclosedKey)));
+        when(request.getParameter(hugeUnclosedKey)).thenReturn("prod");
+
+        assertTimeoutPreemptively(java.time.Duration.ofSeconds(5), () ->
+                new BaseKontroller(request, response).execute());
     }
 
     @Test
