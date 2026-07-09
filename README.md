@@ -211,15 +211,33 @@ CA); click through it, same as you would for any other self-hosted appliance. Th
 certificate and its password persist across restarts (`keystore/bastillion.p12` next to
 where you run it, password stored the same encrypted way as the database password).
 
-**Use your own certificate** (e.g. one from Let's Encrypt/certbot) by converting it to
-PKCS12 and pointing Bastillion at it:
-```bash
-openssl pkcs12 -export -in fullchain.pem -inkey privkey.pem \
-  -out bastillion.p12 -name bastillion -passout pass:changeit
+**Use your own CA-signed certificate** instead of the self-signed default — e.g. a free one
+from [Let's Encrypt](https://letsencrypt.org/):
 
-export KEYSTORE_PATH=/path/to/bastillion.p12
-export KEYSTORE_PASSWORD=changeit
-```
+1. Issue the certificate with [certbot](https://certbot.eff.org/) (requires a real DNS name
+   pointing at this host, and port 80 reachable for the HTTP-01 challenge):
+   ```bash
+   sudo certbot certonly --standalone -d bastillion.example.com
+   ```
+   This writes `fullchain.pem` and `privkey.pem` to
+   `/etc/letsencrypt/live/bastillion.example.com/`.
+
+2. Convert the cert/key pair to PKCS12, the keystore format Bastillion expects:
+   ```bash
+   openssl pkcs12 -export \
+     -in /etc/letsencrypt/live/bastillion.example.com/fullchain.pem \
+     -inkey /etc/letsencrypt/live/bastillion.example.com/privkey.pem \
+     -out bastillion.p12 -name bastillion -passout pass:changeit
+   ```
+
+3. Point Bastillion at it and restart:
+   ```bash
+   export KEYSTORE_PATH=/path/to/bastillion.p12
+   export KEYSTORE_PASSWORD=changeit
+   ```
+   Browsers will now trust the connection with no warning. Let's Encrypt certificates expire
+   every 90 days — `certbot renew` followed by re-running steps 2–3 (and a restart) keeps it
+   current; `certbot renew --deploy-hook` can automate that.
 
 **Behind a reverse proxy or load balancer that already terminates TLS** (nginx, Cloud
 Run, etc.) — disable Bastillion's own HTTPS and let it serve plain HTTP instead:
