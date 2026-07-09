@@ -57,11 +57,11 @@ public class SecureShellWS {
             this.session = session;
 
             run = new SentOutputTask(sessionId, session, UserDB.getUser(AuthUtil.getUserId(httpSession)));
+            Thread thread = new Thread(run);
+            thread.start();
         } catch (GeneralSecurityException | SQLException ex) {
             log.error(ex.toString(), ex);
         }
-        Thread thread = new Thread(run);
-        thread.start();
 
     }
 
