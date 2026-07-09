@@ -44,6 +44,21 @@
         </repository>
     </repositories>
 
+    <!-- Pins transitive dependencies pulled in with known CVEs where the parent (here,
+         jetty-jaas -> api-ldap-model) hasn't bumped its own declared version yet. -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- mina-core 2.2.3 (via jetty-jaas's LDAP JAAS module) has several CVEs around
+                 deserialization of untrusted data in its object serialization codec, patched
+                 (and re-patched after incomplete fixes) across 2.2.4-2.2.9. -->
+            <dependency>
+                <groupId>org.apache.mina</groupId>
+                <artifactId>mina-core</artifactId>
+                <version>2.2.9</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <!-- MVC framework (formerly the io.bastillion:lmvc artifact; merged directly into
              src/main/java/loophole/mvc so the whole app builds from this one pom) -->
