@@ -152,7 +152,7 @@
         <template th:each=" s : ${sessionAudit.hostSystemList}" th:remove="tag">
             <div th:id="'run_cmd_' + ${s.instanceId}" class="run_cmd_active run_cmd">
                 <h6 class="term-header" th:text="${s.displayLabel}"></h6>
-                <div id="term" class="term">
+                <div th:id="'term_' + ${s.instanceId}" class="term">
                     <div th:id="'output_' + ${s.instanceId}" class="output">
                         <div class="terminal"></div>
                     </div>
