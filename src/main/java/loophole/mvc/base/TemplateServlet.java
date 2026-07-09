@@ -16,6 +16,8 @@ import org.thymeleaf.web.IWebExchange;
 import org.thymeleaf.web.servlet.JakartaServletWebApplication;
 
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 @WebServlet("*" + TemplateServlet.VIEW_EXT)
 public class TemplateServlet extends HttpServlet {
@@ -40,6 +42,13 @@ public class TemplateServlet extends HttpServlet {
         WebContext context = new WebContext(webExchange);
         String uri = request.getRequestURI().replaceAll("\\" + TemplateServlet.VIEW_EXT + ".*", TemplateServlet.VIEW_EXT)
                 .replaceAll("^" + request.getContextPath(), "");
+
+        // reject path traversal attempts before resolving the view name to a template resource
+        if (URLDecoder.decode(uri, StandardCharsets.UTF_8).contains("..")) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+
         engine.process(uri, context, response.getWriter());
     }
 
