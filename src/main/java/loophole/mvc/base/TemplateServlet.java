@@ -43,13 +43,32 @@ public class TemplateServlet extends HttpServlet {
         String uri = request.getRequestURI().replaceAll("\\" + TemplateServlet.VIEW_EXT + ".*", TemplateServlet.VIEW_EXT)
                 .replaceAll("^" + request.getContextPath(), "");
 
-        // reject path traversal attempts before resolving the view name to a template resource
-        if (URLDecoder.decode(uri, StandardCharsets.UTF_8).contains("..")) {
+        String templateName = toSafeTemplateName(uri);
+        if (templateName == null) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
-        engine.process(uri, context, response.getWriter());
+        engine.process(templateName, context, response.getWriter());
+    }
+
+    private static String toSafeTemplateName(String rawUri) {
+        String decoded = URLDecoder.decode(rawUri, StandardCharsets.UTF_8);
+        if (!decoded.startsWith("/") || !decoded.endsWith(VIEW_EXT)) {
+            return null;
+        }
+
+        String[] segments = decoded.substring(1).split("/");
+        for (String segment : segments) {
+            if (segment.isEmpty() || ".".equals(segment) || "..".equals(segment)) {
+                return null;
+            }
+            if (!segment.matches("[A-Za-z0-9_-]+(\\.html)?")) {
+                return null;
+            }
+        }
+
+        return decoded;
     }
 
     @Override
