@@ -423,7 +423,7 @@ Enable it in **log4j2.xml** by uncommenting:
 - `io.bastillion.manage.util.SystemAudit`
 - `audit-appender`
 
-> https://github.com/bastillion-io/Bastillion/blob/master/src/main/resources/log4j2.xml#L19-L22
+> https://github.com/bastillion-io/Bastillion/blob/main/src/main/resources/log4j2.xml#L19-L22
 
 Also enable it:
 ```bash
