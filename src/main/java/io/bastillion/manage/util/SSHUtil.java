@@ -24,6 +24,7 @@ import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * SSH utility class used to create public/private key for system and distribute authorized key files
@@ -53,6 +54,28 @@ public class SSHUtil {
     public static final int CHANNEL_TIMEOUT = 60000;
 
     private SSHUtil() {}
+
+    // --- Command Injection Guards ---
+
+    // authorizedKeys is interpolated unquoted into remote shell commands (cat/echo/chmod),
+    // so it's restricted to a plain relative/absolute file path with no shell metacharacters.
+    private static final Pattern SAFE_AUTHORIZED_KEYS_PATH = Pattern.compile("[A-Za-z0-9_./-]+");
+
+    // each key line is interpolated inside a single-quoted echo '...' remote shell command,
+    // so a bare single quote (which would close the quoting early) makes the line unsafe.
+    // The other shell metacharacters have no special meaning inside single quotes in POSIX
+    // shells, but are rejected too as defense-in-depth in case a line ever reaches an
+    // unquoted context.
+    private static final Pattern UNSAFE_KEY_CHARS = Pattern.compile("['\"`$;|&\\r]");
+
+    // package-private (rather than private) so SSHUtilTest can exercise the guards directly
+    static boolean isSafeAuthorizedKeysPath(String path) {
+        return StringUtils.isNotBlank(path) && SAFE_AUTHORIZED_KEYS_PATH.matcher(path).matches();
+    }
+
+    static boolean isSafeKeyContent(String key) {
+        return StringUtils.isNotBlank(key) && !UNSAFE_KEY_CHARS.matcher(key).find();
+    }
 
     // --- Key Accessors ---
 
@@ -183,6 +206,13 @@ public class SSHUtil {
     public static HostSystem addPubKey(HostSystem hostSystem, Session session, String appPublicKey) {
         try {
             String authorizedKeys = hostSystem.getAuthorizedKeys().replaceAll("~\\/|~", "");
+            if (!isSafeAuthorizedKeysPath(authorizedKeys)) {
+                log.error("Refusing to push keys for system {}: authorized_keys path '{}' contains disallowed characters",
+                        hostSystem.getId(), authorizedKeys);
+                hostSystem.setStatusCd(HostSystem.GENERIC_FAIL_STATUS);
+                return hostSystem;
+            }
+
             ChannelExec exec = (ChannelExec) session.openChannel("exec");
             exec.setCommand("cat " + authorizedKeys);
             exec.setErrStream(System.err);
@@ -200,12 +230,25 @@ public class SSHUtil {
 
             String existingKeys = existingKeysBuilder.toString();
             String appPubKey = appPublicKey.replace("\n", "").trim();
+            if (!isSafeKeyContent(appPubKey)) {
+                log.error("Refusing to push keys for system {}: application public key contains disallowed characters",
+                        hostSystem.getId());
+                hostSystem.setStatusCd(HostSystem.GENERIC_FAIL_STATUS);
+                return hostSystem;
+            }
 
             String newKeys;
             if (keyManagementEnabled) {
                 List<String> assigned = PublicKeyDB.getPublicKeysForSystem(hostSystem.getId());
                 StringBuilder sb = new StringBuilder();
-                for (String k : assigned) sb.append(k.replace("\n", "").trim()).append("\n");
+                for (String k : assigned) {
+                    String key = k.replace("\n", "").trim();
+                    if (!isSafeKeyContent(key)) {
+                        log.error("Skipping public key for system {}: key contains disallowed characters", hostSystem.getId());
+                        continue;
+                    }
+                    sb.append(key).append("\n");
+                }
                 sb.append(appPubKey);
                 newKeys = sb.toString();
             } else {
