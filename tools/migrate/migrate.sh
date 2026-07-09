@@ -20,6 +20,34 @@ shopt -s nullglob
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+JAR_URL="https://github.com/bastillion-io/Bastillion/releases/download/v5.0.0/bastillion-migrate-1.0.0.jar"
+JAR_SHA256="0b2d315c4785a2b7edf91f917d2910faea524bcf65c814cd9777772368b85aa6"
+JAR_CACHE="$SCRIPT_DIR/target/bastillion-migrate-1.0.0.jar"
+
+verify_jar_sha256() {
+    local file="$1" actual
+    if command -v sha256sum >/dev/null 2>&1; then
+        actual="$(sha256sum "$file" | awk '{print $1}')"
+    elif command -v shasum >/dev/null 2>&1; then
+        actual="$(shasum -a 256 "$file" | awk '{print $1}')"
+    else
+        echo "No sha256sum/shasum utility found, cannot verify jar checksum." >&2
+        return 1
+    fi
+    [ "$actual" = "$JAR_SHA256" ]
+}
+
+if [ ! -f "$JAR_CACHE" ]; then
+    echo "Downloading migration tool jar from $JAR_URL ..." >&2
+    mkdir -p "$SCRIPT_DIR/target"
+    if curl -fsSL -o "$JAR_CACHE" "$JAR_URL" && verify_jar_sha256 "$JAR_CACHE"; then
+        :
+    else
+        echo "Download or checksum verification failed, discarding and falling back to local build." >&2
+        rm -f "$JAR_CACHE"
+    fi
+fi
+
 migrate_jars=("$SCRIPT_DIR"/target/bastillion-migrate-*.jar)
 if [ "${#migrate_jars[@]}" -eq 0 ]; then
     echo "Building migration tool (mvn package)..." >&2
