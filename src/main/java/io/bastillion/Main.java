@@ -123,6 +123,7 @@ public class Main {
         sslContextFactory.setKeyStorePassword(keystorePassword);
 
         HttpConfiguration httpsConfig = new HttpConfiguration();
+        httpsConfig.setSendServerVersion(false);
         httpsConfig.addCustomizer(new SecureRequestCustomizer());
         ServerConnector connector = new ServerConnector(server,
                 new SslConnectionFactory(sslContextFactory, "http/1.1"),
@@ -190,6 +191,7 @@ public class Main {
     private static void configurePlainConnector(Server server) {
         int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
         HttpConfiguration httpConfig = new HttpConfiguration();
+        httpConfig.setSendServerVersion(false);
         httpConfig.addCustomizer(new ForwardedRequestCustomizer());
         ServerConnector connector = new ServerConnector(server, new HttpConnectionFactory(httpConfig));
         connector.setPort(port);

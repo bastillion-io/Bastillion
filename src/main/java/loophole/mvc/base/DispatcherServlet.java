@@ -67,6 +67,8 @@ public class DispatcherServlet extends HttpServlet {
                 request.getRequestDispatcher(forward)
                         .forward(request, response);
             }
+        } else {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
 
     }
