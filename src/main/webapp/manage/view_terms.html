@@ -63,7 +63,7 @@
                                     output = output.replace(/\r\n\r\n/g, '\r\n \r\n');
                                     var outputList = output.split('\r\n');
                                     for (var i = 0; i < outputList.length; i++) {
-                                        outputInstance.append("<pre>" + outputList[i] + "</pre>");
+                                        outputInstance.append($("<pre></pre>").text(outputList[i]));
                                     }
                                 }
                             });
