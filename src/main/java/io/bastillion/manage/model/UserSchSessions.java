@@ -6,6 +6,7 @@
 package io.bastillion.manage.model;
 
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -15,11 +16,11 @@ public class UserSchSessions {
 
 
     public Map<Integer, SchSession> getSchSessionMap() {
-        return schSessionMap;
+        return Collections.unmodifiableMap(new ConcurrentHashMap<>(schSessionMap));
     }
 
     public void setSchSessionMap(Map<Integer, SchSession> schSessionMap) {
-        this.schSessionMap = schSessionMap;
+        this.schSessionMap = (schSessionMap == null) ? new ConcurrentHashMap<>() : new ConcurrentHashMap<>(schSessionMap);
     }
 
 }
