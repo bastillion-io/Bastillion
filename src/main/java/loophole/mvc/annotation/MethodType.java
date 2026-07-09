@@ -15,7 +15,7 @@ public enum MethodType {
     }
 
     public String toString() {
-        return method.toString();
+        return method;
     }
 
 }
