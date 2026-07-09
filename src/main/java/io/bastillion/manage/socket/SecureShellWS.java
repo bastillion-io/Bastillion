@@ -109,7 +109,11 @@ public class SecureShellWS {
 
     @OnError
     public void onError(Session session, Throwable t) {
-        log.error(t.toString(), t);
+        log.error("Error occurred in WebSocket session ID: {} (Bastillion Session ID: {}) - Exception: {}",
+                session != null ? session.getId() : "unknown",
+                this.sessionId != null ? this.sessionId : "unknown",
+                t.toString(),
+                t);
     }
 
 
