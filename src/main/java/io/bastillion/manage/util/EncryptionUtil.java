@@ -186,6 +186,12 @@ public class EncryptionUtil {
 
         // Legacy fallback #1: old default "AES" (i.e., AES/ECB/PKCS5Padding)
         try {
+            // codeql[java/weak-cryptographic-algorithm]: decrypt-only fallback for ciphertext
+            // written before the CBC->GCM migration (1501b09); encrypt() above only ever
+            // writes v2 GCM. Values only get upgraded to v2 when rewritten (e.g. a password
+            // change), so removing this would break decrypting already-stored dbPassword/
+            // private_key/passphrase/otp_secret values on any deployment that upgraded but
+            // hasn't rewritten them since.
             Cipher c = Cipher.getInstance(T_ECB);
             c.init(Cipher.DECRYPT_MODE, new SecretKeySpec(rawKey, CRYPT_ALGORITHM));
             byte[] decodedVal = Base64.decodeBase64(serialized.getBytes(StandardCharsets.UTF_8));
