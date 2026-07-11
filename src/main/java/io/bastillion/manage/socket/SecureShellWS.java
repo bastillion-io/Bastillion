@@ -89,6 +89,11 @@ public class SecureShellWS {
                     UserSchSessions userSchSessions = SecureShellKtrl.getUserSchSessionMap().get(sessionId);
                     if (userSchSessions != null) {
                         SchSession schSession = userSchSessions.getSchSessionMap().get(id);
+                        // id can reference a terminal that's already closed on this end (a
+                        // stale browser tab, a race with onClose) - ignore it rather than NPE.
+                        if (schSession == null) {
+                            continue;
+                        }
                         if (keyCode != null) {
                             if (keyMap.containsKey(keyCode)) {
                                 schSession.getCommander().write(keyMap.get(keyCode));
