@@ -29,10 +29,14 @@ public class AppConfig {
     private static final Logger log = LoggerFactory.getLogger(AppConfig.class);
     private static PropertiesConfiguration prop;
 
-    public static final String CONFIG_DIR = normalizeDir(
+    public static final String CONFIG_DIR = normalizeDir(resolveConfigDir());
+
+    // Whether CONFIG_DIR was explicitly requested (env var or -DCONFIG_DIR), as opposed to
+    // falling back to defaultConfigDir() - drives which legacy-location migration applies
+    // below (moving classpath-bundled config in vs. moving old working-directory state in).
+    private static final boolean CONFIG_DIR_EXPLICIT =
             StringUtils.isNotEmpty(System.getProperty("CONFIG_DIR"))
-                    ? System.getProperty("CONFIG_DIR").trim()
-                    : defaultConfigDir());
+                    || StringUtils.isNotEmpty(System.getenv("CONFIG_DIR"));
 
     private static FileBasedConfigurationBuilder<PropertiesConfiguration> builder;
 
@@ -55,10 +59,28 @@ public class AppConfig {
 
     static {
         try {
-            // Move configuration files to specified dir if needed
-            if (StringUtils.isNotEmpty(System.getProperty("CONFIG_DIR"))) {
-                moveIfAbsent("BastillionConfig.properties");
-                moveIfAbsent("jaas.conf");
+            if (CONFIG_DIR_EXPLICIT) {
+                // Explicit CONFIG_DIR (env var or -DCONFIG_DIR): move config bundled on the
+                // classpath (the old pre-CONFIG_DIR default location) into it if not already
+                // there.
+                URL classpathDir = AppConfig.class.getClassLoader().getResource(".");
+                if (classpathDir != null) {
+                    File classpathDirFile = new File(classpathDir.getPath());
+                    moveIfAbsent("BastillionConfig.properties", classpathDirFile);
+                    moveIfAbsent("jaas.conf", classpathDirFile);
+                }
+            } else {
+                // No CONFIG_DIR override - we're on the "config" subdirectory default.
+                // Releases before that default existed persisted everything straight in the
+                // working directory; auto-migrate on upgrade so an in-place restart doesn't
+                // orphan a generated keystore/db password (and silently regenerate them) or
+                // strand the SSH host key pair / H2 database.
+                File legacyDir = new File(System.getProperty("user.dir"));
+                moveIfAbsent("BastillionConfig.properties", legacyDir);
+                moveIfAbsent("jaas.conf", legacyDir);
+                moveIfAbsent("bastillion.jceks", legacyDir);
+                moveDirIfAbsent("keydb", legacyDir);
+                moveDirIfAbsent("keystore", legacyDir);
             }
 
             // Build Commons Configuration 2.x-compatible builder. allowFailOnInit=true so a
@@ -78,16 +100,32 @@ public class AppConfig {
         }
     }
 
+    private static String resolveConfigDir() {
+        if (StringUtils.isNotEmpty(System.getProperty("CONFIG_DIR"))) {
+            return System.getProperty("CONFIG_DIR").trim();
+        }
+        if (StringUtils.isNotEmpty(System.getenv("CONFIG_DIR"))) {
+            return System.getenv("CONFIG_DIR").trim();
+        }
+        return defaultConfigDir();
+    }
+
     /**
-     * Always the current working directory, whether running from the packaged jar or
-     * unshaded (mvn compile exec:java). Deliberately NOT the classpath's "." resource
+     * A "config" subdirectory of the working directory, whether running from the packaged
+     * jar or unshaded (mvn compile exec:java). Deliberately NOT the classpath's "." resource
      * (target/classes when unshaded) - that's build output Maven freely overwrites on every
      * compile, which silently wiped runtime-persisted values like a generated keystore
      * password. getProperty() prefers environment variables anyway; a properties file here
-     * is opt-in.
+     * is opt-in. Everything else that anchors to CONFIG_DIR (KEYSTORE_PATH's default, the H2
+     * db via h2.baseDir, the SSH host key pair, bastillion.jceks) falls under the same root
+     * automatically - set CONFIG_DIR once (env var or -DCONFIG_DIR) to relocate all of it.
      */
     private static String defaultConfigDir() {
-        return System.getProperty("user.dir") + File.separator;
+        // Resolved to an absolute path (not a bare "config/" relative literal) because H2
+        // requires an absolute h2.baseDir (see DSPool) to accept the bundled default
+        // dbConnectionURL's relative "keydb/bastillion" - a relative baseDir doesn't satisfy
+        // H2's "implicit relative path" check.
+        return new File(System.getProperty("user.dir"), "config").getAbsolutePath() + File.separator;
     }
 
     // CONFIG_DIR is concatenated directly with filenames (see the FileBasedConfigurationBuilder
@@ -97,19 +135,25 @@ public class AppConfig {
         return dir.endsWith(File.separator) ? dir : dir + File.separator;
     }
 
-    private static void moveIfAbsent(String filename) throws IOException {
+    private static void moveIfAbsent(String filename, File sourceDir) throws IOException {
         File newFile = new File(CONFIG_DIR, filename);
         if (newFile.exists()) {
             return;
         }
-        URL classpathDir = AppConfig.class.getClassLoader().getResource(".");
-        if (classpathDir == null) {
-            // Running from a jar: no on-disk "old location" to migrate from.
-            return;
-        }
-        File oldFile = new File(classpathDir.getPath(), filename);
+        File oldFile = new File(sourceDir, filename);
         if (oldFile.exists()) {
             FileUtils.moveFile(oldFile, newFile);
+        }
+    }
+
+    private static void moveDirIfAbsent(String dirName, File sourceDir) throws IOException {
+        File newDir = new File(CONFIG_DIR, dirName);
+        if (newDir.exists()) {
+            return;
+        }
+        File oldDir = new File(sourceDir, dirName);
+        if (oldDir.isDirectory()) {
+            FileUtils.moveDirectory(oldDir, newDir);
         }
     }
 

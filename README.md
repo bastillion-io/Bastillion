@@ -208,8 +208,9 @@ own instead.
 Bastillion generates its own self-signed certificate on first startup and serves HTTPS —
 nothing to configure. Browsers will show a warning once (it's self-signed, not issued by a
 CA); click through it, same as you would for any other self-hosted appliance. The
-certificate and its password persist across restarts (`keystore/bastillion.p12` next to
-where you run it, password stored the same encrypted way as the database password).
+certificate and its password persist across restarts (`keystore/bastillion.p12` under
+[`CONFIG_DIR`](#configuration), password stored the same encrypted way as the database
+password).
 
 **Use your own CA-signed certificate** instead of the self-signed default — e.g. a free one
 from [Let's Encrypt](https://letsencrypt.org/):
@@ -261,15 +262,22 @@ DB password — gets persisted. See `src/main/resources/BastillionConfig.propert
 full list of settings and their defaults.
 
 **Consolidating everything under one directory** (e.g. a single Docker volume mount):
-Bastillion's state defaults to three independent sibling paths relative to the working
-directory — `keystore/bastillion.p12`, `keydb/bastillion` (the H2 database), and
-`BastillionConfig.properties` itself (via `CONFIG_DIR`) — rather than one shared root. Point
-them all at the same parent to keep everything in one place:
+`CONFIG_DIR` is the one setting to reach for. Everything Bastillion persists —
+`BastillionConfig.properties`, the self-signed TLS keystore (`keystore/bastillion.p12`), the
+H2 database and the SSH host key pair (both under `keydb/`), and `bastillion.jceks` — lives
+under it by default, so pointing `CONFIG_DIR` at one place relocates all of it:
 ```bash
 export CONFIG_DIR=/data/bastillion/
-export KEYSTORE_PATH=/data/bastillion/keystore/bastillion.p12
-export DB_CONNECTION_URL=jdbc:h2:file:/data/bastillion/keydb/bastillion;CIPHER=AES;
 ```
+`KEYSTORE_PATH` and `DB_CONNECTION_URL` still exist for pointing just one of those at a
+different location on its own (a real cert, a remote DB) — see [TLS / HTTPS](#tls--https) and
+the "Database Settings" section below — but neither is needed just to consolidate everything
+into `CONFIG_DIR`.
+
+`CONFIG_DIR` itself defaults to `./config` relative to the working directory. Upgrading an
+existing instance that never set it? Older releases stored state directly in the working
+directory instead of `./config` — Bastillion detects that on first startup with this version
+and moves it into `./config` (or into `CONFIG_DIR`, if you've now set one) automatically.
 
 <details>
 <summary><strong>SSH Key Management</strong></summary>

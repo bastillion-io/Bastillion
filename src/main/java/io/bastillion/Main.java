@@ -93,11 +93,14 @@ public class Main {
      * of X.509 code) and reused after that. Matches how Bastillion has always run standalone
      * - browsers warn on the self-signed cert once, same as before this migration; anyone
      * wanting a trusted cert can point KEYSTORE_PATH/KEYSTORE_PASSWORD at a real one (e.g.
-     * a Let's Encrypt cert converted to PKCS12).
+     * a Let's Encrypt cert converted to PKCS12). KEYSTORE_PATH defaults under AppConfig's
+     * CONFIG_DIR, same as the H2 db, SSH host key pair, and bastillion.jceks - so pointing
+     * CONFIG_DIR at one shared location (e.g. a Docker volume mount) is enough on its own.
      */
     private static void configureTlsConnector(Server server) throws Exception {
         int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "8443"));
-        File keystoreFile = new File(System.getenv().getOrDefault("KEYSTORE_PATH", "keystore/bastillion.p12"));
+        File keystoreFile = new File(System.getenv().getOrDefault("KEYSTORE_PATH",
+                AppConfig.CONFIG_DIR + "keystore" + File.separator + "bastillion.p12"));
         String keystorePassword = System.getenv("KEYSTORE_PASSWORD");
 
         if (StringUtils.isEmpty(keystorePassword)) {
