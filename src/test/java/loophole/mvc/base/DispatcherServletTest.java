@@ -19,7 +19,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
 
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -68,5 +70,33 @@ class DispatcherServletTest {
         servlet.doGet(request, response);
 
         verify(response).sendRedirect("/app/target?_csrf=TOKEN123");
+    }
+
+    @Test
+    void unmatchedUriWithNothingWrittenYetSends404() throws Exception {
+        // No registered @Kontrol path is a substring of this URI, so BaseKontroller.execute()
+        // never reaches the "&&" that checks HTTP method - request.getMethod() is genuinely
+        // never called here, unlike the matched-path tests above.
+        when(request.getRequestURI()).thenReturn("/app/doesNotExist.ktrl");
+        when(response.isCommitted()).thenReturn(false);
+
+        servlet.doGet(request, response);
+
+        verify(response).sendError(HttpServletResponse.SC_NOT_FOUND);
+    }
+
+    @Test
+    void unmatchedForwardOnAnAlreadyCommittedResponseDoesNotAttemptSendError() throws Exception {
+        // Mirrors OTPKtrl.qrImage()/AuthKeysKtrl.downloadPvtKey()/
+        // SessionAuditKtrl.getJSONTermOutputForSession(): the controller writes and closes
+        // the response body itself and returns null on success - sendError() on an
+        // already-committed response throws IllegalStateException("COMPLETED") in Jetty, even
+        // though the response was already sent to the client successfully.
+        when(request.getRequestURI()).thenReturn("/app/doesNotExist.ktrl");
+        when(response.isCommitted()).thenReturn(true);
+
+        servlet.doGet(request, response);
+
+        verify(response, never()).sendError(anyInt());
     }
 }
