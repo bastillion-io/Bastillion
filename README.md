@@ -2,6 +2,7 @@
 ![CodeQL](https://github.com/bastillion-io/Bastillion/actions/workflows/codeql-analysis.yml/badge.svg)
 ![License](https://img.shields.io/badge/license-Prosperity%203.0.0-blue)
 ![Java](https://img.shields.io/badge/Java-21-orange)
+[![Website](https://img.shields.io/badge/website-loophole.company-14161b)](https://loophole.company/)
 
 <p align="center">
   <img src="src/main/webapp/img/bastillion_40x40.png" alt="Bastillion">
@@ -560,6 +561,6 @@ Bastillion is available under the **Prosperity Public License**.
 
 Full list of third-party dependencies and their licenses in [3rdPartyLicenses.md](3rdPartyLicenses.md).
 
-**Loophole, LLC** — Sean Kavanagh
+**[Loophole, LLC](https://loophole.company/)** — Sean Kavanagh
 
 [sean@loophole.company](mailto:sean@loophole.company)
