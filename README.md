@@ -200,8 +200,6 @@ Listens on `https://localhost:8443` by default, same as the downloaded release a
 [TLS / HTTPS](#tls--https) below for how that certificate gets set up and how to use your
 own instead.
 
-> ⚠️ `mvn clean` will remove the H2 database and user data.
-
 ---
 
 ## TLS / HTTPS
