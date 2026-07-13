@@ -21,6 +21,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.security.SecureRandom;
 
 /**
@@ -43,10 +45,8 @@ public class CSRFFilter implements Filter {
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
 
         // csrf check
-        log.debug("CSRF parameter token is " + request.getParameter(SecurityFilter._CSRF));
-        log.debug("CSRF sesson token is " + httpServletRequest.getSession().getAttribute(SecurityFilter._CSRF));
         String _csrf = (String) httpServletRequest.getSession().getAttribute(SecurityFilter._CSRF);
-        if (_csrf == null || _csrf.equals(request.getParameter(SecurityFilter._CSRF))) {
+        if (_csrf == null || constantTimeEquals(_csrf, request.getParameter(SecurityFilter._CSRF))) {
             log.debug("CSRF token is valid for " + httpServletRequest.getRequestURL());
             if (_csrf == null || httpServletRequest.getMethod().equalsIgnoreCase("POST")) {
                 _csrf = (new BigInteger(165, random)).toString(36).toUpperCase();
@@ -62,5 +62,12 @@ public class CSRFFilter implements Filter {
     }
 
     public void destroy() {
+    }
+
+    private static boolean constantTimeEquals(String a, String b) {
+        if (a == null || b == null) {
+            return false;
+        }
+        return MessageDigest.isEqual(a.getBytes(StandardCharsets.UTF_8), b.getBytes(StandardCharsets.UTF_8));
     }
 }
