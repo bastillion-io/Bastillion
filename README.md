@@ -2,6 +2,7 @@
 ![CodeQL](https://github.com/bastillion-io/Bastillion/actions/workflows/codeql-analysis.yml/badge.svg)
 ![License](https://img.shields.io/badge/license-Prosperity%203.0.0-blue)
 ![Java](https://img.shields.io/badge/Java-21-orange)
+[![Built with Claude Code](https://img.shields.io/badge/Built%20with-Claude%20Code-D97757?logo=claude&logoColor=white)](https://claude.com/claude-code)
 [![Website](https://img.shields.io/badge/website-loophole.company-14161b)](https://loophole.company/)
 
 <p align="center">
