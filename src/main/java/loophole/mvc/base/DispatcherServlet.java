@@ -70,7 +70,7 @@ public class DispatcherServlet extends HttpServlet {
         } else if (!response.isCommitted()) {
             // A null forward with no response written is a genuine "no matching view" - but
             // some controllers (OTPKtrl.qrImage, AuthKeysKtrl.downloadPvtKey,
-            // SessionAuditKtrl.getJSONTermOutputForSession) write their own response body
+            // SessionAuditKtrl.streamTermOutputForSession) write their own response body
             // directly and return null on success. isCommitted() tells those two cases
             // apart; without this check, sendError() on an already-flushed-and-closed
             // response throws IllegalStateException("COMPLETED") even though the response

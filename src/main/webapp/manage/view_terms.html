@@ -28,52 +28,99 @@
                 filterTerms();
             });
 
-            function filterTerms() {
-                var filterVal = $('#filter').val();
+            //lines rendered per <pre> block - large sessions would hang the browser with one node per line
+            var RENDER_BATCH = 5000;
+            var termState = {};
 
-                if (filterVal != null && filterVal !== '') {
-                    $(".output > .terminal > pre").each(function (index, value) {
-
-                        if ($(this).text().indexOf(filterVal) >= 0) {
-                            $(this).show();
-                        } else {
-                            $(this).hide();
-                        }
-                    });
-                } else {
-                    $(".output > .terminal > pre").show();
-
+            function schedule(st) {
+                if (!st.scheduled) {
+                    st.scheduled = true;
+                    setTimeout(function () {
+                        st.scheduled = false;
+                        renderPending(st);
+                    }, 0);
                 }
-
             }
 
-            function loadTerms() {
+            function renderPending(st) {
+                var filterVal = $('#filter').val();
+                var batch = st.pending.splice(0, RENDER_BATCH);
+                var visible = filterVal ? batch.filter(function (line) {
+                    return line.indexOf(filterVal) >= 0;
+                }) : batch;
+                if (visible.length > 0) {
+                    st.terminal.append($("<pre></pre>").text(visible.join('\n') || ' '));
+                }
+                if (st.pending.length > 0) {
+                    schedule(st);
+                }
+            }
 
-                $(".output").each(function (index, value) {
-
-                    var id = $(this).attr("id").replace("output_", "");
-
-                    $.getJSON('getJSONTermOutputForSession.ktrl?sessionId=' + [[${sessionAudit.id}]] + '&instanceId=' + id + '&t=' + new Date().getTime() + '&_csrf=' + [[${session._csrf}]],
-                        function (data) {
-                            $.each(data, function (key, val) {
-                                if (val.output !== '' && val.instanceId != null) {
-                                    var outputInstance = $("#output_" + val.instanceId + "> .terminal");
-                                    outputInstance.empty();
-                                    var output = val.output;
-                                    output = output.replace(/\r\n\r\n/g, '\r\n \r\n');
-                                    var outputList = output.split('\r\n');
-                                    for (var i = 0; i < outputList.length; i++) {
-                                        outputInstance.append($("<pre></pre>").text(outputList[i]));
-                                    }
-                                }
-                            });
-                        }
-                    );
-
+            function filterTerms() {
+                $.each(termState, function (id, st) {
+                    st.terminal.empty();
+                    st.pending = st.lines.slice();
+                    schedule(st);
                 });
             }
 
-            loadTerms();
+            function streamTerm(st) {
+                fetch('streamTermOutputForSession.ktrl?sessionId=' + [[${sessionAudit.id}]] + '&instanceId=' + st.id + '&t=' + new Date().getTime() + '&_csrf=' + [[${session._csrf}]],
+                    {credentials: 'same-origin'})
+                    .then(function (response) {
+                        if (!response.ok) {
+                            throw new Error('HTTP ' + response.status);
+                        }
+                        var reader = response.body.getReader();
+                        var decoder = new TextDecoder();
+                        var carry = '';
+
+                        function addText(text, isLast) {
+                            var parts = text.split('\n');
+                            if (isLast) {
+                                carry = '';
+                                if (parts.length > 0 && parts[parts.length - 1] === '') {
+                                    parts.pop();
+                                }
+                            } else {
+                                carry = parts.pop();
+                            }
+                            if (parts.length > 0) {
+                                Array.prototype.push.apply(st.lines, parts);
+                                Array.prototype.push.apply(st.pending, parts);
+                                schedule(st);
+                            }
+                        }
+
+                        function pump() {
+                            return reader.read().then(function (result) {
+                                if (result.done) {
+                                    addText(carry + decoder.decode(), true);
+                                    return;
+                                }
+                                addText(carry + decoder.decode(result.value, {stream: true}), false);
+                                return pump();
+                            });
+                        }
+
+                        return pump();
+                    })
+                    .catch(function () {
+                        st.terminal.append($("<pre></pre>").text('Error - could not load session output'));
+                    });
+            }
+
+            $(".output").each(function () {
+                var id = $(this).attr("id").replace("output_", "");
+                termState[id] = {
+                    id: id,
+                    terminal: $(this).children(".terminal"),
+                    lines: [],
+                    pending: [],
+                    scheduled: false
+                };
+                streamTerm(termState[id]);
+            });
 
         });
         /*]]>*/
@@ -90,8 +137,8 @@
                 overflow-y: scroll;
             }
             .terminal pre {
-                padding: 0;
-                margin: 2px;
+                padding: 0 2px;
+                margin: 0;
                 white-space: pre-wrap;
                 word-wrap: break-word;
                 color: #f0f0f0;
@@ -103,6 +150,11 @@
             .term-container {
                 width: 100%;
                 padding: 25px 0;
+                margin: 0;
+            }
+            /* bastillion.css sets 145% for the live-terminals workspace; the audit view fits the page */
+            div.termwrapper {
+                width: 100%;
                 margin: 0;
             }
         </style>

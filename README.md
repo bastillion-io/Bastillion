@@ -26,6 +26,7 @@ systems — like a bastion host with a friendly dashboard. It does two things:
 - Log in with **2-factor authentication** (Authy or Google Authenticator)
 - Manage and distribute **SSH public keys**, and disable/rotate them centrally
 - Launch secure multi-session web shells and **share commands** across sessions
+- **Record every session** and replay it on demand — audit-ready evidence for any compliance framework
 - Group systems into **Profiles** and control exactly who can reach what
 - Save and re-run **Composite Scripts** across a whole fleet at once
 - Stack **TLS/SSL over SSH** for extra protection
@@ -98,10 +99,28 @@ target systems by hand, no hunting down which server has which stale key.
 
 ![Every SSH key in use, with a one-click Disable per key](docs/screenshots/manage-ssh-keys.png)
 
+### 6. Every session is recorded — audit and replay
+
+Everything typed and every byte returned in those terminals is recorded automatically.
+Managers open **Audit Sessions**, filter by user or system, and replay any session —
+side by side for sessions that spanned multiple hosts, with a text filter to jump
+straight to the lines that matter. Output **streams** into the page as it loads, so even
+a session that dumped hundreds of megabytes of logs replays without breaking a sweat.
+
+If you need to show an auditor who ran what, where, and when — this is that evidence,
+captured out of the box. Practically every compliance framework has a privileged-access
+audit-trail requirement somewhere (PCI DSS, HIPAA, SOC 2, ISO 27001 — pick yours), and
+this checks that box without a commercial PAM product. Sessions are kept for 90 days by
+default (`deleteAuditLogAfter`), and recording can be switched off with
+`ENABLE_INTERNAL_AUDIT=false` — see [Auditing](#configuration).
+
+![Replaying a recorded session across production hosts, with output filtering](docs/screenshots/audit-session.png)
+
 ---
 
 ## 🚀 What's New
 - **Licensing** — free at up to 5 systems, paid tiers available at [loophole.company/pricing.html](https://loophole.company/pricing.html) (see [Licensing](#licensing) below)
+- **Session audit & replay, on by default** — every terminal session is recorded and can be replayed under **Audit Sessions**, streamed to the browser so even huge sessions load instantly
 - Runs as a **self-contained jar** (`java -jar`) with HTTPS out of the box — see [Download and Run](#download-and-run)
 - Upgraded to **Java 21** and **Jakarta EE 11**
 - Full support for **Ed25519** (default) and **Ed448** SSH keys
@@ -424,18 +443,21 @@ Users are synced with profiles when their LDAP role names match Bastillion profi
 <details>
 <summary><strong>Auditing</strong></summary>
 
-Auditing is disabled by default.
+Session auditing is enabled by default: terminal output is stored in Bastillion's database
+and can be reviewed under **Audit Sessions** (manager accounts only). Output is streamed to
+the browser, so even sessions with very large amounts of terminal output can be replayed.
+Audit history is kept for `deleteAuditLogAfter` days (90 by default). Disable it with:
 
-Enable it in **log4j2.xml** by uncommenting:
+```bash
+export ENABLE_INTERNAL_AUDIT=false
+```
+
+There is also a file-based audit log, disabled by default. Enable it in **log4j2.xml** by
+uncommenting:
 - `io.bastillion.manage.util.SystemAudit`
 - `audit-appender`
 
 > https://github.com/bastillion-io/Bastillion/blob/main/src/main/resources/log4j2.xml#L19-L22
-
-Also enable it:
-```bash
-export ENABLE_INTERNAL_AUDIT=true
-```
 </details>
 
 <details>

@@ -15,6 +15,8 @@ import io.bastillion.manage.model.User;
 import io.bastillion.manage.util.DBUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.security.GeneralSecurityException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -25,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * DB class to store terminal logs for sessions
@@ -40,6 +43,17 @@ public class SessionAuditDB {
     public static final String SORT_BY_IP_ADDRESS = "ip_address";
     public static final String SORT_BY_USERNAME = "username";
     public static final String SORT_BY_SESSION_TM = "session_tm";
+
+    private static final Pattern TERMINAL_CONTROL_PATTERN = Pattern.compile(
+            "\u001B\\[[0-9;?]*[ -/]*[@-~]"                       //CSI - colors, cursor movement, screen modes
+                    + "|\u001B\\][^\\u0007\u001B]*(?:\\u0007|\u001B\\\\|$)" //OSC - window title
+                    + "|\u001B[()][0-9A-B]"                        //charset selection
+                    + "|\u001B[=>78cM]"                            //keypad modes, cursor save/restore
+                    + "|\\u0007"                                    //bell
+                    + "|\\]0;|\\[\\d\\d;\\d\\dm|\\[\\dm"              //bare leftovers logged without the escape char
+                    + "|\u001B");                                  //any stray escape char
+    //upper bound on how much of a single line without newlines is buffered before it is forced out
+    private static final int MAX_LINE_BUFFER = 1024 * 1024;
 
     private SessionAuditDB() {
     }
@@ -200,61 +214,97 @@ public class SessionAuditDB {
 
 
     /**
-     * returns terminal logs for user session for host system
+     * streams cleaned terminal output for a user session to the given writer
      *
      * @param sessionId  session id
      * @param instanceId instance id for terminal session
-     * @return session output for session
+     * @param writer     destination for cleaned terminal output
      */
-    public static List<SessionOutput> getTerminalLogsForSession(Long sessionId, Integer instanceId) throws SQLException, GeneralSecurityException {
+    public static void streamTerminalLogsForSession(Long sessionId, Integer instanceId, Writer writer) throws SQLException, GeneralSecurityException, IOException {
         //get db connection
         Connection con = DBUtils.getConn();
-        List<SessionOutput> outputList = getTerminalLogsForSession(con, sessionId, instanceId);
-        DBUtils.closeConn(con);
-
-        return outputList;
+        try {
+            streamTerminalLogsForSession(con, sessionId, instanceId, writer);
+        } finally {
+            DBUtils.closeConn(con);
+        }
     }
 
 
     /**
-     * returns terminal logs for user session for host system
+     * streams cleaned terminal output for a user session to the given writer, one line
+     * at a time, so the full session log is never held in memory
      *
+     * @param con        DB connection
      * @param sessionId  session id
      * @param instanceId instance id for terminal session
-     * @return session output for session
+     * @param writer     destination for cleaned terminal output
      */
-    public static List<SessionOutput> getTerminalLogsForSession(Connection con, Long sessionId, Integer instanceId) throws SQLException {
+    public static void streamTerminalLogsForSession(Connection con, Long sessionId, Integer instanceId, Writer writer) throws SQLException, IOException {
 
-        List<SessionOutput> outputList = new LinkedList<>();
-        PreparedStatement stmt = con.prepareStatement("select * from terminal_log where instance_id=? and session_id=? order by log_tm asc");
-        stmt.setLong(1, instanceId);
-        stmt.setLong(2, sessionId);
-        ResultSet rs = stmt.executeQuery();
-        StringBuilder outputBuilder = new StringBuilder();
-        while (rs.next()) {
-            outputBuilder.append(rs.getString("output"));
+        PreparedStatement stmt = con.prepareStatement("select output from terminal_log where instance_id=? and session_id=? order by log_tm asc");
+        try {
+            stmt.setLong(1, instanceId);
+            stmt.setLong(2, sessionId);
+            ResultSet rs = stmt.executeQuery();
+
+            //lines are buffered across rows so control sequences split between two output
+            //chunks are still cleaned; backspaces never apply across a newline
+            StringBuilder line = new StringBuilder();
+            while (rs.next()) {
+                String output = rs.getString("output");
+                for (int i = 0; i < output.length(); i++) {
+                    char c = output.charAt(i);
+                    if (c == '\n') {
+                        if (line.length() > 0 && line.charAt(line.length() - 1) == '\r') {
+                            line.setLength(line.length() - 1);
+                        }
+                        writer.write(cleanLine(line.toString()));
+                        writer.write('\n');
+                        line.setLength(0);
+                    } else {
+                        line.append(c);
+                        if (line.length() >= MAX_LINE_BUFFER) {
+                            writer.write(cleanLine(line.toString()));
+                            writer.write('\n');
+                            line.setLength(0);
+                        }
+                    }
+                }
+            }
+            if (line.length() > 0) {
+                writer.write(cleanLine(line.toString()));
+                writer.write('\n');
+            }
+            DBUtils.closeRs(rs);
+        } finally {
+            DBUtils.closeStmt(stmt);
         }
+    }
 
-        String output = outputBuilder.toString();
-        output = output.replaceAll("\\u0007|\u001B\\[K|\\]0;|\\[\\d\\d;\\d\\dm|\\[\\dm", "");
-        while (output.contains("\b")) {
-            output = output.replaceFirst(".\b", "");
+    /**
+     * strips terminal control sequences from a line of output and applies backspaces
+     *
+     * @param line raw line of terminal output
+     * @return cleaned line
+     */
+    static String cleanLine(String line) {
+        String cleaned = TERMINAL_CONTROL_PATTERN.matcher(line).replaceAll("");
+        if (cleaned.indexOf('\b') < 0) {
+            return cleaned;
         }
-        DBUtils.closeRs(rs);
-
-        SessionOutput sessionOutput = new SessionOutput();
-        sessionOutput.setSessionId(sessionId);
-        sessionOutput.setInstanceId(instanceId);
-        sessionOutput.getOutput().append(output);
-
-        outputList.add(sessionOutput);
-
-        DBUtils.closeRs(rs);
-        DBUtils.closeStmt(stmt);
-
-
-        return outputList;
-
+        StringBuilder sb = new StringBuilder(cleaned.length());
+        for (int i = 0; i < cleaned.length(); i++) {
+            char c = cleaned.charAt(i);
+            if (c == '\b') {
+                if (sb.length() > 0) {
+                    sb.deleteCharAt(sb.length() - 1);
+                }
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
     }
 
     /**

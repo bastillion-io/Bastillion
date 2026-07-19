@@ -5,7 +5,6 @@
  */
 package io.bastillion.manage.control;
 
-import com.google.gson.Gson;
 import io.bastillion.manage.db.SessionAuditDB;
 import io.bastillion.manage.db.SystemDB;
 import io.bastillion.manage.db.UserDB;
@@ -24,6 +23,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 import java.util.List;
@@ -84,12 +84,14 @@ public class SessionAuditKtrl extends BaseKontroller {
         return "/manage/view_terms.html";
     }
 
-    @Kontrol(path = "/manage/getJSONTermOutputForSession", method = MethodType.GET)
-    public String getJSONTermOutputForSession() throws ServletException {
+    @Kontrol(path = "/manage/streamTermOutputForSession", method = MethodType.GET)
+    public String streamTermOutputForSession() throws ServletException {
 
         try {
-            String json = new Gson().toJson(SessionAuditDB.getTerminalLogsForSession(sessionId, instanceId));
-            getResponse().getOutputStream().write(json.getBytes());
+            getResponse().setContentType("text/plain;charset=UTF-8");
+            PrintWriter writer = getResponse().getWriter();
+            SessionAuditDB.streamTerminalLogsForSession(sessionId, instanceId, writer);
+            writer.flush();
         } catch (SQLException | GeneralSecurityException | IOException ex) {
             log.error(ex.toString(), ex);
             throw new ServletException(ex.toString(), ex);

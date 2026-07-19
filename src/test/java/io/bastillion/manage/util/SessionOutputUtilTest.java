@@ -5,14 +5,19 @@
  */
 package io.bastillion.manage.util;
 
+import io.bastillion.manage.db.DbTestSupport;
 import io.bastillion.manage.model.SessionOutput;
 import io.bastillion.manage.model.User;
 import org.junit.jupiter.api.Test;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
  * SessionOutputUtil buffers SSH terminal output in memory until the browser's ajax poll
@@ -21,6 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * storage-layer contract: raw output passes through unmodified, and getOutput() drains the
  * buffer it returns rather than leaving stale text to double up on the next poll. Each test
  * uses its own session id since userSessionsOutputMap is static/shared for the whole test JVM.
+ * getOutput() also persists drained output to terminal_log when enableInternalAudit is on
+ * (the default), so each test supplies an in-memory DB seeded with its session_log row.
  */
 class SessionOutputUtilTest {
 
@@ -35,7 +42,22 @@ class SessionOutputUtilTest {
         SessionOutput sessionOutput = new SessionOutput();
         sessionOutput.setSessionId(sessionId);
         sessionOutput.setInstanceId(instanceId);
+        // terminal_log columns are not null - always present in prod, where SessionOutput
+        // is built from the HostSystem the terminal is connected to
+        sessionOutput.setDisplayNm("test-system");
+        sessionOutput.setUser("alice");
+        sessionOutput.setHost("localhost");
+        sessionOutput.setPort(22);
         return sessionOutput;
+    }
+
+    private static Connection newConnection(long sessionId) throws Exception {
+        Connection con = DbTestSupport.newConnection();
+        PreparedStatement stmt = con.prepareStatement("insert into session_log (id, username) values (?, 'alice')");
+        stmt.setLong(1, sessionId);
+        stmt.execute();
+        stmt.close();
+        return con;
     }
 
     @Test
@@ -47,10 +69,12 @@ class SessionOutputUtilTest {
         char[] chars = raw.toCharArray();
         SessionOutputUtil.addToOutput(sessionId, 1, chars, 0, chars.length);
 
-        List<SessionOutput> output = SessionOutputUtil.getOutput(null, sessionId, testUser());
+        try (Connection con = newConnection(sessionId)) {
+            List<SessionOutput> output = SessionOutputUtil.getOutput(con, sessionId, testUser());
 
-        assertEquals(1, output.size());
-        assertEquals(raw, output.get(0).getOutput().toString());
+            assertEquals(1, output.size());
+            assertEquals(raw, output.get(0).getOutput().toString());
+        }
     }
 
     @Test
@@ -60,11 +84,13 @@ class SessionOutputUtilTest {
         char[] chars = "first batch".toCharArray();
         SessionOutputUtil.addToOutput(sessionId, 1, chars, 0, chars.length);
 
-        List<SessionOutput> first = SessionOutputUtil.getOutput(null, sessionId, testUser());
-        assertEquals(1, first.size());
+        try (Connection con = newConnection(sessionId)) {
+            List<SessionOutput> first = SessionOutputUtil.getOutput(con, sessionId, testUser());
+            assertEquals(1, first.size());
 
-        List<SessionOutput> second = SessionOutputUtil.getOutput(null, sessionId, testUser());
-        assertTrue(second.isEmpty());
+            List<SessionOutput> second = SessionOutputUtil.getOutput(con, sessionId, testUser());
+            assertTrue(second.isEmpty());
+        }
     }
 
     @Test
@@ -72,9 +98,11 @@ class SessionOutputUtilTest {
         long sessionId = 9003L;
         SessionOutputUtil.addOutput(newInstance(sessionId, 1));
 
-        List<SessionOutput> output = SessionOutputUtil.getOutput(null, sessionId, testUser());
+        try (Connection con = newConnection(sessionId)) {
+            List<SessionOutput> output = SessionOutputUtil.getOutput(con, sessionId, testUser());
 
-        assertTrue(output.isEmpty());
+            assertTrue(output.isEmpty());
+        }
     }
 
     @Test
@@ -87,9 +115,11 @@ class SessionOutputUtilTest {
         char[] readBuffer = "hello-garbage-past-here".toCharArray();
         SessionOutputUtil.addToOutput(sessionId, 1, readBuffer, 0, 5);
 
-        List<SessionOutput> output = SessionOutputUtil.getOutput(null, sessionId, testUser());
+        try (Connection con = newConnection(sessionId)) {
+            List<SessionOutput> output = SessionOutputUtil.getOutput(con, sessionId, testUser());
 
-        assertEquals("hello", output.get(0).getOutput().toString());
+            assertEquals("hello", output.get(0).getOutput().toString());
+        }
     }
 
     @Test
@@ -102,10 +132,12 @@ class SessionOutputUtilTest {
 
         SessionOutputUtil.removeOutput(sessionId, 1);
 
-        List<SessionOutput> output = SessionOutputUtil.getOutput(null, sessionId, testUser());
-        assertEquals(1, output.size());
-        assertEquals(2, output.get(0).getInstanceId());
-        assertEquals("two", output.get(0).getOutput().toString());
+        try (Connection con = newConnection(sessionId)) {
+            List<SessionOutput> output = SessionOutputUtil.getOutput(con, sessionId, testUser());
+            assertEquals(1, output.size());
+            assertEquals(2, output.get(0).getInstanceId());
+            assertEquals("two", output.get(0).getOutput().toString());
+        }
     }
 
     @Test
@@ -116,11 +148,35 @@ class SessionOutputUtilTest {
 
         SessionOutputUtil.removeUserSession(sessionId);
 
-        // No session tracked anymore - getOutput must not throw, just return nothing.
-        List<SessionOutput> output = SessionOutputUtil.getOutput(null, sessionId, testUser());
-        assertTrue(output.isEmpty());
+        try (Connection con = newConnection(sessionId)) {
+            // No session tracked anymore - getOutput must not throw, just return nothing.
+            List<SessionOutput> output = SessionOutputUtil.getOutput(con, sessionId, testUser());
+            assertTrue(output.isEmpty());
+        }
 
         // addToOutput against a removed session is a safe no-op, not an NPE.
         SessionOutputUtil.addToOutput(sessionId, 1, "text".toCharArray(), 0, 4);
+    }
+
+    @Test
+    void drainedOutputIsPersistedToTerminalLogForAuditing() throws Exception {
+        assumeTrue(SessionOutputUtil.enableInternalAudit);
+
+        long sessionId = 9007L;
+        SessionOutputUtil.addOutput(newInstance(sessionId, 1));
+        char[] chars = "audited output".toCharArray();
+        SessionOutputUtil.addToOutput(sessionId, 1, chars, 0, chars.length);
+
+        try (Connection con = newConnection(sessionId)) {
+            SessionOutputUtil.getOutput(con, sessionId, testUser());
+
+            PreparedStatement stmt = con.prepareStatement("select output from terminal_log where session_id=?");
+            stmt.setLong(1, sessionId);
+            ResultSet rs = stmt.executeQuery();
+            assertTrue(rs.next());
+            assertEquals("audited output", rs.getString("output"));
+            rs.close();
+            stmt.close();
+        }
     }
 }

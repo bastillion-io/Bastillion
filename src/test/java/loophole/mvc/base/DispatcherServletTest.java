@@ -88,7 +88,7 @@ class DispatcherServletTest {
     @Test
     void unmatchedForwardOnAnAlreadyCommittedResponseDoesNotAttemptSendError() throws Exception {
         // Mirrors OTPKtrl.qrImage()/AuthKeysKtrl.downloadPvtKey()/
-        // SessionAuditKtrl.getJSONTermOutputForSession(): the controller writes and closes
+        // SessionAuditKtrl.streamTermOutputForSession(): the controller writes and closes
         // the response body itself and returns null on success - sendError() on an
         // already-committed response throws IllegalStateException("COMPLETED") in Jetty, even
         // though the response was already sent to the client successfully.
