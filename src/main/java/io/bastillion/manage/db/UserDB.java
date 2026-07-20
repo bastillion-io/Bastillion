@@ -58,28 +58,26 @@ public class UserDB {
         String orderBy = sortedSet.toOrderByClause();
         String sql = "select * from  users" + orderBy;
 
-        Connection con = DBUtils.getConn();
-        PreparedStatement stmt = con.prepareStatement(sql);
-        ResultSet rs = stmt.executeQuery();
-        while (rs.next()) {
-            User user = new User();
-            user.setId(rs.getLong("id"));
-            user.setFirstNm(rs.getString(FIRST_NM));
-            user.setLastNm(rs.getString(LAST_NM));
-            user.setEmail(rs.getString(EMAIL));
-            user.setUsername(rs.getString(USERNAME));
-            user.setPassword(rs.getString(PASSWORD));
-            user.setAuthType(rs.getString(AUTH_TYPE));
-            user.setUserType(rs.getString(USER_TYPE));
-            user.setLastLoginTm(rs.getTimestamp(LAST_LOGIN_TM));
-            user.setExpirationTm(rs.getTimestamp(EXPIRATION_TM));
-            user.setExpired(EXPIRATION_DAYS > 0 && user.getExpirationTm() != null && user.getExpirationTm().before(new Date()));
-            userList.add(user);
+        try (Connection con = DBUtils.getConn();
+             PreparedStatement stmt = con.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                User user = new User();
+                user.setId(rs.getLong("id"));
+                user.setFirstNm(rs.getString(FIRST_NM));
+                user.setLastNm(rs.getString(LAST_NM));
+                user.setEmail(rs.getString(EMAIL));
+                user.setUsername(rs.getString(USERNAME));
+                user.setPassword(rs.getString(PASSWORD));
+                user.setAuthType(rs.getString(AUTH_TYPE));
+                user.setUserType(rs.getString(USER_TYPE));
+                user.setLastLoginTm(rs.getTimestamp(LAST_LOGIN_TM));
+                user.setExpirationTm(rs.getTimestamp(EXPIRATION_TM));
+                user.setExpired(EXPIRATION_DAYS > 0 && user.getExpirationTm() != null && user.getExpirationTm().before(new Date()));
+                userList.add(user);
 
+            }
         }
-        DBUtils.closeRs(rs);
-        DBUtils.closeStmt(stmt);
-        DBUtils.closeConn(con);
 
         sortedSet.setItemList(userList);
         return sortedSet;
@@ -100,30 +98,29 @@ public class UserDB {
         String orderBy = sortedSet.toOrderByClause();
         String sql = "select u.*, m.profile_id from users u left join user_map  m on m.user_id = u.id and m.profile_id = ? where u.user_type like '" + User.ADMINISTRATOR + "'" + orderBy;
 
-        Connection con = DBUtils.getConn();
-        PreparedStatement stmt = con.prepareStatement(sql);
-        stmt.setLong(1, profileId);
-        ResultSet rs = stmt.executeQuery();
-        while (rs.next()) {
-            User user = new User();
-            user.setId(rs.getLong("id"));
-            user.setFirstNm(rs.getString(FIRST_NM));
-            user.setLastNm(rs.getString(LAST_NM));
-            user.setEmail(rs.getString(EMAIL));
-            user.setUsername(rs.getString(USERNAME));
-            user.setPassword(rs.getString(PASSWORD));
-            user.setAuthType(rs.getString(AUTH_TYPE));
-            user.setUserType(rs.getString(USER_TYPE));
-            user.setLastLoginTm(rs.getTimestamp(LAST_LOGIN_TM));
-            user.setExpirationTm(rs.getTimestamp(EXPIRATION_TM));
-            user.setExpired(EXPIRATION_DAYS > 0 && user.getExpirationTm() != null && user.getExpirationTm().before(new Date()));
-            user.setChecked(profileId.equals(rs.getLong(PROFILE_ID)));
-            userList.add(user);
+        try (Connection con = DBUtils.getConn();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setLong(1, profileId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    User user = new User();
+                    user.setId(rs.getLong("id"));
+                    user.setFirstNm(rs.getString(FIRST_NM));
+                    user.setLastNm(rs.getString(LAST_NM));
+                    user.setEmail(rs.getString(EMAIL));
+                    user.setUsername(rs.getString(USERNAME));
+                    user.setPassword(rs.getString(PASSWORD));
+                    user.setAuthType(rs.getString(AUTH_TYPE));
+                    user.setUserType(rs.getString(USER_TYPE));
+                    user.setLastLoginTm(rs.getTimestamp(LAST_LOGIN_TM));
+                    user.setExpirationTm(rs.getTimestamp(EXPIRATION_TM));
+                    user.setExpired(EXPIRATION_DAYS > 0 && user.getExpirationTm() != null && user.getExpirationTm().before(new Date()));
+                    user.setChecked(profileId.equals(rs.getLong(PROFILE_ID)));
+                    userList.add(user);
 
+                }
+            }
         }
-        DBUtils.closeRs(rs);
-        DBUtils.closeStmt(stmt);
-        DBUtils.closeConn(con);
 
         sortedSet.setItemList(userList);
         return sortedSet;
@@ -138,11 +135,9 @@ public class UserDB {
      */
     public static User getUser(Long userId) throws SQLException, GeneralSecurityException {
 
-        Connection con = DBUtils.getConn();
-        User user = getUser(con, userId);
-        DBUtils.closeConn(con);
-
-        return user;
+        try (Connection con = DBUtils.getConn()) {
+            return getUser(con, userId);
+        }
     }
 
     /**
@@ -155,28 +150,28 @@ public class UserDB {
     public static User getUser(Connection con, Long userId) throws SQLException {
 
         User user = null;
-        PreparedStatement stmt = con.prepareStatement("select * from  users where id=?");
-        stmt.setLong(1, userId);
-        ResultSet rs = stmt.executeQuery();
+        try (PreparedStatement stmt = con.prepareStatement("select * from  users where id=?")) {
+            stmt.setLong(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
 
-        while (rs.next()) {
-            user = new User();
-            user.setId(rs.getLong("id"));
-            user.setFirstNm(rs.getString(FIRST_NM));
-            user.setLastNm(rs.getString(LAST_NM));
-            user.setEmail(rs.getString(EMAIL));
-            user.setUsername(rs.getString(USERNAME));
-            user.setPassword(rs.getString(PASSWORD));
-            user.setAuthType(rs.getString(AUTH_TYPE));
-            user.setUserType(rs.getString(USER_TYPE));
-            user.setLastLoginTm(rs.getTimestamp(LAST_LOGIN_TM));
-            user.setExpirationTm(rs.getTimestamp(EXPIRATION_TM));
-            user.setExpired(EXPIRATION_DAYS > 0 && user.getExpirationTm() != null && user.getExpirationTm().before(new Date()));
-            user.setSalt(rs.getString("salt"));
-            user.setProfileList(UserProfileDB.getProfilesByUser(con, userId));
+                while (rs.next()) {
+                    user = new User();
+                    user.setId(rs.getLong("id"));
+                    user.setFirstNm(rs.getString(FIRST_NM));
+                    user.setLastNm(rs.getString(LAST_NM));
+                    user.setEmail(rs.getString(EMAIL));
+                    user.setUsername(rs.getString(USERNAME));
+                    user.setPassword(rs.getString(PASSWORD));
+                    user.setAuthType(rs.getString(AUTH_TYPE));
+                    user.setUserType(rs.getString(USER_TYPE));
+                    user.setLastLoginTm(rs.getTimestamp(LAST_LOGIN_TM));
+                    user.setExpirationTm(rs.getTimestamp(EXPIRATION_TM));
+                    user.setExpired(EXPIRATION_DAYS > 0 && user.getExpirationTm() != null && user.getExpirationTm().before(new Date()));
+                    user.setSalt(rs.getString("salt"));
+                    user.setProfileList(UserProfileDB.getProfilesByUser(con, userId));
+                }
+            }
         }
-        DBUtils.closeRs(rs);
-        DBUtils.closeStmt(stmt);
 
         return user;
     }
@@ -188,11 +183,9 @@ public class UserDB {
      */
     public static Long insertUser(User user) throws SQLException, GeneralSecurityException {
 
-        Connection con = DBUtils.getConn();
-        Long userId = insertUser(con, user);
-        DBUtils.closeConn(con);
-
-        return userId;
+        try (Connection con = DBUtils.getConn()) {
+            return insertUser(con, user);
+        }
     }
 
     /**
@@ -205,36 +198,36 @@ public class UserDB {
 
         Long userId = null;
 
-        PreparedStatement stmt = con.prepareStatement("insert into users (first_nm, last_nm, email, username, auth_type, user_type, password, salt, expiration_tm) values (?,?,?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
-        stmt.setString(1, user.getFirstNm());
-        stmt.setString(2, user.getLastNm());
-        stmt.setString(3, user.getEmail());
-        stmt.setString(4, user.getUsername());
-        stmt.setString(5, user.getAuthType());
-        stmt.setString(6, user.getUserType());
-        if (StringUtils.isNotEmpty(user.getPassword())) {
-            String salt = EncryptionUtil.generateSalt();
-            stmt.setString(7, EncryptionUtil.hashV2(user.getPassword(), salt));
-            stmt.setString(8, salt);
-        } else {
-            stmt.setString(7, null);
-            stmt.setString(8, null);
+        try (PreparedStatement stmt = con.prepareStatement("insert into users (first_nm, last_nm, email, username, auth_type, user_type, password, salt, expiration_tm) values (?,?,?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, user.getFirstNm());
+            stmt.setString(2, user.getLastNm());
+            stmt.setString(3, user.getEmail());
+            stmt.setString(4, user.getUsername());
+            stmt.setString(5, user.getAuthType());
+            stmt.setString(6, user.getUserType());
+            if (StringUtils.isNotEmpty(user.getPassword())) {
+                String salt = EncryptionUtil.generateSalt();
+                stmt.setString(7, EncryptionUtil.hashV2(user.getPassword(), salt));
+                stmt.setString(8, salt);
+            } else {
+                stmt.setString(7, null);
+                stmt.setString(8, null);
+            }
+            if (Auth.MANAGER.equals(user.getUserType()) || EXPIRATION_DAYS <= 0) {
+                stmt.setTimestamp(9, null);
+            } else {
+                Calendar c = Calendar.getInstance();
+                c.setTime(new Date());
+                c.add(Calendar.DATE, EXPIRATION_DAYS);
+                stmt.setTimestamp(9, new Timestamp(c.getTime().getTime()));
+            }
+            stmt.execute();
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs != null && rs.next()) {
+                    userId = rs.getLong(1);
+                }
+            }
         }
-        if (Auth.MANAGER.equals(user.getUserType()) || EXPIRATION_DAYS <= 0) {
-            stmt.setTimestamp(9, null);
-        } else {
-            Calendar c = Calendar.getInstance();
-            c.setTime(new Date());
-            c.add(Calendar.DATE, EXPIRATION_DAYS);
-            stmt.setTimestamp(9, new Timestamp(c.getTime().getTime()));
-        }
-        stmt.execute();
-        ResultSet rs = stmt.getGeneratedKeys();
-        if (rs != null && rs.next()) {
-            userId = rs.getLong(1);
-        }
-        DBUtils.closeRs(rs);
-        DBUtils.closeStmt(stmt);
 
         return userId;
     }
@@ -246,21 +239,20 @@ public class UserDB {
      */
     public static void updateUserNoCredentials(User user) throws SQLException, GeneralSecurityException {
 
-        Connection con = DBUtils.getConn();
-        PreparedStatement stmt = con.prepareStatement("update users set first_nm=?, last_nm=?, email=?, username=?, user_type=? where id=?");
-        stmt.setString(1, user.getFirstNm());
-        stmt.setString(2, user.getLastNm());
-        stmt.setString(3, user.getEmail());
-        stmt.setString(4, user.getUsername());
-        stmt.setString(5, user.getUserType());
-        stmt.setLong(6, user.getId());
-        stmt.execute();
-        DBUtils.closeStmt(stmt);
-        if (User.ADMINISTRATOR.equals(user.getUserType())) {
-            PublicKeyDB.deleteUnassignedKeysByUser(con, user.getId());
+        try (Connection con = DBUtils.getConn()) {
+            try (PreparedStatement stmt = con.prepareStatement("update users set first_nm=?, last_nm=?, email=?, username=?, user_type=? where id=?")) {
+                stmt.setString(1, user.getFirstNm());
+                stmt.setString(2, user.getLastNm());
+                stmt.setString(3, user.getEmail());
+                stmt.setString(4, user.getUsername());
+                stmt.setString(5, user.getUserType());
+                stmt.setLong(6, user.getId());
+                stmt.execute();
+            }
+            if (User.ADMINISTRATOR.equals(user.getUserType())) {
+                PublicKeyDB.deleteUnassignedKeysByUser(con, user.getId());
+            }
         }
-
-        DBUtils.closeConn(con);
     }
 
     /**
@@ -270,24 +262,24 @@ public class UserDB {
      */
     public static void updateUserCredentials(User user) throws SQLException, GeneralSecurityException {
 
-        Connection con = DBUtils.getConn();
-        String salt = EncryptionUtil.generateSalt();
-        PreparedStatement stmt = con.prepareStatement("update users set first_nm=?, last_nm=?, email=?, username=?, user_type=?, password=?, salt=? where id=?");
-        stmt.setString(1, user.getFirstNm());
-        stmt.setString(2, user.getLastNm());
-        stmt.setString(3, user.getEmail());
-        stmt.setString(4, user.getUsername());
-        stmt.setString(5, user.getUserType());
-        stmt.setString(6, EncryptionUtil.hashV2(user.getPassword(), salt));
-        stmt.setString(7, salt);
-        stmt.setLong(8, user.getId());
-        stmt.execute();
-        DBUtils.closeStmt(stmt);
+        try (Connection con = DBUtils.getConn()) {
+            String salt = EncryptionUtil.generateSalt();
+            try (PreparedStatement stmt = con.prepareStatement("update users set first_nm=?, last_nm=?, email=?, username=?, user_type=?, password=?, salt=? where id=?")) {
+                stmt.setString(1, user.getFirstNm());
+                stmt.setString(2, user.getLastNm());
+                stmt.setString(3, user.getEmail());
+                stmt.setString(4, user.getUsername());
+                stmt.setString(5, user.getUserType());
+                stmt.setString(6, EncryptionUtil.hashV2(user.getPassword(), salt));
+                stmt.setString(7, salt);
+                stmt.setLong(8, user.getId());
+                stmt.execute();
+            }
 
-        if (User.ADMINISTRATOR.equals(user.getUserType())) {
-            PublicKeyDB.deleteUnassignedKeysByUser(con, user.getId());
+            if (User.ADMINISTRATOR.equals(user.getUserType())) {
+                PublicKeyDB.deleteUnassignedKeysByUser(con, user.getId());
+            }
         }
-        DBUtils.closeConn(con);
     }
 
     /**
@@ -297,12 +289,11 @@ public class UserDB {
      */
     public static void deleteUser(Long userId) throws SQLException, GeneralSecurityException {
 
-        Connection con = DBUtils.getConn();
-        PreparedStatement stmt = con.prepareStatement("delete from users where id=?");
-        stmt.setLong(1, userId);
-        stmt.execute();
-        DBUtils.closeStmt(stmt);
-        DBUtils.closeConn(con);
+        try (Connection con = DBUtils.getConn();
+             PreparedStatement stmt = con.prepareStatement("delete from users where id=?")) {
+            stmt.setLong(1, userId);
+            stmt.execute();
+        }
     }
 
     /**
@@ -312,12 +303,11 @@ public class UserDB {
      */
     public static void resetSharedSecret(Long userId) throws SQLException, GeneralSecurityException {
 
-        Connection con = DBUtils.getConn();
-        PreparedStatement stmt = con.prepareStatement("update users set otp_secret=null where id=?");
-        stmt.setLong(1, userId);
-        stmt.execute();
-        DBUtils.closeStmt(stmt);
-        DBUtils.closeConn(con);
+        try (Connection con = DBUtils.getConn();
+             PreparedStatement stmt = con.prepareStatement("update users set otp_secret=null where id=?")) {
+            stmt.setLong(1, userId);
+            stmt.execute();
+        }
     }
 
     /**
@@ -334,18 +324,16 @@ public class UserDB {
             userId = -99L;
         }
 
-        Connection con = DBUtils.getConn();
-        PreparedStatement stmt = con.prepareStatement("select * from users where lower(username) like lower(?) and id != ?");
-        stmt.setString(1, username);
-        stmt.setLong(2, userId);
-        ResultSet rs = stmt.executeQuery();
-        if (rs.next()) {
-            isUnique = false;
+        try (Connection con = DBUtils.getConn();
+             PreparedStatement stmt = con.prepareStatement("select * from users where lower(username) like lower(?) and id != ?")) {
+            stmt.setString(1, username);
+            stmt.setLong(2, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    isUnique = false;
+                }
+            }
         }
-        DBUtils.closeRs(rs);
-        DBUtils.closeStmt(stmt);
-
-        DBUtils.closeConn(con);
 
         return isUnique;
     }
@@ -357,18 +345,15 @@ public class UserDB {
      */
     public static void unlockAccount(Long userId) throws SQLException, GeneralSecurityException {
 
-        Connection con = DBUtils.getConn();
-        PreparedStatement stmt = con.prepareStatement("update users set expiration_tm=? where id=?");
-        Calendar c = Calendar.getInstance();
-        c.setTime(new Date());
-        c.add(Calendar.DATE, EXPIRATION_DAYS);
-        stmt.setTimestamp(1, new Timestamp(c.getTime().getTime()));
-        stmt.setLong(2, userId);
-        stmt.execute();
-        DBUtils.closeStmt(stmt);
-
-
-        DBUtils.closeConn(con);
+        try (Connection con = DBUtils.getConn();
+             PreparedStatement stmt = con.prepareStatement("update users set expiration_tm=? where id=?")) {
+            Calendar c = Calendar.getInstance();
+            c.setTime(new Date());
+            c.add(Calendar.DATE, EXPIRATION_DAYS);
+            stmt.setTimestamp(1, new Timestamp(c.getTime().getTime()));
+            stmt.setLong(2, userId);
+            stmt.execute();
+        }
     }
 
 

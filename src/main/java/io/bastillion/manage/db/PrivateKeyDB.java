@@ -32,24 +32,20 @@ public class PrivateKeyDB {
 
         ApplicationKey appKey = null;
 
-        Connection con = DBUtils.getConn();
+        try (Connection con = DBUtils.getConn();
+             PreparedStatement stmt = con.prepareStatement("select * from  application_key");
+             ResultSet rs = stmt.executeQuery()) {
 
-        PreparedStatement stmt = con.prepareStatement("select * from  application_key");
+            while (rs.next()) {
 
-        ResultSet rs = stmt.executeQuery();
+                appKey = new ApplicationKey();
+                appKey.setId(rs.getLong("id"));
+                appKey.setPassphrase(EncryptionUtil.decrypt(rs.getString("passphrase")));
+                appKey.setPrivateKey(EncryptionUtil.decrypt(rs.getString("private_key")));
+                appKey.setPublicKey(rs.getString("public_key"));
 
-        while (rs.next()) {
-
-            appKey = new ApplicationKey();
-            appKey.setId(rs.getLong("id"));
-            appKey.setPassphrase(EncryptionUtil.decrypt(rs.getString("passphrase")));
-            appKey.setPrivateKey(EncryptionUtil.decrypt(rs.getString("private_key")));
-            appKey.setPublicKey(rs.getString("public_key"));
-
+            }
         }
-        DBUtils.closeRs(rs);
-        DBUtils.closeStmt(stmt);
-        DBUtils.closeConn(con);
 
         return appKey;
     }
@@ -66,20 +62,18 @@ public class PrivateKeyDB {
     public static void updateApplicationKey(String publicKey, String privateKey, String passphrase)
             throws SQLException, GeneralSecurityException {
 
-        Connection con = DBUtils.getConn();
+        try (Connection con = DBUtils.getConn()) {
+            try (PreparedStatement delStmt = con.prepareStatement("delete from application_key")) {
+                delStmt.execute();
+            }
 
-        PreparedStatement delStmt = con.prepareStatement("delete from application_key");
-        delStmt.execute();
-        DBUtils.closeStmt(delStmt);
-
-        PreparedStatement insStmt = con.prepareStatement(
-                "insert into application_key (public_key, private_key, passphrase) values(?,?,?)");
-        insStmt.setString(1, publicKey);
-        insStmt.setString(2, EncryptionUtil.encrypt(privateKey));
-        insStmt.setString(3, EncryptionUtil.encrypt(passphrase == null ? "" : passphrase));
-        insStmt.execute();
-        DBUtils.closeStmt(insStmt);
-
-        DBUtils.closeConn(con);
+            try (PreparedStatement insStmt = con.prepareStatement(
+                    "insert into application_key (public_key, private_key, passphrase) values(?,?,?)")) {
+                insStmt.setString(1, publicKey);
+                insStmt.setString(2, EncryptionUtil.encrypt(privateKey));
+                insStmt.setString(3, EncryptionUtil.encrypt(passphrase == null ? "" : passphrase));
+                insStmt.execute();
+            }
+        }
     }
 }

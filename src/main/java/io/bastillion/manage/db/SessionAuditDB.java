@@ -72,11 +72,10 @@ public class SessionAuditDB {
         java.sql.Date date = new java.sql.Date(cal.getTimeInMillis());
 
 
-        PreparedStatement stmt = con.prepareStatement("delete from session_log where session_tm < ?");
-        stmt.setDate(1, date);
-        stmt.execute();
-
-        DBUtils.closeStmt(stmt);
+        try (PreparedStatement stmt = con.prepareStatement("delete from session_log where session_tm < ?")) {
+            stmt.setDate(1, date);
+            stmt.execute();
+        }
     }
 
 
@@ -96,32 +95,33 @@ public class SessionAuditDB {
         sql += StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM)) ? " and session_log.id in ( select session_id from terminal_log where terminal_log.display_nm like ?) " : "";
         sql += orderBy;
 
-        Connection con = DBUtils.getConn();
-        deleteAuditHistory(con);
+        try (Connection con = DBUtils.getConn()) {
+            deleteAuditHistory(con);
 
-        PreparedStatement stmt = con.prepareStatement(sql);
-        int i = 1;
-        //set filters in prepared statement
-        if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_USER))) {
-            stmt.setString(i++, sortedSet.getFilterMap().get(FILTER_BY_USER));
-        }
-        if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM))) {
-            stmt.setString(i, sortedSet.getFilterMap().get(FILTER_BY_SYSTEM));
-        }
+            try (PreparedStatement stmt = con.prepareStatement(sql)) {
+                int i = 1;
+                //set filters in prepared statement
+                if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_USER))) {
+                    stmt.setString(i++, sortedSet.getFilterMap().get(FILTER_BY_USER));
+                }
+                if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM))) {
+                    stmt.setString(i, sortedSet.getFilterMap().get(FILTER_BY_SYSTEM));
+                }
 
-        ResultSet rs = stmt.executeQuery();
-        while (rs.next()) {
-            SessionAudit sessionAudit = new SessionAudit();
-            sessionAudit.setId(rs.getLong("session_log.id"));
-            sessionAudit.setSessionTm(rs.getTimestamp("session_tm"));
-            sessionAudit.setFirstNm(rs.getString("first_nm"));
-            sessionAudit.setLastNm(rs.getString("last_nm"));
-            sessionAudit.setIpAddress(rs.getString("ip_address"));
-            sessionAudit.setUsername(rs.getString("username"));
-            outputList.add(sessionAudit);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        SessionAudit sessionAudit = new SessionAudit();
+                        sessionAudit.setId(rs.getLong("session_log.id"));
+                        sessionAudit.setSessionTm(rs.getTimestamp("session_tm"));
+                        sessionAudit.setFirstNm(rs.getString("first_nm"));
+                        sessionAudit.setLastNm(rs.getString("last_nm"));
+                        sessionAudit.setIpAddress(rs.getString("ip_address"));
+                        sessionAudit.setUsername(rs.getString("username"));
+                        outputList.add(sessionAudit);
+                    }
+                }
+            }
         }
-        DBUtils.closeStmt(stmt);
-        DBUtils.closeConn(con);
 
         sortedSet.setItemList(outputList);
 
@@ -136,11 +136,9 @@ public class SessionAuditDB {
      */
     public static Long createSessionLog(User user) throws SQLException, GeneralSecurityException {
         //get db connection
-        Connection con = DBUtils.getConn();
-
-        Long sessionId = createSessionLog(con, user);
-        DBUtils.closeConn(con);
-        return sessionId;
+        try (Connection con = DBUtils.getConn()) {
+            return createSessionLog(con, user);
+        }
     }
 
     /**
@@ -154,18 +152,18 @@ public class SessionAuditDB {
         Long sessionId = null;
 
         //insert
-        PreparedStatement stmt = con.prepareStatement("insert into session_log (first_nm, last_nm, username, ip_address) values(?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
-        stmt.setString(1, user.getFirstNm());
-        stmt.setString(2, user.getLastNm());
-        stmt.setString(3, user.getUsername());
-        stmt.setString(4, user.getIpAddress());
-        stmt.execute();
-        ResultSet rs = stmt.getGeneratedKeys();
-        if (rs != null && rs.next()) {
-            sessionId = rs.getLong(1);
+        try (PreparedStatement stmt = con.prepareStatement("insert into session_log (first_nm, last_nm, username, ip_address) values(?,?,?,?)", Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, user.getFirstNm());
+            stmt.setString(2, user.getLastNm());
+            stmt.setString(3, user.getUsername());
+            stmt.setString(4, user.getIpAddress());
+            stmt.execute();
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs != null && rs.next()) {
+                    sessionId = rs.getLong(1);
+                }
+            }
         }
-
-        DBUtils.closeStmt(stmt);
 
         return sessionId;
     }
@@ -179,9 +177,9 @@ public class SessionAuditDB {
      */
     public static void insertTerminalLog(SessionOutput sessionOutput) throws SQLException, GeneralSecurityException {
         //get db connection
-        Connection con = DBUtils.getConn();
-        insertTerminalLog(con, sessionOutput);
-        DBUtils.closeConn(con);
+        try (Connection con = DBUtils.getConn()) {
+            insertTerminalLog(con, sessionOutput);
+        }
     }
 
     /**
@@ -195,16 +193,16 @@ public class SessionAuditDB {
 
         if (sessionOutput != null && sessionOutput.getSessionId() != null && sessionOutput.getInstanceId() != null && sessionOutput.getOutput() != null && !sessionOutput.getOutput().toString().equals("")) {
             //insert
-            PreparedStatement stmt = con.prepareStatement("insert into terminal_log (session_id, instance_id, display_nm, username, host, port, output) values(?,?,?,?,?,?,?)");
-            stmt.setLong(1, sessionOutput.getSessionId());
-            stmt.setLong(2, sessionOutput.getInstanceId());
-            stmt.setString(3, sessionOutput.getDisplayNm());
-            stmt.setString(4, sessionOutput.getUser());
-            stmt.setString(5, sessionOutput.getHost());
-            stmt.setInt(6, sessionOutput.getPort());
-            stmt.setString(7, sessionOutput.getOutput().toString());
-            stmt.execute();
-            DBUtils.closeStmt(stmt);
+            try (PreparedStatement stmt = con.prepareStatement("insert into terminal_log (session_id, instance_id, display_nm, username, host, port, output) values(?,?,?,?,?,?,?)")) {
+                stmt.setLong(1, sessionOutput.getSessionId());
+                stmt.setLong(2, sessionOutput.getInstanceId());
+                stmt.setString(3, sessionOutput.getDisplayNm());
+                stmt.setString(4, sessionOutput.getUser());
+                stmt.setString(5, sessionOutput.getHost());
+                stmt.setInt(6, sessionOutput.getPort());
+                stmt.setString(7, sessionOutput.getOutput().toString());
+                stmt.execute();
+            }
         }
     }
 
@@ -218,11 +216,8 @@ public class SessionAuditDB {
      */
     public static void streamTerminalLogsForSession(Long sessionId, Integer instanceId, Writer writer) throws SQLException, GeneralSecurityException, IOException {
         //get db connection
-        Connection con = DBUtils.getConn();
-        try {
+        try (Connection con = DBUtils.getConn()) {
             streamTerminalLogsForSession(con, sessionId, instanceId, writer);
-        } finally {
-            DBUtils.closeConn(con);
         }
     }
 
@@ -238,43 +233,40 @@ public class SessionAuditDB {
      */
     public static void streamTerminalLogsForSession(Connection con, Long sessionId, Integer instanceId, Writer writer) throws SQLException, IOException {
 
-        PreparedStatement stmt = con.prepareStatement("select output from terminal_log where instance_id=? and session_id=? order by log_tm asc");
-        try {
+        try (PreparedStatement stmt = con.prepareStatement("select output from terminal_log where instance_id=? and session_id=? order by log_tm asc")) {
             stmt.setLong(1, instanceId);
             stmt.setLong(2, sessionId);
-            ResultSet rs = stmt.executeQuery();
+            try (ResultSet rs = stmt.executeQuery()) {
 
-            //lines are buffered across rows so control sequences split between two output
-            //chunks are still cleaned; backspaces never apply across a newline
-            StringBuilder line = new StringBuilder();
-            while (rs.next()) {
-                String output = rs.getString("output");
-                for (int i = 0; i < output.length(); i++) {
-                    char c = output.charAt(i);
-                    if (c == '\n') {
-                        if (line.length() > 0 && line.charAt(line.length() - 1) == '\r') {
-                            line.setLength(line.length() - 1);
-                        }
-                        writer.write(cleanLine(line.toString()));
-                        writer.write('\n');
-                        line.setLength(0);
-                    } else {
-                        line.append(c);
-                        if (line.length() >= MAX_LINE_BUFFER) {
+                //lines are buffered across rows so control sequences split between two output
+                //chunks are still cleaned; backspaces never apply across a newline
+                StringBuilder line = new StringBuilder();
+                while (rs.next()) {
+                    String output = rs.getString("output");
+                    for (int i = 0; i < output.length(); i++) {
+                        char c = output.charAt(i);
+                        if (c == '\n') {
+                            if (line.length() > 0 && line.charAt(line.length() - 1) == '\r') {
+                                line.setLength(line.length() - 1);
+                            }
                             writer.write(cleanLine(line.toString()));
                             writer.write('\n');
                             line.setLength(0);
+                        } else {
+                            line.append(c);
+                            if (line.length() >= MAX_LINE_BUFFER) {
+                                writer.write(cleanLine(line.toString()));
+                                writer.write('\n');
+                                line.setLength(0);
+                            }
                         }
                     }
                 }
+                if (line.length() > 0) {
+                    writer.write(cleanLine(line.toString()));
+                    writer.write('\n');
+                }
             }
-            if (line.length() > 0) {
-                writer.write(cleanLine(line.toString()));
-                writer.write('\n');
-            }
-            DBUtils.closeRs(rs);
-        } finally {
-            DBUtils.closeStmt(stmt);
         }
     }
 
@@ -313,20 +305,20 @@ public class SessionAuditDB {
     public static List<HostSystem> getHostSystemsForSession(Connection con, Long sessionId) throws SQLException {
 
         List<HostSystem> hostSystemList = new ArrayList<>();
-        PreparedStatement stmt = con.prepareStatement("select distinct instance_id, display_nm, username, host, port from terminal_log where session_id=?");
-        stmt.setLong(1, sessionId);
-        ResultSet rs = stmt.executeQuery();
-        while (rs.next()) {
-            HostSystem hostSystem = new HostSystem();
-            hostSystem.setDisplayNm(rs.getString("display_nm"));
-            hostSystem.setUser(rs.getString("username"));
-            hostSystem.setHost(rs.getString("host"));
-            hostSystem.setPort(rs.getInt("port"));
-            hostSystem.setInstanceId(rs.getInt("instance_id"));
-            hostSystemList.add(hostSystem);
+        try (PreparedStatement stmt = con.prepareStatement("select distinct instance_id, display_nm, username, host, port from terminal_log where session_id=?")) {
+            stmt.setLong(1, sessionId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    HostSystem hostSystem = new HostSystem();
+                    hostSystem.setDisplayNm(rs.getString("display_nm"));
+                    hostSystem.setUser(rs.getString("username"));
+                    hostSystem.setHost(rs.getString("host"));
+                    hostSystem.setPort(rs.getInt("port"));
+                    hostSystem.setInstanceId(rs.getInt("instance_id"));
+                    hostSystemList.add(hostSystem);
+                }
+            }
         }
-        DBUtils.closeRs(rs);
-        DBUtils.closeStmt(stmt);
 
         return hostSystemList;
     }
@@ -342,22 +334,22 @@ public class SessionAuditDB {
         SessionAudit sessionAudit = new SessionAudit();
         String sql = "select * from session_log where session_log.id = ? ";
 
-        Connection con = DBUtils.getConn();
-        PreparedStatement stmt = con.prepareStatement(sql);
-        stmt.setLong(1, sessionId);
+        try (Connection con = DBUtils.getConn();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setLong(1, sessionId);
 
-        ResultSet rs = stmt.executeQuery();
-        while (rs.next()) {
-            sessionAudit.setId(rs.getLong("session_log.id"));
-            sessionAudit.setSessionTm(rs.getTimestamp("session_tm"));
-            sessionAudit.setUsername(rs.getString("username"));
-            sessionAudit.setFirstNm(rs.getString("first_nm"));
-            sessionAudit.setLastNm(rs.getString("last_nm"));
-            sessionAudit.setIpAddress(rs.getString("ip_address"));
-            sessionAudit.setHostSystemList(getHostSystemsForSession(con, sessionId));
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    sessionAudit.setId(rs.getLong("session_log.id"));
+                    sessionAudit.setSessionTm(rs.getTimestamp("session_tm"));
+                    sessionAudit.setUsername(rs.getString("username"));
+                    sessionAudit.setFirstNm(rs.getString("first_nm"));
+                    sessionAudit.setLastNm(rs.getString("last_nm"));
+                    sessionAudit.setIpAddress(rs.getString("ip_address"));
+                    sessionAudit.setHostSystemList(getHostSystemsForSession(con, sessionId));
+                }
+            }
         }
-        DBUtils.closeStmt(stmt);
-        DBUtils.closeConn(con);
 
         return sessionAudit;
     }

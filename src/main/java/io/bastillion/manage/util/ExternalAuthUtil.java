@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.security.Principal;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -252,13 +253,22 @@ public class ExternalAuthUtil {
                     //set auth token
                     AuthDB.updateLogin(con, user);
                 }
-                DBUtils.closeConn(con);
             } catch (LoginException le) {
                 authToken = null;
                 log.debug(le.toString(), le);
             } catch (Exception ex) {
                 authToken = null;
                 log.error(ex.toString(), ex);
+            } finally {
+                // con is opened partway through the try block above (after LDAP/JAAS login
+                // succeeds) - closing it here rather than only on the success path ensures a
+                // failure partway through (e.g. a DB error while provisioning the user record)
+                // doesn't leak the pooled connection.
+                try {
+                    DBUtils.closeConn(con);
+                } catch (SQLException ex) {
+                    log.error(ex.toString(), ex);
+                }
             }
         }
         return authToken;

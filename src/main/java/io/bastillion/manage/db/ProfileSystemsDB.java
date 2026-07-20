@@ -32,22 +32,20 @@ public class ProfileSystemsDB {
      */
     public static void setSystemsForProfile(Long profileId, List<Long> systemIdList) throws SQLException, GeneralSecurityException {
 
+        try (Connection con = DBUtils.getConn()) {
+            try (PreparedStatement stmt = con.prepareStatement("delete from system_map where profile_id=?")) {
+                stmt.setLong(1, profileId);
+                stmt.execute();
+            }
 
-        Connection con = DBUtils.getConn();
-        PreparedStatement stmt = con.prepareStatement("delete from system_map where profile_id=?");
-        stmt.setLong(1, profileId);
-        stmt.execute();
-        DBUtils.closeStmt(stmt);
-
-        for (Long systemId : systemIdList) {
-            stmt = con.prepareStatement("insert into system_map (profile_id, system_id) values (?,?)");
-            stmt.setLong(1, profileId);
-            stmt.setLong(2, systemId);
-            stmt.execute();
-            DBUtils.closeStmt(stmt);
+            for (Long systemId : systemIdList) {
+                try (PreparedStatement stmt = con.prepareStatement("insert into system_map (profile_id, system_id) values (?,?)")) {
+                    stmt.setLong(1, profileId);
+                    stmt.setLong(2, systemId);
+                    stmt.execute();
+                }
+            }
         }
-
-        DBUtils.closeConn(con);
     }
 
     /**
@@ -61,22 +59,21 @@ public class ProfileSystemsDB {
 
         List<HostSystem> hostSystemList = new ArrayList<>();
 
-        PreparedStatement stmt = con.prepareStatement("select * from  system s, system_map m where s.id=m.system_id and m.profile_id=? order by display_nm asc");
-        stmt.setLong(1, profileId);
-        ResultSet rs = stmt.executeQuery();
-        while (rs.next()) {
-            HostSystem hostSystem = new HostSystem();
-            hostSystem.setId(rs.getLong("id"));
-            hostSystem.setDisplayNm(rs.getString("display_nm"));
-            hostSystem.setUser(rs.getString("username"));
-            hostSystem.setHost(rs.getString("host"));
-            hostSystem.setPort(rs.getInt("port"));
-            hostSystem.setAuthorizedKeys(rs.getString("authorized_keys"));
-            hostSystemList.add(hostSystem);
+        try (PreparedStatement stmt = con.prepareStatement("select * from  system s, system_map m where s.id=m.system_id and m.profile_id=? order by display_nm asc")) {
+            stmt.setLong(1, profileId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    HostSystem hostSystem = new HostSystem();
+                    hostSystem.setId(rs.getLong("id"));
+                    hostSystem.setDisplayNm(rs.getString("display_nm"));
+                    hostSystem.setUser(rs.getString("username"));
+                    hostSystem.setHost(rs.getString("host"));
+                    hostSystem.setPort(rs.getInt("port"));
+                    hostSystem.setAuthorizedKeys(rs.getString("authorized_keys"));
+                    hostSystemList.add(hostSystem);
+                }
+            }
         }
-        DBUtils.closeRs(rs);
-        DBUtils.closeStmt(stmt);
-
 
         return hostSystemList;
     }
@@ -89,11 +86,9 @@ public class ProfileSystemsDB {
      */
     public static List<HostSystem> getSystemsByProfile(Long profileId) throws SQLException, GeneralSecurityException {
 
-        Connection con = DBUtils.getConn();
-        List<HostSystem> hostSystemList = getSystemsByProfile(con, profileId);
-        DBUtils.closeConn(con);
-
-        return hostSystemList;
+        try (Connection con = DBUtils.getConn()) {
+            return getSystemsByProfile(con, profileId);
+        }
     }
 
     /**
@@ -107,14 +102,14 @@ public class ProfileSystemsDB {
 
         List<Long> systemIdList = new ArrayList<>();
 
-        PreparedStatement stmt = con.prepareStatement("select * from  system s, system_map m where s.id=m.system_id and m.profile_id=? order by display_nm asc");
-        stmt.setLong(1, profileId);
-        ResultSet rs = stmt.executeQuery();
-        while (rs.next()) {
-            systemIdList.add(rs.getLong("id"));
+        try (PreparedStatement stmt = con.prepareStatement("select * from  system s, system_map m where s.id=m.system_id and m.profile_id=? order by display_nm asc")) {
+            stmt.setLong(1, profileId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    systemIdList.add(rs.getLong("id"));
+                }
+            }
         }
-        DBUtils.closeRs(rs);
-        DBUtils.closeStmt(stmt);
 
         return systemIdList;
     }
@@ -127,11 +122,9 @@ public class ProfileSystemsDB {
      */
     public static List<Long> getSystemIdsByProfile(Long profileId) throws SQLException, GeneralSecurityException {
 
-        Connection con = DBUtils.getConn();
-        List<Long> systemIdList = getSystemIdsByProfile(con, profileId);
-        DBUtils.closeConn(con);
-
-        return systemIdList;
+        try (Connection con = DBUtils.getConn()) {
+            return getSystemIdsByProfile(con, profileId);
+        }
     }
 
     /**
@@ -146,16 +139,15 @@ public class ProfileSystemsDB {
 
         List<Long> systemIdList = new ArrayList<>();
 
-        PreparedStatement stmt = con.prepareStatement("select sm.system_id from  system_map sm, user_map um where um.profile_id=sm.profile_id and sm.profile_id=? and um.user_id=?");
-        stmt.setLong(1, profileId);
-        stmt.setLong(2, userId);
-        ResultSet rs = stmt.executeQuery();
-
-        while (rs.next()) {
-            systemIdList.add(rs.getLong("system_id"));
+        try (PreparedStatement stmt = con.prepareStatement("select sm.system_id from  system_map sm, user_map um where um.profile_id=sm.profile_id and sm.profile_id=? and um.user_id=?")) {
+            stmt.setLong(1, profileId);
+            stmt.setLong(2, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    systemIdList.add(rs.getLong("system_id"));
+                }
+            }
         }
-        DBUtils.closeRs(rs);
-        DBUtils.closeStmt(stmt);
 
         return systemIdList;
     }
@@ -169,10 +161,8 @@ public class ProfileSystemsDB {
      */
     public static List<Long> getSystemIdsByProfile(Long profileId, Long userId) throws SQLException, GeneralSecurityException {
 
-        Connection con = DBUtils.getConn();
-        List<Long> systemIdList = getSystemIdsByProfile(con, profileId, userId);
-        DBUtils.closeConn(con);
-
-        return systemIdList;
+        try (Connection con = DBUtils.getConn()) {
+            return getSystemIdsByProfile(con, profileId, userId);
+        }
     }
 }

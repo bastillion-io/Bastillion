@@ -133,6 +133,16 @@ public class UploadAndPushKtrl extends BaseKontroller {
     @Kontrol(path = "/admin/push", method = MethodType.POST)
     public String push() throws ServletException {
 
+        // uploadFileName is bound directly from this request's own parameter (carried forward
+        // as a hidden field between push iterations), not re-derived server-side - without
+        // stripping it to a bare filename the same way uploadSubmit() already does, a crafted
+        // value like "../../../etc/passwd" would let an already-authenticated admin read an
+        // arbitrary local file (pushed via SFTP to a system they control) or delete an
+        // arbitrary local file below, instead of only ever touching UPLOAD_PATH.
+        if (uploadFileName != null) {
+            uploadFileName = new File(uploadFileName).getName();
+        }
+
         try {
 
             Long userId = AuthUtil.getUserId(getRequest().getSession());

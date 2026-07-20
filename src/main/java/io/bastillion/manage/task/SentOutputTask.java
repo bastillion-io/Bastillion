@@ -40,8 +40,7 @@ public class SentOutputTask implements Runnable {
     public void run() {
         Gson gson = new Gson();
         while (session.isOpen()) {
-            try {
-                Connection con = DBUtils.getConn();
+            try (Connection con = DBUtils.getConn()) {
                 List<SessionOutput> outputList = SessionOutputUtil.getOutput(con, sessionId, user);
                 if (!outputList.isEmpty()) {
                     String json = gson.toJson(outputList);
@@ -49,7 +48,6 @@ public class SentOutputTask implements Runnable {
                     this.session.getBasicRemote().sendText(json);
                 }
                 Thread.sleep(25);
-                DBUtils.closeConn(con);
             } catch (SQLException | GeneralSecurityException | IOException | InterruptedException ex) {
                 log.error(ex.toString(), ex);
             }

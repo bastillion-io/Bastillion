@@ -36,25 +36,25 @@ public class SystemStatusDB {
      * @param userType        user type
      */
     public static void setInitialSystemStatus(List<Long> systemSelectIds, Long userId, String userType) throws SQLException, GeneralSecurityException {
-        Connection con = DBUtils.getConn();
+        try (Connection con = DBUtils.getConn()) {
 
-        //checks perms if to see if in assigned profiles
-        if (!Auth.MANAGER.equals(userType)) {
-            systemSelectIds = SystemDB.checkSystemPerms(con, systemSelectIds, userId);
+            //checks perms if to see if in assigned profiles
+            if (!Auth.MANAGER.equals(userType)) {
+                systemSelectIds = SystemDB.checkSystemPerms(con, systemSelectIds, userId);
+            }
+
+            //deletes all old systems
+            deleteAllSystemStatus(con, userId);
+            for (Long hostSystemId : systemSelectIds) {
+
+                HostSystem hostSystem = new HostSystem();
+                hostSystem.setId(hostSystemId);
+                hostSystem.setStatusCd(HostSystem.INITIAL_STATUS);
+
+                //insert new status
+                insertSystemStatus(con, hostSystem, userId);
+            }
         }
-
-        //deletes all old systems
-        deleteAllSystemStatus(con, userId);
-        for (Long hostSystemId : systemSelectIds) {
-
-            HostSystem hostSystem = new HostSystem();
-            hostSystem.setId(hostSystemId);
-            hostSystem.setStatusCd(HostSystem.INITIAL_STATUS);
-
-            //insert new status
-            insertSystemStatus(con, hostSystem, userId);
-        }
-        DBUtils.closeConn(con);
     }
 
     /**
@@ -65,10 +65,10 @@ public class SystemStatusDB {
      */
     private static void deleteAllSystemStatus(Connection con, Long userId) throws SQLException {
 
-        PreparedStatement stmt = con.prepareStatement("delete from status where user_id=?");
-        stmt.setLong(1, userId);
-        stmt.execute();
-        DBUtils.closeStmt(stmt);
+        try (PreparedStatement stmt = con.prepareStatement("delete from status where user_id=?")) {
+            stmt.setLong(1, userId);
+            stmt.execute();
+        }
     }
 
 
@@ -81,12 +81,12 @@ public class SystemStatusDB {
      */
     private static void insertSystemStatus(Connection con, HostSystem hostSystem, Long userId) throws SQLException {
 
-        PreparedStatement stmt = con.prepareStatement("insert into status (id, status_cd, user_id) values (?,?,?)");
-        stmt.setLong(1, hostSystem.getId());
-        stmt.setString(2, hostSystem.getStatusCd());
-        stmt.setLong(3, userId);
-        stmt.execute();
-        DBUtils.closeStmt(stmt);
+        try (PreparedStatement stmt = con.prepareStatement("insert into status (id, status_cd, user_id) values (?,?,?)")) {
+            stmt.setLong(1, hostSystem.getId());
+            stmt.setString(2, hostSystem.getStatusCd());
+            stmt.setLong(3, userId);
+            stmt.execute();
+        }
     }
 
     /**
@@ -97,9 +97,9 @@ public class SystemStatusDB {
      */
     public static void updateSystemStatus(HostSystem hostSystem, Long userId) throws SQLException, GeneralSecurityException {
 
-        Connection con = DBUtils.getConn();
-        updateSystemStatus(con, hostSystem, userId);
-        DBUtils.closeConn(con);
+        try (Connection con = DBUtils.getConn()) {
+            updateSystemStatus(con, hostSystem, userId);
+        }
     }
 
 
@@ -112,12 +112,12 @@ public class SystemStatusDB {
      */
     public static void updateSystemStatus(Connection con, HostSystem hostSystem, Long userId) throws SQLException {
 
-        PreparedStatement stmt = con.prepareStatement("update status set status_cd=? where id=? and user_id=?");
-        stmt.setString(1, hostSystem.getStatusCd());
-        stmt.setLong(2, hostSystem.getId());
-        stmt.setLong(3, userId);
-        stmt.execute();
-        DBUtils.closeStmt(stmt);
+        try (PreparedStatement stmt = con.prepareStatement("update status set status_cd=? where id=? and user_id=?")) {
+            stmt.setString(1, hostSystem.getStatusCd());
+            stmt.setLong(2, hostSystem.getId());
+            stmt.setLong(3, userId);
+            stmt.execute();
+        }
     }
 
 
@@ -128,11 +128,9 @@ public class SystemStatusDB {
      */
     public static List<HostSystem> getAllSystemStatus(Long userId) throws SQLException, GeneralSecurityException {
 
-        Connection con = DBUtils.getConn();
-        List<HostSystem> hostSystemList = getAllSystemStatus(con, userId);
-        DBUtils.closeConn(con);
-
-        return hostSystemList;
+        try (Connection con = DBUtils.getConn()) {
+            return getAllSystemStatus(con, userId);
+        }
     }
 
     /**
@@ -145,17 +143,16 @@ public class SystemStatusDB {
 
         List<HostSystem> hostSystemList = new ArrayList<>();
 
-        PreparedStatement stmt = con.prepareStatement("select * from status where user_id=? order by id asc");
-        stmt.setLong(1, userId);
-        ResultSet rs = stmt.executeQuery();
-
-        while (rs.next()) {
-            HostSystem hostSystem = SystemDB.getSystem(con, rs.getLong("id"));
-            hostSystem.setStatusCd(rs.getString(STATUS_CD));
-            hostSystemList.add(hostSystem);
+        try (PreparedStatement stmt = con.prepareStatement("select * from status where user_id=? order by id asc")) {
+            stmt.setLong(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    HostSystem hostSystem = SystemDB.getSystem(con, rs.getLong("id"));
+                    hostSystem.setStatusCd(rs.getString(STATUS_CD));
+                    hostSystemList.add(hostSystem);
+                }
+            }
         }
-        DBUtils.closeRs(rs);
-        DBUtils.closeStmt(stmt);
 
         return hostSystemList;
     }
@@ -170,20 +167,18 @@ public class SystemStatusDB {
     public static HostSystem getSystemStatus(Long systemId, Long userId) throws SQLException, GeneralSecurityException {
 
         HostSystem hostSystem = null;
-        Connection con = DBUtils.getConn();
 
-        PreparedStatement stmt = con.prepareStatement("select * from status where id=? and user_id=?");
-        stmt.setLong(1, systemId);
-        stmt.setLong(2, userId);
-        ResultSet rs = stmt.executeQuery();
-
-        while (rs.next()) {
-            hostSystem = SystemDB.getSystem(con, rs.getLong("id"));
-            hostSystem.setStatusCd(rs.getString(STATUS_CD));
+        try (Connection con = DBUtils.getConn();
+             PreparedStatement stmt = con.prepareStatement("select * from status where id=? and user_id=?")) {
+            stmt.setLong(1, systemId);
+            stmt.setLong(2, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    hostSystem = SystemDB.getSystem(con, rs.getLong("id"));
+                    hostSystem.setStatusCd(rs.getString(STATUS_CD));
+                }
+            }
         }
-        DBUtils.closeRs(rs);
-        DBUtils.closeStmt(stmt);
-        DBUtils.closeConn(con);
 
         return hostSystem;
     }
@@ -198,27 +193,21 @@ public class SystemStatusDB {
     public static HostSystem getNextPendingSystem(Long userId) throws SQLException, GeneralSecurityException {
 
         HostSystem hostSystem = null;
-        Connection con = DBUtils.getConn();
-        PreparedStatement stmt = con.prepareStatement("select * from status where (status_cd like ? or status_cd like ? or status_cd like ?) and user_id=? order by id asc");
-        stmt.setString(1, HostSystem.INITIAL_STATUS);
-        stmt.setString(2, HostSystem.AUTH_FAIL_STATUS);
-        stmt.setString(3, HostSystem.PUBLIC_KEY_FAIL_STATUS);
-        stmt.setLong(4, userId);
-        ResultSet rs = stmt.executeQuery();
 
-        if (rs.next()) {
-            hostSystem = SystemDB.getSystem(con, rs.getLong("id"));
-            hostSystem.setStatusCd(rs.getString(STATUS_CD));
+        try (Connection con = DBUtils.getConn();
+             PreparedStatement stmt = con.prepareStatement("select * from status where (status_cd like ? or status_cd like ? or status_cd like ?) and user_id=? order by id asc")) {
+            stmt.setString(1, HostSystem.INITIAL_STATUS);
+            stmt.setString(2, HostSystem.AUTH_FAIL_STATUS);
+            stmt.setString(3, HostSystem.PUBLIC_KEY_FAIL_STATUS);
+            stmt.setLong(4, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    hostSystem = SystemDB.getSystem(con, rs.getLong("id"));
+                    hostSystem.setStatusCd(rs.getString(STATUS_CD));
+                }
+            }
         }
-        DBUtils.closeRs(rs);
-        DBUtils.closeStmt(stmt);
-        DBUtils.closeConn(con);
 
         return hostSystem;
     }
 }
-
-
-
-
-

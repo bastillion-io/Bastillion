@@ -33,23 +33,22 @@ public class UserProfileDB {
      */
     public static void setUsersForProfile(Long profileId, List<Long> userIdList) throws SQLException, GeneralSecurityException {
 
-        Connection con = DBUtils.getConn();
-        PreparedStatement stmt = con.prepareStatement("delete from user_map where profile_id=?");
-        stmt.setLong(1, profileId);
-        stmt.execute();
-        DBUtils.closeStmt(stmt);
+        try (Connection con = DBUtils.getConn()) {
+            try (PreparedStatement stmt = con.prepareStatement("delete from user_map where profile_id=?")) {
+                stmt.setLong(1, profileId);
+                stmt.execute();
+            }
 
-        for (Long userId : userIdList) {
-            stmt = con.prepareStatement("insert into user_map (profile_id, user_id) values (?,?)");
-            stmt.setLong(1, profileId);
-            stmt.setLong(2, userId);
-            stmt.execute();
-            DBUtils.closeStmt(stmt);
+            for (Long userId : userIdList) {
+                try (PreparedStatement stmt = con.prepareStatement("insert into user_map (profile_id, user_id) values (?,?)")) {
+                    stmt.setLong(1, profileId);
+                    stmt.setLong(2, userId);
+                    stmt.execute();
+                }
+            }
+            //delete all unassigned keys by profile
+            PublicKeyDB.deleteUnassignedKeysByProfile(con, profileId);
         }
-        //delete all unassigned keys by profile
-        PublicKeyDB.deleteUnassignedKeysByProfile(con, profileId);
-
-        DBUtils.closeConn(con);
     }
 
     /**
@@ -60,12 +59,9 @@ public class UserProfileDB {
      */
     public static List<Profile> getProfilesByUser(Long userId) throws SQLException, GeneralSecurityException {
 
-
-        Connection con = DBUtils.getConn();
-        List<Profile> profileList = getProfilesByUser(con, userId);
-        DBUtils.closeConn(con);
-
-        return profileList;
+        try (Connection con = DBUtils.getConn()) {
+            return getProfilesByUser(con, userId);
+        }
     }
 
     /**
@@ -78,17 +74,14 @@ public class UserProfileDB {
 
         ArrayList<Profile> profileList = new ArrayList<>();
 
-
-        PreparedStatement stmt = con.prepareStatement("select * from  profiles g, user_map m where g.id=m.profile_id and m.user_id=? order by nm asc");
-        stmt.setLong(1, userId);
-        ResultSet rs = stmt.executeQuery();
-
-        while (rs.next()) {
-            profileList.add(ProfileDB.mapProfile(rs));
+        try (PreparedStatement stmt = con.prepareStatement("select * from  profiles g, user_map m where g.id=m.profile_id and m.user_id=? order by nm asc")) {
+            stmt.setLong(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    profileList.add(ProfileDB.mapProfile(rs));
+                }
+            }
         }
-        DBUtils.closeRs(rs);
-        DBUtils.closeStmt(stmt);
-
 
         return profileList;
     }
@@ -103,19 +96,17 @@ public class UserProfileDB {
     public static boolean checkIsUsersProfile(Long userId, Long profileId) throws SQLException, GeneralSecurityException {
         boolean isUsersProfile = false;
 
-        Connection con = DBUtils.getConn();
-        PreparedStatement stmt = con.prepareStatement("select * from user_map where profile_id=? and user_id=?");
-        stmt.setLong(1, profileId);
-        stmt.setLong(2, userId);
+        try (Connection con = DBUtils.getConn();
+             PreparedStatement stmt = con.prepareStatement("select * from user_map where profile_id=? and user_id=?")) {
+            stmt.setLong(1, profileId);
+            stmt.setLong(2, userId);
 
-        ResultSet rs = stmt.executeQuery();
-
-        while (rs.next()) {
-            isUsersProfile = true;
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    isUsersProfile = true;
+                }
+            }
         }
-        DBUtils.closeRs(rs);
-        DBUtils.closeStmt(stmt);
-        DBUtils.closeConn(con);
 
         return isUsersProfile;
     }
@@ -133,27 +124,27 @@ public class UserProfileDB {
             if (StringUtils.isNotEmpty(profileNm)) {
 
                 Long profileId = null;
-                PreparedStatement stmt = con.prepareStatement("select id from  profiles p where lower(p.nm) like ?");
-                stmt.setString(1, profileNm.toLowerCase());
-                ResultSet rs = stmt.executeQuery();
-                while (rs.next()) {
-                    profileId = rs.getLong("id");
+                try (PreparedStatement stmt = con.prepareStatement("select id from  profiles p where lower(p.nm) like ?")) {
+                    stmt.setString(1, profileNm.toLowerCase());
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        while (rs.next()) {
+                            profileId = rs.getLong("id");
+                        }
+                    }
                 }
-                DBUtils.closeRs(rs);
-                DBUtils.closeStmt(stmt);
 
                 if (profileId != null) {
-                    stmt = con.prepareStatement("delete from user_map where profile_id=?");
-                    stmt.setLong(1, profileId);
-                    stmt.execute();
-                    DBUtils.closeStmt(stmt);
+                    try (PreparedStatement stmt = con.prepareStatement("delete from user_map where profile_id=?")) {
+                        stmt.setLong(1, profileId);
+                        stmt.execute();
+                    }
 
                     if (assignedProfilesNmList.contains(profileNm)) {
-                        stmt = con.prepareStatement("insert into user_map (profile_id, user_id) values (?,?)");
-                        stmt.setLong(1, profileId);
-                        stmt.setLong(2, userId);
-                        stmt.execute();
-                        DBUtils.closeStmt(stmt);
+                        try (PreparedStatement stmt = con.prepareStatement("insert into user_map (profile_id, user_id) values (?,?)")) {
+                            stmt.setLong(1, profileId);
+                            stmt.setLong(2, userId);
+                            stmt.execute();
+                        }
                     }
 
                     //delete all unassigned keys by profile
@@ -176,26 +167,26 @@ public class UserProfileDB {
         if (StringUtils.isNotEmpty(profileNm)) {
 
             Long profileId = null;
-            PreparedStatement stmt = con.prepareStatement("select id from  profiles p where lower(p.nm) like ?");
-            stmt.setString(1, profileNm.toLowerCase());
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                profileId = rs.getLong("id");
+            try (PreparedStatement stmt = con.prepareStatement("select id from  profiles p where lower(p.nm) like ?")) {
+                stmt.setString(1, profileNm.toLowerCase());
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        profileId = rs.getLong("id");
+                    }
+                }
             }
-            DBUtils.closeRs(rs);
-            DBUtils.closeStmt(stmt);
 
             if (profileId != null) {
-                stmt = con.prepareStatement("delete from user_map where profile_id=?");
-                stmt.setLong(1, profileId);
-                stmt.execute();
-                DBUtils.closeStmt(stmt);
+                try (PreparedStatement stmt = con.prepareStatement("delete from user_map where profile_id=?")) {
+                    stmt.setLong(1, profileId);
+                    stmt.execute();
+                }
 
-                stmt = con.prepareStatement("insert into user_map (profile_id, user_id) values (?,?)");
-                stmt.setLong(1, profileId);
-                stmt.setLong(2, userId);
-                stmt.execute();
-                DBUtils.closeStmt(stmt);
+                try (PreparedStatement stmt = con.prepareStatement("insert into user_map (profile_id, user_id) values (?,?)")) {
+                    stmt.setLong(1, profileId);
+                    stmt.setLong(2, userId);
+                    stmt.execute();
+                }
 
                 //delete all unassigned keys by profile
                 PublicKeyDB.deleteUnassignedKeysByProfile(con, profileId);
