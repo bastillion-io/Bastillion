@@ -55,11 +55,8 @@ public class UserDB {
 
         ArrayList<User> userList = new ArrayList<>();
 
-        String orderBy = "";
-        if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
-            orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
-        }
-        String sql = "select * from  users " + orderBy;
+        String orderBy = sortedSet.toOrderByClause();
+        String sql = "select * from  users" + orderBy;
 
         Connection con = DBUtils.getConn();
         PreparedStatement stmt = con.prepareStatement(sql);
@@ -100,10 +97,7 @@ public class UserDB {
         ArrayList<User> userList = new ArrayList<>();
 
 
-        String orderBy = "";
-        if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
-            orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
-        }
+        String orderBy = sortedSet.toOrderByClause();
         String sql = "select u.*, m.profile_id from users u left join user_map  m on m.user_id = u.id and m.profile_id = ? where u.user_type like '" + User.ADMINISTRATOR + "'" + orderBy;
 
         Connection con = DBUtils.getConn();

@@ -89,11 +89,7 @@ public class SessionAuditDB {
     public static SortedSet getSessions(SortedSet sortedSet) throws SQLException, GeneralSecurityException {
         List<SessionAudit> outputList = new LinkedList<>();
 
-        String orderBy = "";
-        if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
-            orderBy = " order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
-        }
-
+        String orderBy = sortedSet.toOrderByClause();
 
         String sql = "select * from session_log where 1=1 ";
         sql += StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_USER)) ? " and session_log.username like ? " : "";

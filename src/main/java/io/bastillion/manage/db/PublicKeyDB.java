@@ -143,10 +143,7 @@ public class PublicKeyDB {
 
         ArrayList<PublicKey> publicKeysList = new ArrayList<>();
 
-        String orderBy = "";
-        if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
-            orderBy = " order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
-        }
+        String orderBy = sortedSet.toOrderByClause();
         String sql = "select p.*, u.username from public_keys p, users u where u.id=p.user_id  ";
 
         sql += StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_USER_ID)) ? " and p.user_id=? " : "";
@@ -204,11 +201,8 @@ public class PublicKeyDB {
         ArrayList<PublicKey> publicKeysList = new ArrayList<>();
 
 
-        String orderBy = "";
-        if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
-            orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
-        }
-        String sql = "select * from public_keys where user_id = ? and enabled=true " + orderBy;
+        String orderBy = sortedSet.toOrderByClause();
+        String sql = "select * from public_keys where user_id = ? and enabled=true" + orderBy;
 
         Connection con = DBUtils.getConn();
         PreparedStatement stmt = con.prepareStatement(sql);

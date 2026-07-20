@@ -40,10 +40,7 @@ public class ProfileDB {
 
         ArrayList<Profile> profileList = new ArrayList<>();
 
-        String orderBy = "";
-        if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
-            orderBy = " order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
-        }
+        String orderBy = sortedSet.toOrderByClause();
         String sql = "select distinct p.* from  profiles p ";
         if (StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_SYSTEM))) {
             sql = sql + ", system_map m, system s where m.profile_id = p.id and m.system_id = s.id" +

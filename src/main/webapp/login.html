@@ -9,6 +9,19 @@
 <head>
     <meta th:replace="~{_res/inc/header}">
     <title>Bastillion - Login</title>
+    <style>
+        .login-wrap {
+            min-height: calc(100vh - 75px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 380px;
+        }
+    </style>
 </head>
 
 <body>
@@ -24,45 +37,32 @@
         <!--/.nav-collapse -->
     </div>
 </div>
-<div class="container">
-    <h3></h3>
-    <div th:replace="~{_res/inc/errors}"></div>
-    <form id="loginSubmit" th:action="@{/loginSubmit.ktrl}" method="post"
-          autocomplete="off">
-        <table>
-            <tr>
-                <td>Username:
-                </td>
-                <td>
-                    <input type="text" name="auth.username" class="form-control" title="Username"> <span class="error"
-                                                                                    th:text="${fieldErrors.get('auth.username')}"></span>
-                </td>
-            </tr>
-            <tr>
-                <td>Password:
-                </td>
-                <td>
-                    <input type="password" name="auth.password" class="form-control" title="Password"> <span class="error"
-                                                                                        th:text="${fieldErrors.get('auth.password')}"></span>
-                </td>
-            </tr>
-            <tr th:if="${otpEnabled}">
-                <td>OTP Access Code:
-                </td>
-                <td>
-                    <input type="text" name="auth.otpToken" class="form-control" title="OTP Access Code"> <span class="error"
-                                                                                           th:text="${fieldErrors.get('auth.otpToken')}"></span>
-                </td>
-            </tr>
-            <tr>
-                <td>&#xA0;</td>
-                <td>
-                    <div id="login_btn" class="btn btn-secondary submit_btn">Login</div>
-                </td>
-            </tr>
-        </table>
-        <input type="hidden" name="_csrf" th:value="${session._csrf}">
-    </form>
+<div class="container login-wrap">
+    <div class="card login-card">
+        <div class="card-body">
+            <div th:replace="~{_res/inc/errors}"></div>
+            <form id="loginSubmit" th:action="@{/loginSubmit.ktrl}" method="post"
+                  autocomplete="off">
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input type="text" name="auth.username" class="form-control" title="Username">
+                    <span class="error" th:text="${fieldErrors.get('auth.username')}"></span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="auth.password" class="form-control" title="Password">
+                    <span class="error" th:text="${fieldErrors.get('auth.password')}"></span>
+                </div>
+                <div class="mb-3" th:if="${otpEnabled}">
+                    <label class="form-label">OTP Access Code</label>
+                    <input type="text" name="auth.otpToken" class="form-control" title="OTP Access Code">
+                    <span class="error" th:text="${fieldErrors.get('auth.otpToken')}"></span>
+                </div>
+                <div id="login_btn" class="btn btn-secondary submit_btn w-100">Login</div>
+                <input type="hidden" name="_csrf" th:value="${session._csrf}">
+            </form>
+        </div>
+    </div>
 </div>
 </body>
 

@@ -49,14 +49,11 @@ public class SystemDB {
     public static SortedSet getUserSystemSet(SortedSet sortedSet, Long userId) throws SQLException, GeneralSecurityException {
         List<HostSystem> hostSystemList = new ArrayList<>();
 
-        String orderBy = "";
-        if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
-            orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
-        }
+        String orderBy = sortedSet.toOrderByClause();
         String sql = "select * from system where id in (select distinct system_id from  system_map m, user_map um where m.profile_id=um.profile_id and um.user_id=? ";
         //if profile id exists add to statement
         sql += StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID)) ? " and um.profile_id=? " : "";
-        sql += ") " + orderBy;
+        sql += ")" + orderBy;
 
         //get user for auth token
         Connection con = DBUtils.getConn();
@@ -99,11 +96,8 @@ public class SystemDB {
     public static SortedSet getSystemSet(SortedSet sortedSet, Long profileId) throws SQLException, GeneralSecurityException {
         List<HostSystem> hostSystemList = new ArrayList<>();
 
-        String orderBy = "";
-        if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
-            orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
-        }
-        String sql = "select s.*, m.profile_id from  system s left join system_map  m on m.system_id = s.id and m.profile_id = ? " + orderBy;
+        String orderBy = sortedSet.toOrderByClause();
+        String sql = "select s.*, m.profile_id from  system s left join system_map  m on m.system_id = s.id and m.profile_id = ?" + orderBy;
 
         Connection con = DBUtils.getConn();
         PreparedStatement stmt = con.prepareStatement(sql);
@@ -139,13 +133,10 @@ public class SystemDB {
     public static SortedSet getSystemSet(SortedSet sortedSet) throws SQLException, GeneralSecurityException {
         List<HostSystem> hostSystemList = new ArrayList<>();
 
-        String orderBy = "";
-        if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
-            orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
-        }
+        String orderBy = sortedSet.toOrderByClause();
         String sql = "select * from  system s ";
         //if profile id exists add to statement
-        sql += StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID)) ? ",system_map m where s.id=m.system_id and m.profile_id=? " : "";
+        sql += StringUtils.isNotEmpty(sortedSet.getFilterMap().get(FILTER_BY_PROFILE_ID)) ? ",system_map m where s.id=m.system_id and m.profile_id=?" : "";
         sql += orderBy;
 
         Connection con = DBUtils.getConn();

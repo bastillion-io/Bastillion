@@ -6,6 +6,7 @@
 package io.bastillion.manage.control;
 
 import io.bastillion.common.util.AuthUtil;
+import io.bastillion.common.util.LoginThrottleUtil;
 import io.bastillion.manage.db.AuthDB;
 import io.bastillion.manage.model.Auth;
 import io.bastillion.manage.model.User;
@@ -23,6 +24,7 @@ import javax.crypto.spec.SecretKeySpec;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.util.Collections;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -32,6 +34,7 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * loginSubmit() is the actual credential/OTP/profile/expiry gate in front of the whole app -
@@ -88,6 +91,40 @@ class LoginKtrlTest {
         LoginKtrl ktrl = new LoginKtrl(request, response);
         lenient().when(request.getSession()).thenReturn(session);
         return ktrl;
+    }
+
+    private static String freshIp() {
+        return "198.51.100." + UUID.randomUUID().toString().substring(0, 8);
+    }
+
+    // ---- per-IP login throttle (LoginThrottleUtil) ---------------------------------------
+    // getClientIPAddress() falls back to request.getRemoteAddr(), unstubbed (null) in every
+    // other test in this file - LoginThrottleUtil.isBlocked(null) is always false, which is
+    // exactly why those tests never interact with throttling at all. These stub a real,
+    // unique-per-test IP instead so the shared static throttle state can't leak between tests.
+
+    @Test
+    void throttledIpIsRejectedBeforeAuthDbIsEverConsulted() throws Exception {
+        String ip = freshIp();
+        when(request.getRemoteAddr()).thenReturn(ip);
+        for (int i = 0; i < 10; i++) {
+            LoginThrottleUtil.recordFailure(ip);
+        }
+
+        LoginKtrl ktrl = newController();
+        Auth auth = new Auth();
+        auth.setUsername("alice");
+        auth.setPassword("whatever-the-real-password-is");
+        setAuth(ktrl, auth);
+
+        try (MockedStatic<AuthDB> authDB = mockStatic(AuthDB.class)) {
+            String view = ktrl.loginSubmit();
+
+            assertEquals("/login.html", view);
+            assertTrue(ktrl.getErrors().contains(
+                    "Authentication Failed : Too many failed login attempts. Please try again later."));
+            authDB.verify(() -> AuthDB.login(any()), never());
+        }
     }
 
     @Test

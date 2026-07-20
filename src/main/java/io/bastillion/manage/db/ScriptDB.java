@@ -40,11 +40,8 @@ public class ScriptDB {
 
         ArrayList<Script> scriptList = new ArrayList<>();
 
-        String orderBy = "";
-        if (sortedSet.getOrderByField() != null && !sortedSet.getOrderByField().trim().equals("")) {
-            orderBy = "order by " + sortedSet.getOrderByField() + " " + sortedSet.getOrderByDirection();
-        }
-        String sql = "select * from scripts where user_id=? " + orderBy;
+        String orderBy = sortedSet.toOrderByClause();
+        String sql = "select * from scripts where user_id=?" + orderBy;
 
         Connection con = DBUtils.getConn();
         PreparedStatement stmt = con.prepareStatement(sql);

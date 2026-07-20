@@ -53,6 +53,16 @@ public class SortedSet {
         this.orderByDirection = orderByDirection;
     }
 
+    /**
+     * @return " order by &lt;field&gt; &lt;direction&gt;" if a sort field is set, otherwise ""
+     */
+    public String toOrderByClause() {
+        if (getOrderByField() != null && !getOrderByField().trim().isEmpty()) {
+            return " order by " + getOrderByField() + " " + getOrderByDirection();
+        }
+        return "";
+    }
+
     public List getItemList() {
         return itemList;
     }
