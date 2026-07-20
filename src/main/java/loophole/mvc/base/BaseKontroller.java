@@ -145,7 +145,16 @@ public class BaseKontroller {
                 if (method.isAnnotationPresent(Kontrol.class)) {
                     Kontrol c = method.getAnnotation(Kontrol.class);
 
-                    if (request.getRequestURI().contains(c.path() + DispatcherServlet.CTR_EXT)
+                    // Route on the container-normalized servlet path (matrix parameters like
+                    // ";foo=bar" stripped, "." / ".." segments resolved), matched exactly - not
+                    // the raw request URI with a substring contains(). AuthFilter's /manage/*
+                    // and /admin/* url-pattern mappings are matched by the container against
+                    // this same normalized path; using the raw URI with contains() here let a
+                    // crafted URI like "/x;/manage/viewUsers.ktrl" normalize to something
+                    // AuthFilter's mapping didn't match while still containing the literal
+                    // controller path substring, dispatching to the real controller with no
+                    // auth check at all.
+                    if (request.getServletPath().equals(c.path() + DispatcherServlet.CTR_EXT)
                             && MethodType.valueOf(request.getMethod()).equals(c.method())) {
 
                         try {

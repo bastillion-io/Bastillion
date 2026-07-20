@@ -5,6 +5,7 @@ import com.google.gson.JsonSyntaxException;
 import io.bastillion.common.util.AppConfig;
 import io.bastillion.common.util.AuthUtil;
 import io.bastillion.manage.control.SecureShellKtrl;
+import io.bastillion.manage.db.AuthDB;
 import io.bastillion.manage.db.UserDB;
 import io.bastillion.manage.model.SchSession;
 import io.bastillion.manage.model.UserSchSessions;
@@ -40,6 +41,24 @@ public class SecureShellWS {
     @OnOpen
     public void onOpen(Session session, EndpointConfig config) {
 
+        if (this.httpSession == null) {
+            this.httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
+        }
+
+        // The servlet container does not run AuthFilter (mapped to /admin/*) against the
+        // WebSocket upgrade request for this endpoint, so this connection would otherwise be
+        // reachable with no session at all - explicitly require the same valid, non-expired
+        // admin auth that AuthFilter enforces for the rest of /admin/* before doing anything
+        // else, rather than relying on a downstream NPE (e.g. UserDB.getUser(null)) to
+        // incidentally kill unauthenticated connections.
+        if (!isAuthenticated()) {
+            try {
+                session.close(new CloseReason(CloseReason.CloseCodes.VIOLATED_POLICY, "Not authenticated"));
+            } catch (IOException ex) {
+                log.error(ex.toString(), ex);
+            }
+            return;
+        }
 
         //set websocket timeout
         if (StringUtils.isNotEmpty(AppConfig.getProperty("websocketTimeout"))) {
@@ -48,9 +67,6 @@ public class SecureShellWS {
             session.setMaxIdleTimeout(0);
         }
 
-        if (this.httpSession == null) {
-            this.httpSession = (HttpSession) config.getUserProperties().get(HttpSession.class.getName());
-        }
         Runnable run = null;
         try {
             this.sessionId = AuthUtil.getSessionId(httpSession);
@@ -63,6 +79,36 @@ public class SecureShellWS {
             log.error(ex.toString(), ex);
         }
 
+    }
+
+    /**
+     * Mirrors AuthFilter's check (valid, non-expired admin auth token) since that filter is
+     * never invoked for this endpoint's WebSocket upgrade request.
+     */
+    private boolean isAuthenticated() {
+        if (httpSession == null) {
+            return false;
+        }
+        try {
+            String authToken = AuthUtil.getAuthToken(httpSession);
+            if (StringUtils.isEmpty(authToken)) {
+                return false;
+            }
+            String userType = AuthDB.isAuthorized(AuthUtil.getUserId(httpSession), authToken);
+            if (userType == null) {
+                return false;
+            }
+            String timeStr = AuthUtil.getTimeout(httpSession);
+            if (StringUtils.isEmpty(timeStr)) {
+                return false;
+            }
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("MMddyyyyHHmmss");
+            java.util.Date sessionTimeout = sdf.parse(timeStr);
+            return sessionTimeout != null && !new java.util.Date().after(sessionTimeout);
+        } catch (GeneralSecurityException | SQLException | java.text.ParseException ex) {
+            log.error(ex.toString(), ex);
+            return false;
+        }
     }
 
 

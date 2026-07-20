@@ -48,7 +48,7 @@ class BaseKontrollerExecuteTest {
 
     @Test
     void invokesControllerMethodMatchingPathAndHttpMethod() throws Exception {
-        when(request.getRequestURI()).thenReturn("/app/hello.ktrl");
+        when(request.getServletPath()).thenReturn("/hello.ktrl");
         when(request.getMethod()).thenReturn("GET");
         when(request.getParameterNames()).thenReturn(Collections.emptyEnumeration());
 
@@ -60,7 +60,7 @@ class BaseKontrollerExecuteTest {
 
     @Test
     void doesNotInvokeControllerMethodWhenHttpMethodDoesNotMatch() throws Exception {
-        when(request.getRequestURI()).thenReturn("/app/hello.ktrl");
+        when(request.getServletPath()).thenReturn("/hello.ktrl");
         when(request.getMethod()).thenReturn("POST");
 
         String forward = new BaseKontroller(request, response).execute();
@@ -71,7 +71,7 @@ class BaseKontrollerExecuteTest {
 
     @Test
     void populatesModelAnnotatedFieldsFromRequestParametersAndBack() throws Exception {
-        when(request.getRequestURI()).thenReturn("/app/echo.ktrl");
+        when(request.getServletPath()).thenReturn("/echo.ktrl");
         when(request.getMethod()).thenReturn("POST");
         when(request.getParameterNames()).thenReturn(Collections.enumeration(java.util.List.of("name", "age")));
         when(request.getParameter("name")).thenReturn("world");
@@ -93,7 +93,7 @@ class BaseKontrollerExecuteTest {
 
     @Test
     void populatesMapModelFieldFromBracketedParameterName() throws Exception {
-        when(request.getRequestURI()).thenReturn("/app/tags.ktrl");
+        when(request.getServletPath()).thenReturn("/tags.ktrl");
         when(request.getMethod()).thenReturn("POST");
         when(request.getParameterNames()).thenReturn(Collections.enumeration(java.util.List.of("tags[env]")));
         when(request.getParameter("tags[env]")).thenReturn("prod");
@@ -108,7 +108,7 @@ class BaseKontrollerExecuteTest {
 
     @Test
     void stripsQuotesFromBracketedParameterKey() throws Exception {
-        when(request.getRequestURI()).thenReturn("/app/tags.ktrl");
+        when(request.getServletPath()).thenReturn("/tags.ktrl");
         when(request.getMethod()).thenReturn("POST");
         when(request.getParameterNames()).thenReturn(Collections.enumeration(java.util.List.of("tags['env']")));
         when(request.getParameter("tags['env']")).thenReturn("prod");
@@ -122,7 +122,7 @@ class BaseKontrollerExecuteTest {
 
     @Test
     void handlesBracketedParameterKeyMissingClosingBracket() throws Exception {
-        when(request.getRequestURI()).thenReturn("/app/tags.ktrl");
+        when(request.getServletPath()).thenReturn("/tags.ktrl");
         when(request.getMethod()).thenReturn("POST");
         when(request.getParameterNames()).thenReturn(Collections.enumeration(java.util.List.of("tags[env")));
         when(request.getParameter("tags[env")).thenReturn("prod");
@@ -141,7 +141,7 @@ class BaseKontrollerExecuteTest {
         // bracket, so every suffix after the last successful match previously failed to
         // match only after an O(n) backtrack - O(n^2) overall for n this large.
         String hugeUnclosedKey = "tags[" + "a".repeat(200_000);
-        when(request.getRequestURI()).thenReturn("/app/tags.ktrl");
+        when(request.getServletPath()).thenReturn("/tags.ktrl");
         when(request.getMethod()).thenReturn("POST");
         when(request.getParameterNames()).thenReturn(Collections.enumeration(java.util.List.of(hugeUnclosedKey)));
         when(request.getParameter(hugeUnclosedKey)).thenReturn("prod");
@@ -152,7 +152,7 @@ class BaseKontrollerExecuteTest {
 
     @Test
     void skipsExecuteMethodAndReturnsValidationInputWhenValidateAddsFieldError() throws Exception {
-        when(request.getRequestURI()).thenReturn("/app/validate.ktrl");
+        when(request.getServletPath()).thenReturn("/validate.ktrl");
         when(request.getMethod()).thenReturn("POST");
         when(request.getParameterNames()).thenReturn(Collections.emptyEnumeration());
 

@@ -90,7 +90,7 @@ class AuthFilterTest {
     void validManagerTokenContinuesChainRegardlessOfPath() throws Exception {
         givenAuthenticatedSession("token123", 5L);
         when(session.getAttribute(AuthUtil.TIMEOUT)).thenReturn(timeoutString(10));
-        when(request.getRequestURI()).thenReturn("/manage/systems");
+        when(request.getServletPath()).thenReturn("/manage/systems");
 
         try (MockedStatic<AuthDB> authDB = mockStatic(AuthDB.class)) {
             authDB.when(() -> AuthDB.isAuthorized(5L, "token123")).thenReturn(Auth.MANAGER);
@@ -106,7 +106,7 @@ class AuthFilterTest {
     void administratorIsBlockedFromManagePaths() throws Exception {
         givenAuthenticatedSession("token123", 5L);
         when(session.getAttribute(AuthUtil.TIMEOUT)).thenReturn(timeoutString(10));
-        when(request.getRequestURI()).thenReturn("/manage/systems");
+        when(request.getServletPath()).thenReturn("/manage/systems");
         when(request.getContextPath()).thenReturn("");
 
         try (MockedStatic<AuthDB> authDB = mockStatic(AuthDB.class)) {
@@ -123,7 +123,7 @@ class AuthFilterTest {
     void administratorCanReachNonManagePaths() throws Exception {
         givenAuthenticatedSession("token123", 5L);
         when(session.getAttribute(AuthUtil.TIMEOUT)).thenReturn(timeoutString(10));
-        when(request.getRequestURI()).thenReturn("/dashboard");
+        when(request.getServletPath()).thenReturn("/dashboard");
 
         try (MockedStatic<AuthDB> authDB = mockStatic(AuthDB.class)) {
             authDB.when(() -> AuthDB.isAuthorized(5L, "token123")).thenReturn(Auth.ADMINISTRATOR);
@@ -139,7 +139,7 @@ class AuthFilterTest {
     void expiredSessionRedirectsDespiteAnOtherwiseValidToken() throws Exception {
         givenAuthenticatedSession("token123", 5L);
         when(session.getAttribute(AuthUtil.TIMEOUT)).thenReturn(timeoutString(-10));
-        when(request.getRequestURI()).thenReturn("/dashboard");
+        when(request.getServletPath()).thenReturn("/dashboard");
         when(request.getContextPath()).thenReturn("");
 
         try (MockedStatic<AuthDB> authDB = mockStatic(AuthDB.class)) {

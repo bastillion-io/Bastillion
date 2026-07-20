@@ -50,7 +50,7 @@ class DispatcherServletTest {
 
     @Test
     void forwardsToViewReturnedByController() throws Exception {
-        when(request.getRequestURI()).thenReturn("/app/hello.ktrl");
+        when(request.getServletPath()).thenReturn("/hello.ktrl");
         when(request.getMethod()).thenReturn("GET");
         when(request.getRequestDispatcher("/hello.html")).thenReturn(dispatcher);
 
@@ -61,7 +61,7 @@ class DispatcherServletTest {
 
     @Test
     void redirectsAndAppendsCsrfTokenFromSession() throws Exception {
-        when(request.getRequestURI()).thenReturn("/app/redirect.ktrl");
+        when(request.getServletPath()).thenReturn("/redirect.ktrl");
         when(request.getMethod()).thenReturn("GET");
         when(request.getSession()).thenReturn(session);
         when(session.getAttribute(SecurityFilter._CSRF)).thenReturn("TOKEN123");
@@ -77,7 +77,7 @@ class DispatcherServletTest {
         // No registered @Kontrol path is a substring of this URI, so BaseKontroller.execute()
         // never reaches the "&&" that checks HTTP method - request.getMethod() is genuinely
         // never called here, unlike the matched-path tests above.
-        when(request.getRequestURI()).thenReturn("/app/doesNotExist.ktrl");
+        when(request.getServletPath()).thenReturn("/doesNotExist.ktrl");
         when(response.isCommitted()).thenReturn(false);
 
         servlet.doGet(request, response);
@@ -92,7 +92,7 @@ class DispatcherServletTest {
         // the response body itself and returns null on success - sendError() on an
         // already-committed response throws IllegalStateException("COMPLETED") in Jetty, even
         // though the response was already sent to the client successfully.
-        when(request.getRequestURI()).thenReturn("/app/doesNotExist.ktrl");
+        when(request.getServletPath()).thenReturn("/doesNotExist.ktrl");
         when(response.isCommitted()).thenReturn(true);
 
         servlet.doGet(request, response);

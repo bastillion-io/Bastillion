@@ -64,7 +64,9 @@ public class AuthFilter implements Filter {
                 //check if valid admin auth token
                 String userType = AuthDB.isAuthorized(AuthUtil.getUserId(servletRequest.getSession()), authToken);
                 if (userType != null) {
-                    String uri = servletRequest.getRequestURI();
+                    // Normalized servlet path, not the raw request URI - see BaseKontroller.execute()
+                    // for why raw getRequestURI() + contains() is unsafe for path-based auth decisions.
+                    String uri = servletRequest.getServletPath();
                     if (Auth.MANAGER.equals(userType)) {
                         isAdmin = true;
                     } else if (!uri.contains("/manage/") && Auth.ADMINISTRATOR.equals(userType)) {

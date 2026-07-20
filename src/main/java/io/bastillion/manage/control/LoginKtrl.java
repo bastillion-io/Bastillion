@@ -7,6 +7,7 @@ package io.bastillion.manage.control;
 
 import io.bastillion.common.util.AppConfig;
 import io.bastillion.common.util.AuthUtil;
+import io.bastillion.common.util.LoginThrottleUtil;
 import io.bastillion.manage.db.AuthDB;
 import io.bastillion.manage.model.Auth;
 import io.bastillion.manage.model.User;
@@ -50,16 +51,27 @@ public class LoginKtrl extends BaseKontroller {
         return "/login.html";
     }
 
+    private static final String AUTH_ERROR_TOO_MANY_ATTEMPTS = "Authentication Failed : Too many failed login attempts. Please try again later.";
+
     @Kontrol(path = "/loginSubmit", method = MethodType.POST)
     public String loginSubmit() throws ServletException {
         String retVal = "redirect:/admin/menu.html";
+
+        //get client IP
+        String clientIP = AuthUtil.getClientIPAddress(getRequest());
+
+        //throttle by client IP, not by username - a per-account lockout would let anyone
+        //remotely lock out a known admin username by deliberately failing its password
+        if (LoginThrottleUtil.isBlocked(clientIP)) {
+            loginAuditLogger.info(auth.getUsername() + " (" + clientIP + ") - " + AUTH_ERROR_TOO_MANY_ATTEMPTS);
+            addError(AUTH_ERROR_TOO_MANY_ATTEMPTS);
+            return "/login.html";
+        }
 
         String authToken = null;
         try {
             authToken = AuthDB.login(auth);
 
-            //get client IP
-            String clientIP = AuthUtil.getClientIPAddress(getRequest());
             if (authToken != null) {
 
                 User user = AuthDB.getUserByAuthToken(authToken);
@@ -68,6 +80,7 @@ public class LoginKtrl extends BaseKontroller {
                     if (otpEnabled) {
                         sharedSecret = AuthDB.getSharedSecret(user.getId());
                         if (StringUtils.isNotEmpty(sharedSecret) && (auth.getOtpToken() == null || !OTPUtil.verifyToken(sharedSecret, auth.getOtpToken()))) {
+                            LoginThrottleUtil.recordFailure(clientIP);
                             loginAuditLogger.info(auth.getUsername() + " (" + clientIP + ") - " + AUTH_ERROR);
                             addError(AUTH_ERROR);
                             return "/login.html";
@@ -101,10 +114,12 @@ public class LoginKtrl extends BaseKontroller {
                     } else if ("changeme".equals(auth.getPassword()) && Auth.AUTH_BASIC.equals(user.getAuthType())) {
                         retVal = "redirect:/admin/userSettings.ktrl";
                     }
+                    LoginThrottleUtil.recordSuccess(clientIP);
                     loginAuditLogger.info(auth.getUsername() + " (" + clientIP + ") - Authentication Success");
                 }
 
             } else {
+                LoginThrottleUtil.recordFailure(clientIP);
                 loginAuditLogger.info(auth.getUsername() + " (" + clientIP + ") - " + AUTH_ERROR);
                 addError(AUTH_ERROR);
                 retVal = "/login.html";
