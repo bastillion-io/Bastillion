@@ -24,10 +24,6 @@ public class SecurityFilter implements Filter {
     // csrf parameter and session name
     public static final String _CSRF = "_csrf";
 
-    // x-frame-options header
-    private static final String CSP_HEADER = "Content-Security-Policy";
-    private static final String CSP_VALUE = "frame-ancestors 'self';";
-
     // disable MIME sniffing
     private static final String X_CONTENT_TYPE_HEADER = "X-Content-Type-Options";
     private static final String X_CONTENT_TYPE_VALUE = "nosniff";
@@ -47,9 +43,6 @@ public class SecurityFilter implements Filter {
             throws IOException, ServletException {
 
         HttpServletResponse httpServletResponse = (HttpServletResponse) response;
-
-        // click jacking header
-        httpServletResponse.addHeader(CSP_HEADER, CSP_VALUE);
 
         // disable MIME sniffing
         httpServletResponse.addHeader(X_CONTENT_TYPE_HEADER, X_CONTENT_TYPE_VALUE);

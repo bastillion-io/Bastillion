@@ -61,6 +61,11 @@ public class DummyController extends BaseKontroller {
         return "redirect:/target";
     }
 
+    @Kontrol(path = "/throws", method = MethodType.GET)
+    public String throwsInternalDetail() {
+        throw new IllegalStateException("sensitive database path /private/db");
+    }
+
     @Kontrol(path = "/echo", method = MethodType.POST)
     public String echo() {
         echoExecuted = true;

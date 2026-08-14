@@ -2,6 +2,13 @@
 <web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
 
+    <!-- Never generate directory indexes for static assets. Files remain directly
+         addressable, but requests such as /_res/ and /img/ return 404. -->
+    <context-param>
+        <param-name>org.eclipse.jetty.servlet.Default.dirAllowed</param-name>
+        <param-value>false</param-value>
+    </context-param>
+
     <session-config>
         <cookie-config>
             <http-only>true</http-only>

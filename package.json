@@ -5,20 +5,16 @@
     "type": "git",
     "url": "git+https://github.com/bastillion-io/Bastillion.git"
   },
+  "scripts": {
+    "build-assets": "node scripts/build-assets.mjs"
+  },
   "dependencies": {
+    "@xterm/addon-fit": "0.11.0",
+    "@xterm/xterm": "6.0.0",
     "@popperjs/core": "2.11.8",
     "bootstrap": "5.3.8",
     "floatthead": "2.2.5",
     "jquery": "4.0.0",
-    "jquery-ui": "1.14.2",
-    "xterm": "5.3.0",
-    "xterm-addon-fit": "0.8.0"
-  },
-  "devDependencies": {
-    "grunt": "^1.6.3",
-    "grunt-cli": "^1.5.0",
-    "grunt-contrib-clean": "^2.0.1",
-    "grunt-contrib-copy": "^1.0.0",
-    "grunt-mkdir": "^1.1.0"
+    "jquery-ui": "1.14.2"
   }
 }

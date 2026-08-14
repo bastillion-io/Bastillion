@@ -13,7 +13,7 @@
 
         $(document).ready(function () {
 
-            $.ajaxSetup({cache: false, async:false});
+            $.ajaxSetup({cache: false});
 
             //get instance id list from selected terminals
             function getActiveTermsInstanceIds() {
@@ -199,14 +199,23 @@
             });
 
             function resetSize() {
-                var ids = getActiveTermsInstanceIds();
+                var ids = [];
+                $(".run_cmd").each(function () {
+                    ids.push($(this).attr("id").replace("run_cmd_", ""));
+                });
                 for (var i = 0; i < ids.length; i++) {
-                    var w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-                    $("#output_" + ids[i]).width((w - 125)/2);
-                    $("#output_" + ids[i]).height(346 + y_offset);
-                    resize($("#output_" + ids[i]));
+                    var output = $("#output_" + ids[i]);
+                    output.css("width", "auto");
+                    output.height(346 + y_offset);
+                    resize(output);
                 }
             }
+
+            var windowResizeTimer;
+            $(window).on('resize', function () {
+                clearTimeout(windowResizeTimer);
+                windowResizeTimer = setTimeout(resetSize, 120);
+            });
 
             //resize element during drag event. Makes call to set pty width and height
             function resize(element) {
@@ -216,11 +225,20 @@
                     var width = Math.floor($('#output_' + id).innerWidth() - 20);
                     var height = Math.floor($('#output_' + id).innerHeight() - y_offset);
 
+                    // Fit first, then give the remote PTY xterm's exact character grid.
+                    // Estimating columns from pixels causes wrapping disagreements that
+                    // make zsh display its inverse-video PROMPT_EOL_MARK (usually "%").
+                    fitMap[id].fit();
+
                     $.ajax({
-                        url: '../admin/setPtyType.ktrl?id=' + id + '&userSettings.ptyWidth=' + width + '&userSettings.ptyHeight=' + height + '&_csrf=' + [[${session._csrf}]],
+                        url: '../admin/setPtyType.ktrl?id=' + id
+                            + '&userSettings.ptyColumns=' + termMap[id].cols
+                            + '&userSettings.ptyRows=' + termMap[id].rows
+                            + '&userSettings.ptyWidth=' + width
+                            + '&userSettings.ptyHeight=' + height
+                            + '&_csrf=' + [[${session._csrf}]],
                         cache: false
                     });
-                    fitMap[id].fit();
                 }
 
             }
@@ -316,8 +334,13 @@
 
                 termMap[id].open($("#run_cmd_" + id).find('.output').get(0));
 
-
-                termMap[id].write(output);
+                // The remote shell starts before the browser can report its exact grid.
+                // On that first paint only, zsh may have already emitted its default
+                // standout PROMPT_EOL_MARK. Remove that exact control sequence when it is
+                // followed by zsh's line-padding carriage return; ordinary percent signs
+                // and genuine partial-line markers later in the session are untouched.
+                var initialZshEolMark = /\x1b\[1m\x1b\[7m%\x1b\[27m(?:\x1b\[1m)?\x1b\[0m(?= +\r)/;
+                termMap[id].write(output.replace(initialZshEolMark, ''));
 
 
             }
@@ -446,10 +469,36 @@
     </script>
 
     <style>
-        .term-container {
+        .live-term-container {
+            width: calc(100% - 32px);
+            max-width: none;
+            padding: 10px 0 32px;
+            margin: 0 auto;
+        }
+        .live-term-container .termwrapper {
+            display: grid;
             width: 100%;
-            padding: 10px 0;
             margin: 0;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+            align-items: start;
+        }
+        .live-term-container .run_cmd {
+            width: auto;
+            min-width: 0;
+            margin: 0;
+            float: none;
+        }
+        .live-term-container .output {
+            width: auto;
+        }
+        @media (max-width: 900px) {
+            .live-term-container {
+                width: calc(100% - 20px);
+            }
+            .live-term-container .termwrapper {
+                grid-template-columns: minmax(0, 1fr);
+            }
         }
         .term {
             background: [[${userSettings.bg}]];
@@ -461,14 +510,12 @@
 <body>
 <template th:if="${(systemList != null && !systemList.empty) || pendingSystemStatus.id != null }"
           th:remove="tag">
-    <div class="navbar navbar-dark bg-dark fixed-top navbar-expand" role="navigation">
+    <div class="navbar navbar-dark fixed-top navbar-expand" role="navigation">
         <div class="container">
             <div class="navbar-brand">
-                <div class="nav-img">
-                    <img src="/img/bastillion_40x40.png" th:src="@{/img/bastillion_40x40.png}"
-                         alt="bastillion">
-                </div>
-                Bastillion
+                <img class="brand-logo" src="/img/bastillion-logo.svg" th:src="@{/img/bastillion-logo.svg}"
+                     alt="Bastillion">
+                <span>Bastillion</span>
             </div>
             <div class="navbar-collapse" id="navbarCollapse">
                 <template th:if="${pendingSystemStatus == null || pendingSystemStatus.id == null}"
@@ -515,7 +562,7 @@
             <!--/.nav-collapse -->
         </div>
     </div>
-    <div class="term-container container">
+    <div class="term-container live-term-container container">
         <div class="termwrapper"></div>
     </div>
 </template>

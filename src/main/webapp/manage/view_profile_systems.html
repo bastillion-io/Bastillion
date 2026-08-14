@@ -33,13 +33,13 @@
                 var id = $(this).attr('id')
 
                 var orderDirection = $('#viewProfileSystems_sortedSet_orderByDirection');
-                if (orderDirection.attr('value') === 'asc') {
-                    orderDirection.attr('value', 'desc');
+                if (orderDirection.val() === 'asc') {
+                    orderDirection.val('desc');
                 } else {
-                    orderDirection.attr('value', 'asc');
+                    orderDirection.val('asc');
                 }
 
-                $('#viewProfileSystems_sortedSet_orderByField').attr('value', id);
+                $('#viewProfileSystems_sortedSet_orderByField').val(id);
                 $("#viewProfileSystems").submit();
 
             });
@@ -78,7 +78,7 @@
               method="post">
             <input type="hidden" name="_csrf" th:value="${session._csrf}">
             <input type="hidden" name="profile.id" th:value="${profile.id}">
-            <table class="table-striped scrollableTable">
+        <table class="table-striped scrollableTable selectionTable">
                 <thead>
                 <tr>
                     <th th:id="${@io.bastillion.manage.db.SystemDB@PROFILE_ID}" class="sort">

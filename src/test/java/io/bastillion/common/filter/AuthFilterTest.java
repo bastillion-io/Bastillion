@@ -24,6 +24,9 @@ import java.sql.SQLException;
 
 import static io.bastillion.common.util.AuthTestSupport.encryptedAttribute;
 import static io.bastillion.common.util.AuthTestSupport.timeoutString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
@@ -166,8 +169,11 @@ class AuthFilterTest {
             authDB.when(() -> AuthDB.isAuthorized(anyLong(), eq("token123")))
                     .thenThrow(new SQLException("connection lost"));
 
-            org.junit.jupiter.api.Assertions.assertThrows(ServletException.class,
+            ServletException exception = assertThrows(ServletException.class,
                     () -> filter.doFilter(request, response, filterChain));
+
+            assertEquals("Request processing failed", exception.getMessage());
+            assertNull(exception.getCause());
 
             verify(filterChain, never()).doFilter(any(), any());
             verify(session).invalidate();

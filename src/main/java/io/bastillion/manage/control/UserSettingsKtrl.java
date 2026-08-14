@@ -7,6 +7,7 @@ package io.bastillion.manage.control;
 
 import com.jcraft.jsch.JSchException;
 import io.bastillion.common.util.AuthUtil;
+import io.bastillion.common.util.ThemeUtil;
 import io.bastillion.manage.db.AuthDB;
 import io.bastillion.manage.db.PrivateKeyDB;
 import io.bastillion.manage.db.SystemDB;
@@ -132,8 +133,10 @@ public class UserSettingsKtrl extends BaseKontroller {
     public String themeSubmit() throws ServletException {
         userSettings.setTheme(userSettings.getTheme());
         userSettings.setPlane(userSettings.getPlane());
+        userSettings.setUiTheme(userSettings.getUiTheme());
         try {
             UserThemeDB.saveTheme(AuthUtil.getUserId(getRequest().getSession()), userSettings);
+            ThemeUtil.setThemeCookie(getRequest(), getResponse(), userSettings.getUiTheme());
         } catch (SQLException | GeneralSecurityException ex) {
             log.error(ex.toString(), ex);
             throw new ServletException(ex.toString(), ex);

@@ -33,13 +33,13 @@
                 var id = $(this).attr('id')
 
                 var orderDirection = $('#viewSystems_sortedSet_orderByDirection');
-                if (orderDirection.attr('value') === 'asc') {
-                    orderDirection.attr('value', 'desc');
+                if (orderDirection.val() === 'asc') {
+                    orderDirection.val('desc');
                 } else {
-                    orderDirection.attr('value', 'asc');
+                    orderDirection.val('asc');
                 }
 
-                $('#viewSystems_sortedSet_orderByField').attr('value', id);
+                $('#viewSystems_sortedSet_orderByField').val(id);
                 $("#viewSystems").submit();
 
             });
@@ -112,7 +112,7 @@
             <input type="hidden" name="_csrf" th:value="${session._csrf}">
             <input type="hidden" name="script.id" th:if="${script != null && script.id != null}"
                    th:value="${script.id}">
-            <table class="table-striped scrollableTable">
+            <table class="table-striped scrollableTable selectionTable">
                 <thead>
                 <tr>
                     <th>

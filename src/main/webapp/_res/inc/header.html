@@ -6,8 +6,20 @@
 <head xmlns:th="http://www.thymeleaf.org" th:remove="tag">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta id="theme-color" name="theme-color" content="#080b10"/>
+    <script>
+        // Apply the saved preference before styles load to avoid a light/dark flash.
+        (function () {
+            var match = document.cookie.match(/(?:^|;\s*)bastillion_theme=(dark|light)(?:;|$)/);
+            var theme = match ? match[1] : 'dark';
+            document.documentElement.setAttribute('data-bs-theme', theme);
+            document.getElementById('theme-color').setAttribute(
+                'content', theme === 'light' ? '#f4f7f5' : '#080b10');
+        }());
+    </script>
 
-    <link rel="icon" th:href="@{/img/bastillion.ico}" type="image/x-icon"/>
+    <link rel="icon" th:href="@{/img/bastillion-logo.svg}" type="image/svg+xml"/>
     <link rel="stylesheet" type="text/css" th:href="@{/_res/node/css/jquery-ui/all.css}"/>
     <link rel="stylesheet" type="text/css" th:href="@{/_res/node/css/xterm.css}"/>
     <link rel="stylesheet" type="text/css" th:href="@{/_res/node/css/bootstrap.min.css}"/>
@@ -46,7 +58,7 @@
     <!-- Extra libs -->
     <script th:src="@{/_res/node/js/jquery.floatThead.min.js}"></script>
     <script th:src="@{/_res/node/js/xterm.js}"></script>
-    <script th:src="@{/_res/node/js/xterm-addon-fit.js}"></script>
+    <script th:src="@{/_res/node/js/addon-fit.js}"></script>
 
 
     <script th:inline="javascript">
@@ -56,6 +68,11 @@
             $.ajaxSetup({cache: false});
 
             $(function () {
+                // Several legacy templates use non-button elements for actions. Give those
+                // controls button semantics and complete keyboard support while the markup
+                // is gradually simplified.
+                $('.btn').filter('div, span').attr('role', 'button');
+
                 var tabindex = 1;
                 $('input,textarea,select,.btn').each(function () {
                     if (this.type !== "hidden") {
@@ -65,17 +82,29 @@
                     }
                 });
 
-                $(".btn").keyup(function (event) {
-                    if (event.keyCode === 13) {
+                $(".btn").on('keydown', function (event) {
+                    if (event.key === ' ') {
+                        event.preventDefault();
+                    }
+                }).on('keyup', function (event) {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
                         $(this).click();
                     }
                 });
 
-                $("form input, form select, .btn").keydown(function (event) {
+                $("form input, form select").keydown(function (event) {
                     if (event.keyCode === 13) {
                         event.preventDefault();
                         $(this).closest("form").submit();
                     }
+                });
+
+                $('[data-theme-toggle]').on('change', function () {
+                    var theme = this.checked ? 'dark' : 'light';
+                    $('#ui-theme-value').val(theme);
+                    document.documentElement.setAttribute('data-bs-theme', theme);
+                    $('#theme-color').attr('content', theme === 'light' ? '#f4f7f5' : '#080b10');
                 });
             });
 
@@ -88,8 +117,6 @@
                     }
                 });
             }
-
-            $(".scrollableTable tr:even").css("background-color", "#2b3035");
 
             $(':input:enabled:visible:first').focus();
 

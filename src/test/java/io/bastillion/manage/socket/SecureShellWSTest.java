@@ -331,6 +331,13 @@ class SecureShellWSTest {
         assertDoesNotThrow(ws::onClose);
     }
 
+    @Test
+    void onCloseBeforeAuthenticationAssignsASessionIdDoesNotThrow() throws Exception {
+        SecureShellWS unopenedSocket = new SecureShellWS();
+
+        assertDoesNotThrow(unopenedSocket::onClose);
+    }
+
     private static SchSession sshSession(Channel channel, Session session) {
         SchSession schSession = new SchSession();
         schSession.setChannel(channel);

@@ -223,7 +223,10 @@ public class BaseKontroller {
 
                         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException | ClassNotFoundException ex) {
                             log.error(ex.toString(), ex);
-                            throw new ServletException(ex.toString(), ex);
+                            // The full exception stays in server logs. Do not hand its class,
+                            // message, or cause to the container where an error renderer could
+                            // disclose database, filesystem, or implementation details.
+                            throw new ServletException("Request processing failed");
                         }
                     }
                 }

@@ -200,6 +200,7 @@ public class AuthDB {
                 if (rs.next()) {
                     Long userId = rs.getLong("id");
                     user = UserDB.getUser(con, userId);
+                    user.setUiTheme(UserThemeDB.getUiTheme(con, userId));
                 }
             }
         }

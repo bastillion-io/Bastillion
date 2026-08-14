@@ -293,9 +293,16 @@ public class SecureShellKtrl extends BaseKontroller {
 
                 SchSession schSession = userSchSessions.getSchSessionMap().get(id);
 
-                ChannelShell channel = (ChannelShell) schSession.getChannel();
-                channel.setPtySize((int) Math.floor(userSettings.getPtyWidth() / 8.0000), (int) Math.floor(userSettings.getPtyHeight() / 14.4166), userSettings.getPtyWidth(), userSettings.getPtyHeight());
-                schSession.setChannel(channel);
+                if (schSession != null && schSession.getChannel() instanceof ChannelShell channel
+                        && userSettings.getPtyColumns() != null && userSettings.getPtyRows() != null
+                        && userSettings.getPtyWidth() != null && userSettings.getPtyHeight() != null) {
+                    int columns = Math.max(1, Math.min(userSettings.getPtyColumns(), 1000));
+                    int rows = Math.max(1, Math.min(userSettings.getPtyRows(), 1000));
+                    int width = Math.max(1, userSettings.getPtyWidth());
+                    int height = Math.max(1, userSettings.getPtyHeight());
+                    channel.setPtySize(columns, rows, width, height);
+                    schSession.setChannel(channel);
+                }
 
             }
 
@@ -342,5 +349,4 @@ public class SecureShellKtrl extends BaseKontroller {
 
     }
 }
-
 

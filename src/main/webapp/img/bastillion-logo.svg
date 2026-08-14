@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="logo-title">
+  <title id="logo-title">Bastillion</title>
+  <defs>
+    <linearGradient id="bastillion-gradient" x1="7" y1="7" x2="57" y2="57" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#56d364"/>
+      <stop offset="1" stop-color="#2ea043"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#bastillion-gradient)"/>
+  <path d="M16,17 L16,11 L23,11 L23,17 L28,17 L28,11 L35,11 L35,17 L40,17 L40,11 L47,11 L47,17 L47,53 L16,53 Z"
+        fill="#0f0f14" opacity=".94"/>
+  <path d="M32,21 C27,28 25,35 25,42 L28,42 L32,49 L36,42 L39,42 C39,35 37,28 32,21 Z" fill="#fff"/>
+  <rect x="30.5" y="23" width="3" height="22" rx="1.5" fill="#fff"/>
+</svg>

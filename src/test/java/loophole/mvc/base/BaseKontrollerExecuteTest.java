@@ -7,6 +7,7 @@ package loophole.mvc.base;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
 import loophole.mvc.testctrl.DummyController;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,8 @@ import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
@@ -165,5 +168,18 @@ class BaseKontrollerExecuteTest {
         ArgumentCaptor<Map> fieldErrorsCaptor = ArgumentCaptor.forClass(Map.class);
         verify(request).setAttribute(eq("fieldErrors"), fieldErrorsCaptor.capture());
         assertEquals("name is required", fieldErrorsCaptor.getValue().get("name"));
+    }
+
+    @Test
+    void controllerExceptionsDoNotExposeInternalDetailsToTheContainer() {
+        when(request.getServletPath()).thenReturn("/throws.ktrl");
+        when(request.getMethod()).thenReturn("GET");
+        when(request.getParameterNames()).thenReturn(Collections.emptyEnumeration());
+
+        ServletException exception = assertThrows(ServletException.class,
+                () -> new BaseKontroller(request, response).execute());
+
+        assertEquals("Request processing failed", exception.getMessage());
+        assertNull(exception.getCause());
     }
 }

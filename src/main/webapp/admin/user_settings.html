@@ -53,11 +53,25 @@
             <input type="hidden" name="_csrf" th:value="${session._csrf}">
         </form>
     </div>
-    <h3>Set Terminal Theme</h3>
-    <p>Change the theme for your terminals below</p>
+    <h3>Appearance</h3>
+    <p>Choose the interface and terminal appearance saved for your account.</p>
     <form th:action="@{/admin/themeSubmit.ktrl}"
           method="post" autocomplete="off">
         <table>
+            <tr>
+                <td>Interface:</td>
+                <td>
+                    <input type="hidden" id="ui-theme-value" name="userSettings.uiTheme"
+                           th:value="${userSettings != null and userSettings.uiTheme == 'light'} ? 'light' : 'dark'">
+                    <div class="form-check form-switch theme-setting">
+                        <input class="form-check-input" type="checkbox" role="switch"
+                               id="dark-mode-toggle"
+                               data-theme-toggle
+                               th:checked="${userSettings == null or userSettings.uiTheme != 'light'}">
+                        <label class="form-check-label" for="dark-mode-toggle">Use dark mode</label>
+                    </div>
+                </td>
+            </tr>
             <tr>
                 <td>Terminal Theme:
                 </td>
@@ -83,7 +97,7 @@
             <tr>
                 <td>&#xA0;</td>
                 <td>
-                    <div id="theme_btn" class="btn btn-secondary submit_btn">Update Theme</div>
+                    <div id="theme_btn" class="btn btn-secondary submit_btn">Save Appearance</div>
                 </td>
             </tr>
         </table>

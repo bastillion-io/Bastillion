@@ -25,14 +25,12 @@
 </head>
 
 <body>
-<div class="navbar navbar-dark bg-dark fixed-top navbar-expand" role="navigation">
+<div class="navbar navbar-dark fixed-top navbar-expand" role="navigation">
     <div class="container">
         <div class="navbar-brand">
-            <div class="nav-img">
-                <img src="/img/bastillion_40x40.png" th:src="@{/img/bastillion_40x40.png}"
-                     alt="bastillion">
-            </div>
-            Bastillion
+            <img class="brand-logo" src="/img/bastillion-logo.svg" th:src="@{/img/bastillion-logo.svg}"
+                 alt="Bastillion">
+            <span>Bastillion</span>
         </div>
         <!--/.nav-collapse -->
     </div>
@@ -40,6 +38,11 @@
 <div class="container login-wrap">
     <div class="card login-card">
         <div class="card-body">
+            <div class="login-heading">
+                <span class="eyebrow">Secure access gateway</span>
+                <h1>Welcome back</h1>
+                <p>Sign in to manage systems and SSH sessions.</p>
+            </div>
             <div th:replace="~{_res/inc/errors}"></div>
             <form id="loginSubmit" th:action="@{/loginSubmit.ktrl}" method="post"
                   autocomplete="off">
@@ -58,7 +61,7 @@
                     <input type="text" name="auth.otpToken" class="form-control" title="OTP Access Code">
                     <span class="error" th:text="${fieldErrors.get('auth.otpToken')}"></span>
                 </div>
-                <div id="login_btn" class="btn btn-secondary submit_btn w-100">Login</div>
+                <div id="login_btn" class="btn btn-secondary submit_btn w-100">Sign in</div>
                 <input type="hidden" name="_csrf" th:value="${session._csrf}">
             </form>
         </div>

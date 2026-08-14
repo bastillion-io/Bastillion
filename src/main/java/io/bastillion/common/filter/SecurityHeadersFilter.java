@@ -24,9 +24,8 @@ import java.io.IOException;
  * per RFC 6797 section 8.1, a UA that receives more than one Strict-Transport-Security header on a
  * response must ignore all of them, so duplicating it would silently disable HSTS entirely.
  * <p>
- * The Content-Security-Policy header IS repeated here (browsers enforce multiple CSP headers
- * as an intersection, which is spec-defined and safe) to add real restrictions beyond
- * frame-ancestors; the app's templates rely on inline &lt;script&gt;/&lt;style&gt; blocks
+ * This filter owns the application's Content-Security-Policy. The app's templates rely on
+ * inline &lt;script&gt;/&lt;style&gt; blocks
  * (Thymeleaf-injected CSRF tokens, per-user terminal theme colors), so script-src/style-src
  * allow 'unsafe-inline' rather than blocking them outright.
  */
@@ -38,7 +37,9 @@ public class SecurityHeadersFilter implements Filter {
             "style-src 'self' 'unsafe-inline'; " +
             "img-src 'self'; " +
             "font-src 'self'; " +
-            "connect-src 'self' wss:; " +
+            // The terminal WebSocket is same-origin. A bare wss: source would permit a
+            // connection to every secure WebSocket host, which is broader than needed.
+            "connect-src 'self'; " +
             "object-src 'none'; " +
             "base-uri 'self'; " +
             "form-action 'self'; " +

@@ -69,15 +69,9 @@ public class SessionOutputUtil {
      * @param sessionOutput session output object
      */
     public static void addOutput(SessionOutput sessionOutput) {
-
-        UserSessionsOutput userSessionsOutput = userSessionsOutputMap.get(sessionOutput.getSessionId());
-        if (userSessionsOutput == null) {
-            userSessionsOutputMap.put(sessionOutput.getSessionId(), new UserSessionsOutput());
-            userSessionsOutput = userSessionsOutputMap.get(sessionOutput.getSessionId());
-        }
+        UserSessionsOutput userSessionsOutput = userSessionsOutputMap.computeIfAbsent(
+                sessionOutput.getSessionId(), ignored -> new UserSessionsOutput());
         userSessionsOutput.getSessionOutputMap().put(sessionOutput.getInstanceId(), sessionOutput);
-
-
     }
 
 
@@ -94,9 +88,31 @@ public class SessionOutputUtil {
 
         UserSessionsOutput userSessionsOutput = userSessionsOutputMap.get(sessionId);
         if (userSessionsOutput != null) {
-            userSessionsOutput.getSessionOutputMap().get(instanceId).getOutput().append(value, offset, count);
+            SessionOutput sessionOutput = userSessionsOutput.getSessionOutputMap().get(instanceId);
+            if (sessionOutput != null && sessionOutput.getOutput() != null) {
+                sessionOutput.getOutput().append(value, offset, count);
+            }
         }
 
+    }
+
+    /**
+     * Returns whether a session currently has terminal output waiting to be drained.
+     * This inexpensive memory check keeps the sender from borrowing a database connection
+     * every 25 ms while all terminals are idle.
+     */
+    public static boolean hasPendingOutput(Long sessionId) {
+        UserSessionsOutput userSessionsOutput = userSessionsOutputMap.get(sessionId);
+        if (userSessionsOutput == null) {
+            return false;
+        }
+        for (SessionOutput sessionOutput : userSessionsOutput.getSessionOutputMap().values()) {
+            if (sessionOutput != null && sessionOutput.getOutput() != null
+                    && sessionOutput.getOutput().length() > 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
 

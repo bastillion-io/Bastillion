@@ -171,26 +171,34 @@ public class SecureShellWS {
     @OnClose
     public void onClose() {
 
+        // Authentication can reject a socket before a Bastillion session id is assigned.
+        // The container may still invoke onClose for that rejected connection.
+        if (sessionId == null) {
+            return;
+        }
+
         if (SecureShellKtrl.getUserSchSessionMap() != null) {
             UserSchSessions userSchSessions = SecureShellKtrl.getUserSchSessionMap().get(sessionId);
             if (userSchSessions != null) {
                 Map<Integer, SchSession> schSessionMap = userSchSessions.getSchSessionMap();
 
-                for (Integer sessionKey : schSessionMap.keySet()) {
-
-                    SchSession schSession = schSessionMap.get(sessionKey);
-
-                    //disconnect ssh session
-                    schSession.getChannel().disconnect();
-                    schSession.getSession().disconnect();
+                // Work from a snapshot. Removing entries while iterating over keySet can
+                // throw ConcurrentModificationException and leave SSH sessions connected.
+                for (SchSession schSession : new ArrayList<>(schSessionMap.values())) {
+                    if (schSession == null) {
+                        continue;
+                    }
+                    if (schSession.getChannel() != null) {
+                        schSession.getChannel().disconnect();
+                    }
+                    if (schSession.getSession() != null) {
+                        schSession.getSession().disconnect();
+                    }
                     schSession.setChannel(null);
                     schSession.setSession(null);
                     schSession.setInputToChannel(null);
                     schSession.setCommander(null);
                     schSession.setOutFromChannel(null);
-                    schSession = null;
-                    //remove from map
-                    schSessionMap.remove(sessionKey);
                 }
 
 

@@ -33,7 +33,6 @@ class SecurityFilterTest {
     void addsSecurityHeadersAndContinuesChain() throws Exception {
         filter.doFilter(request, response, filterChain);
 
-        verify(response).addHeader("Content-Security-Policy", "frame-ancestors 'self';");
         verify(response).addHeader("X-Content-Type-Options", "nosniff");
         verify(response).addHeader("X-XSS-Protection", "1; mode=block");
         verify(response).addHeader("Strict-Transport-Security", "max-age=31536000");

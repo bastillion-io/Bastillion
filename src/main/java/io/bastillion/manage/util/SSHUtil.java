@@ -323,7 +323,7 @@ public class SSHUtil {
             new Thread(new SecureShellTask(sessionOutput, outFromChannel)).start();
 
             OutputStream inputToChannel = channel.getOutputStream();
-            PrintStream commander = new PrintStream(inputToChannel, true);
+            PrintStream commander = new PrintStream(inputToChannel, true, StandardCharsets.UTF_8);
             channel.connect();
 
             schSession = new SchSession();

@@ -49,12 +49,12 @@
                 var id = $(this).attr('id')
 
                 var orderDirection = $('#viewProfiles_sortedSet_orderByDirection');
-                if (orderDirection.attr('value') === 'asc') {
-                    orderDirection.attr('value', 'desc');
+                if (orderDirection.val() === 'asc') {
+                    orderDirection.val('desc');
                 } else {
-                    orderDirection.attr('value', 'asc');
+                    orderDirection.val('asc');
                 }
-                $('#viewProfiles_sortedSet_orderByField').attr('value', id);
+                $('#viewProfiles_sortedSet_orderByField').val(id);
                 $("#viewProfiles").submit();
 
             });

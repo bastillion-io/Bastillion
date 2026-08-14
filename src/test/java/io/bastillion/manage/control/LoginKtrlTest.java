@@ -29,6 +29,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mockStatic;
@@ -185,6 +186,7 @@ class LoginKtrlTest {
         setAuth(ktrl, auth);
 
         User user = managerWithProfile();
+        user.setUiTheme("light");
 
         try (MockedStatic<AuthDB> authDB = mockStatic(AuthDB.class)) {
             authDB.when(() -> AuthDB.login(auth)).thenReturn("tok-123");
@@ -195,6 +197,7 @@ class LoginKtrlTest {
 
             assertEquals("redirect:/admin/menu.html", view);
             verify(session).setAttribute(eq(AuthUtil.AUTH_TOKEN), any());
+            verify(response).addHeader(eq("Set-Cookie"), contains("bastillion_theme=light"));
             authDB.verify(() -> AuthDB.updateLastLogin(user));
         }
     }

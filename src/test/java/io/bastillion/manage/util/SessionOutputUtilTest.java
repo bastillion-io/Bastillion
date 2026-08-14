@@ -16,6 +16,7 @@ import java.sql.ResultSet;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
@@ -103,6 +104,31 @@ class SessionOutputUtilTest {
 
             assertTrue(output.isEmpty());
         }
+    }
+
+    @Test
+    void pendingOutputTracksWhetherTheBufferNeedsDraining() throws Exception {
+        long sessionId = 9008L;
+        SessionOutputUtil.addOutput(newInstance(sessionId, 1));
+        assertFalse(SessionOutputUtil.hasPendingOutput(sessionId));
+
+        SessionOutputUtil.addToOutput(sessionId, 1, "ready".toCharArray(), 0, 5);
+        assertTrue(SessionOutputUtil.hasPendingOutput(sessionId));
+
+        try (Connection con = newConnection(sessionId)) {
+            SessionOutputUtil.getOutput(con, sessionId, testUser());
+        }
+        assertFalse(SessionOutputUtil.hasPendingOutput(sessionId));
+    }
+
+    @Test
+    void addToOutputIgnoresAnUnknownTerminalInstance() {
+        long sessionId = 9009L;
+        SessionOutputUtil.addOutput(newInstance(sessionId, 1));
+
+        SessionOutputUtil.addToOutput(sessionId, 2, "stale".toCharArray(), 0, 5);
+
+        assertFalse(SessionOutputUtil.hasPendingOutput(sessionId));
     }
 
     @Test

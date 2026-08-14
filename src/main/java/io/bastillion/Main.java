@@ -11,6 +11,7 @@ import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
+import org.eclipse.jetty.servlet.ErrorPageErrorHandler;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.websocket.jakarta.server.config.JakartaWebSocketServletContainerInitializer;
@@ -62,6 +63,11 @@ public class Main {
         webApp.setContextPath("/");
         webApp.setResourceBase(resolveWebAppDir().toString());
         webApp.setParentLoaderPriority(true);
+        ErrorPageErrorHandler errorHandler = new ErrorPageErrorHandler();
+        errorHandler.setShowServlet(false);
+        errorHandler.setShowStacks(false);
+        errorHandler.setShowMessageInTitle(false);
+        webApp.setErrorHandler(errorHandler);
         // Without this, a failed context start (e.g. DBInitServlet rejecting a bad DB
         // config) just leaves the server up returning 503s instead of failing the process.
         webApp.setThrowUnavailableOnStartupException(true);

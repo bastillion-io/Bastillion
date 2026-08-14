@@ -17,6 +17,7 @@ public class User extends Auth {
     String ipAddress;
     Boolean checked = false;
     List<Profile> profileList;
+    String uiTheme = UserSettings.DARK;
 
     public Boolean getChecked() {
         return checked;
@@ -64,5 +65,14 @@ public class User extends Auth {
 
     public void setIpAddress(String ipAddress) {
         this.ipAddress = ipAddress;
+    }
+
+    public String getUiTheme() {
+        return uiTheme;
+    }
+
+    public void setUiTheme(String uiTheme) {
+        this.uiTheme = UserSettings.LIGHT.equalsIgnoreCase(uiTheme)
+                ? UserSettings.LIGHT : UserSettings.DARK;
     }
 }

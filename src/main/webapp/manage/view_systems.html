@@ -38,13 +38,13 @@
                 var id = $(this).attr('id');
 
                 var orderDirection = $('#viewSystems_sortedSet_orderByDirection');
-                if (orderDirection.attr('value') === 'asc') {
-                    orderDirection.attr('value', 'desc');
+                if (orderDirection.val() === 'asc') {
+                    orderDirection.val('desc');
                 } else {
-                    orderDirection.attr('value', 'asc');
+                    orderDirection.val('asc');
                 }
 
-                $('#viewSystems_sortedSet_orderByField').attr('value', id);
+                $('#viewSystems_sortedSet_orderByField').val(id);
                 $("#viewSystems").submit();
 
             });
@@ -156,8 +156,8 @@
                     <td>
                         <div>
                             <button th:id="'refresh_btn_' + ${s.id}"
-                                    class="btn btn-secondary refresh_btn spacer spacer-left">
-                                <img src="../img/refresh.png" alt="Refresh" style="float:left;width:20px;height:20px;">
+                                    class="btn btn-secondary refresh_btn spacer spacer-left"
+                                    aria-label="Refresh system status" title="Refresh status">
                             </button>
                             <button class="btn btn-secondary spacer spacer-middle" data-bs-toggle="modal"
                                     th:attr="data-bs-target='#edit_dialog_' + ${s.id}">Edit

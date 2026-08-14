@@ -8,6 +8,7 @@ package io.bastillion.manage.control;
 import io.bastillion.common.util.AppConfig;
 import io.bastillion.common.util.AuthUtil;
 import io.bastillion.common.util.LoginThrottleUtil;
+import io.bastillion.common.util.ThemeUtil;
 import io.bastillion.manage.db.AuthDB;
 import io.bastillion.manage.model.Auth;
 import io.bastillion.manage.model.User;
@@ -107,6 +108,7 @@ public class LoginKtrl extends BaseKontroller {
                     AuthUtil.setUsername(getRequest().getSession(), user.getUsername());
 
                     AuthDB.updateLastLogin(user);
+                    ThemeUtil.setThemeCookie(getRequest(), getResponse(), user.getUiTheme());
 
                     //for first time login redirect to set OTP
                     if (otpEnabled && StringUtils.isEmpty(sharedSecret)) {

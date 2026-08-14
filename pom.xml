@@ -97,7 +97,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>6.1.2</version>
+            <version>6.1.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -132,7 +132,7 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk18on</artifactId>
-            <version>1.85</version>
+            <version>1.85.2</version>
         </dependency>
 
         <!-- JSON -->
@@ -230,6 +230,32 @@
         </resources>
 
         <plugins>
+            <!-- Fail early with a clear message when the build is run with an unsupported
+                 Java or Maven version. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.6.3</version>
+                <executions>
+                    <execution>
+                        <id>enforce-build-environment</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>[3.6.3,)</version>
+                                </requireMavenVersion>
+                                <requireJavaVersion>
+                                    <version>[21,)</version>
+                                </requireJavaVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <!-- Frontend -->
             <plugin>
                 <groupId>com.github.eirslett</groupId>
@@ -254,15 +280,18 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>grunt-build</id>
+                        <id>build-frontend-assets</id>
                         <phase>generate-resources</phase>
                         <goals>
-                            <goal>grunt</goal>
+                            <goal>npm</goal>
                         </goals>
+                        <configuration>
+                            <arguments>run build-assets</arguments>
+                        </configuration>
                     </execution>
                 </executions>
                 <configuration>
-                    <nodeVersion>v16.13.1</nodeVersion>
+                    <nodeVersion>v24.18.0</nodeVersion>
                 </configuration>
             </plugin>
 

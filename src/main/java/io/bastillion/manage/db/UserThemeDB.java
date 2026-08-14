@@ -31,16 +31,16 @@ public class UserThemeDB {
      */
     public static UserSettings getTheme(Long userId) throws SQLException, GeneralSecurityException {
 
-        UserSettings theme = null;
+        UserSettings theme = new UserSettings();
 
         try (Connection con = DBUtils.getConn();
              PreparedStatement stmt = con.prepareStatement("select * from user_theme where user_id=?")) {
             stmt.setLong(1, userId);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    theme = new UserSettings();
                     theme.setBg(rs.getString("bg"));
                     theme.setFg(rs.getString("fg"));
+                    theme.setUiTheme(rs.getString("ui_theme"));
                     if (StringUtils.isNotEmpty(rs.getString("d1"))) {
                         String[] colors = new String[16];
                         colors[0] = rs.getString("d1");
@@ -82,9 +82,8 @@ public class UserThemeDB {
                 stmt.execute();
             }
 
-            if (StringUtils.isNotEmpty(theme.getPlane()) || StringUtils.isNotEmpty(theme.getTheme())) {
-
-                try (PreparedStatement stmt = con.prepareStatement("insert into user_theme(user_id, bg, fg, d1, d2, d3, d4, d5, d6, d7, d8, b1, b2, b3, b4, b5, b6, b7, b8) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")) {
+            if (theme != null) {
+                try (PreparedStatement stmt = con.prepareStatement("insert into user_theme(user_id, bg, fg, d1, d2, d3, d4, d5, d6, d7, d8, b1, b2, b3, b4, b5, b6, b7, b8, ui_theme) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)")) {
                     stmt.setLong(1, userId);
                     stmt.setString(2, theme.getBg());
                     stmt.setString(3, theme.getFg());
@@ -99,8 +98,19 @@ public class UserThemeDB {
                             stmt.setString(i + 4, null);
                         }
                     }
+                    stmt.setString(20, theme.getUiTheme());
                     stmt.execute();
                 }
+            }
+        }
+    }
+
+    public static String getUiTheme(Connection con, Long userId) throws SQLException {
+        try (PreparedStatement stmt = con.prepareStatement(
+                "select ui_theme from user_theme where user_id=?")) {
+            stmt.setLong(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next() ? rs.getString("ui_theme") : UserSettings.DARK;
             }
         }
     }

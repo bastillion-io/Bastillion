@@ -126,8 +126,17 @@
         /*]]>*/
     </script>
     <style>
-            .run_cmd {
-                width: 45%
+            .audit-term-container {
+                width: calc(100% - 32px);
+                max-width: none;
+                padding: 10px 0 32px;
+                margin: 0 auto;
+            }
+            .audit-term-container .run_cmd {
+                width: auto;
+                min-width: 0;
+                margin: 0;
+                float: none;
             }
             .term {
                 background-color: #000;
@@ -147,28 +156,34 @@
                 padding: 10px 2px 10px 10px;
                 float: right;
             }
-            .term-container {
+            .audit-term-container .termwrapper {
+                display: grid;
                 width: 100%;
-                padding: 25px 0;
                 margin: 0;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 14px;
+                align-items: start;
             }
-            /* bastillion.css sets 145% for the live-terminals workspace; the audit view fits the page */
-            div.termwrapper {
-                width: 100%;
-                margin: 0;
+            @media (max-width: 900px) {
+                .audit-term-container {
+                    width: calc(100% - 20px);
+                }
+                .audit-term-container .termwrapper {
+                    grid-template-columns: minmax(0, 1fr);
+                }
             }
         </style>
     <title>Bastillion - Session Terminals</title>
 </head>
 
 <body>
-<div class="navbar navbar-dark bg-dark fixed-top navbar-expand" role="navigation">
+<div class="navbar navbar-dark fixed-top navbar-expand" role="navigation">
     <div class="container">
         <div class="navbar-brand">
-            <div class="nav-img">
-                <img src="/img/bastillion_40x40.png" th:src="@{/img/bastillion_40x40.png}"
-                     alt="bastillion">
-            </div>Bastillion</div>
+            <img class="brand-logo" src="/img/bastillion-logo.svg" th:src="@{/img/bastillion-logo.svg}"
+                 alt="Bastillion">
+            <span>Bastillion</span>
+        </div>
         <div class="navbar-collapse" id="navbarCollapse">
             <template th:if="${pendingSystemStatus == null}" th:remove="tag">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
@@ -199,7 +214,7 @@
         <!--/.nav-collapse -->
     </div>
 </div>
-<div class="term-container container">
+<div class="term-container audit-term-container container">
     <div class="termwrapper" th:if="${sessionAudit != null}">
         <template th:each=" s : ${sessionAudit.hostSystemList}" th:remove="tag">
             <div th:id="'run_cmd_' + ${s.instanceId}" class="run_cmd_active run_cmd">

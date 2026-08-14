@@ -103,7 +103,7 @@ public class AuthFilter implements Filter {
         } catch (SQLException | ParseException | IOException | GeneralSecurityException ex) {
             AuthUtil.deleteAllSession(servletRequest.getSession());
             log.error(ex.toString(), ex);
-            throw new ServletException(ex.toString(), ex);
+            throw new ServletException("Request processing failed");
         }
     }
 }

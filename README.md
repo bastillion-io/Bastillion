@@ -6,7 +6,7 @@
 [![Website](https://img.shields.io/badge/website-loophole.company-14161b)](https://loophole.company/)
 
 <p align="center">
-  <img src="src/main/webapp/img/bastillion_40x40.png" alt="Bastillion">
+  <img src="src/main/webapp/img/bastillion-logo.svg" alt="Bastillion" width="40" height="40">
 </p>
 
 <h1 align="center">Bastillion</h1>

@@ -13,11 +13,17 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class UserSettings {
 
+    public static final String DARK = "dark";
+    public static final String LIGHT = "light";
+
     String[] colors = null;
     String bg;
     String fg;
     String plane;
     String theme;
+    String uiTheme = DARK;
+    Integer ptyColumns;
+    Integer ptyRows;
     Integer ptyWidth;
     Integer ptyHeight;
 
@@ -75,8 +81,32 @@ public class UserSettings {
         this.theme = theme;
     }
 
+    public String getUiTheme() {
+        return uiTheme;
+    }
+
+    public void setUiTheme(String uiTheme) {
+        this.uiTheme = LIGHT.equalsIgnoreCase(uiTheme) ? LIGHT : DARK;
+    }
+
     public Integer getPtyWidth() {
         return ptyWidth;
+    }
+
+    public Integer getPtyColumns() {
+        return ptyColumns;
+    }
+
+    public void setPtyColumns(Integer ptyColumns) {
+        this.ptyColumns = ptyColumns;
+    }
+
+    public Integer getPtyRows() {
+        return ptyRows;
+    }
+
+    public void setPtyRows(Integer ptyRows) {
+        this.ptyRows = ptyRows;
     }
 
     public void setPtyWidth(Integer ptyWidth) {
