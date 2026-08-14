@@ -98,7 +98,7 @@ Because every host trusts the *same* application key (not one key per user), dis
 once under **Manage SSH Keys** revokes access everywhere immediately — no need to touch
 target systems by hand, no hunting down which server has which stale key.
 
-![Every SSH key in use, with a one-click Disable per key](docs/screenshots/manage-ssh-keys.png)
+![Manage SSH keys with profile, fingerprint, creation date, and delete actions](docs/screenshots/manage-ssh-keys.png)
 
 ### 6. Every session is recorded — audit and replay
 
@@ -115,7 +115,7 @@ this checks that box without a commercial PAM product. Sessions are kept for 90 
 default (`deleteAuditLogAfter`), and recording can be switched off with
 `ENABLE_INTERNAL_AUDIT=false` — see [Auditing](#configuration).
 
-![Replaying a recorded session across production hosts, with output filtering](docs/screenshots/audit-session.png)
+![Audit sessions listed with user and system filters](docs/screenshots/audit-session.png)
 
 ---
 

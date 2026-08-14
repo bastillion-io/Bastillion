@@ -41,3 +41,4 @@ bastillion.jceks
 dependency-reduced-pom.xml
 
 .claude
+*.lic

@@ -7,196 +7,202 @@
 <html xmlns:th="http://www.thymeleaf.org" data-bs-theme="dark">
 <head>
     <meta th:replace="~{_res/inc/header}">
-    <title>Bastillion - Set Admin Password</title>
+    <title>Bastillion - User Settings</title>
 </head>
 
 <body class="user-settings">
 <div th:replace="~{_res/inc/navigation}"></div>
-<div class="container">
-    <div th:if="${!@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled || #strings.equals(session.authType,'BASIC')}">
-        <h3>Set Admin Password</h3>
-        <p>Change your administrative password below</p>
-        <div th:replace="~{_res/inc/errors}"></div>
-        <form th:action="@{/admin/passwordSubmit.ktrl}" method="post" autocomplete="off">
-            <table>
-                <tr>
-                    <td>Current Password:
-                    </td>
-                    <td>
-                        <input type="password" name="auth.prevPassword" class="form-control" title="Current Password"> <span class="error"
-                                                                                                        th:text="${fieldErrors.get('auth.prevPassword')}"></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>New Password:
-                    </td>
-                    <td>
-                        <input type="password" name="auth.password" class="form-control" title="New Password"> <span class="error"
-                                                                                                th:text="${fieldErrors.get('auth.password')}"></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Confirm New Password:
-                    </td>
-                    <td>
-                        <input type="password" name="auth.passwordConfirm" class="form-control" title="Confirm New Password"> <span
-                            class="error" th:text="${fieldErrors.get('auth.passwordConfirm')}"></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>&#xA0;</td>
-                    <td>
-                        <div id="change_btn" class="btn btn-secondary submit_btn">Change Password</div>
-                    </td>
-                </tr>
-            </table>
-            <input type="hidden" name="_csrf" th:value="${session._csrf}">
-        </form>
-    </div>
-    <h3>Appearance</h3>
-    <p>Choose the interface and terminal appearance saved for your account.</p>
-    <form th:action="@{/admin/themeSubmit.ktrl}"
-          method="post" autocomplete="off">
-        <table>
-            <tr>
-                <td>Interface:</td>
-                <td>
-                    <input type="hidden" id="ui-theme-value" name="userSettings.uiTheme"
-                           th:value="${userSettings != null and userSettings.uiTheme == 'light'} ? 'light' : 'dark'">
+<main class="container settings-page">
+    <header class="settings-heading">
+        <div>
+            <span class="settings-eyebrow">Account</span>
+            <h1>User settings</h1>
+            <p>Manage your sign-in, appearance, SSH key, and license.</p>
+        </div>
+    </header>
+
+    <div th:replace="~{_res/inc/errors}"></div>
+
+    <div class="settings-grid">
+        <section class="settings-card"
+                 th:if="${!@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled || #strings.equals(session.authType,'BASIC')}">
+            <div class="settings-card-header">
+                <div>
+                    <h2>Password</h2>
+                    <p>Update the password used to sign in to Bastillion.</p>
+                </div>
+            </div>
+            <form class="settings-form" th:action="@{/admin/passwordSubmit.ktrl}" method="post" autocomplete="off">
+                <div class="settings-field">
+                    <label class="form-label" for="current-password">Current password</label>
+                    <input id="current-password" type="password" name="auth.prevPassword"
+                           class="form-control" autocomplete="current-password">
+                    <span class="error" th:text="${fieldErrors.get('auth.prevPassword')}"></span>
+                </div>
+                <div class="settings-field-row">
+                    <div class="settings-field">
+                        <label class="form-label" for="new-password">New password</label>
+                        <input id="new-password" type="password" name="auth.password"
+                               class="form-control" autocomplete="new-password">
+                        <span class="error" th:text="${fieldErrors.get('auth.password')}"></span>
+                    </div>
+                    <div class="settings-field">
+                        <label class="form-label" for="confirm-password">Confirm password</label>
+                        <input id="confirm-password" type="password" name="auth.passwordConfirm"
+                               class="form-control" autocomplete="new-password">
+                        <span class="error" th:text="${fieldErrors.get('auth.passwordConfirm')}"></span>
+                    </div>
+                </div>
+                <div class="settings-actions">
+                    <div id="change_btn" class="btn btn-secondary submit_btn">Change password</div>
+                </div>
+                <input type="hidden" name="_csrf" th:value="${session._csrf}">
+            </form>
+        </section>
+
+        <section class="settings-card">
+            <div class="settings-card-header">
+                <div>
+                    <h2>Appearance</h2>
+                    <p>Personalize the interface and terminal for your account.</p>
+                </div>
+            </div>
+            <form class="settings-form" th:action="@{/admin/themeSubmit.ktrl}" method="post" autocomplete="off">
+                <input type="hidden" id="ui-theme-value" name="userSettings.uiTheme"
+                       th:value="${userSettings != null and userSettings.uiTheme == 'light'} ? 'light' : 'dark'">
+                <div class="settings-toggle-row">
+                    <div>
+                        <span class="settings-toggle-title">Use dark mode</span>
+                        <span class="settings-help">Applies throughout Bastillion.</span>
+                    </div>
                     <div class="form-check form-switch theme-setting">
                         <input class="form-check-input" type="checkbox" role="switch"
-                               id="dark-mode-toggle"
-                               data-theme-toggle
+                               id="dark-mode-toggle" data-theme-toggle
+                               aria-label="Use dark mode"
                                th:checked="${userSettings == null or userSettings.uiTheme != 'light'}">
-                        <label class="form-check-label" for="dark-mode-toggle">Use dark mode</label>
                     </div>
-                </td>
-            </tr>
-            <tr>
-                <td>Terminal Theme:
-                </td>
-                <td>
-                    <select name="userSettings.theme" class="form-select" title="Terminal Theme">
-                        <option value="">- Select Theme -</option>
-                        <option th:each="o : ${themeMap}" th:value="${o.value}"
-                                th:text="${o.key}" th:selected="${userSettings.theme == o.value}"></option>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td>Foreground / Background:
-                </td>
-                <td>
-                    <select name="userSettings.plane" class="form-select" title="Foreground / Background">
-                        <option value="">- Select FG / BG -</option>
-                        <option th:each="o : ${planeMap}" th:value="${o.value}"
-                                th:text="${o.key}" th:selected="${userSettings.plane == o.value}"></option>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td>&#xA0;</td>
-                <td>
-                    <div id="theme_btn" class="btn btn-secondary submit_btn">Save Appearance</div>
-                </td>
-            </tr>
-        </table>
-        <input type="hidden" name="_csrf" th:value="${session._csrf}">
-    </form>
-    <h3>Public Key</h3>
-    <p>Public SSH Key used for application authentication when registering systems</p>
-    <pre style="white-space:pre-wrap;" class="form-control" th:text="${publicKey}"></pre>
+                </div>
+                <div class="settings-field-row">
+                    <div class="settings-field">
+                        <label class="form-label" for="terminal-theme">Terminal theme</label>
+                        <select id="terminal-theme" name="userSettings.theme" class="form-select">
+                            <option value="">Use terminal default</option>
+                            <option th:each="o : ${themeMap}" th:value="${o.value}"
+                                    th:text="${o.key}" th:selected="${userSettings.theme == o.value}"></option>
+                        </select>
+                    </div>
+                    <div class="settings-field">
+                        <label class="form-label" for="terminal-colors">Terminal colors</label>
+                        <select id="terminal-colors" name="userSettings.plane" class="form-select">
+                            <option value="">Use theme default</option>
+                            <option th:each="o : ${planeMap}" th:value="${o.value}"
+                                    th:text="${o.key}" th:selected="${userSettings.plane == o.value}"></option>
+                        </select>
+                    </div>
+                </div>
+                <div class="settings-actions">
+                    <div id="theme_btn" class="btn btn-secondary submit_btn">Save appearance</div>
+                </div>
+                <input type="hidden" name="_csrf" th:value="${session._csrf}">
+            </form>
+        </section>
 
-    <template th:if="${#strings.equals(session.userType,'M')}" th:remove="tag">
-        <h3>Replace Application SSH Key</h3>
-        <p>Import your own key pair instead of the one Bastillion generated. This is meant as a
-            <strong>one-time step when first setting up Bastillion</strong>, before you've registered any
-            systems yet.</p>
-        <p class="warning">This replaces the <em>one</em> key every registered system trusts. If you already
-            have systems registered, Bastillion will immediately lose SSH access to all of them the moment
-            you replace it &mdash; unless this exact key is already sitting in <code>authorized_keys</code>
-            on every one of them first. When in doubt, add this key to your systems by hand before
-            replacing it here, not after.</p>
-        <form th:action="@{/admin/importAppKeySubmit.ktrl}" method="post" autocomplete="off">
-            <table>
-                <tr>
-                    <td>Private Key:
-                    </td>
-                    <td>
-                        <textarea name="importPrivateKey" class="form-control" title="Private Key" rows="8"
-                                  cols="60" placeholder="-----BEGIN OPENSSH PRIVATE KEY-----"></textarea>
+        <section class="settings-card settings-card-wide">
+            <div class="settings-card-header settings-card-header-inline">
+                <div>
+                    <h2>Application public key</h2>
+                    <p>Add this key to a system when registering it with Bastillion.</p>
+                </div>
+            </div>
+            <pre class="settings-key" th:text="${publicKey}"></pre>
+        </section>
+    </div>
+
+    <div class="settings-grid settings-admin-grid"
+         th:if="${#strings.equals(session.userType,'M')}">
+        <details class="settings-card settings-danger"
+                 th:open="${importPrivateKey != null or importPublicKey != null}">
+            <summary>
+                <span>
+                    <span class="settings-danger-label">Advanced</span>
+                    <strong>Replace application SSH key</strong>
+                    <small>Import an existing key pair during initial setup.</small>
+                </span>
+            </summary>
+            <div class="settings-danger-content">
+                <div class="settings-warning">
+                    <strong>This can disconnect every registered system.</strong>
+                    Make sure the new public key is already in <code>authorized_keys</code> on every
+                    system before replacing the current key.
+                </div>
+                <form class="settings-form" th:action="@{/admin/importAppKeySubmit.ktrl}"
+                      method="post" autocomplete="off">
+                    <div class="settings-field">
+                        <label class="form-label" for="private-key">Private key</label>
+                        <textarea id="private-key" name="importPrivateKey" class="form-control"
+                                  rows="8" placeholder="-----BEGIN OPENSSH PRIVATE KEY-----"></textarea>
                         <span class="error" th:text="${fieldErrors.get('importPrivateKey')}"></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Public Key:
-                    </td>
-                    <td>
-                        <textarea name="importPublicKey" class="form-control" title="Public Key" rows="3"
-                                  cols="60" placeholder="ssh-ed25519 AAAA..."></textarea>
+                    </div>
+                    <div class="settings-field">
+                        <label class="form-label" for="public-key">Public key</label>
+                        <textarea id="public-key" name="importPublicKey" class="form-control"
+                                  rows="3" placeholder="ssh-ed25519 AAAA..."></textarea>
                         <span class="error" th:text="${fieldErrors.get('importPublicKey')}"></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Passphrase:
-                    </td>
-                    <td>
-                        <input type="password" name="importPassphrase" class="form-control"
-                               title="Passphrase (leave blank if none)">
-                    </td>
-                </tr>
-                <tr th:if="${systemCount != null and systemCount > 0}">
-                    <td>&#xA0;</td>
-                    <td>
-                        <label>
-                            <input type="checkbox" name="importConfirmReplace" value="true"
-                                   class="form-check-input">
-                            This exact key is already in <code>authorized_keys</code> on every registered
-                            system.
-                        </label>
-                    </td>
-                </tr>
-                <tr>
-                    <td>&#xA0;</td>
-                    <td>
-                        <div id="import_key_btn" class="btn btn-secondary submit_btn">Replace Key</div>
-                    </td>
-                </tr>
-            </table>
-            <input type="hidden" name="_csrf" th:value="${session._csrf}">
-        </form>
-    </template>
+                    </div>
+                    <div class="settings-field">
+                        <label class="form-label" for="key-passphrase">Passphrase <span class="settings-optional">Optional</span></label>
+                        <input id="key-passphrase" type="password" name="importPassphrase"
+                               class="form-control" autocomplete="new-password">
+                    </div>
+                    <label class="settings-confirm" th:if="${systemCount != null and systemCount > 0}">
+                        <input type="checkbox" name="importConfirmReplace" value="true"
+                               class="form-check-input">
+                        <span>This key is already authorized on every registered system.</span>
+                    </label>
+                    <div class="settings-actions">
+                        <div id="import_key_btn" class="btn btn-danger submit_btn">Replace key</div>
+                    </div>
+                    <input type="hidden" name="_csrf" th:value="${session._csrf}">
+                </form>
+            </div>
+        </details>
 
-    <template th:if="${#strings.equals(session.userType,'M')}" th:remove="tag">
-        <h3>License</h3>
-        <template th:if="${@io.bastillion.manage.util.LicenseUtil@isLicensed()}" th:remove="tag">
-            <p>Licensed to <strong th:text="${@io.bastillion.manage.util.LicenseUtil@getLicensee()}"></strong>
-                &mdash; up to <strong th:text="${@io.bastillion.manage.util.LicenseUtil@getMaxSystems()}"></strong> systems.</p>
-            <p th:if="${@io.bastillion.manage.util.LicenseUtil@getExpiryDate() == null}">This license does not expire.</p>
-            <p th:unless="${@io.bastillion.manage.util.LicenseUtil@getExpiryDate() == null}"
-               th:class="${@io.bastillion.manage.util.LicenseUtil@isExpiringWithinDays(90)} ? 'warning' : ''">
-                Expires <span th:text="${@io.bastillion.manage.util.LicenseUtil@getExpiryDate()}"></span>
-                (<span th:text="${@io.bastillion.manage.util.LicenseUtil@getDaysUntilExpiry()}"></span> days remaining)
-                <span th:if="${@io.bastillion.manage.util.LicenseUtil@isExpiringWithinDays(90)}">&mdash; renew soon to avoid losing the ability to add new systems.</span>
-            </p>
-        </template>
-        <template th:unless="${@io.bastillion.manage.util.LicenseUtil@isLicensed()}" th:remove="tag">
-            <p th:if="${@io.bastillion.manage.util.LicenseUtil@isExpired()}" class="error">
-                Your license for <strong th:text="${@io.bastillion.manage.util.LicenseUtil@getLicensee()}"></strong>
-                expired on <span th:text="${@io.bastillion.manage.util.LicenseUtil@getExpiryDate()}"></span>.
-                Running unlicensed, capped at <span th:text="${@io.bastillion.manage.util.LicenseUtil@getMaxSystems()}"></span> systems.
-            </p>
-            <p th:unless="${@io.bastillion.manage.util.LicenseUtil@isExpired()}">
-                Unlicensed &mdash; capped at <strong th:text="${@io.bastillion.manage.util.LicenseUtil@getMaxSystems()}"></strong> systems.
-            </p>
-        </template>
-        <p>
-            <a class="btn btn-secondary" href="https://loophole.company/pricing.html" target="_blank" rel="noopener">
-                <span th:text="${@io.bastillion.manage.util.LicenseUtil@isLicensed()} ? 'Upgrade or Renew License' : 'Purchase a License'"></span>
-            </a>
-        </p>
-    </template>
-</div>
+        <section class="settings-card settings-license">
+            <div class="settings-card-header">
+                <div>
+                    <h2>License</h2>
+                    <p>Your current Bastillion plan and system allowance.</p>
+                </div>
+            </div>
+            <div class="settings-license-status">
+                <template th:if="${@io.bastillion.manage.util.LicenseUtil@isLicensed()}" th:remove="tag">
+                    <span class="settings-status-badge settings-status-active">Active</span>
+                    <p>Licensed to <strong th:text="${@io.bastillion.manage.util.LicenseUtil@getLicensee()}"></strong>
+                        for up to <strong th:text="${@io.bastillion.manage.util.LicenseUtil@getMaxSystems()}"></strong> systems.</p>
+                    <p th:if="${@io.bastillion.manage.util.LicenseUtil@getExpiryDate() == null}">This license does not expire.</p>
+                    <p th:unless="${@io.bastillion.manage.util.LicenseUtil@getExpiryDate() == null}"
+                       th:class="${@io.bastillion.manage.util.LicenseUtil@isExpiringWithinDays(90)} ? 'warning' : ''">
+                        Expires <span th:text="${@io.bastillion.manage.util.LicenseUtil@getExpiryDate()}"></span>
+                        (<span th:text="${@io.bastillion.manage.util.LicenseUtil@getDaysUntilExpiry()}"></span> days remaining).
+                    </p>
+                </template>
+                <template th:unless="${@io.bastillion.manage.util.LicenseUtil@isLicensed()}" th:remove="tag">
+                    <span class="settings-status-badge settings-status-limited">Unlicensed</span>
+                    <p th:if="${@io.bastillion.manage.util.LicenseUtil@isExpired()}" class="error">
+                        The license for <strong th:text="${@io.bastillion.manage.util.LicenseUtil@getLicensee()}"></strong>
+                        expired on <span th:text="${@io.bastillion.manage.util.LicenseUtil@getExpiryDate()}"></span>.
+                    </p>
+                    <p>Limited to <strong th:text="${@io.bastillion.manage.util.LicenseUtil@getMaxSystems()}"></strong> systems.</p>
+                </template>
+            </div>
+            <div class="settings-actions">
+                <a class="btn btn-secondary" href="https://loophole.company/pricing.html" target="_blank" rel="noopener">
+                    <span th:text="${@io.bastillion.manage.util.LicenseUtil@isLicensed()} ? 'Manage license' : 'Purchase a license'"></span>
+                </a>
+            </div>
+        </section>
+    </div>
+</main>
 </body>
 
 </html>
