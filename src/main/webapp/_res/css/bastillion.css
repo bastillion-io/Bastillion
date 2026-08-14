@@ -461,7 +461,68 @@ table.floatThead-table {
 
 /* pages rendered inside an iframe (upload/push) don't need room for the fixed navbar */
 .iframe-body {
-    padding: 10px;
+    width: 100%;
+    min-height: 100%;
+    padding: 20px;
+    overflow-x: hidden;
+    background: var(--bastillion-surface);
+}
+
+.upload-push-dialog {
+    width: min(1100px, calc(100vw - 32px));
+    max-width: 1100px;
+    margin: 16px auto;
+}
+
+.upload-push-dialog .modal-content {
+    width: 100%;
+    max-height: calc(100vh - 32px);
+    overflow: hidden;
+}
+
+.upload-push-dialog .modal-header {
+    flex: 0 0 auto;
+}
+
+.upload-push-modal-body {
+    min-width: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.upload-push-frame {
+    display: block;
+    width: 100%;
+    height: min(62vh, 540px);
+    min-height: 340px;
+    background: var(--bastillion-surface);
+    border: 0;
+}
+
+.upload-form,
+.upload-field {
+    display: grid;
+    gap: 8px;
+}
+
+.upload-form {
+    width: 100%;
+    gap: 18px;
+}
+
+.upload-field .error:empty {
+    display: none;
+}
+
+.upload-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.uploadScrollWrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow: auto;
 }
 
 .settings-page {
@@ -895,8 +956,7 @@ code, pre {
     box-shadow: 0 18px 45px rgba(0, 0, 0, .45);
 }
 
-.dropdown-item,
-.dropdown-item > a {
+.dropdown-item {
     display: block;
     padding: 8px 10px;
     border-radius: 7px;
@@ -905,10 +965,14 @@ code, pre {
 }
 
 .dropdown-item:hover,
-.dropdown-item:focus,
-.dropdown-item:hover > a {
+.dropdown-item:focus {
     color: #fff;
     background: rgba(74, 222, 128, .1);
+}
+
+.dropdown-menu .dropdown-item:focus-visible {
+    outline: 0;
+    box-shadow: inset 0 0 0 1px rgba(74, 222, 128, .45);
 }
 
 .card,
@@ -937,6 +1001,16 @@ code, pre {
 
 .modal-title {
     font-weight: 700;
+}
+
+[data-bs-theme="dark"] .modal-header .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+    opacity: .78;
+}
+
+[data-bs-theme="dark"] .modal-header .btn-close:hover,
+[data-bs-theme="dark"] .modal-header .btn-close:focus {
+    opacity: 1;
 }
 
 .login-wrap {
@@ -1404,14 +1478,12 @@ a:focus-visible {
     box-shadow: 0 18px 45px rgba(26, 55, 39, .16);
 }
 
-[data-bs-theme="light"] .dropdown-item,
-[data-bs-theme="light"] .dropdown-item > a {
+[data-bs-theme="light"] .dropdown-item {
     color: #34453b;
 }
 
 [data-bs-theme="light"] .dropdown-item:hover,
-[data-bs-theme="light"] .dropdown-item:focus,
-[data-bs-theme="light"] .dropdown-item:hover > a {
+[data-bs-theme="light"] .dropdown-item:focus {
     color: #102819;
     background: rgba(22, 131, 59, .09);
 }
@@ -1640,6 +1712,28 @@ a:focus-visible {
 
     .settings-danger-content {
         padding: 0 19px 19px;
+    }
+
+    .upload-push-dialog {
+        width: calc(100vw - 16px);
+        margin: 8px auto;
+    }
+
+    .upload-push-dialog .modal-content {
+        max-height: calc(100vh - 16px);
+    }
+
+    .upload-push-dialog .modal-header {
+        padding: 16px 18px;
+    }
+
+    .upload-push-frame {
+        height: min(68vh, 500px);
+        min-height: 300px;
+    }
+
+    .iframe-body {
+        padding: 14px;
     }
 }
 

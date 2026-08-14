@@ -532,17 +532,17 @@
                                 class="caret"></b></a>
                             <ul
                                     class="dropdown-menu">
-                                <li class="dropdown-item"><a id="upload_push" href="#">Upload &amp; Push</a>
+                                <li><a id="upload_push" class="dropdown-item" href="#">Upload &amp; Push</a>
                                 </li>
-                                <li class="dropdown-item"><a id="connect_to_host" data-bs-toggle="modal"
+                                <li><a id="connect_to_host" class="dropdown-item" data-bs-toggle="modal"
                                                              data-bs-target="#connect_to_host_dialog"
                                                              href="#">Connect to Host</a>
                                 </li>
-                                <li class="dropdown-item"><a id="dup_session" href="#">Duplicate Session</a>
+                                <li><a id="dup_session" class="dropdown-item" href="#">Duplicate Session</a>
                                 </li>
-                                <li class="dropdown-item"><a id="reset_size" href="#">Reset Size</a>
+                                <li><a id="reset_size" class="dropdown-item" href="#">Reset Size</a>
                                 </li>
-                                <li class="dropdown-item"><a id="disconnect" href="#">Disconnect</a>
+                                <li><a id="disconnect" class="dropdown-item" href="#">Disconnect</a>
                                 </li>
                             </ul>
                         </li>
@@ -696,14 +696,14 @@
     </div>
 </div>
 <div id="upload_push_dialog" class="modal fade">
-    <div class="modal-dialog">
-        <div class="modal-content" style="width:700px">
+    <div class="modal-dialog modal-dialog-centered upload-push-dialog">
+        <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Upload &amp; Push</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <iframe id="upload_push_frame" width="675px" height="300px" style="border: none;"></iframe>
+            <div class="modal-body upload-push-modal-body">
+                <iframe id="upload_push_frame" class="upload-push-frame" title="Upload and push files"></iframe>
             </div>
         </div>
     </div>

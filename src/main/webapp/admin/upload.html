@@ -15,33 +15,22 @@
 <body class="iframe-body">
 <template th:if="${idList!= null && !idList.empty}" th:remove="tag">
     <div th:replace="~{_res/inc/errors}"></div>
-    <form id="upload" th:action="@{/admin/uploadSubmit.ktrl} + '?_csrf=' + ${session._csrf}"
+    <form id="upload" class="upload-form" th:action="@{/admin/uploadSubmit.ktrl} + '?_csrf=' + ${session._csrf}"
           method="post" enctype="multipart/form-data">
-        <table>
-            <tr>
-                <td>File:
-                </td>
-                <td>
-                    <input name="upload" type="file" required="required" class="form-control" title="File"> <span class="error"
-                                                                                             th:text="${fieldErrors.get('upload')}"></span>
-                </td>
-            </tr>
-            <tr>
-                <td>Destination Directory:
-                </td>
-                <td>
-                    <input name="pushDir" type="text" class="form-control" title="Destination Directory" required="required"
-                           th:value="${pushDir}"> <span class="error"
-                                                        th:text="${fieldErrors.get('pushDir')}"></span>
-                </td>
-            </tr>
-            <tr>
-                <td>&#xA0;</td>
-                <td>
-                    <div id="upload_btn" class="btn btn-secondary upload">Upload</div>
-                </td>
-            </tr>
-        </table>
+        <div class="upload-field">
+            <label class="form-label" for="upload-file">File</label>
+            <input id="upload-file" name="upload" type="file" required class="form-control">
+            <span class="error" th:text="${fieldErrors.get('upload')}"></span>
+        </div>
+        <div class="upload-field">
+            <label class="form-label" for="push-directory">Destination directory</label>
+            <input id="push-directory" name="pushDir" type="text" class="form-control" required
+                   th:value="${pushDir}">
+            <span class="error" th:text="${fieldErrors.get('pushDir')}"></span>
+        </div>
+        <div class="upload-actions">
+            <div id="upload_btn" class="btn btn-secondary upload">Upload</div>
+        </div>
     </form>
 </template>
 <p class="error" th:if="${idList == null || idList.empty}">No systems associated with upload</p>
