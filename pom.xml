@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.bastillion</groupId>
     <artifactId>bastillion</artifactId>
-    <version>5.1.1-SNAPSHOT</version>
+    <version>6.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Bastillion</name>
 
@@ -176,35 +176,43 @@
             <version>3.5.4</version>
         </dependency>
 
-        <!-- Jetty 11 (Jakarta EE 9), embedded - the app is its own server now (see
+        <!-- Jetty 12 (Jakarta EE 10), embedded - the app is its own server now (see
              io.bastillion.Main), not a WAR deployed into an external container, so these
-             are compile-scope (bundled into the runnable jar) rather than provided. -->
+             are compile-scope (bundled into the runnable jar) rather than provided. Jetty 12
+             split the old monolithic artifacts into an EE-version-agnostic core
+             (jetty-server) plus per-Jakarta-EE-generation "ee10" modules for anything
+             servlet-shaped (WebAppContext, the Jakarta WebSocket server integration). -->
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>11.0.26</version>
+            <version>12.1.12</version>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty.ee10</groupId>
+            <artifactId>jetty-ee10-webapp</artifactId>
+            <version>12.1.12</version>
+        </dependency>
+        <!-- JAAS LoginModule SPI (LdapLoginModule, AbstractLoginModule, ObjectCallback) used
+             directly by ExternalAuthUtil - Jetty 12 dropped the standalone jetty-jaas
+             artifact and folded its classes into jetty-security under
+             org.eclipse.jetty.security.jaas.*. -->
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-webapp</artifactId>
-            <version>11.0.26</version>
+            <artifactId>jetty-security</artifactId>
+            <version>12.1.12</version>
         </dependency>
         <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-jaas</artifactId>
-            <version>11.0.26</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty.websocket</groupId>
-            <artifactId>websocket-jakarta-server</artifactId>
-            <version>11.0.26</version>
+            <groupId>org.eclipse.jetty.ee10.websocket</groupId>
+            <artifactId>jetty-ee10-websocket-jakarta-server</artifactId>
+            <version>12.1.12</version>
         </dependency>
 
-        <!-- Jakarta Servlet API -->
+        <!-- Jakarta Servlet API (EE10 - jetty-ee10-webapp pulls this in transitively, but it's
+             declared explicitly here since app code compiles directly against it). -->
         <dependency>
-            <groupId>org.eclipse.jetty.toolchain</groupId>
-            <artifactId>jetty-jakarta-servlet-api</artifactId>
-            <version>5.0.2</version>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>6.0.0</version>
         </dependency>
     </dependencies>
 

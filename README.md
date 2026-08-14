@@ -123,7 +123,7 @@ default (`deleteAuditLogAfter`), and recording can be switched off with
 - **Licensing** — free at up to 5 systems, paid tiers available at [loophole.company/pricing.html](https://loophole.company/pricing.html) (see [Licensing](#licensing) below)
 - **Session audit & replay, on by default** — every terminal session is recorded and can be replayed under **Audit Sessions**, streamed to the browser so even huge sessions load instantly
 - Runs as a **self-contained jar** (`java -jar`) with HTTPS out of the box — see [Download and Run](#download-and-run)
-- Upgraded to **Java 21** and **Jakarta EE 11**
+- Upgraded to **Java 21**, **Jetty 12**, and **Jakarta EE 10**
 - Full support for **Ed25519** (default) and **Ed448** SSH keys
 - **v4 → v5 migration tool** to bring over users, systems, keys, and audit logs from an existing instance — see [`tools/migrate`](tools/migrate/README.md)
 - Hardened with a **CSRF filter** and app-wide **security headers**
@@ -415,7 +415,7 @@ ldap-ol {
 To map LDAP roles to Bastillion profiles:
 ```
 ldap-ol-with-roles {
-    org.eclipse.jetty.jaas.spi.LdapLoginModule required
+    org.eclipse.jetty.security.jaas.spi.LdapLoginModule required
     debug="false"
     useLdaps="false"
     contextFactory="com.sun.jndi.ldap.LdapCtxFactory"

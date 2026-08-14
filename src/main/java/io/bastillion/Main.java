@@ -3,6 +3,9 @@ package io.bastillion;
 import io.bastillion.common.util.AppConfig;
 import io.bastillion.manage.socket.SecureShellWS;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jetty.ee10.servlet.ErrorPageErrorHandler;
+import org.eclipse.jetty.ee10.webapp.WebAppContext;
+import org.eclipse.jetty.ee10.websocket.jakarta.server.config.JakartaWebSocketServletContainerInitializer;
 import org.eclipse.jetty.http.HttpCookie;
 import org.eclipse.jetty.server.ForwardedRequestCustomizer;
 import org.eclipse.jetty.server.HttpConfiguration;
@@ -11,10 +14,8 @@ import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
-import org.eclipse.jetty.servlet.ErrorPageErrorHandler;
+import org.eclipse.jetty.util.resource.ResourceFactory;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
-import org.eclipse.jetty.webapp.WebAppContext;
-import org.eclipse.jetty.websocket.jakarta.server.config.JakartaWebSocketServletContainerInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,10 +62,12 @@ public class Main {
 
         WebAppContext webApp = new WebAppContext();
         webApp.setContextPath("/");
-        webApp.setResourceBase(resolveWebAppDir().toString());
+        webApp.setBaseResource(ResourceFactory.root().newResource(resolveWebAppDir()));
         webApp.setParentLoaderPriority(true);
+        // setShowServlet (Jetty 11) is gone in Jetty 12 - showCauses/showOrigin (which would
+        // disclose similar internals) already default to false, so no replacement call is
+        // needed to keep the same "don't leak internals" behavior.
         ErrorPageErrorHandler errorHandler = new ErrorPageErrorHandler();
-        errorHandler.setShowServlet(false);
         errorHandler.setShowStacks(false);
         errorHandler.setShowMessageInTitle(false);
         webApp.setErrorHandler(errorHandler);
