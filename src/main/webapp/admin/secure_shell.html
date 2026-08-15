@@ -238,6 +238,10 @@
 
                 clipboard.setData('text/plain', selectedText);
                 e.preventDefault();
+                if (selectionTermId && termMap[selectionTermId]) {
+                    termMap[selectionTermId].clearSelection();
+                }
+                selectionTermId = null;
                 termFocus = true;
             });
 
