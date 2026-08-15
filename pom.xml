@@ -340,6 +340,34 @@
                 </configuration>
             </plugin>
 
+            <!-- Wipes target/test-config/ before every test run, not just `mvn clean test`.
+                 Several SAML tests persist config through AppConfig.updateProperty(), which
+                 writes to that directory's properties file on disk (not just in memory);
+                 without this, a plain `mvn test` re-run would read back whatever an earlier
+                 run left there and silently break any test asserting on an "unset" default. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.4.1</version>
+                <executions>
+                    <execution>
+                        <id>clean-test-config</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                        <configuration>
+                            <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                            <filesets>
+                                <fileset>
+                                    <directory>${project.build.directory}/test-config</directory>
+                                </fileset>
+                            </filesets>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <!-- Unit tests -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

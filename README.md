@@ -499,6 +499,14 @@ export DEFAULT_PROFILE_FOR_SAML=everyone
 
 Admins are added upon first SSO login and can be assigned system profiles.
 
+**Username shown in Bastillion:** the SAML NameID becomes the username. Entra sends
+`user.userprincipalname` by default, which is fine for regular tenant members but produces an
+ugly guest UPN like `alice_gmail.com#EXT#@yourtenant.onmicrosoft.com` for B2B guests (anyone
+signed in with a personal or external email added as a guest). For a cleaner username, go to
+the Enterprise Application's *Single sign-on* → SAML → *Attributes & Claims*, edit **Unique
+User Identifier (Name ID)**, and change its *Source attribute* from `user.userprincipalname`
+to `user.mail`.
+
 **How role mapping actually works - same mechanism as LDAP above:** `SAML_ROLE_ATTRIBUTE`
 names *which* assertion attribute carries the user's groups/roles; whatever *values* that
 attribute holds on a given login are compared, **by exact text match**, against the names of

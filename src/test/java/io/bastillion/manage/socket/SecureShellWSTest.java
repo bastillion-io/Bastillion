@@ -287,6 +287,21 @@ class SecureShellWSTest {
         verify(commander, never()).print(org.mockito.ArgumentMatchers.anyString());
     }
 
+    @Test
+    void instanceIdStillMidHandshakeIsIgnoredNotCrashed() throws Exception {
+        // SSHUtil.reserveNextInstanceId (see SSHUtil.java) puts a SchSession into the map
+        // to claim its instance id atomically before the SSH handshake finishes, so there's
+        // a real window where the map holds a SchSession with every field - including
+        // getCommander() - still null. A keystroke landing in that window must be skipped,
+        // not NPE, the same as a completely unregistered id.
+        openWebSocketSession();
+        UserSchSessions sessions = new UserSchSessions();
+        sessions.getSchSessionMap().put(1, new SchSession());
+        SecureShellKtrl.getUserSchSessionMap().put(SESSION_ID, sessions);
+
+        assertDoesNotThrow(() -> ws.onMessage("{\"id\":[\"1\"],\"command\":\"whoami\"}"));
+    }
+
     // ---- onClose ------------------------------------------------------------------------
 
     @Test
