@@ -131,6 +131,41 @@
                 });
             }
 
+            function getSelectedTerminalText() {
+                if (selectionTermId && termMap[selectionTermId]
+                    && termMap[selectionTermId].hasSelection()) {
+                    return termMap[selectionTermId].getSelection();
+                }
+
+                var ids = Object.keys(termMap || {});
+                for (var i = 0; i < ids.length; i++) {
+                    if (termMap[ids[i]].hasSelection()) {
+                        selectionTermId = ids[i];
+                        return termMap[ids[i]].getSelection();
+                    }
+                }
+                return '';
+            }
+
+            function sendToActiveTerminals(message) {
+                var ids = getActiveTermsInstanceIds();
+                if (!ids.length || !connection || connection.readyState !== WebSocket.OPEN) {
+                    return false;
+                }
+
+                message.id = ids;
+                connection.send(JSON.stringify(message));
+                return true;
+            }
+
+            function isFormEntryTarget(target) {
+                var entry = $(target);
+                if (entry.is('#dummy')) {
+                    return false;
+                }
+                return entry.is('input, textarea, select, [contenteditable="true"]');
+            }
+
             var termFocus = true;
             $(document).keypress(function (e) {
                 if (termFocus) {
@@ -139,7 +174,7 @@
                     if (String.fromCharCode(keyCode) && String.fromCharCode(keyCode) !== ''
                         && (!e.ctrlKey || e.altKey) && !e.metaKey && !isNavKeyDown()) {
                         var cmdStr = String.fromCharCode(keyCode);
-                        connection.send(JSON.stringify({id: getActiveTermsInstanceIds(), command: cmdStr}));
+                        sendToActiveTerminals({command: cmdStr});
                     }
 
                 }
@@ -150,8 +185,22 @@
                     var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
                     keys[keyCode] = true;
 
+                    var copyShortcut = !e.altKey && keyCode === 67 && (e.ctrlKey || e.metaKey);
+                    if (copyShortcut && getSelectedTerminalText()) {
+                        // Let the copy event put xterm's selection on the clipboard.
+                        return;
+                    }
+
+                    if (e.ctrlKey && !e.altKey && !e.metaKey && keyCode === 67) {
+                        // No selection: Ctrl+C remains the terminal interrupt character.
+                        sendToActiveTerminals({keyCode: keyCode});
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                        return;
+                    }
+
                     if ((e.ctrlKey && !e.altKey) || NAV_KEY_CODES.indexOf(keyCode) !== -1) {
-                        connection.send(JSON.stringify({id: getActiveTermsInstanceIds(), keyCode: keyCode}));
+                        sendToActiveTerminals({keyCode: keyCode});
                     }
 
                     //prevent default for unix ctrl commands
@@ -173,25 +222,46 @@
             });
 
             $(document).click(function (e) {
-                if (termFocus && !$('body').hasClass('modal-open')) {
+                if (termFocus && !$('body').hasClass('modal-open')
+                    && !$(e.target).closest('.xterm').length) {
                     $('#dummy').focus();
                 }
             });
 
 
-            //get cmd text from paste
-            $(this).bind('paste', function (e) {
-                $('#dummy').focus();
-                $('#dummy').val('');
-                setTimeout(function () {
-                    var cmdStr = $('#dummy').val();
-                    connection.send(JSON.stringify({id: getActiveTermsInstanceIds(), command: cmdStr}));
-                }, 100);
+            $(document).on('copy', function (e) {
+                var selectedText = getSelectedTerminalText();
+                var clipboard = e.originalEvent && e.originalEvent.clipboardData;
+                if (!selectedText || !clipboard) {
+                    return;
+                }
+
+                clipboard.setData('text/plain', selectedText);
+                e.preventDefault();
+                termFocus = true;
             });
 
+            $(document).on('paste', function (e) {
+                if ($('body').hasClass('modal-open') || isFormEntryTarget(e.target)
+                    || $(e.target).closest('.xterm').length) {
+                    return;
+                }
+
+                var clipboard = e.originalEvent && e.originalEvent.clipboardData;
+                var pastedText = clipboard ? clipboard.getData('text/plain') : '';
+                if (!pastedText || !sendToActiveTerminals({command: pastedText})) {
+                    return;
+                }
+
+                e.preventDefault();
+                termFocus = true;
+                $('#dummy').focus();
+            });
 
             var termMap = {};
             var fitMap = {};
+            var selectionTermId = null;
+            var focusedTermId = null;
 
 
             $("#reset_size").click(function () {
@@ -294,11 +364,11 @@
                     {
                     [# th:if= "${userSettings != null && userSettings.bg != null}"]
                         background: [[${userSettings.bg}]],
+                        cursorAccent: [[${userSettings.bg}]],
                     [/]
-                    [# th:if= "${userSettings != null && userSettings.bg != null}"]
+                    [# th:if= "${userSettings != null && userSettings.fg != null}"]
                         foreground: [[${userSettings.fg}]],
                         cursor: [[${userSettings.fg}]],
-                        cursorAccent: [[${userSettings.fg}]],
                     [/]
                     [# th:if= "${userSettings !=null && userSettings.colors != null && userSettings.colors.length == 16}"]
                         black: [[${userSettings.colors[0]}]],
@@ -323,9 +393,9 @@
                 termMap[id] = new Terminal({
                     fontSize: 14,
                     'theme': CUSTOM_THEME,
-                    'cursorStyle' : 'bar',
-                    'cursorWidth' : '10',
-                    'cursorInactiveStyle' : 'bar',
+                    'cursorStyle' : 'block',
+                    'cursorBlink' : true,
+                    'cursorInactiveStyle' : 'outline',
                     fontFamily: 'DejaVu Sans Mono, Liberation Mono, monospace'
                 });
 
@@ -333,6 +403,23 @@
                 termMap[id].loadAddon(fitMap[id])
 
                 termMap[id].open($("#run_cmd_" + id).find('.output').get(0));
+                termMap[id].attachCustomKeyEventHandler(function (event) {
+                    var copyShortcut = event.type === 'keydown' && !event.altKey
+                        && (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'c';
+                    return !(copyShortcut && termMap[id].hasSelection());
+                });
+                termMap[id].onData(function (data) {
+                    sendToActiveTerminals({command: data});
+                });
+                $(termMap[id].textarea).on('focus', function () {
+                    focusedTermId = String(id);
+                });
+                termMap[id].onSelectionChange(function () {
+                    if (termMap[id].hasSelection()) {
+                        selectionTermId = String(id);
+                        termFocus = false;
+                    }
+                });
 
                 // The remote shell starts before the browser can report its exact grid.
                 // On that first paint only, zsh may have already emitted its default
@@ -340,7 +427,22 @@
                 // followed by zsh's line-padding carriage return; ordinary percent signs
                 // and genuine partial-line markers later in the session are untouched.
                 var initialZshEolMark = /\x1b\[1m\x1b\[7m%\x1b\[27m(?:\x1b\[1m)?\x1b\[0m(?= +\r)/;
-                termMap[id].write(output.replace(initialZshEolMark, ''));
+                var blinkingBlockCursor = '\x1b[1 q';
+                termMap[id].write(output.replace(initialZshEolMark, '') + blinkingBlockCursor, function () {
+                    // xterm does not initialize its cursor until the first focus or key
+                    // event. Prime it after the prompt is parsed. Keep the first pane
+                    // focused and restore the user's current pane as others initialize.
+                    var previousFocusedTermId = focusedTermId;
+                    termMap[id].focus();
+                    termMap[id].refresh(0, termMap[id].rows - 1);
+                    if (previousFocusedTermId === null) {
+                        focusedTermId = String(id);
+                    } else if (previousFocusedTermId !== String(id)
+                        && termMap[previousFocusedTermId]) {
+                        termMap[id].blur();
+                        termMap[previousFocusedTermId].focus();
+                    }
+                });
 
 
             }
@@ -362,24 +464,19 @@
                     }
                 });
 
-                //set focus to term
-                $(".output").mouseup(function (e) {
-                    if (window.getSelection().toString()) {
+                var id = element.attr("id").replace("run_cmd_", "");
+                element.find(".output").on('mouseup', function () {
+                    var terminal = termMap[id];
+                    if (terminal && terminal.hasSelection()) {
+                        selectionTermId = id;
                         termFocus = false;
                     } else {
                         termFocus = true;
                     }
                 });
 
-                $(".output").bind('copy', function () {
-                    setTimeout(function () {
-                        termFocus = true;
-                        window.getSelection().removeAllRanges();
-                    }, 100);
-                });
-
                 //set resizable
-                $(".output").resizable({
+                element.find(".output").resizable({
                     ghost: true,
                     stop: function (event, ui) {
                         resize($(this));
