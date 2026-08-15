@@ -267,6 +267,15 @@
             var selectionTermId = null;
             var focusedTermId = null;
 
+            // zsh can emit its default standout PROMPT_EOL_MARK on any line that
+            // doesn't end in a newline, not just the very first paint - a duplicated
+            // or newly-connected terminal's first WebSocket message often only
+            // contains a partial prefix of the shell's startup output (this poller's
+            // 25ms cycle can catch the channel mid-stream), so the marked line can
+            // just as easily arrive in a later message as in the first one. Matching
+            // it here, shared by both write paths below, means either can strip it.
+            var zshEolMark = /\x1b\[1m\x1b\[7m%\x1b\[27m(?:\x1b\[1m)?\x1b\[0m(?= +\r)/;
+
 
             $("#reset_size").click(function () {
                 resetSize();
@@ -355,7 +364,7 @@
                             createTermMap(val.instanceId, val.output);
                             resetSize();
                         } else {
-                            termMap[val.instanceId].write(val.output);
+                            termMap[val.instanceId].write(val.output.replace(zshEolMark, ''));
                         }
                     }
 
@@ -425,14 +434,8 @@
                     }
                 });
 
-                // The remote shell starts before the browser can report its exact grid.
-                // On that first paint only, zsh may have already emitted its default
-                // standout PROMPT_EOL_MARK. Remove that exact control sequence when it is
-                // followed by zsh's line-padding carriage return; ordinary percent signs
-                // and genuine partial-line markers later in the session are untouched.
-                var initialZshEolMark = /\x1b\[1m\x1b\[7m%\x1b\[27m(?:\x1b\[1m)?\x1b\[0m(?= +\r)/;
                 var blinkingBlockCursor = '\x1b[1 q';
-                termMap[id].write(output.replace(initialZshEolMark, '') + blinkingBlockCursor, function () {
+                termMap[id].write(output.replace(zshEolMark, '') + blinkingBlockCursor, function () {
                     // xterm does not initialize its cursor until the first focus or key
                     // event. Prime it after the prompt is parsed. Keep the first pane
                     // focused and restore the user's current pane as others initialize.
