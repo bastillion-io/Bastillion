@@ -501,6 +501,17 @@
                 return instance;
             }
 
+            // createSession.ktrl works off a per-user pending-system queue on the server
+            // (SystemStatusDB.setInitialSystemStatus wipes and rebuilds it on every call,
+            // rather than scoping it to one request), so two overlapping calls - e.g.
+            // duplicating several different active terminals at once - can wipe out each
+            // other's still-unprocessed queue entry before the server ever gets to it. One
+            // host then never gets a session (its terminal box stays empty) while another
+            // can get processed twice. Chaining every call through this one promise keeps
+            // the server from ever seeing two createSession.ktrl requests in flight for this
+            // user at once, without blocking the browser the way the old async:false did.
+            var createSessionChain = $.when();
+
             //creates a new terminal element for hostId, wires up its events, inserts it via insertFn,
             //then asks the server to create the backing session
             function addTerminal(hostId, displayLabel, insertFn) {
@@ -510,8 +521,23 @@
 
                 setTerminalEvents($("#run_cmd_" + newInstanceId));
 
-                //call server to create instances - returned the new cloned instance id
-                $.getJSON('../admin/createSession.ktrl?systemSelectId=' + hostId + '&_csrf=' + [[${session._csrf}]]);
+                //call server to create instances. createSession.ktrl has no view, so its
+                //response body is empty - $.getJSON forces JSON parsing and rejects on that
+                //empty body even though the server-side call succeeded, which silently
+                //broke this chain after the first request (every request after it just
+                //never got sent). Plain $.ajax with no dataType lets jQuery see there's
+                //nothing to parse instead of treating an empty body as a parse error.
+                //Registering the same handler as both the success and failure callback
+                //(rather than .then(fn) with no failure handler) also means one host
+                //genuinely failing to connect can't stop every host queued after it in
+                //the same batch from ever being requested.
+                function fireCreateSession() {
+                    return $.ajax({
+                        url: '../admin/createSession.ktrl?systemSelectId=' + hostId + '&_csrf=' + [[${session._csrf}]],
+                        cache: false
+                    });
+                }
+                createSessionChain = createSessionChain.then(fireCreateSession, fireCreateSession);
             }
 
             //function clones terminals based on active
