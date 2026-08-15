@@ -120,6 +120,7 @@ default (`deleteAuditLogAfter`), and recording can be switched off with
 ---
 
 ## 🚀 What's New
+- **SAML 2.0 SSO** — sign in via an enterprise IdP (Entra ID, Okta, ADFS, and others) — see [Configuration](#configuration)
 - **Licensing** — free at up to 5 systems, paid tiers available at [loophole.company/pricing.html](https://loophole.company/pricing.html) (see [Licensing](#licensing) below)
 - **Session audit & replay, on by default** — every terminal session is recorded and can be replayed under **Audit Sessions**, streamed to the browser so even huge sessions load instantly
 - Runs as a **self-contained jar** (`java -jar`) with HTTPS out of the box — see [Download and Run](#download-and-run)
@@ -393,9 +394,10 @@ export DB_CONNECTION_URL=jdbc:h2:tcp://<host>:<port>/~/bastillion;CIPHER=AES;
 </details>
 
 <details>
-<summary><strong>External Authentication (LDAP)</strong></summary>
+<summary><strong>External Authentication (LDAP / JAAS)</strong></summary>
 
-Enable external auth:
+Authenticate against an existing LDAP/Active Directory server instead of (or alongside) local
+passwords. Enable it:
 ```bash
 export JAAS_MODULE=ldap-ol
 ```
@@ -437,8 +439,65 @@ ldap-ol-with-roles {
 };
 ```
 
-Admins are added upon first login and can be assigned system profiles.
-Users are synced with profiles when their LDAP role names match Bastillion profiles.
+Admins are added upon first login and can be assigned system profiles. Users are synced with
+profiles when their LDAP role names match Bastillion profiles - a user whose roles match no
+Bastillion profile is rejected at login (**Manager** accounts are the one exception; they
+aren't profile-scoped). Set `defaultProfileForLdap` to a profile name to assign every LDAP
+user to it automatically, guaranteeing everyone can log in regardless of role matching:
+```bash
+export DEFAULT_PROFILE_FOR_LDAP=everyone
+```
+</details>
+
+<details>
+<summary><strong>Single Sign-On (SAML 2.0)</strong></summary>
+
+Authenticate against an enterprise identity provider - Microsoft Entra ID, Okta, ADFS, or any
+SAML 2.0 IdP - instead of (or alongside) local passwords or LDAP. A **Sign in with SSO**
+button appears on the login page once configured. Enable it:
+```bash
+export SAML_BASE_URL=https://bastillion.example.com
+export SAML_IDP_METADATA_URL=https://login.microsoftonline.com/<tenant-id>/federationmetadata/2007-06/federationmetadata.xml?appid=<app-id>
+```
+
+In Entra ID (or your IdP of choice), register Bastillion as an Enterprise Application /
+Service Provider with:
+- Identifier (Entity ID): `https://bastillion.example.com` (or `SAML_SP_ENTITY_ID` if set - see below)
+- Reply URL (Assertion Consumer Service URL): `https://bastillion.example.com/saml/acs`
+
+No IdP metadata URL to hand? Configure the IdP manually instead - all three are required
+together in that case:
+```bash
+export SAML_IDP_ENTITY_ID=https://sts.windows.net/<tenant-id>/
+export SAML_IDP_SSO_URL=https://login.microsoftonline.com/<tenant-id>/saml2
+export SAML_IDP_CERT=<base64-encoded X.509 certificate>
+```
+
+Only needed if the Entity ID registered on the IdP side can't match `SAML_BASE_URL` exactly:
+```bash
+export SAML_SP_ENTITY_ID=https://bastillion.example.com
+```
+
+To map Entra group/role claims to Bastillion profiles - the same name-matching mechanism
+LDAP roles use above:
+```bash
+export SAML_ROLE_ATTRIBUTE=http://schemas.microsoft.com/ws/2008/06/identity/claims/groups
+export DEFAULT_PROFILE_FOR_SAML=everyone
+```
+
+Admins are added upon first SSO login and can be assigned system profiles. Users are synced
+with profiles when their assertion's role/group claim values match Bastillion profiles,
+exactly as with LDAP - including the same rejection-without-a-matching-profile behavior, so
+`DEFAULT_PROFILE_FOR_SAML` above is worth setting for the same reason
+`DEFAULT_PROFILE_FOR_LDAP` is.
+
+Bastillion's own one-time-passcode check is skipped for SSO logins - the IdP is expected to
+enforce its own MFA/Conditional Access policy instead. First-time OTP enrollment is still
+offered so SAML users have a local fallback credential available if SSO is ever disabled.
+
+Not currently supported: signed SAML requests, encrypted assertions, and Single Logout (SLO)
+- logout stays local-only. SAML SSO can be enabled alongside LDAP; both are evaluated
+independently and either can provision new users on first login.
 </details>
 
 <details>

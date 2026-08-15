@@ -18,6 +18,7 @@ public class Auth {
 
     public static final String AUTH_BASIC = "BASIC";
     public static final String AUTH_EXTERNAL = "EXTERNAL";
+    public static final String AUTH_SAML = "SAML";
 
     Long id;
     String username;

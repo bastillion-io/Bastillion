@@ -83,7 +83,7 @@
                                class="userSelect form-check-input" title="Select All">
                     </th>
                     <th th:id="${@io.bastillion.manage.db.UserDB@USERNAME}" class="sort">Username</th>
-                    <th th:if="${@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled}"
+                    <th th:if="${@io.bastillion.common.util.AuthSessionUtil@externalAuthEnabled}"
                         th:id="${@io.bastillion.manage.db.UserDB@AUTH_TYPE}" class="sort">Auth Type</th>
                     <th th:id="${@io.bastillion.manage.db.UserDB@LAST_NM}" class="sort">Last Name</th>
                     <th th:id="${@io.bastillion.manage.db.UserDB@FIRST_NM}"
@@ -99,7 +99,7 @@
                                    class="userSelect form-check-input" th:value="${user.id}" th:checked="${user.checked}">
                         </td>
                         <td th:text="${user.username}"></td>
-                        <td th:if="${@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled}">
+                        <td th:if="${@io.bastillion.common.util.AuthSessionUtil@externalAuthEnabled}">
                             <template th:if="${#strings.equals(user.authType, 'BASIC')}"
                                       th:remove="tag">Basic</template>
                             <template th:if="${#strings.equals(user.authType, 'EXTERNAL')}"

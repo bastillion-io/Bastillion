@@ -25,7 +25,7 @@
 
     <div class="settings-grid">
         <section class="settings-card"
-                 th:if="${!@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled || #strings.equals(session.authType,'BASIC')}">
+                 th:if="${!@io.bastillion.common.util.AuthSessionUtil@externalAuthEnabled || #strings.equals(session.authType,'BASIC')}">
             <div class="settings-card-header">
                 <div>
                     <h2>Password</h2>

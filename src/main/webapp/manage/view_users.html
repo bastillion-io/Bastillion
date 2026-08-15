@@ -76,7 +76,7 @@
 
             [# th:if= "${user.id <= 0}"]
                 new bootstrap.Modal($("#add_dialog")).show();
-                [# th:if= "${@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled}"]
+                [# th:if= "${@io.bastillion.common.util.AuthSessionUtil@externalAuthEnabled}"]
                     hideShowPassword($('.auth_type:checked').val());
                 [/]
             [/]
@@ -109,7 +109,7 @@
                 <th th:id="${@io.bastillion.manage.db.UserDB@USER_TYPE}"
                     class="sort">User Type</th>
                 <th th:id="${@io.bastillion.manage.db.UserDB@AUTH_TYPE}"
-                    th:if="${@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled}"
+                    th:if="${@io.bastillion.common.util.AuthSessionUtil@externalAuthEnabled}"
                     class="sort">Auth Type</th>
                 <th th:id="${@io.bastillion.manage.db.UserDB@LAST_NM}" class="sort">Last Name</th>
                 <th th:id="${@io.bastillion.manage.db.UserDB@FIRST_NM}"
@@ -125,7 +125,7 @@
                 <td th:text="${u.username}"></td>
                 <td th:if="${#strings.equals(u.userType, 'A')}">Administrative Only</td>
                 <td th:if="${!#strings.equals(u.userType, 'A')}">Full Access</td>
-                <template th:if="${@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled}"
+                <template th:if="${@io.bastillion.common.util.AuthSessionUtil@externalAuthEnabled}"
                           th:remove="tag">
                     <td th:if="${#strings.equals(u.authType,'BASIC')}">Basic</td>
                     <td th:if="${!#strings.equals(u.authType,'BASIC')}">External</td>
@@ -184,7 +184,7 @@
                                         </select> <span class="error" th:text="${fieldErrors.get('user.userType')}"></span>
                                     </td>
                                 </tr>
-                                <tr th:if="${@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled}">
+                                <tr th:if="${@io.bastillion.common.util.AuthSessionUtil@externalAuthEnabled}">
                                     <td>Authentication Type
                                     </td>
                                     <td>
@@ -281,7 +281,7 @@
                                             </select> <span class="error" th:text="${fieldErrors.get('user.userType')}"></span>
                                         </td>
                                     </tr>
-                                    <tr th:if="${@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled}">
+                                    <tr th:if="${@io.bastillion.common.util.AuthSessionUtil@externalAuthEnabled}">
                                         <td>Authentication Type
                                         </td>
                                         <td>
@@ -314,7 +314,7 @@
                                                    size="25"> <span class="error" th:text="${fieldErrors.get('user.email')}"></span>
                                         </td>
                                     </tr>
-                                    <template th:if="${!@io.bastillion.manage.util.ExternalAuthUtil@externalAuthEnabled || #strings.equals(u.authType,'BASIC')}"
+                                    <template th:if="${!@io.bastillion.common.util.AuthSessionUtil@externalAuthEnabled || #strings.equals(u.authType,'BASIC')}"
                                               th:remove="tag">
                                         <tr>
                                             <td>Password

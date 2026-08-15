@@ -5,14 +5,16 @@
  */
 package io.bastillion.manage.control;
 
+import com.onelogin.saml2.authn.AuthnRequest;
+import com.onelogin.saml2.settings.Saml2Settings;
+import io.bastillion.common.saml.SamlSettingsUtil;
 import io.bastillion.common.util.AppConfig;
+import io.bastillion.common.util.AuthSessionUtil;
 import io.bastillion.common.util.AuthUtil;
 import io.bastillion.common.util.LoginThrottleUtil;
-import io.bastillion.common.util.ThemeUtil;
 import io.bastillion.manage.db.AuthDB;
 import io.bastillion.manage.model.Auth;
-import io.bastillion.manage.model.User;
-import io.bastillion.manage.util.OTPUtil;
+import io.bastillion.manage.util.SamlAuthUtil;
 import loophole.mvc.annotation.Kontrol;
 import loophole.mvc.annotation.MethodType;
 import loophole.mvc.annotation.Model;
@@ -25,6 +27,8 @@ import org.slf4j.LoggerFactory;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 
@@ -35,12 +39,19 @@ public class LoginKtrl extends BaseKontroller {
     //check if otp is enabled
     @Model(name = "otpEnabled")
     static final Boolean otpEnabled = ("required".equals(AppConfig.getProperty("oneTimePassword")) || "optional".equals(AppConfig.getProperty("oneTimePassword")));
+    //check if SAML SSO is enabled
+    @Model(name = "samlEnabled")
+    static final Boolean samlEnabled = SamlAuthUtil.samlAuthEnabled;
     private static final Logger loginAuditLogger = LoggerFactory.getLogger("io.bastillion.manage.control.LoginAudit");
     private final String AUTH_ERROR = "Authentication Failed : Login credentials are invalid";
     private final String AUTH_ERROR_NO_PROFILE = "Authentication Failed : There are no profiles assigned to this account";
     private final String AUTH_ERROR_EXPIRED_ACCOUNT = "Authentication Failed : Account has expired";
+    private final String SSO_ERROR = "Authentication Failed : Single sign-on login was not successful";
     @Model(name = "auth")
     Auth auth;
+    //bound from the ?ssoError= query param SamlAcsServlet redirects failures to - see
+    //loophole.mvc.base.BaseKontroller's generic request-param field binding
+    String ssoError;
 
 
     public LoginKtrl(HttpServletRequest request, HttpServletResponse response) {
@@ -49,7 +60,42 @@ public class LoginKtrl extends BaseKontroller {
 
     @Kontrol(path = "/login", method = MethodType.GET)
     public String login() {
+        if (ssoError != null) {
+            switch (ssoError) {
+                case "noprofile" -> addError(AUTH_ERROR_NO_PROFILE);
+                case "expired" -> addError(AUTH_ERROR_EXPIRED_ACCOUNT);
+                default -> addError(SSO_ERROR);
+            }
+        }
         return "/login.html";
+    }
+
+    /**
+     * Redirects the browser to the IdP to start an SP-initiated SAML SSO login. A same-origin
+     * GET click, so this is an ordinary @Kontrol method (unlike SamlAcsServlet, which handles
+     * the IdP's cross-origin POST back and can't be one - see its class javadoc).
+     */
+    @Kontrol(path = "/samlLogin", method = MethodType.GET)
+    public String samlLogin() {
+        if (!samlEnabled) {
+            return "redirect:/";
+        }
+        try {
+            Saml2Settings settings = SamlSettingsUtil.getSettings();
+            AuthnRequest authnRequest = new AuthnRequest(settings);
+            String redirectUrl = settings.getIdpSingleSignOnServiceUrl() + "?SAMLRequest="
+                    + URLEncoder.encode(authnRequest.getEncodedAuthnRequest(), StandardCharsets.UTF_8);
+            //writes the response directly rather than returning "redirect:" + redirectUrl -
+            //DispatcherServlet auto-appends Bastillion's own _csrf param to any "redirect:"
+            //return value, which is meaningless (and wrong) for a redirect to a third-party
+            //IdP URL. Returning null after writing the response directly is an established
+            //pattern here - see OTPKtrl.qrImage, AuthKeysKtrl.downloadPvtKey.
+            getResponse().sendRedirect(redirectUrl);
+        } catch (Exception ex) {
+            log.error(ex.toString(), ex);
+            return "redirect:/login.ktrl?ssoError=invalid";
+        }
+        return null;
     }
 
     private static final String AUTH_ERROR_TOO_MANY_ATTEMPTS = "Authentication Failed : Too many failed login attempts. Please try again later.";
@@ -75,50 +121,33 @@ public class LoginKtrl extends BaseKontroller {
 
             if (authToken != null) {
 
-                User user = AuthDB.getUserByAuthToken(authToken);
-                if (user != null) {
-                    String sharedSecret = null;
-                    if (otpEnabled) {
-                        sharedSecret = AuthDB.getSharedSecret(user.getId());
-                        if (StringUtils.isNotEmpty(sharedSecret) && (auth.getOtpToken() == null || !OTPUtil.verifyToken(sharedSecret, auth.getOtpToken()))) {
-                            LoginThrottleUtil.recordFailure(clientIP);
-                            loginAuditLogger.info(auth.getUsername() + " (" + clientIP + ") - " + AUTH_ERROR);
-                            addError(AUTH_ERROR);
-                            return "/login.html";
-                        }
+                AuthSessionUtil.Result result = AuthSessionUtil.establishSession(
+                        getRequest(), getResponse(), authToken, auth.getOtpToken(), false);
+
+                switch (result.status()) {
+                    case NOT_FOUND, OTP_INVALID -> {
+                        LoginThrottleUtil.recordFailure(clientIP);
+                        loginAuditLogger.info(auth.getUsername() + " (" + clientIP + ") - " + AUTH_ERROR);
+                        addError(AUTH_ERROR);
+                        return "/login.html";
                     }
-                    //check to see if admin has any assigned profiles
-                    if (!User.MANAGER.equals(user.getUserType()) && (user.getProfileList() == null || user.getProfileList().size() <= 0)) {
+                    case NO_PROFILES -> {
                         loginAuditLogger.info(auth.getUsername() + " (" + clientIP + ") - " + AUTH_ERROR_NO_PROFILE);
                         addError(AUTH_ERROR_NO_PROFILE);
                         return "/login.html";
                     }
-
-                    //check to see if account has expired
-                    if (user.isExpired()) {
+                    case EXPIRED -> {
                         loginAuditLogger.info(auth.getUsername() + " (" + clientIP + ") - " + AUTH_ERROR_EXPIRED_ACCOUNT);
                         addError(AUTH_ERROR_EXPIRED_ACCOUNT);
                         return "/login.html";
                     }
-
-                    AuthUtil.setAuthToken(getRequest().getSession(), authToken);
-                    AuthUtil.setUserId(getRequest().getSession(), user.getId());
-                    AuthUtil.setAuthType(getRequest().getSession(), user.getAuthType());
-                    AuthUtil.setTimeout(getRequest().getSession());
-                    AuthUtil.setUsername(getRequest().getSession(), user.getUsername());
-
-                    AuthDB.updateLastLogin(user);
-                    ThemeUtil.setThemeCookie(getRequest(), getResponse(), user.getUiTheme());
-
-                    //for first time login redirect to set OTP
-                    if (otpEnabled && StringUtils.isEmpty(sharedSecret)) {
-                        retVal = "redirect:/admin/viewOTP.ktrl";
-                    } else if ("changeme".equals(auth.getPassword()) && Auth.AUTH_BASIC.equals(user.getAuthType())) {
-                        retVal = "redirect:/admin/userSettings.ktrl";
-                    }
-                    LoginThrottleUtil.recordSuccess(clientIP);
-                    loginAuditLogger.info(auth.getUsername() + " (" + clientIP + ") - Authentication Success");
+                    case OTP_ENROLLMENT_REQUIRED -> retVal = "redirect:/admin/viewOTP.ktrl";
+                    case SUCCESS -> retVal = "changeme".equals(auth.getPassword())
+                            && Auth.AUTH_BASIC.equals(result.user().getAuthType())
+                            ? "redirect:/admin/userSettings.ktrl" : "redirect:/admin/menu.html";
                 }
+                LoginThrottleUtil.recordSuccess(clientIP);
+                loginAuditLogger.info(auth.getUsername() + " (" + clientIP + ") - Authentication Success");
 
             } else {
                 LoginThrottleUtil.recordFailure(clientIP);

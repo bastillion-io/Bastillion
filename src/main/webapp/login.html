@@ -64,6 +64,11 @@
                 <div id="login_btn" class="btn btn-secondary submit_btn w-100">Sign in</div>
                 <input type="hidden" name="_csrf" th:value="${session._csrf}">
             </form>
+            <template th:if="${samlEnabled}" th:remove="tag">
+                <div class="text-center text-muted my-2">or</div>
+                <a id="saml_login_btn" class="btn btn-outline-secondary w-100"
+                   th:href="'/samlLogin.ktrl?_csrf=' + ${session._csrf}">Sign in with SSO</a>
+            </template>
         </div>
     </div>
 </div>

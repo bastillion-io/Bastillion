@@ -56,6 +56,17 @@
                 <artifactId>mina-core</artifactId>
                 <version>2.2.9</version>
             </dependency>
+            <!-- xmlsec 2.2.3 (via java-saml-core's XML Signature verification of SAML
+                 assertions) is vulnerable to CVE-2023-44483 - a private key may be disclosed
+                 in log files when generating an XML Signature with debug-level logging
+                 enabled - fixed in 2.2.6, 2.3.4, and 3.0.3. Pinned to the nearest patched
+                 release in the same minor line for the safest binary compatibility with
+                 java-saml-core's internal usage. -->
+            <dependency>
+                <groupId>org.apache.santuario</groupId>
+                <artifactId>xmlsec</artifactId>
+                <version>2.2.6</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -213,6 +224,20 @@
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
             <version>6.0.0</version>
+        </dependency>
+
+        <!-- SAML SSO -->
+        <!-- java-saml-core, not java-saml (the "toolkit" module) - the toolkit's Auth facade
+             class is coupled to javax.servlet.http.HttpServletRequest/Response (the
+             pre-Jakarta-EE-9 namespace), which this Jetty 12 / Jakarta EE 10 app doesn't have
+             on its classpath at all. java-saml-core is genuinely framework-agnostic (its own
+             com.onelogin.saml2.http.HttpRequest is a plain POJO) - SamlAuthUtil adapts a
+             jakarta.servlet.http.HttpServletRequest into it directly. Also brings in
+             joda-time (DateTime return types) transitively. -->
+        <dependency>
+            <groupId>com.onelogin</groupId>
+            <artifactId>java-saml-core</artifactId>
+            <version>2.9.0</version>
         </dependency>
     </dependencies>
 

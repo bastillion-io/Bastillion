@@ -334,4 +334,49 @@ class LoginKtrlTest {
         assertEquals("redirect:/", view);
         verify(session).invalidate();
     }
+
+    // ---- ssoError (SamlAcsServlet's failure-path redirect back to /login.ktrl) -----------
+
+    @Test
+    void loginWithNoSsoErrorShowsNoErrors() {
+        LoginKtrl ktrl = newController();
+
+        String view = ktrl.login();
+
+        assertEquals("/login.html", view);
+        assertTrue(ktrl.getErrors().isEmpty());
+    }
+
+    @Test
+    void loginWithNoProfileSsoErrorShowsTheSameMessageAsLocalLoginsNoProfileRejection() {
+        LoginKtrl ktrl = newController();
+        ktrl.ssoError = "noprofile";
+
+        String view = ktrl.login();
+
+        assertEquals("/login.html", view);
+        assertTrue(ktrl.getErrors().contains(
+                "Authentication Failed : There are no profiles assigned to this account"));
+    }
+
+    @Test
+    void loginWithExpiredSsoErrorShowsTheSameMessageAsLocalLoginsExpiredRejection() {
+        LoginKtrl ktrl = newController();
+        ktrl.ssoError = "expired";
+
+        String view = ktrl.login();
+
+        assertTrue(ktrl.getErrors().contains("Authentication Failed : Account has expired"));
+    }
+
+    @Test
+    void loginWithUnrecognizedSsoErrorShowsAGenericSsoMessage() {
+        LoginKtrl ktrl = newController();
+        ktrl.ssoError = "invalid";
+
+        String view = ktrl.login();
+
+        assertTrue(ktrl.getErrors().contains(
+                "Authentication Failed : Single sign-on login was not successful"));
+    }
 }

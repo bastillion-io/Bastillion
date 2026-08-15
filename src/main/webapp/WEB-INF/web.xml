@@ -90,6 +90,19 @@
         <url-pattern>/config</url-pattern>
     </servlet-mapping>
 
+    <!-- SAML Assertion Consumer Service - mapped to a path outside *.ktrl, *.html,
+         /manage/*, and /admin/* so it isn't subject to CSRFFilter or AuthFilter (see
+         SamlAcsServlet's class javadoc for why that's required, not just convenient). -->
+    <servlet>
+        <servlet-name>SamlAcsServlet</servlet-name>
+        <servlet-class>io.bastillion.common.saml.SamlAcsServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>SamlAcsServlet</servlet-name>
+        <url-pattern>/saml/acs</url-pattern>
+    </servlet-mapping>
+
     <servlet>
         <servlet-name>DispatcherServlet</servlet-name>
         <servlet-class>loophole.mvc.base.DispatcherServlet</servlet-class>
