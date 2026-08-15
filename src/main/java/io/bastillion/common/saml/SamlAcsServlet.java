@@ -36,6 +36,29 @@ import java.sql.SQLException;
  * <p>
  * A path outside those filters' url-patterns sidesteps both by construction, mirroring
  * exactly how DBInitServlet's /config registration already works.
+ * <p>
+ * One more wrinkle, only caught by driving a real browser through a real IdP: an
+ * SP-initiated login starts from /login.html, which - being a normal same-origin GET -
+ * already established an ordinary session (with a _csrf token) in the browser's cookie jar
+ * before the user ever clicked "Sign in with SSO". That cookie is invisible to this servlet
+ * (the IdP's POST is cross-origin, so SameSite=Lax already strips it from the *request* we
+ * see - request.getSession(false) here is always null, there is nothing on the request side
+ * to invalidate), but the browser still has it, and nothing about a *failed* login
+ * (establishSession() never touches the session before returning a failure Status) tells the
+ * browser to drop it. So it rides along unmodified on the follow-up same-site GET this
+ * servlet redirects to. CSRFFilter then sees that old session's non-null _csrf with no
+ * matching request param on the ssoError redirect, invalidates it, and bounces to "/" -
+ * silently swallowing the error before LoginKtrl.login() ever runs.
+ * <p>
+ * The fix has to happen on the response side, not the request side: force a brand-new
+ * session on every response from this servlet, success or failure, via getSession(true)
+ * before anything else runs. A same-named cookie always overwrites the old one in the
+ * browser's jar regardless of value, so the fresh Set-Cookie this queues up (Jetty's own
+ * mechanism, not anything specific to session content) discards the stale cookie by
+ * construction. The subsequent redirect - to any target - then always lands on a session
+ * CSRFFilter has never seen before (_csrf null short-circuits its check), exactly like a
+ * first-time visitor. On success, establishSession()'s request.getSession() call just
+ * returns this same already-created session rather than minting a second one.
  */
 @WebServlet(name = "SamlAcsServlet", urlPatterns = {SamlSettingsUtil.ACS_PATH})
 public class SamlAcsServlet extends HttpServlet {
@@ -45,6 +68,8 @@ public class SamlAcsServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        request.getSession(true);
+
         String redirectTo = "/login.ktrl?ssoError=invalid";
         try {
             String authToken = SamlAuthUtil.login(request);
