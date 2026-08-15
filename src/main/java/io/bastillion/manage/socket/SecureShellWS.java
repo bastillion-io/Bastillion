@@ -136,8 +136,10 @@ public class SecureShellWS {
                     if (userSchSessions != null) {
                         SchSession schSession = userSchSessions.getSchSessionMap().get(id);
                         // id can reference a terminal that's already closed on this end (a
-                        // stale browser tab, a race with onClose) - ignore it rather than NPE.
-                        if (schSession == null) {
+                        // stale browser tab, a race with onClose), or one whose SSH handshake
+                        // hasn't finished yet (the instance id is reserved in the map before
+                        // the commander is set) - ignore it rather than NPE either way.
+                        if (schSession == null || schSession.getCommander() == null) {
                             continue;
                         }
                         if (keyCode != null) {

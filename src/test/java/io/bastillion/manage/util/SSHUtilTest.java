@@ -8,11 +8,19 @@ package io.bastillion.manage.util;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.KeyPair;
+import io.bastillion.manage.model.SchSession;
+import io.bastillion.manage.model.UserSchSessions;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.security.KeyPairGenerator;
 import java.util.Base64;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -209,5 +217,58 @@ class SSHUtilTest {
     void isSafeKeyContentRejectsBlank() {
         assertFalse(SSHUtil.isSafeKeyContent(""));
         assertFalse(SSHUtil.isSafeKeyContent(null));
+    }
+
+    // --- reserveNextInstanceId: the fix for the "duplicate session" terminal-output regression ---
+
+    /**
+     * Regression test for a bug where clicking "duplicate session" (or connecting to several
+     * hosts at once) fired concurrent createSession.ktrl requests for the same Bastillion
+     * session. openSSHTermOnSystem used to compute the next free instance id and insert into
+     * the session map as two separate, unsynchronized steps with the slow SSH handshake in
+     * between - two overlapping requests could both compute the same id, and the second
+     * insert silently overwrote the first terminal's session. Symptom: the new terminal's
+     * output box stayed empty (its id never got a session), while the old terminal received
+     * doubled-up output (two SSH channels both feeding the same instance id's output buffer).
+     * reserveNextInstanceId() closes this by making "find the next free id" and "claim it"
+     * one atomic operation, so this test exercises exactly that guarantee under real
+     * concurrent threads rather than relying on timing alone.
+     */
+    @Test
+    void reserveNextInstanceIdNeverHandsOutTheSameIdToConcurrentCallers() throws Exception {
+        UserSchSessions userSchSessions = new UserSchSessions();
+        int threadCount = 25;
+        ExecutorService pool = Executors.newFixedThreadPool(threadCount);
+        CountDownLatch ready = new CountDownLatch(threadCount);
+        CountDownLatch go = new CountDownLatch(1);
+
+        try {
+            java.util.List<Future<Integer>> futures = new java.util.ArrayList<>();
+            for (int i = 0; i < threadCount; i++) {
+                futures.add(pool.submit(() -> {
+                    SchSession schSession = new SchSession();
+                    ready.countDown();
+                    go.await();
+                    return SSHUtil.reserveNextInstanceId(userSchSessions, schSession);
+                }));
+            }
+
+            ready.await();
+            go.countDown();
+
+            Set<Integer> ids = new HashSet<>();
+            for (Future<Integer> future : futures) {
+                Integer id = future.get();
+                assertTrue(ids.add(id), "the same instance id (" + id + ") was handed out to two concurrent callers");
+            }
+
+            assertEquals(threadCount, ids.size());
+            assertEquals(threadCount, userSchSessions.getSchSessionMap().size());
+            for (int expected = 1; expected <= threadCount; expected++) {
+                assertTrue(ids.contains(expected), "expected instance id " + expected + " to have been assigned");
+            }
+        } finally {
+            pool.shutdown();
+        }
     }
 }

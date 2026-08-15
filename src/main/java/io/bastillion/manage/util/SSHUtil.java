@@ -294,10 +294,22 @@ public class SSHUtil {
             throws SQLException, GeneralSecurityException {
 
         JSch jsch = new JSch();
-        int instanceId = getNextInstanceId(sessionId, userSessionMap);
+
+        // Reserve the instance id up front, atomically, before the slow SSH handshake below.
+        // The client can fire off several createSession.ktrl requests for the same Bastillion
+        // session concurrently (e.g. "duplicate session"), so computing the next free id and
+        // inserting into the map used to be two separate steps with a gap between them wide
+        // enough for the handshake to fit in - two concurrent requests could both compute the
+        // same id, and the second insert would silently overwrite the first terminal's session.
+        // computeIfAbsent + synchronizing the id lookup/reservation on the per-session map
+        // closes both that race and the equivalent one on userSessionMap itself.
+        UserSchSessions userSchSessions = userSessionMap.computeIfAbsent(sessionId, ignored -> new UserSchSessions());
+        SchSession schSession = new SchSession();
+        schSession.setUserId(userId);
         hostSystem.setStatusCd(HostSystem.SUCCESS_STATUS);
+        schSession.setHostSystem(hostSystem);
+        int instanceId = reserveNextInstanceId(userSchSessions, schSession);
         hostSystem.setInstanceId(instanceId);
-        SchSession schSession = null;
 
         try {
             ApplicationKey appKey = PrivateKeyDB.getApplicationKey();
@@ -326,14 +338,11 @@ public class SSHUtil {
             PrintStream commander = new PrintStream(inputToChannel, true, StandardCharsets.UTF_8);
             channel.connect();
 
-            schSession = new SchSession();
-            schSession.setUserId(userId);
             schSession.setSession(session);
             schSession.setChannel(channel);
             schSession.setCommander(commander);
             schSession.setInputToChannel(inputToChannel);
             schSession.setOutFromChannel(outFromChannel);
-            schSession.setHostSystem(hostSystem);
 
             addPubKey(hostSystem, session, appKey.getPublicKey());
         } catch (Exception ex) {
@@ -342,26 +351,39 @@ public class SSHUtil {
             hostSystem.setStatusCd(HostSystem.GENERIC_FAIL_STATUS);
         }
 
-        if (hostSystem.getStatusCd().equals(HostSystem.SUCCESS_STATUS)) {
-            UserSchSessions userSchSessions = userSessionMap.getOrDefault(sessionId, new UserSchSessions());
-            userSchSessions.getSchSessionMap().put(instanceId, schSession);
-            userSessionMap.put(sessionId, userSchSessions);
+        if (!hostSystem.getStatusCd().equals(HostSystem.SUCCESS_STATUS)) {
+            userSchSessions.getSchSessionMap().remove(instanceId);
         }
         SystemStatusDB.updateSystemStatus(hostSystem, userId);
         SystemDB.updateSystem(hostSystem);
         return hostSystem;
     }
 
-    private static int getNextInstanceId(Long sessionId, Map<Long, UserSchSessions> map) {
+    /**
+     * Smallest instance id not already in use, starting at 1 - mirrors the client-side
+     * getNextInstanceId() in secure_shell.html so ids line up under normal (non-racing) use.
+     * Caller is responsible for synchronizing this lookup with the reservation put().
+     */
+    private static int getNextInstanceId(Map<Integer, SchSession> schSessionMap) {
         int instanceId = 1;
-        if (map.get(sessionId) != null) {
-            for (Integer id : map.get(sessionId).getSchSessionMap().keySet()) {
-                if (!id.equals(instanceId) && map.get(sessionId).getSchSessionMap().get(instanceId) == null)
-                    return instanceId;
-                instanceId++;
-            }
+        while (schSessionMap.containsKey(instanceId)) {
+            instanceId++;
         }
         return instanceId;
+    }
+
+    /**
+     * Atomically finds the next free instance id for userSchSessions and inserts schSession
+     * under it, so two concurrent callers (e.g. clicking "duplicate session" on the same
+     * Bastillion session) can never be handed the same id. Package-private so the concurrency
+     * guarantee itself can be unit tested without a real SSH handshake.
+     */
+    static int reserveNextInstanceId(UserSchSessions userSchSessions, SchSession schSession) {
+        synchronized (userSchSessions) {
+            int instanceId = getNextInstanceId(userSchSessions.getSchSessionMap());
+            userSchSessions.getSchSessionMap().put(instanceId, schSession);
+            return instanceId;
+        }
     }
 
     // --- Authentication and Add Key ---

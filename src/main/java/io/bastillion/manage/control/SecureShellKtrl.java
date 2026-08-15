@@ -331,7 +331,8 @@ public class SecureShellKtrl extends BaseKontroller {
                 //add to host system list
                 systemList.add(schSession.getHostSystem());
                 //run script it exists
-                if (script != null && script.getId() != null && script.getId() > 0) {
+                if (script != null && script.getId() != null && script.getId() > 0
+                        && schSession.getCommander() != null) {
                     try {
                         script = ScriptDB.getScript(script.getId(), userId);
                         BufferedReader reader = new BufferedReader(new StringReader(script.getScript()));
