@@ -501,78 +501,77 @@ the plaintext export file.
 
 ## More Screenshots
 
-Login, 2FA enrollment, the main menu, and a few other screens not already shown in
-[How It Works](#how-it-works) above.
+The core workflow is shown in [How It Works](#how-it-works). Expand a group below to
+explore the rest of the interface.
 
-<table>
-<tr>
-<td width="50%">
+<details>
+<summary><strong>Authentication</strong> — login and two-factor enrollment</summary>
 
-**Login** — username/password, with an optional OTP access code field for 2FA.
+### Login
 
-![Login](docs/screenshots/login.png)
+Sign in with a username and password, plus an optional OTP access code.
 
-</td>
-<td width="50%">
+![Bastillion login screen](docs/screenshots/login.png)
 
-**Two-Factor Setup** — scan the QR code with Authy or Google Authenticator.
+### Two-Factor Setup
 
-![Two-Factor Setup](docs/screenshots/two-factor-setup.png)
+Scan the QR code with Authy, Google Authenticator, or another compatible app.
 
-</td>
-</tr>
-<tr>
-<td width="50%">
+![Bastillion two-factor setup screen](docs/screenshots/two-factor-setup.png)
 
-**Main Menu** — scoped to what the logged-in user is allowed to see.
+</details>
 
-![Main Menu](docs/screenshots/main-menu.png)
+<details>
+<summary><strong>Access Management</strong> — navigation, profiles, and users</summary>
 
-</td>
-<td width="50%">
+### Main Menu
 
-**Manage Profiles** — group systems into named profiles that control access.
+The available tools are scoped to the signed-in user's permissions.
 
-![Manage Profiles](docs/screenshots/manage-profiles.png)
+![Bastillion main menu](docs/screenshots/main-menu.png)
 
-</td>
-</tr>
-<tr>
-<td width="50%">
+### Manage Profiles
 
-**Manage Users** — create accounts and assign them a user type; users are then linked to
-profiles to grant access to specific systems.
+Group systems into named profiles that control access.
 
-![Manage Users](docs/screenshots/manage-users.png)
+![Bastillion profile management screen](docs/screenshots/manage-profiles.png)
 
-</td>
-<td width="50%">
+### Manage Users
 
-**Terminals** — pick one or more systems (optionally filtered by profile) to open
-simultaneously.
+Create accounts, choose user roles, and grant system access through profiles.
 
-![Terminals](docs/screenshots/terminals-select.png)
+![Bastillion user management screen](docs/screenshots/manage-users.png)
 
-</td>
-</tr>
-<tr>
-<td width="50%">
+</details>
 
-**Composite Scripts** — save a script once and execute it across every selected terminal.
+<details>
+<summary><strong>Terminals &amp; Automation</strong> — launch sessions and run saved scripts</summary>
 
-![Composite Scripts](docs/screenshots/composite-scripts.png)
+### Terminals
 
-</td>
-<td width="50%">
+Select one or more systems, optionally filtered by profile, and open them simultaneously.
 
-**User Settings** — change your password, pick a terminal theme, and view the public key
-Bastillion uses to authenticate to registered systems.
+![Bastillion terminal selection screen](docs/screenshots/terminals-select.png)
 
-![User Settings](docs/screenshots/user-settings.png)
+### Composite Scripts
 
-</td>
-</tr>
-</table>
+Save a script once and execute it across every selected terminal.
+
+![Bastillion composite script management screen](docs/screenshots/composite-scripts.png)
+
+</details>
+
+<details>
+<summary><strong>Settings</strong> — account appearance and application authentication</summary>
+
+### User Settings
+
+Change your password, choose the interface and terminal appearance, and manage the public
+key Bastillion uses to authenticate to registered systems.
+
+![Bastillion user settings screen](docs/screenshots/user-settings.png)
+
+</details>
 
 ---
 

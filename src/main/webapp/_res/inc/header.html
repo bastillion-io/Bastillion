@@ -124,9 +124,20 @@
                 $('input:enabled:visible:first').focus();
             });
 
-            //disable double-click on btns
-            $("form").submit(function () {
-                $('.btn').attr('disabled', 'disabled');
+            // Prevent duplicate submissions without changing every button on the page.
+            // Disabling all .btn elements caused unrelated actions to flash into
+            // Bootstrap's disabled colors while a form was navigating away.
+            $("form").submit(function (event) {
+                var form = $(this);
+                if (form.data("submitting")) {
+                    return false;
+                }
+
+                form.data("submitting", true);
+                var submitter = event.originalEvent && event.originalEvent.submitter;
+                if (submitter) {
+                    $(submitter).prop("disabled", true);
+                }
                 return true;
             }).attr("accept-charset", "utf-8");
 
