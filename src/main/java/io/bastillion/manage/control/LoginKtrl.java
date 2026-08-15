@@ -5,8 +5,6 @@
  */
 package io.bastillion.manage.control;
 
-import com.onelogin.saml2.authn.AuthnRequest;
-import com.onelogin.saml2.settings.Saml2Settings;
 import io.bastillion.common.saml.SamlSettingsUtil;
 import io.bastillion.common.util.AppConfig;
 import io.bastillion.common.util.AuthSessionUtil;
@@ -27,8 +25,6 @@ import org.slf4j.LoggerFactory;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 
@@ -81,10 +77,7 @@ public class LoginKtrl extends BaseKontroller {
             return "redirect:/";
         }
         try {
-            Saml2Settings settings = SamlSettingsUtil.getSettings();
-            AuthnRequest authnRequest = new AuthnRequest(settings);
-            String redirectUrl = settings.getIdpSingleSignOnServiceUrl() + "?SAMLRequest="
-                    + URLEncoder.encode(authnRequest.getEncodedAuthnRequest(), StandardCharsets.UTF_8);
+            String redirectUrl = SamlSettingsUtil.buildLoginRedirectUrl(SamlSettingsUtil.getSettings());
             //writes the response directly rather than returning "redirect:" + redirectUrl -
             //DispatcherServlet auto-appends Bastillion's own _csrf param to any "redirect:"
             //return value, which is meaningless (and wrong) for a redirect to a third-party

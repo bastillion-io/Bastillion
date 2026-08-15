@@ -439,11 +439,23 @@ ldap-ol-with-roles {
 };
 ```
 
-Admins are added upon first login and can be assigned system profiles. Users are synced with
-profiles when their LDAP role names match Bastillion profiles - a user whose roles match no
-Bastillion profile is rejected at login (**Manager** accounts are the one exception; they
-aren't profile-scoped). Set `defaultProfileForLdap` to a profile name to assign every LDAP
-user to it automatically, guaranteeing everyone can log in regardless of role matching:
+Admins are added upon first login and can be assigned system profiles.
+
+**How role mapping actually works:** each LDAP group a user belongs to (per `roleBaseDn`/
+`roleMemberAttribute` above) becomes a "role name" - the value of that group's
+`roleNameAttribute` (`cn` in the example above). On every login, Bastillion compares each of
+those role names, **by exact text match**, against the names of the Profiles you've created
+under **Manage → Profiles**. A match assigns the user to that profile; no match, no access to
+that profile. So if a user is a member of the LDAP group `cn=admins,ou=groups,...`, you need
+a Bastillion profile literally named `admins` (capitalization aside - the comparison is
+case-insensitive, spelling is not) for that membership to mean anything in Bastillion. There
+is no separate mapping step or UI for this - the names simply have to line up.
+
+A user whose roles match no Bastillion profile is rejected at login (**Manager** accounts are
+the one exception; they aren't profile-scoped). Set `defaultProfileForLdap` to a profile name
+to assign every LDAP user to it automatically, guaranteeing everyone can log in regardless of
+role matching - useful as a safety net while you're still getting profile names lined up with
+your directory's group names:
 ```bash
 export DEFAULT_PROFILE_FOR_LDAP=everyone
 ```
@@ -478,26 +490,77 @@ Only needed if the Entity ID registered on the IdP side can't match `SAML_BASE_U
 export SAML_SP_ENTITY_ID=https://bastillion.example.com
 ```
 
-To map Entra group/role claims to Bastillion profiles - the same name-matching mechanism
-LDAP roles use above:
+To map Entra group/role claims to Bastillion profiles (see "How role mapping actually works"
+below before changing `SAML_ROLE_ATTRIBUTE` from its default):
 ```bash
 export SAML_ROLE_ATTRIBUTE=http://schemas.microsoft.com/ws/2008/06/identity/claims/groups
 export DEFAULT_PROFILE_FOR_SAML=everyone
 ```
 
-Admins are added upon first SSO login and can be assigned system profiles. Users are synced
-with profiles when their assertion's role/group claim values match Bastillion profiles,
-exactly as with LDAP - including the same rejection-without-a-matching-profile behavior, so
+Admins are added upon first SSO login and can be assigned system profiles.
+
+**How role mapping actually works - same mechanism as LDAP above:** `SAML_ROLE_ATTRIBUTE`
+names *which* assertion attribute carries the user's groups/roles; whatever *values* that
+attribute holds on a given login are compared, **by exact text match**, against the names of
+the Profiles you've created under **Manage → Profiles**. A value that matches a profile name
+assigns the user to it; nothing else about the claim matters. So a Bastillion profile must be
+named exactly the same as the string the assertion sends - there's no separate mapping step
+or UI, the names just have to line up.
+
+This is the part that most often trips people up with Entra ID specifically: by default,
+Entra's group claim can emit each group as its **Object ID** (a GUID) rather than its display
+name, unless the Enterprise Application's token configuration is explicitly set to emit group
+**names**. If your Bastillion profiles are named things like `admins`/`everyone` but Entra is
+sending GUIDs, nothing will ever match. Check the actual claim value in a real assertion (or
+Entra's token configuration for the app) before assuming the mapping is broken - it's usually
+this, not a Bastillion-side problem. Three ways to fix it, in order of what we'd recommend:
+
+1. **Use Entra App Roles instead of group claims (cleanest).** Under the app's registration →
+   App roles, define roles with exactly the values you want (`admins`, `everyone`, ...), then
+   assign users/groups to those roles under the Enterprise Application's *Users and groups*.
+   Configure the SAML token to emit the `roles` claim, and point `SAML_ROLE_ATTRIBUTE` at that
+   claim's URI instead of the groups claim. You choose the exact string Entra sends - no GUID
+   problem at all, and it's a cleaner authorization model than repurposing AD groups anyway.
+2. **Change the groups claim's source attribute.** Enterprise Application → Single sign-on →
+   SAML → *Attributes & Claims* → edit the Groups claim → there's a *Source attribute*
+   dropdown, normally defaulted to Group ID. Depending on your tenant and whether the groups
+   are cloud-only or synced from on-prem AD, you may be able to switch it to `sAMAccountName`
+   or a display-name option - exact choices vary by tenant and Entra portal version, so check
+   what's actually offered rather than assuming a specific label.
+3. **Or don't fight it - name the Bastillion profile after whatever Entra actually sends.** If
+   Entra insists on sending the GUID, create a Bastillion profile literally named that GUID.
+   Uglier, but needs zero Entra-side reconfiguration.
+
+A user whose claims match no Bastillion profile is rejected at login (**Manager** accounts are
+the one exception; they aren't profile-scoped) - exactly as with LDAP, so
 `DEFAULT_PROFILE_FOR_SAML` above is worth setting for the same reason
-`DEFAULT_PROFILE_FOR_LDAP` is.
+`DEFAULT_PROFILE_FOR_LDAP` is: a safety net while you're still lining up profile names with
+your IdP's claim values.
 
 Bastillion's own one-time-passcode check is skipped for SSO logins - the IdP is expected to
 enforce its own MFA/Conditional Access policy instead. First-time OTP enrollment is still
 offered so SAML users have a local fallback credential available if SSO is ever disabled.
 
-Not currently supported: signed SAML requests, encrypted assertions, and Single Logout (SLO)
-- logout stays local-only. SAML SSO can be enabled alongside LDAP; both are evaluated
-independently and either can provision new users on first login.
+**Signed requests and encrypted assertions:** Bastillion generates its own SAML signing
+certificate automatically (self-signed, the same way it generates its TLS certificate) the
+first time it's needed, and signs every outgoing AuthnRequest with it from then on - no
+setup required, and harmless even if your IdP doesn't check it. Fetch
+`https://bastillion.example.com/saml/metadata` to get that certificate in standard SP
+metadata form and hand it to your IdP admin if they should verify Bastillion's signed
+requests, or should encrypt assertions for Bastillion - most IdPs can import an SP metadata
+URL directly instead of pasting in a raw certificate. If you'd rather use a real (e.g.
+CA-issued) key pair instead of the auto-generated one, point `SAML_SP_KEYSTORE_PATH`/
+`SAML_SP_KEYSTORE_PASSWORD` at a PKCS12 keystore containing it. To *require* encrypted
+assertions (off by default - only turn this on once your IdP is actually configured to
+encrypt for Bastillion's certificate, or every login will start failing):
+```bash
+export SAML_WANT_ENCRYPTED_ASSERTIONS=true
+```
+
+Not currently supported: Single Logout (SLO) - logout stays local-only, and doesn't tell the
+IdP or any other application you were signed into via the same SSO session. SAML SSO can be
+enabled alongside LDAP; both are evaluated independently and either can provision new users
+on first login.
 </details>
 
 <details>

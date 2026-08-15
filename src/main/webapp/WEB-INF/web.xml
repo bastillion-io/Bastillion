@@ -103,6 +103,18 @@
         <url-pattern>/saml/acs</url-pattern>
     </servlet-mapping>
 
+    <!-- Serves Bastillion's own SAML SP metadata XML - see SamlMetadataServlet's class
+         javadoc for why this is also outside CSRFFilter's reach. -->
+    <servlet>
+        <servlet-name>SamlMetadataServlet</servlet-name>
+        <servlet-class>io.bastillion.common.saml.SamlMetadataServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>SamlMetadataServlet</servlet-name>
+        <url-pattern>/saml/metadata</url-pattern>
+    </servlet-mapping>
+
     <servlet>
         <servlet-name>DispatcherServlet</servlet-name>
         <servlet-class>loophole.mvc.base.DispatcherServlet</servlet-class>
