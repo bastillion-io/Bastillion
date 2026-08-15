@@ -85,7 +85,7 @@
             </table>
             <div th:if="${!@io.bastillion.manage.control.OTPKtrl@requireOTP}">
                 <button th:onclick="window.location = 'menu.html?_csrf=' + [[${session._csrf}]]"
-                        class="btn btn-danger spacer spacer-left" style="float:left">Skip for Now</button>
+                        class="btn btn-secondary btn-muted spacer spacer-left" style="float:left">Skip for Now</button>
             </div>
             <form th:action="@{/admin/otpSubmit.ktrl}" method="post">
                 <input type="hidden" name="_csrf" th:value="${session._csrf}">

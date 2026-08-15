@@ -3,15 +3,19 @@
  *
  *    Licensed under The Prosperity Public License 3.0.0
  */-->
-<div class="navbar navbar-dark fixed-top navbar-expand" role="navigation"
+<div class="navbar navbar-dark fixed-top navbar-expand-lg" role="navigation"
      xmlns:th="http://www.thymeleaf.org">
     <div class="container">
-        <div class="navbar-brand">
+        <a class="navbar-brand" th:href="'../admin/menu.html?_csrf=' + ${session._csrf}">
             <img class="brand-logo" src="/img/bastillion-logo.svg" th:src="@{/img/bastillion-logo.svg}"
                  alt="Bastillion">
             <span>Bastillion</span>
-        </div>
-        <div class="navbar-collapse" id="navbarCollapse">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
+                aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item"><a th:href="'../admin/menu.html?_csrf=' + ${session._csrf}"
                                         class="nav-link">Home</a>
@@ -57,7 +61,7 @@
                                         class="nav-link">Audit Sessions</a>
                 </li>
             </ul>
-            <ul class="navbar-nav mb-2 mb-lg-0" style="float:right">
+            <ul class="navbar-nav account-nav mb-2 mb-lg-0">
                 <li class="dropdown nav-item"><a href="#" class="dropdown-toggle nav-link" data-bs-toggle="dropdown">
 
                     <span th:text="${session.username}"></span>
