@@ -76,6 +76,18 @@ class SessionAuditDBTest {
     }
 
     @Test
+    void normalizesZshDoubleCarriageReturnWithoutAddingBlankLines() throws Exception {
+        try (Connection con = DbTestSupport.newConnection()) {
+            Long sessionId = newSession(con);
+            insertRow(con, sessionId,
+                    "prompt % pwd\u001B[?2004l\r\r\n/Users/alice\r\n",
+                    1700000000000L);
+
+            assertEquals("prompt % pwd\n/Users/alice\n", stream(con, sessionId));
+        }
+    }
+
+    @Test
     void onlyStreamsRowsForTheRequestedInstance() throws Exception {
         try (Connection con = DbTestSupport.newConnection()) {
             Long sessionId = newSession(con);

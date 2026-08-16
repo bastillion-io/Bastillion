@@ -252,7 +252,10 @@ public class SessionAuditDB {
                     for (int i = 0; i < output.length(); i++) {
                         char c = output.charAt(i);
                         if (c == '\n') {
-                            if (line.length() > 0 && line.charAt(line.length() - 1) == '\r') {
+                            // zsh commonly submits a command as CR CR LF while bash uses
+                            // CR LF. Remove every trailing carriage return so the extra zsh
+                            // CR does not render as a blank line in the audit transcript.
+                            while (line.length() > 0 && line.charAt(line.length() - 1) == '\r') {
                                 line.setLength(line.length() - 1);
                             }
                             writeCleanedLine(writer, line.toString());
