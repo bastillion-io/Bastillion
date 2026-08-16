@@ -121,7 +121,7 @@ default (`deleteAuditLogAfter`), and recording can be switched off with
 
 ## 🚀 What's New
 - **SAML 2.0 SSO** — sign in via an enterprise IdP (Entra ID, Okta, ADFS, and others) — see [Configuration](#configuration)
-- **Licensing** — free at up to 5 systems, paid tiers available at [loophole.company/pricing.html](https://loophole.company/pricing.html) (see [Licensing](#licensing) below)
+- **Licensing** — free at up to 8 systems, paid tiers available at [loophole.company/pricing.html](https://loophole.company/pricing.html) (see [Licensing](#licensing) below)
 - **Session audit & replay, on by default** — every terminal session is recorded and can be replayed under **Audit Sessions**, streamed to the browser so even huge sessions load instantly
 - Runs as a **self-contained jar** (`java -jar`) with HTTPS out of the box — see [Download and Run](#download-and-run)
 - Upgraded to **Java 21**, **Jetty 12**, and **Jakarta EE 10**
@@ -133,7 +133,7 @@ default (`deleteAuditLogAfter`), and recording can be switched off with
 
 ## Licensing
 
-Bastillion runs unlicensed at up to **5 registered systems** — enough to try it for real
+Bastillion runs unlicensed at up to **8 registered systems** — enough to try it for real
 before buying. A license raises that cap.
 
 1. Buy a license at **[loophole.company/pricing.html](https://loophole.company/pricing.html)**

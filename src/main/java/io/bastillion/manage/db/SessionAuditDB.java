@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -56,7 +57,7 @@ public class SessionAuditDB {
     // with a newline. It is terminal chrome, not command output, and should not appear
     // as a standalone "%" line in recorded audit sessions.
     private static final Pattern ZSH_PROMPT_EOL_MARK_PATTERN = Pattern.compile(
-            "\u001B\\[1m\u001B\\[7m%\u001B\\[27m(?:\u001B\\[1m)?\u001B\\[0m[ \\t]*$");
+            "\u001B\\[1m\u001B\\[7m%\u001B\\[27m(?:\u001B\\[1m)?\u001B\\[0m");
     //upper bound on how much of a single line without newlines is buffered before it is forced out
     private static final int MAX_LINE_BUFFER = 1024 * 1024;
 
@@ -282,8 +283,18 @@ public class SessionAuditDB {
      * @return cleaned line
      */
     static String cleanLine(String line) {
-        String withoutZshEolMark = ZSH_PROMPT_EOL_MARK_PATTERN.matcher(line).replaceAll("");
+        boolean containedTerminalStyling = line.indexOf('\u001B') >= 0;
+        Matcher zshEolMarkMatcher = ZSH_PROMPT_EOL_MARK_PATTERN.matcher(line);
+        boolean containedZshEolMark = zshEolMarkMatcher.find();
+        String withoutZshEolMark = zshEolMarkMatcher.replaceAll("");
         String cleaned = TERMINAL_CONTROL_PATTERN.matcher(withoutZshEolMark).replaceAll("");
+        // zsh versions and prompt configurations can append additional cursor/erase
+        // sequences to PROMPT_EOL_MARK. If stripping those sequences leaves only the
+        // styled marker, discard it. A real, unstyled "%" output line is preserved.
+        if ((containedZshEolMark && cleaned.trim().isEmpty())
+                || (containedTerminalStyling && "%".equals(cleaned.trim()))) {
+            return "";
+        }
         if (cleaned.indexOf('\b') < 0) {
             return cleaned;
         }

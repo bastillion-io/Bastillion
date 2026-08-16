@@ -28,6 +28,11 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  */
 class LicenseUtilTest {
 
+    @Test
+    void unlicensedTierAllowsEightSystems() {
+        assertEquals(8, LicenseUtil.FREE_TIER_MAX_SYSTEMS);
+    }
+
     private static String payload(String licenseId, String licensee, String maxSystems, String issuedDate, String expiry) {
         return String.join("|", licenseId, licensee, maxSystems, issuedDate, expiry);
     }

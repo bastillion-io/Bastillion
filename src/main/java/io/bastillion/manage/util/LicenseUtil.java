@@ -37,7 +37,7 @@ public class LicenseUtil {
     // Public half of the offline signing keypair. The private key never ships with the product.
     private static final String PUBLIC_KEY_B64 = "MCowBQYDK2VwAyEAe+6TgNZGJ3rKiCiVqpK+soD6m91H6mh9ktHauNWwl6Y=";
 
-    public static final int FREE_TIER_MAX_SYSTEMS = 5;
+    public static final int FREE_TIER_MAX_SYSTEMS = 8;
 
     private static final boolean VALID;
     private static final String LICENSEE;

@@ -176,8 +176,13 @@ class SessionAuditDBTest {
     @Test
     void cleanLineRemovesZshPromptEolMarkButPreservesRealPercentSigns() {
         String zshEolMark = "\u001B[1m\u001B[7m%\u001B[27m\u001B[1m\u001B[0m   ";
+        String zshEolMarkWithErase = "\u001B[1m\u001B[7m%\u001B[27m\u001B[1m\u001B[0m\u001B[K";
+        String styledZshEolMark = "\u001B[7m%\u001B[0m";
 
         assertEquals("", SessionAuditDB.cleanLine(zshEolMark));
+        assertEquals("", SessionAuditDB.cleanLine(zshEolMarkWithErase));
+        assertEquals("", SessionAuditDB.cleanLine(styledZshEolMark));
+        assertEquals("%", SessionAuditDB.cleanLine("%"));
         assertEquals("kavanagh@host ~ % pwd", SessionAuditDB.cleanLine("kavanagh@host ~ % pwd"));
         assertEquals("100% complete", SessionAuditDB.cleanLine("100% complete"));
     }
