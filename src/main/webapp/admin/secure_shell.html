@@ -296,7 +296,8 @@
                 });
                 for (var i = 0; i < ids.length; i++) {
                     var output = $("#output_" + ids[i]);
-                    output.css("width", "auto");
+                    output.closest(".run_cmd").css("width", "100%");
+                    output.css("width", "100%");
                     output.height(346 + y_offset);
                     resize(output);
                 }
@@ -508,7 +509,15 @@
                 //set resizable
                 element.find(".output").resizable({
                     ghost: true,
+                    resize: function (event, ui) {
+                        // The output owns the resize handle, but the terminal chrome
+                        // must follow it. Otherwise xterm gets narrower while the card
+                        // remains stretched across the full grid column.
+                        element.css("width", ui.size.width + "px");
+                    },
                     stop: function (event, ui) {
+                        element.css("width", ui.size.width + "px");
+                        $(this).css("width", "100%");
                         resize($(this));
                     }
                 });
