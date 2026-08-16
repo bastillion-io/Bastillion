@@ -28,6 +28,13 @@
 
             $('#upload_push_dialog').on('hidden.bs.modal', function () {
                 $("#upload_push_frame").attr("src", "");
+                $(this).removeClass('upload-form-state');
+            });
+
+            $('#upload_push_frame').on('load', function () {
+                var frameBody = this.contentDocument && this.contentDocument.body;
+                $('#upload_push_dialog').toggleClass('upload-form-state',
+                    frameBody != null && frameBody.classList.contains('upload-form-page'));
             });
 
             $(".termwrapper").sortable({
@@ -93,6 +100,7 @@
                     idListStr = idListStr + '&idList=' + entry;
                 });
 
+                $('#upload_push_dialog').addClass('upload-form-state');
                 $("#upload_push_frame").attr("src", "setUpload.ktrl" + idListStr);
                 new bootstrap.Modal($("#upload_push_dialog")).show();
             });
@@ -305,13 +313,17 @@
                 var id = element.attr("id").replace("output_", "");
 
                 if (termMap[id]) {
-                    var width = Math.floor($('#output_' + id).innerWidth() - 20);
-                    var height = Math.floor($('#output_' + id).innerHeight() - y_offset);
-
                     // Fit first, then give the remote PTY xterm's exact character grid.
                     // Estimating columns from pixels causes wrapping disagreements that
                     // make zsh display its inverse-video PROMPT_EOL_MARK (usually "%").
                     fitMap[id].fit();
+
+                    // Use the rendered screen rather than the card dimensions so the PTY
+                    // remains exact when terminal padding or chrome changes.
+                    var screen = termMap[id].element.querySelector('.xterm-screen');
+                    var bounds = screen ? screen.getBoundingClientRect() : null;
+                    var width = Math.max(1, Math.floor(bounds ? bounds.width : element.innerWidth()));
+                    var height = Math.max(1, Math.floor(bounds ? bounds.height : element.innerHeight()));
 
                     $.ajax({
                         url: '../admin/setPtyType.ktrl?id=' + id
@@ -405,17 +417,19 @@
 
                 termMap[id] = new Terminal({
                     fontSize: 14,
+                    lineHeight: 1.2,
+                    letterSpacing: 0,
                     'theme': CUSTOM_THEME,
                     'cursorStyle' : 'block',
                     'cursorBlink' : true,
                     'cursorInactiveStyle' : 'outline',
-                    fontFamily: 'DejaVu Sans Mono, Liberation Mono, monospace'
+                    fontFamily: 'SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, monospace'
                 });
 
                 fitMap[id] = new FitAddon.FitAddon()
                 termMap[id].loadAddon(fitMap[id])
 
-                termMap[id].open($("#run_cmd_" + id).find('.output').get(0));
+                termMap[id].open($("#run_cmd_" + id).find('.terminal-viewport').get(0));
                 termMap[id].attachCustomKeyEventHandler(function (event) {
                     var copyShortcut = event.type === 'keydown' && !event.altKey
                         && (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'c';
@@ -497,7 +511,9 @@
                     "<div id=\"run_cmd_" + instanceId + "\" class=\"run_cmd_active run_cmd\">"
                     + "<h6 class=\"term-header\">" + displayLabel + "</h6>"
                     + "<div class=\"term\">"
-                    + "<div id=\"output_" + instanceId + "\" class=\"output\"></div>"
+                    + "<div id=\"output_" + instanceId + "\" class=\"output\">"
+                    + "<div class=\"terminal-viewport\"></div>"
+                    + "</div>"
                     + "</div>"
                     + "<div data-bs-hostId=\"" + hostId + "\" class=\"host\"></div>"
                     + "</div>";

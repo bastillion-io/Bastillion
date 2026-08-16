@@ -5,13 +5,16 @@
  */
 package io.bastillion.manage.control;
 
+import io.bastillion.common.util.AuthUtil;
 import io.bastillion.manage.db.SessionAuditDB;
 import io.bastillion.manage.db.SystemDB;
 import io.bastillion.manage.db.UserDB;
+import io.bastillion.manage.db.UserThemeDB;
 import io.bastillion.manage.model.HostSystem;
 import io.bastillion.manage.model.SessionAudit;
 import io.bastillion.manage.model.SortedSet;
 import io.bastillion.manage.model.User;
+import io.bastillion.manage.model.UserSettings;
 import loophole.mvc.annotation.Kontrol;
 import loophole.mvc.annotation.MethodType;
 import loophole.mvc.annotation.Model;
@@ -47,6 +50,8 @@ public class SessionAuditKtrl extends BaseKontroller {
     List<HostSystem> systemList;
     @Model(name = "userList")
     List<User> userList;
+    @Model(name = "userSettings")
+    UserSettings userSettings;
 
     public SessionAuditKtrl(HttpServletRequest request, HttpServletResponse response) {
         super(request, response);
@@ -77,6 +82,13 @@ public class SessionAuditKtrl extends BaseKontroller {
     public String getTermsForSession() throws ServletException {
         try {
             sessionAudit = SessionAuditDB.getSessionsTerminals(sessionId);
+            userSettings = UserThemeDB.getTheme(AuthUtil.getUserId(getRequest().getSession()));
+            if (userSettings.getBg() == null || userSettings.getBg().isBlank()) {
+                userSettings.setBg("#070a0e");
+            }
+            if (userSettings.getFg() == null || userSettings.getFg().isBlank()) {
+                userSettings.setFg("#e6edf3");
+            }
         } catch (SQLException | GeneralSecurityException ex) {
             log.error(ex.toString(), ex);
             throw new ServletException(ex.toString(), ex);

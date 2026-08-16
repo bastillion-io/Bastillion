@@ -12,7 +12,7 @@
     <title>Bastillion - Upload &amp; Push</title>
 </head>
 
-<body class="iframe-body">
+<body class="iframe-body upload-form-page">
 <template th:if="${idList!= null && !idList.empty}" th:remove="tag">
     <div th:replace="~{_res/inc/errors}"></div>
     <form id="upload" class="upload-form" th:action="@{/admin/uploadSubmit.ktrl} + '?_csrf=' + ${session._csrf}"
