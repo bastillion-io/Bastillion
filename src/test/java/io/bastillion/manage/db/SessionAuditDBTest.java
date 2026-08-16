@@ -111,6 +111,19 @@ class SessionAuditDBTest {
     }
 
     @Test
+    void removesZshPromptEolMarkerLineWithoutLeavingAnExtraNewline() throws Exception {
+        try (Connection con = DbTestSupport.newConnection()) {
+            Long sessionId = newSession(con);
+            String marker = "\u001B[1m\u001B[7m%\u001B[27m\u001B[1m\u001B[0m\u001B[K";
+            insertRow(con, sessionId,
+                    "Last login: today\r\n" + marker + "\r\nprompt % pwd\r\n/Users/alice\r\n\r\nnext",
+                    1700000000000L);
+
+            assertEquals("Last login: today\nprompt % pwd\n/Users/alice\n\nnext\n", stream(con, sessionId));
+        }
+    }
+
+    @Test
     void appliesBackspacesIncludingOnesThatStartALine() throws Exception {
         try (Connection con = DbTestSupport.newConnection()) {
             Long sessionId = newSession(con);

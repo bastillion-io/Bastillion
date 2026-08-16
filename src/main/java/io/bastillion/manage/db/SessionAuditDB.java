@@ -255,22 +255,19 @@ public class SessionAuditDB {
                             if (line.length() > 0 && line.charAt(line.length() - 1) == '\r') {
                                 line.setLength(line.length() - 1);
                             }
-                            writer.write(cleanLine(line.toString()));
-                            writer.write('\n');
+                            writeCleanedLine(writer, line.toString());
                             line.setLength(0);
                         } else {
                             line.append(c);
                             if (line.length() >= MAX_LINE_BUFFER) {
-                                writer.write(cleanLine(line.toString()));
-                                writer.write('\n');
+                                writeCleanedLine(writer, line.toString());
                                 line.setLength(0);
                             }
                         }
                     }
                 }
                 if (line.length() > 0) {
-                    writer.write(cleanLine(line.toString()));
-                    writer.write('\n');
+                    writeCleanedLine(writer, line.toString());
                 }
             }
         }
@@ -283,6 +280,28 @@ public class SessionAuditDB {
      * @return cleaned line
      */
     static String cleanLine(String line) {
+        String cleaned = cleanAuditLine(line);
+        return cleaned == null ? "" : cleaned;
+    }
+
+    /**
+     * Writes a real terminal line, but drops zsh's visual end-of-line marker along
+     * with its newline. Returning an empty string from {@link #cleanLine(String)} is
+     * not enough here because genuine empty terminal lines must remain visible.
+     */
+    private static void writeCleanedLine(Writer writer, String line) throws IOException {
+        String cleaned = cleanAuditLine(line);
+        if (cleaned != null) {
+            writer.write(cleaned);
+            writer.write('\n');
+        }
+    }
+
+    /**
+     * @return cleaned terminal text, or {@code null} when the entire line is zsh's
+     * visual PROMPT_EOL_MARK and should not be included in an audit replay
+     */
+    private static String cleanAuditLine(String line) {
         boolean containedTerminalStyling = line.indexOf('\u001B') >= 0;
         Matcher zshEolMarkMatcher = ZSH_PROMPT_EOL_MARK_PATTERN.matcher(line);
         boolean containedZshEolMark = zshEolMarkMatcher.find();
@@ -293,7 +312,7 @@ public class SessionAuditDB {
         // styled marker, discard it. A real, unstyled "%" output line is preserved.
         if ((containedZshEolMark && cleaned.trim().isEmpty())
                 || (containedTerminalStyling && "%".equals(cleaned.trim()))) {
-            return "";
+            return null;
         }
         if (cleaned.indexOf('\b') < 0) {
             return cleaned;
