@@ -52,6 +52,11 @@ public class SessionAuditDB {
                     + "|\\u0007"                                    //bell
                     + "|\\]0;|\\[\\d\\d;\\d\\dm|\\[\\dm"              //bare leftovers logged without the escape char
                     + "|\u001B");                                  //any stray escape char
+    // zsh paints this inverse-video percent sign when the previous output did not end
+    // with a newline. It is terminal chrome, not command output, and should not appear
+    // as a standalone "%" line in recorded audit sessions.
+    private static final Pattern ZSH_PROMPT_EOL_MARK_PATTERN = Pattern.compile(
+            "\u001B\\[1m\u001B\\[7m%\u001B\\[27m(?:\u001B\\[1m)?\u001B\\[0m[ \\t]*$");
     //upper bound on how much of a single line without newlines is buffered before it is forced out
     private static final int MAX_LINE_BUFFER = 1024 * 1024;
 
@@ -277,7 +282,8 @@ public class SessionAuditDB {
      * @return cleaned line
      */
     static String cleanLine(String line) {
-        String cleaned = TERMINAL_CONTROL_PATTERN.matcher(line).replaceAll("");
+        String withoutZshEolMark = ZSH_PROMPT_EOL_MARK_PATTERN.matcher(line).replaceAll("");
+        String cleaned = TERMINAL_CONTROL_PATTERN.matcher(withoutZshEolMark).replaceAll("");
         if (cleaned.indexOf('\b') < 0) {
             return cleaned;
         }

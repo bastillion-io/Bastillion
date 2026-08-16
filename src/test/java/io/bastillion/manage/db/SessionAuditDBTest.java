@@ -172,4 +172,13 @@ class SessionAuditDBTest {
         // a stray escape char never lingers in the output
         assertEquals("ab", SessionAuditDB.cleanLine("a\u001Bb"));
     }
+
+    @Test
+    void cleanLineRemovesZshPromptEolMarkButPreservesRealPercentSigns() {
+        String zshEolMark = "\u001B[1m\u001B[7m%\u001B[27m\u001B[1m\u001B[0m   ";
+
+        assertEquals("", SessionAuditDB.cleanLine(zshEolMark));
+        assertEquals("kavanagh@host ~ % pwd", SessionAuditDB.cleanLine("kavanagh@host ~ % pwd"));
+        assertEquals("100% complete", SessionAuditDB.cleanLine("100% complete"));
+    }
 }

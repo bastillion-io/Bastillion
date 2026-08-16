@@ -41,7 +41,8 @@
                 connectWith: ".run_cmd",
                 handle: ".term-header",
                 zIndex: 10000,
-                helper: 'clone'
+                helper: 'clone',
+                cancel: '.ui-resizable-handle'
             });
 
             //submit
@@ -272,6 +273,7 @@
 
             var termMap = {};
             var fitMap = {};
+            var ptyResizeRequests = {};
             var selectionTermId = null;
             var focusedTermId = null;
 
@@ -296,7 +298,10 @@
                 });
                 for (var i = 0; i < ids.length; i++) {
                     var output = $("#output_" + ids[i]);
-                    output.closest(".run_cmd").css("width", "100%");
+                    output.closest(".run_cmd").css({
+                        "width": "100%",
+                        "height": "auto"
+                    });
                     output.css("width", "100%");
                     output.height(346 + y_offset);
                     resize(output);
@@ -304,7 +309,12 @@
             }
 
             var windowResizeTimer;
-            $(window).on('resize', function () {
+            $(window).on('resize', function (event) {
+                // jQuery UI's terminal-card resize event can bubble to window.
+                // Treat only a genuine browser viewport resize as a layout reset.
+                if (event.target !== window) {
+                    return;
+                }
                 clearTimeout(windowResizeTimer);
                 windowResizeTimer = setTimeout(resetSize, 120);
             });
@@ -326,14 +336,27 @@
                     var width = Math.max(1, Math.floor(bounds ? bounds.width : element.innerWidth()));
                     var height = Math.max(1, Math.floor(bounds ? bounds.height : element.innerHeight()));
 
-                    $.ajax({
-                        url: '../admin/setPtyType.ktrl?id=' + id
-                            + '&userSettings.ptyColumns=' + termMap[id].cols
-                            + '&userSettings.ptyRows=' + termMap[id].rows
-                            + '&userSettings.ptyWidth=' + width
-                            + '&userSettings.ptyHeight=' + height
-                            + '&_csrf=' + [[${session._csrf}]],
+                    if (ptyResizeRequests[id]) {
+                        ptyResizeRequests[id].abort();
+                    }
+                    var request = $.ajax({
+                        url: '../admin/setPtyType.ktrl',
+                        method: 'GET',
+                        data: {
+                            id: id,
+                            'userSettings.ptyColumns': termMap[id].cols,
+                            'userSettings.ptyRows': termMap[id].rows,
+                            'userSettings.ptyWidth': width,
+                            'userSettings.ptyHeight': height,
+                            _csrf: [[${session._csrf}]]
+                        },
                         cache: false
+                    });
+                    ptyResizeRequests[id] = request;
+                    request.always(function () {
+                        if (ptyResizeRequests[id] === request) {
+                            delete ptyResizeRequests[id];
+                        }
                     });
                 }
 
@@ -483,6 +506,9 @@
 
                 //if terminal window toggle active for commands
                 element.mousedown(function (e) {
+                    if ($(e.target).hasClass("ui-resizable-handle")) {
+                        return;
+                    }
                     //check for cmd-click / ctr-click
                     if (!e.ctrlKey && !e.metaKey) {
                         $(".run_cmd").removeClass('run_cmd_active');
@@ -506,21 +532,52 @@
                     }
                 });
 
-                //set resizable
-                element.find(".output").resizable({
-                    ghost: true,
+                // Resize the complete terminal card. Resizing only .output lets
+                // jQuery UI restore the parent grid item to its stretched width when
+                // the drag ends, which makes the terminal appear to snap back.
+                var output = element.find(".output");
+                var terminalChromeHeight = element.outerHeight() - output.outerHeight();
+                element.resizable({
+                    ghost: false,
+                    handles: "e, s, se",
+                    minWidth: 320,
+                    minHeight: Math.max(180, terminalChromeHeight + 120),
+                    start: function () {
+                        element.addClass("term-resizing");
+                        terminalChromeHeight = element.outerHeight() - output.outerHeight();
+                    },
                     resize: function (event, ui) {
-                        // The output owns the resize handle, but the terminal chrome
-                        // must follow it. Otherwise xterm gets narrower while the card
-                        // remains stretched across the full grid column.
-                        element.css("width", ui.size.width + "px");
+                        output.outerHeight(Math.max(120, ui.size.height - terminalChromeHeight));
                     },
                     stop: function (event, ui) {
-                        element.css("width", ui.size.width + "px");
-                        $(this).css("width", "100%");
-                        resize($(this));
+                        output.outerHeight(Math.max(120, ui.size.height - terminalChromeHeight));
+                        element.css("height", "auto");
+                        element.removeClass("term-resizing");
+                        // Wait for the grid and xterm viewport to expose their final
+                        // dimensions, then fit xterm and send those exact rows/columns
+                        // to ChannelShell.setPtySize on the server.
+                        window.requestAnimationFrame(function () {
+                            resize(output);
+                        });
                     }
                 });
+
+                // jQuery UI normally infers the resize axis from mouseover. When
+                // moving quickly from the terminal into a handle, that axis can be
+                // stale (usually "s"), so a corner drag changes only the height.
+                // Capture the handle that was actually pressed before jQuery UI's
+                // bubbling mousedown handler starts the resize.
+                element.get(0).addEventListener("mousedown", function (event) {
+                    var handle = event.target.closest(".ui-resizable-handle");
+                    if (!handle) {
+                        return;
+                    }
+                    var axisMatch = handle.className.match(/ui-resizable-(se|sw|ne|nw|n|e|s|w)/);
+                    var instance = element.resizable("instance");
+                    if (axisMatch && instance) {
+                        instance.axis = axisMatch[1];
+                    }
+                }, true);
             }
 
             //returns div for newly created terminal element
@@ -658,6 +715,7 @@
             min-width: 0;
             margin: 0;
             float: none;
+            justify-self: start;
             box-sizing: border-box;
         }
         .live-term-container .output {

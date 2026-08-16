@@ -1590,6 +1590,35 @@ a:focus-visible {
     box-sizing: border-box;
 }
 
+/* Keep the resize hit areas inside the clipped terminal card. jQuery UI
+   normally places these outside the edge, leaving only a few draggable pixels. */
+.live-term-container .run_cmd > .ui-resizable-e {
+    right: 0;
+    width: 10px;
+    touch-action: none;
+}
+
+.live-term-container .run_cmd > .ui-resizable-s {
+    bottom: 0;
+    height: 10px;
+    touch-action: none;
+}
+
+.live-term-container .run_cmd > .ui-resizable-se {
+    right: 3px;
+    bottom: 3px;
+    width: 18px;
+    height: 18px;
+    border-right: 2px solid color-mix(in srgb, var(--terminal-fg, #e6edf3) 45%, transparent);
+    border-bottom: 2px solid color-mix(in srgb, var(--terminal-fg, #e6edf3) 45%, transparent);
+    border-radius: 0 0 4px;
+    touch-action: none;
+}
+
+.live-term-container .run_cmd.term-resizing {
+    user-select: none;
+}
+
 .audit-term-container .terminal {
     border: 1px solid rgba(148, 163, 184, .32);
     border-color: color-mix(in srgb, var(--terminal-fg, #e6edf3) 32%, var(--terminal-bg, #070a0e));
