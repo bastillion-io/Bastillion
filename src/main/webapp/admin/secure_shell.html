@@ -415,6 +415,15 @@
                     [/]
                     };
 
+                var terminalBackground = CUSTOM_THEME.background || '#070a0e';
+                var terminalForeground = CUSTOM_THEME.foreground || '#e6edf3';
+                var terminalCard = $("#run_cmd_" + id);
+                terminalCard.css({
+                    '--terminal-bg': terminalBackground,
+                    '--terminal-fg': terminalForeground
+                });
+                terminalCard.find('.term').css('background-color', terminalBackground);
+
                 termMap[id] = new Terminal({
                     fontSize: 14,
                     lineHeight: 1.2,
@@ -618,25 +627,33 @@
         .live-term-container {
             width: calc(100% - 32px);
             max-width: none;
+            min-width: 0;
             padding: 10px 0 32px;
             margin: 0 auto;
+            overflow-x: hidden;
         }
         .live-term-container .termwrapper {
             display: grid;
             width: 100%;
+            max-width: 100%;
+            min-width: 0;
             margin: 0;
+            box-sizing: border-box;
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 14px;
             align-items: start;
         }
         .live-term-container .run_cmd {
-            width: auto;
+            width: 100%;
+            max-width: 100%;
             min-width: 0;
             margin: 0;
             float: none;
+            box-sizing: border-box;
         }
         .live-term-container .output {
             width: auto;
+            max-width: 100%;
         }
         @media (max-width: 900px) {
             .live-term-container {

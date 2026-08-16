@@ -129,14 +129,18 @@
             .audit-term-container {
                 width: calc(100% - 32px);
                 max-width: none;
+                min-width: 0;
                 padding: 10px 0 32px;
                 margin: 0 auto;
+                overflow-x: hidden;
             }
             .audit-term-container .run_cmd {
-                width: auto;
+                width: 100%;
+                max-width: 100%;
                 min-width: 0;
                 margin: 0;
                 float: none;
+                box-sizing: border-box;
             }
             .term {
                 background-color: var(--terminal-bg);
@@ -144,7 +148,8 @@
             .terminal {
                 height: 320px;
                 padding: 14px 16px 18px;
-                overflow: auto;
+                overflow-x: hidden;
+                overflow-y: auto;
                 color: var(--terminal-fg);
                 background: var(--terminal-bg);
                 font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
@@ -156,6 +161,7 @@
                 padding: 0;
                 margin: 0;
                 white-space: pre-wrap;
+                overflow-wrap: anywhere;
                 word-wrap: break-word;
                 color: inherit;
                 font: inherit;
@@ -168,10 +174,21 @@
             .audit-term-container .termwrapper {
                 display: grid;
                 width: 100%;
+                max-width: 100%;
+                min-width: 0;
                 margin: 0;
+                box-sizing: border-box;
                 grid-template-columns: repeat(2, minmax(0, 1fr));
                 gap: 14px;
                 align-items: start;
+            }
+            .audit-term-container .term,
+            .audit-term-container .output,
+            .audit-term-container .terminal {
+                width: 100%;
+                max-width: 100%;
+                min-width: 0;
+                box-sizing: border-box;
             }
             @media (max-width: 900px) {
                 .audit-term-container {
