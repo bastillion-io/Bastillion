@@ -134,8 +134,9 @@ public class UserProfileDB {
                 }
 
                 if (profileId != null) {
-                    try (PreparedStatement stmt = con.prepareStatement("delete from user_map where profile_id=?")) {
+                    try (PreparedStatement stmt = con.prepareStatement("delete from user_map where profile_id=? and user_id=?")) {
                         stmt.setLong(1, profileId);
+                        stmt.setLong(2, userId);
                         stmt.execute();
                     }
 
@@ -177,8 +178,9 @@ public class UserProfileDB {
             }
 
             if (profileId != null) {
-                try (PreparedStatement stmt = con.prepareStatement("delete from user_map where profile_id=?")) {
+                try (PreparedStatement stmt = con.prepareStatement("delete from user_map where profile_id=? and user_id=?")) {
                     stmt.setLong(1, profileId);
+                    stmt.setLong(2, userId);
                     stmt.execute();
                 }
 
