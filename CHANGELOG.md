@@ -4,6 +4,20 @@ All notable changes to this project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [5.2.1]
+
+### Security
+
+- **High: SAML/LDAP login permanently deleted other users' SSH keys.** Profile-sync on every SAML/LDAP login ran an unscoped `DELETE FROM user_map WHERE profile_id=?`, wiping every other user's profile membership for that profile instead of just the logging-in user's. The subsequent `deleteUnassignedKeysByProfile()` cleanup then treated those users as unassigned and permanently deleted their registered SSH public keys, with no automatic recovery. Any authenticated SAML/LDAP login — even one with a low-privilege IdP role — could lock every other user (including admins) out of their assigned systems and destroy their keys. `UserProfileDB.assignProfilesToUser()` and `assignProfileToUser()` now scope both deletes to `profile_id=? and user_id=?`. Reported by @tonghuaroot (GHSA-577v-6px6-m424).
+
+### Dependencies
+
+- `com.github.mwiede:jsch` 2.28.6 → 2.28.7
+- `github/codeql-action` 4.37.7 → 4.37.9
+- `actions/setup-java` 5 → 6
+
+**Upgrade note:** Critical for any deployment using SAML or LDAP authentication — upgrade immediately. Profile assignments for affected users re-sync automatically on their next login, but deleted SSH keys do not come back on their own; a manager must manually re-register them.
+
 ## [5.2.0]
 
 ### Security
