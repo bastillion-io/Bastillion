@@ -1,122 +1,106 @@
 <!--/**
- *    Copyright (C) 2013 Loophole, LLC
- *
- *    Licensed under The Prosperity Public License 3.0.0
+ * Copyright (C) 2013 Loophole, LLC
+ * Licensed under The Prosperity Public License 3.0.0
  */-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" data-bs-theme="dark">
-
 <head>
-
     <meta th:replace="~{_res/inc/header}">
-
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        $(document).ready(function () {
-
-            //open add dialog
-            $("#assign_sys").button().click(function () {
-                $('#assignSystemsToProfile').submit();
-            });
-
-            //select all check boxes
-            $("#assignSystemsToProfile_systemSelectAll").click(function (e) {
-                e.stopImmediatePropagation();
-                if ($(this).is(':checked')) {
-                    $(".systemSelect").prop('checked', true);
-                } else {
-                    $(".systemSelect").prop('checked', false);
-                }
-            });
-
-            $(".sort,.sortAsc,.sortDesc").click(function () {
-                var id = $(this).attr('id')
-
-                var orderDirection = $('#viewProfileSystems_sortedSet_orderByDirection');
-                if (orderDirection.val() === 'asc') {
-                    orderDirection.val('desc');
-                } else {
-                    orderDirection.val('asc');
-                }
-
-                $('#viewProfileSystems_sortedSet_orderByField').val(id);
-                $("#viewProfileSystems").submit();
-
-            });
-
-            [# th:if= "${!#strings.isEmpty(sortedSet.orderByField)}"]
-                $('#' + [[${sortedSet.orderByField}]]).attr('class', [[${sortedSet.orderByDirection}]]);
-            [/]
-
-        });
-        /*]]>*/
-
-    </script>
-
     <title>Bastillion - Assign Systems to Profile</title>
+    <script>
+        $(function () {
+            var form = $('#assignSystemsToProfile');
+            var choices = form.find('input[name="systemSelectId"]');
+            var selectAll = $('#assignment-select-all');
+            function updateSelection() {
+                var selected = choices.filter(':checked').length;
+                selectAll.prop('checked', choices.length > 0 && selected === choices.length)
+                    .prop('indeterminate', selected > 0 && selected < choices.length);
+                $('#assignment-count').text(selected + ' of ' + choices.length + ' systems selected');
+            }
+            selectAll.on('change', function () {
+                choices.prop('checked', this.checked);
+                updateSelection();
+            });
+            choices.on('change', updateSelection);
+            // Sort in place so pending checkbox changes survive reordering.
+            $('.assignment-sort').on('click', function () {
+                var button = $(this);
+                var header = button.closest('th');
+                var descending = header.attr('aria-sort') === 'ascending';
+                var column = Number(button.attr('data-column'));
+                var rows = form.find('tbody tr').get();
+                rows.sort(function (a, b) {
+                    var result = a.cells[column].textContent.trim().localeCompare(
+                        b.cells[column].textContent.trim(), undefined, {numeric: true, sensitivity: 'base'});
+                    return descending ? -result : result;
+                });
+                form.find('th[aria-sort]').attr('aria-sort', 'none');
+                header.attr('aria-sort', descending ? 'descending' : 'ascending');
+                form.find('tbody').append(rows);
+            });
+            updateSelection();
+        });
+    </script>
 </head>
-
 <body>
 <div th:replace="~{_res/inc/navigation}"></div>
-<div class="container">
-    <form id="viewProfileSystems" th:action="@{/manage/viewProfileSystems.ktrl}"
-          method="get">
-        <input type="hidden" name="_csrf" th:value="${session._csrf}">
-        <input type="hidden" id="viewProfileSystems_sortedSet_orderByDirection"
-               name="sortedSet.orderByDirection" th:value="${sortedSet.orderByDirection}">
-        <input type="hidden" id="viewProfileSystems_sortedSet_orderByField" name="sortedSet.orderByField"
-               th:value="${sortedSet.orderByField}">
-        <input type="hidden" name="profile.id" th:value="${profile.id}">
-    </form>
-    <h3>Assign Systems to Profile</h3>
-    <p>Select the systems below to be assigned to the current profile.</p>
-    <h4
-            th:text="${profile.nm}"></h4>
-    <p class="small" th:text="${profile.desc}"></p>
-    <div class="scrollWrapper" th:if="${sortedSet.itemList != null && !sortedSet.itemList.empty}">
-        <form id="assignSystemsToProfile" th:action="@{/manage/assignSystemsToProfile.ktrl}"
-              method="post">
+<main class="container assignment-page table-page">
+    <a class="assignment-back" th:href="'viewProfiles.ktrl?_csrf=' + ${session._csrf}">← Profiles</a>
+    <div class="assignment-heading">
+        <h1>Assign systems</h1>
+        <p>Choose which systems belong to this profile.</p>
+    </div>
+    <section class="assignment-panel" aria-labelledby="profile-name">
+        <div class="assignment-profile">
+            <div>
+                <h2 id="profile-name" th:text="${profile.nm}"></h2>
+                <p th:if="${!#strings.isEmpty(profile.desc)}" th:text="${profile.desc}"></p>
+            </div>
+        </div>
+        <form id="assignSystemsToProfile" th:action="@{/manage/assignSystemsToProfile.ktrl}" method="post"
+              th:if="${sortedSet.itemList != null && !sortedSet.itemList.empty}">
             <input type="hidden" name="_csrf" th:value="${session._csrf}">
             <input type="hidden" name="profile.id" th:value="${profile.id}">
-        <table class="table-striped scrollableTable selectionTable">
-                <thead>
-                <tr>
-                    <th th:id="${@io.bastillion.manage.db.SystemDB@PROFILE_ID}" class="sort">
-                        <input type="checkbox" id="assignSystemsToProfile_systemSelectAll" name="systemSelectAll"
-                               class="systemSelect form-check-input" title="Select All">
-                    </th>
-                    <th th:id="${@io.bastillion.manage.db.SystemDB@SORT_BY_NAME}" class="sort">Display Name</th>
-                    <th th:id="${@io.bastillion.manage.db.SystemDB@SORT_BY_USER}"
-                        class="sort">User
-                    </th>
-                    <th th:id="${@io.bastillion.manage.db.SystemDB@SORT_BY_HOST}"
-                        class="sort">Host
-                    </th>
-                </tr>
-                </thead>
-                <tbody>
-                <template th:each="s : ${sortedSet.itemList}" th:remove="tag">
+            <div class="assignment-summary">
+                <span id="assignment-count" role="status" aria-live="polite"></span>
+            </div>
+            <div class="assignment-table-wrap">
+                <table class="assignment-table selectionTable">
+                    <caption class="visually-hidden">Systems available for this profile</caption>
+                    <colgroup><col class="assignment-check-column"><col><col><col></colgroup>
+                    <thead>
                     <tr>
-                        <td>
-                            <input type="checkbox" th:id="'systemSelectId_'+ ${s.id}" name="systemSelectId"
-                                   class="systemSelect form-check-input" th:value="${s.id}" th:checked="${s.checked}">
-                        </td>
-                        <td th:text="${s.displayNm}"></td>
-                        <td th:text="${s.user}"></td>
-                        <td th:text="${s.host}"></td>
+                        <th scope="col"><input type="checkbox" id="assignment-select-all" class="form-check-input" aria-label="Select all systems"></th>
+                        <th scope="col" aria-sort="none"><button class="assignment-sort" type="button" data-column="1">System name <span aria-hidden="true">↕</span></button></th>
+                        <th scope="col" aria-sort="none"><button class="assignment-sort" type="button" data-column="2">SSH user <span aria-hidden="true">↕</span></button></th>
+                        <th scope="col" aria-sort="none"><button class="assignment-sort" type="button" data-column="3">Host / port <span aria-hidden="true">↕</span></button></th>
                     </tr>
-                </template>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                    <tr th:each="s : ${sortedSet.itemList}">
+                        <td><input type="checkbox" th:id="'systemSelectId_' + ${s.id}" name="systemSelectId"
+                                   class="form-check-input" th:value="${s.id}" th:checked="${s.checked}" th:aria-label="'Select ' + ${s.displayNm}"></td>
+                        <td><label th:for="'systemSelectId_' + ${s.id}" th:text="${s.displayNm}"></label></td>
+                        <td><code th:text="${s.user}"></code></td>
+                        <td><code th:text="${s.host} + ':' + ${s.port}"></code></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="assignment-footer">
+                <span>Unchecked systems will be removed from this profile.</span>
+                <div>
+                    <a class="btn btn-outline-secondary" th:href="'viewProfiles.ktrl?_csrf=' + ${session._csrf}">Cancel</a>
+                    <button type="submit" id="assign_sys" class="btn btn-secondary">Save assignments</button>
+                </div>
+            </div>
         </form>
-    </div>
-    <div id="assign_sys" th:if="${sortedSet.itemList != null && !sortedSet.itemList.empty}"
-         class="btn btn-secondary assign_sys_btn spacer spacer-bottom">Assign
-    </div>
-    <div class="error" th:if="${sortedSet.itemList == null || sortedSet.itemList.empty}">There are no systems defined
-        (<a th:href="'viewSystems.ktrl?_csrf=' + ${session._csrf}">Manage Systems</a>).
-    </div>
-</div>
+        <div class="empty-state" th:if="${sortedSet.itemList == null || sortedSet.itemList.empty}">
+            <strong>No systems available</strong>
+            <span><a th:href="'viewSystems.ktrl?_csrf=' + ${session._csrf}">Add a system</a> before assigning access to this profile.</span>
+        </div>
+    </section>
+</main>
 </body>
-
 </html>

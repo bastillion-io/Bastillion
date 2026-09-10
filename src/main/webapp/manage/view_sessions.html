@@ -57,9 +57,9 @@
 
 <body>
 <div th:replace="~{_res/inc/navigation}"></div>
-<div class="container">
+<div class="container table-page table-page-wide">
     <h3>Audit Sessions</h3>
-    Audit sessions below
+    <p>Review recorded terminal activity by user and date.</p>
     <table>
         <tr>
             <td class="align_left">
@@ -138,7 +138,7 @@
             </tbody>
         </table>
     </div>
-    <p class="error" th:if="${sortedSet.itemList == null || sortedSet.itemList.empty}">No session audits available</p>
+    <p class="empty-state" th:if="${sortedSet.itemList == null || sortedSet.itemList.empty}"><strong>No sessions to show</strong><span>Recorded SSH sessions appear here. If filters are applied, try a different user or system.</span></p>
 </div>
 </body>
 

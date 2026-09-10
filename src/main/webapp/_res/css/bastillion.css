@@ -834,7 +834,7 @@ table.floatThead-table {
     --bastillion-border: rgba(255, 255, 255, .09);
     --bastillion-border-strong: rgba(255, 255, 255, .15);
     --bastillion-text: #f3f6f8;
-    --bastillion-muted: #98a4b3;
+    --bastillion-muted: #aab5c2;
     --bastillion-accent: #4ade80;
     --bastillion-accent-hover: #6ee79a;
     --bastillion-accent-deep: #22a447;
@@ -1101,12 +1101,16 @@ code, pre {
 }
 
 .login-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     min-height: calc(100vh - 96px) !important;
     padding-top: 12px;
     padding-bottom: 64px;
 }
 
 .login-card {
+    width: 100%;
     max-width: 430px !important;
     overflow: hidden;
     box-shadow: 0 28px 80px rgba(0, 0, 0, .48), 0 0 0 1px rgba(74, 222, 128, .04);
@@ -1366,8 +1370,8 @@ table {
     background: #19222c;
     border-bottom: 1px solid #3b4857;
     font-size: .75rem;
-    font-weight: 750;
-    letter-spacing: .045em;
+    font-weight: 650;
+    letter-spacing: .025em;
     text-transform: uppercase;
 }
 
@@ -1682,7 +1686,7 @@ a:focus-visible {
     --bastillion-border: rgba(20, 43, 31, .12);
     --bastillion-border-strong: rgba(20, 43, 31, .22);
     --bastillion-text: #17231c;
-    --bastillion-muted: #647269;
+    --bastillion-muted: #53635a;
     --bastillion-accent: #16833b;
     --bastillion-accent-hover: #116f31;
     --bastillion-accent-deep: #16833b;
@@ -1825,7 +1829,7 @@ a:focus-visible {
 [data-bs-theme="light"] .table-striped th,
 [data-bs-theme="light"] .tablescroll_head th,
 [data-bs-theme="light"] .scrollableTable th {
-    color: #26372d;
+    color: #203027;
     background: #e7eee9;
     border-bottom-color: #bcc9c0;
 }
@@ -1833,7 +1837,7 @@ a:focus-visible {
 [data-bs-theme="light"] .table-striped td,
 [data-bs-theme="light"] .tablescroll_body td,
 [data-bs-theme="light"] .scrollableTable td {
-    color: #26372d;
+    color: #203027;
     border-bottom-color: #d5ddd7;
 }
 
@@ -2085,4 +2089,206 @@ a:focus-visible {
         scroll-behavior: auto !important;
         transition-duration: .01ms !important;
     }
+}
+
+/* Landing surfaces share the application palette in both color themes. */
+.workspace { padding-bottom: 48px; }
+.workspace-hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 12px 0 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--bastillion-border);
+}
+.workspace-intro h1 {
+    margin: 8px 0;
+    font-size: 2.25rem;
+    font-weight: 750;
+    letter-spacing: -.045em;
+    line-height: 1.15;
+}
+.workspace-intro p {
+    margin: 0;
+    color: var(--bastillion-muted);
+    font-size: .95rem;
+}
+.workspace-launch { flex-shrink: 0; padding: 11px 18px; }
+.workspace-launch span { margin-left: 22px; }
+.workspace-icon svg { width: 22px; height: 22px; }
+.navbar .nav-link.active {
+    color: var(--bastillion-accent);
+    background: color-mix(in srgb, var(--bastillion-accent) 10%, transparent);
+    border-radius: 7px;
+    box-shadow: inset 0 -2px var(--bastillion-accent);
+}
+.navbar .dropdown-item.active {
+    color: var(--bastillion-text);
+    background: color-mix(in srgb, var(--bastillion-accent) 15%, var(--bastillion-surface));
+}
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin: 20px 0;
+    padding: 26px 28px;
+    border: 1px dashed var(--bastillion-border-strong);
+    border-radius: 12px;
+    background: var(--bastillion-surface);
+    color: var(--bastillion-muted);
+    font-size: .9rem;
+}
+.empty-state strong { color: var(--bastillion-text); font-size: 1rem; }
+.workspace .featurette { margin: 0; }
+.workspace .list-group { padding: 0; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.workspace .list-group-item { padding: 18px; }
+.workspace .list-group-item > div { align-items: center; gap: 12px; margin-bottom: 10px; }
+.workspace .list-group-item h3 { flex: 1; margin: 0 !important; color: var(--bastillion-text); font-size: 1rem; letter-spacing: -.02em; }
+.workspace .list-group-item p { margin: 0 !important; font-size: .85rem; }
+.workspace-icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 38px;
+    height: 38px;
+    color: var(--bastillion-accent);
+    background: color-mix(in srgb, var(--bastillion-accent) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--bastillion-accent) 22%, transparent);
+    border-radius: 10px;
+    font: 1.3rem ui-monospace, monospace;
+}
+@media (max-width: 1050px) {
+    .workspace .list-group { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 767px) {
+    .workspace-hero { flex-wrap: wrap; padding: 16px 0 24px; }
+}
+@media (max-width: 520px) {
+    .workspace .list-group { grid-template-columns: 1fr; }
+}
+
+/* Give shell scripts room without inserting line breaks into saved commands. */
+.script-dialog { --bs-modal-width: 860px; }
+.script-dialog textarea { font: .9rem/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; tab-size: 4; min-height: 320px; }
+.script-dialog td { vertical-align: top; }
+.script-dialog td:first-child { padding-top: 14px; }
+
+.assignment-page { padding-bottom: 40px; }
+.assignment-back { display: inline-block; margin: 4px 0 22px; color: var(--bastillion-muted); font-size: .85rem; text-decoration: none !important; }
+.assignment-heading h1 { margin: 8px 0; font-size: 2rem; letter-spacing: -.04em; }
+.assignment-heading p { color: var(--bastillion-muted); margin-bottom: 26px; }
+.assignment-panel { border: 1px solid var(--bastillion-border-strong); border-radius: 14px; overflow: hidden; background: var(--bastillion-surface); }
+.assignment-profile { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 24px; border-bottom: 1px solid var(--bastillion-border); }
+.assignment-profile h2 { font-size: 1.15rem; margin: 0 0 6px; }
+.assignment-profile p { margin: 0; color: var(--bastillion-muted); font-size: .9rem; }
+.assignment-summary { display: flex; justify-content: space-between; gap: 16px; padding: 16px 24px; color: var(--bastillion-muted); font-size: .8rem; }
+#assignment-count { color: var(--bastillion-text); font-weight: 650; }
+.assignment-table-wrap { overflow: auto; }
+.assignment-table { width: 100%; min-width: 620px; table-layout: fixed; margin: 0; }
+.assignment-check-column { width: 60px; }
+.assignment-table th, .assignment-table td { padding: 16px 20px; text-align: left; vertical-align: middle; border-bottom: 1px solid var(--bastillion-border); }
+.assignment-table th { background: var(--bastillion-surface-raised); padding-block: 10px; }
+.assignment-table th:first-child, .assignment-table td:first-child { padding-left: 24px; padding-right: 10px; }
+.assignment-table label { display: block; margin: 0; font-weight: 600; cursor: pointer; overflow-wrap: anywhere; }
+.assignment-table code { color: var(--bastillion-muted); font-size: .85rem; overflow-wrap: anywhere; }
+.assignment-table tbody tr:hover { background: color-mix(in srgb, var(--bastillion-accent) 4%, transparent); }
+.assignment-table tbody tr:has(input:checked) { background: color-mix(in srgb, var(--bastillion-accent) 7%, transparent); }
+.assignment-table tbody tr:has(input:checked) td:first-child { box-shadow: inset 3px 0 var(--bastillion-accent); }
+.assignment-sort { display: flex; align-items: center; gap: 12px; padding: 6px 0; background: none; border: 0; color: var(--bastillion-muted); font-size: .75rem; font-weight: 650; }
+.assignment-sort span { opacity: .6; }
+.assignment-sort:hover, th[aria-sort="ascending"] .assignment-sort, th[aria-sort="descending"] .assignment-sort { color: var(--bastillion-accent); }
+.assignment-footer { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 20px 24px; }
+.assignment-footer > span { font-size: .8rem; color: var(--bastillion-muted); }
+.assignment-footer > div { display: flex; gap: 10px; flex-shrink: 0; }
+.assignment-footer .btn { text-decoration: none; }
+@media (max-width: 767px) { .assignment-footer { flex-wrap: wrap; } }
+/* Local icons remain visible when the security policy blocks data-URL images. */
+.form-check-input[type="checkbox"]:not([role="switch"]):checked { background-image: url('../../../img/checkbox-check.svg'); background-size: 100% 100%; }
+.form-check-input[type="checkbox"]:not([role="switch"]):indeterminate { background-image: url('../../../img/checkbox-mixed.svg'); background-size: 100% 100%; }
+.script-dialog .modal-body .row { width: 100%; margin: 0; }
+.script-dialog table { width: 100%; table-layout: fixed; }
+.script-dialog td:first-child { width: 120px; }
+.script-dialog textarea, .script-dialog input.form-control { width: 100%; }
+
+.assignment-table td { overflow-wrap: anywhere; }
+.assignment-panel > .empty-state { margin: 24px; }
+
+/* Selected live terminals are command targets, in either app theme. */
+.live-term-container .run_cmd_active {
+    border-color: #22c55e;
+    box-shadow: 0 0 0 2px #22c55e, 0 10px 24px rgba(0, 0, 0, .2);
+}
+.live-term-container .run_cmd_active .term-header {
+    background: #14532d;
+    color: #fff;
+}
+[data-bs-theme="light"] .live-term-container .run_cmd_active {
+    border-color: #15803d;
+    box-shadow: 0 0 0 2px #15803d, 0 8px 20px rgba(20, 83, 45, .18);
+}
+[data-bs-theme="light"] .live-term-container .run_cmd_active .term-header {
+    background: #dcfce7;
+    color: #14532d;
+}
+
+/* Keep authenticator enrollment compact and consistent with account settings. */
+body > .container.otp-setup { max-width: 880px; }
+.otp-setup h1 { font-size: 1.65rem; margin-bottom: 10px; }
+.otp-setup > p { color: var(--bastillion-muted); margin-bottom: 24px; }
+.otp-panel { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 28px; padding: 28px; border: 1px solid var(--bastillion-border); border-radius: 12px; background: var(--bastillion-surface); }
+.otp-code { align-self: start; padding: 12px; background: #fff; border-radius: 8px; }
+.otp-code img { display: block; width: 100%; height: auto; }
+.otp-instructions h2 { font-size: 1.1rem; margin: 0 0 16px; }
+.otp-instructions ol { padding-left: 20px; font-size: .9rem; }
+.otp-instructions li { margin-bottom: 10px; }
+.otp-manual { font-size: .85rem; margin: 20px 0; }
+.otp-manual summary { cursor: pointer; color: var(--bastillion-accent); }
+.otp-manual code { display: block; padding-top: 12px; overflow-wrap: anywhere; user-select: all; }
+.otp-note { color: var(--bastillion-muted); font-size: .85rem; margin: 0; }
+.otp-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; padding-top: 20px; border-top: 1px solid var(--bastillion-border); }
+@media (max-width: 650px) { .otp-panel { grid-template-columns: minmax(0, 1fr); padding: 20px; } .otp-code { width: 230px; justify-self: center; } }
+
+/* Center table pages with room to scan, without spanning the entire desktop. */
+.scrollableTable {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    table-layout: auto;
+}
+.scrollableTable th,
+.scrollableTable td {
+    padding: 13px 22px;
+    text-align: left;
+}
+.scrollableTable th:last-child,
+.scrollableTable td:last-child { text-align: left; }
+.scrollableTable td:last-child > div { justify-content: flex-start; }
+.scrollableTable.selectionTable th:first-child,
+.scrollableTable.selectionTable td:first-child {
+    width: 44px;
+    padding-inline: 12px;
+    text-align: center;
+}
+.scrollWrapper { overflow-x: auto; }
+
+/* Apply the same compact layout to profile assignments and long key identifiers. */
+.assignment-panel { width: 100%; max-width: 100%; }
+.assignment-table { width: 100%; min-width: 0; table-layout: auto; }
+.assignment-table th, .assignment-table td { padding: 13px 22px; }
+.assignment-check-column { width: 44px; }
+.assignment-table th:first-child, .assignment-table td:first-child { padding-inline: 12px; }
+.assignment-table .assignment-sort { white-space: nowrap; }
+.scrollableTable .key-fingerprint { font: .8rem/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; overflow-wrap: anywhere; max-width: 30rem; }
+.scrollableTable th { white-space: nowrap; }
+.scrollableTable td .btn { padding: 6px 12px; }
+
+body > .container.table-page {
+    width: calc(100% - 64px);
+    max-width: 1080px;
+    margin-inline: auto;
+}
+.table-page .scrollableTable td:last-child:has(.btn) { width: 1%; }
+body > .container.table-page-wide { max-width: 1240px; }
+@media (max-width: 767px) {
+    body > .container.table-page { width: calc(100% - 32px); }
 }

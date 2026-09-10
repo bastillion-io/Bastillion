@@ -256,7 +256,7 @@
     </div>
 </div>
 <div class="container" th:if="${sessionAudit == null || sessionAudit.hostSystemList.empty}">
-    <div class="error">No terms are associated with this session (<a th:href="'../manage/viewSessions.ktrl?_csrf=' + ${session._csrf}">Audit Sessions</a>).</div>
+    <div class="error">No terminals were recorded for this session (<a th:href="'../manage/viewSessions.ktrl?_csrf=' + ${session._csrf}">Audit Sessions</a>).</div>
 </div>
 </body>
 

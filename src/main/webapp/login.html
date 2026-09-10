@@ -9,19 +9,7 @@
 <head>
     <meta th:replace="~{_res/inc/header}">
     <title>Bastillion - Login</title>
-    <style>
-        .login-wrap {
-            min-height: calc(100vh - 75px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
 
-        .login-card {
-            width: 100%;
-            max-width: 380px;
-        }
-    </style>
 </head>
 
 <body>
@@ -35,11 +23,10 @@
         <!--/.nav-collapse -->
     </div>
 </div>
-<div class="container login-wrap">
+<main class="container login-wrap">
     <div class="card login-card">
         <div class="card-body">
             <div class="login-heading">
-                <span class="eyebrow">Secure access gateway</span>
                 <h1>Welcome back</h1>
                 <p>Sign in to manage systems and SSH sessions.</p>
             </div>
@@ -47,21 +34,22 @@
             <form id="loginSubmit" th:action="@{/loginSubmit.ktrl}" method="post"
                   autocomplete="off">
                 <div class="mb-3">
-                    <label class="form-label">Username</label>
-                    <input type="text" name="auth.username" class="form-control" title="Username">
+                    <label class="form-label" for="login-username">Username</label>
+                    <input type="text" id="login-username" name="auth.username" autocomplete="username" autocapitalize="none" spellcheck="false" class="form-control" title="Username">
                     <span class="error" th:text="${fieldErrors.get('auth.username')}"></span>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Password</label>
-                    <input type="password" name="auth.password" class="form-control" title="Password">
+                    <label class="form-label" for="login-password">Password</label>
+                    <input type="password" id="login-password" name="auth.password" autocomplete="current-password" class="form-control" title="Password">
                     <span class="error" th:text="${fieldErrors.get('auth.password')}"></span>
                 </div>
                 <div class="mb-3" th:if="${otpEnabled}">
-                    <label class="form-label">OTP Access Code</label>
-                    <input type="text" name="auth.otpToken" class="form-control" title="OTP Access Code">
+                    <label class="form-label" for="login-otpToken">OTP Access Code</label>
+                    <input type="text" id="login-otpToken" name="auth.otpToken" autocomplete="one-time-code" inputmode="numeric" aria-describedby="otp-help" class="form-control" title="OTP Access Code">
+                    <div id="otp-help" class="form-text">Enter your authenticator code if two-factor authentication is set up.</div>
                     <span class="error" th:text="${fieldErrors.get('auth.otpToken')}"></span>
                 </div>
-                <div id="login_btn" class="btn btn-secondary submit_btn w-100">Sign in</div>
+                <button type="submit" id="login_btn" class="btn btn-secondary w-100">Sign in <span aria-hidden="true">↗</span></button>
                 <input type="hidden" name="_csrf" th:value="${session._csrf}">
             </form>
             <template th:if="${samlEnabled}" th:remove="tag">
@@ -71,7 +59,7 @@
             </template>
         </div>
     </div>
-</div>
+</main>
 </body>
 
 </html>

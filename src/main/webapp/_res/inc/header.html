@@ -67,28 +67,27 @@
 
             $.ajaxSetup({cache: false});
 
+            // Keep parent sections active on assignment and edit screens too.
+            var navigationPath = window.location.pathname;
+            if (/^\/manage\/.*Profile(Systems|Users)/.test(navigationPath)) navigationPath = '/manage/viewProfiles.ktrl';
+            // Match the path without the rotating CSRF query parameter.
+            $('.navbar a[href]').each(function () {
+                if (this.getAttribute('href') === '#' || this.pathname !== navigationPath) return;
+                if ($(this).hasClass('navbar-brand')) return;
+                $(this).addClass('active').attr('aria-current', 'page');
+                $(this).closest('.dropdown').children('.nav-link').addClass('active');
+            });
+
             $(function () {
                 // Several legacy templates use non-button elements for actions. Give those
                 // controls button semantics and complete keyboard support while the markup
                 // is gradually simplified.
-                $('.btn').filter('div, span').attr('role', 'button');
-
-                var tabindex = 1;
-                $('input,textarea,select,.btn').each(function () {
-                    if (this.type !== "hidden") {
-                        var $input = $(this);
-                        $input.attr("tabindex", tabindex);
-                        tabindex++;
-                    }
-                });
-
-                $(".btn").on('keydown', function (event) {
-                    if (event.key === ' ') {
-                        event.preventDefault();
-                    }
-                }).on('keyup', function (event) {
-                    if (event.key === 'Enter' || event.key === ' ') {
-                        event.preventDefault();
+                var legacyButtons = $('.btn').filter('div, span');
+                legacyButtons.attr({'role': 'button', 'tabindex': '0'});
+                legacyButtons.on('keydown', function (event) {
+                    if (event.key !== 'Enter' && event.key !== ' ') return;
+                    event.preventDefault();
+                    if (!event.repeat && !$(this).is('.disabled, [aria-disabled="true"]')) {
                         $(this).click();
                     }
                 });
@@ -121,7 +120,7 @@
             $(':input:enabled:visible:first').focus();
 
             $('.modal').on('shown.bs.modal', function () {
-                $('input:enabled:visible:first').focus();
+                $(this).find('input:enabled:visible:first').focus();
             });
 
             // Prevent duplicate submissions without changing every button on the page.

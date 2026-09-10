@@ -8,6 +8,7 @@
 
 <head>
     <meta th:replace="~{_res/inc/header}">
+    <script th:src="@{/_res/js/terminal-output.js}"></script>
     <script th:inline="javascript">
         /*<![CDATA[*/
 
@@ -72,15 +73,22 @@
                         cache: false
                     });
                     $('#run_cmd_' + id).remove();
-                    termMap[id].dispose();
+                    if (termMap[id]) termMap[id].dispose();
                     delete termMap[id];
+                    delete fitMap[id];
+                    delete outputFilters[id];
                 }
-
+                updateTerminalSelection();
+                resetSize();
+                focusSelectedTerminal();
             });
 
             //select all
-            $('#select_all').click(function () {
+            $('#select_all').click(function (event) {
+                event.preventDefault();
                 $(".run_cmd").addClass('run_cmd_active');
+                updateTerminalSelection();
+                focusSelectedTerminal();
             });
 
 
@@ -125,20 +133,7 @@
 
             [# th:if= "${pendingSystemStatus == null || pendingSystemStatus.id == null}"]
 
-            $('#dummy').focus();
-            var keys = {};
 
-            //non-printable/navigation keys that should never be sent as a typed character
-            //27-ESC 37-LEFT 38-UP 39-RIGHT 40-DOWN 13-ENTER 8-BS 9-TAB 46-DEL 45-INSERT 33-PGUP 34-PGDN 35-END 36-HOME
-            var NAV_KEY_CODES = [27, 37, 38, 39, 40, 13, 8, 9, 46, 45, 33, 34, 35, 36];
-            //unix ctrl-shortcuts (s,q,t,\,z,h,w,u,r,d) the browser should not handle itself
-            var CTRL_INTERCEPT_KEY_CODES = [83, 81, 84, 220, 90, 72, 87, 85, 82, 68];
-
-            function isNavKeyDown() {
-                return NAV_KEY_CODES.some(function (code) {
-                    return keys[code];
-                });
-            }
 
             function getSelectedTerminalText() {
                 if (selectionTermId && termMap[selectionTermId]
@@ -167,78 +162,23 @@
                 return true;
             }
 
-            function isFormEntryTarget(target) {
-                var entry = $(target);
-                if (entry.is('#dummy')) {
-                    return false;
-                }
-                return entry.is('input, textarea, select, [contenteditable="true"]');
+
+            function updateTerminalSelection() {
+                var count = getActiveTermsInstanceIds().length;
+                $('#terminal-selection').text(count + ' of ' + $('.run_cmd').length + ' selected');
+                $('#terminal-empty').prop('hidden', $('.run_cmd').length !== 0);
+                $('#dup_session, #disconnect, #upload_push').toggleClass('disabled', count === 0)
+                    .attr('aria-disabled', String(count === 0));
             }
 
-            var termFocus = true;
-            $(document).keypress(function (e) {
-                if (termFocus) {
-                    var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
-
-                    if (String.fromCharCode(keyCode) && String.fromCharCode(keyCode) !== ''
-                        && (!e.ctrlKey || e.altKey) && !e.metaKey && !isNavKeyDown()) {
-                        var cmdStr = String.fromCharCode(keyCode);
-                        sendToActiveTerminals({command: cmdStr});
-                    }
-
-                }
-            });
-            //function for command keys (ie ESC, CTRL, etc..)
-            $(document).keydown(function (e) {
-                if (termFocus) {
-                    var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
-                    keys[keyCode] = true;
-
-                    var copyShortcut = !e.altKey && keyCode === 67 && (e.ctrlKey || e.metaKey);
-                    if (copyShortcut && getSelectedTerminalText()) {
-                        // Let the copy event put xterm's selection on the clipboard.
-                        return;
-                    }
-
-                    if (e.ctrlKey && !e.altKey && !e.metaKey && keyCode === 67) {
-                        // No selection: Ctrl+C remains the terminal interrupt character.
-                        sendToActiveTerminals({keyCode: keyCode});
-                        e.preventDefault();
-                        e.stopImmediatePropagation();
-                        return;
-                    }
-
-                    if ((e.ctrlKey && !e.altKey) || NAV_KEY_CODES.indexOf(keyCode) !== -1) {
-                        sendToActiveTerminals({keyCode: keyCode});
-                    }
-
-                    //prevent default for unix ctrl commands
-                    if (e.ctrlKey && CTRL_INTERCEPT_KEY_CODES.indexOf(keyCode) !== -1) {
-                        e.preventDefault();
-                        e.stopImmediatePropagation();
-                    }
-
-                }
-
-            });
-
-            $(document).keyup(function (e) {
-                var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
-                delete keys[keyCode];
-                if (termFocus) {
-                    $('#dummy').focus();
-                }
-            });
-
-            $(document).click(function (e) {
-                if (termFocus && !$('body').hasClass('modal-open')
-                    && !$(e.target).closest('.xterm').length) {
-                    $('#dummy').focus();
-                }
-            });
-
+            function focusSelectedTerminal() {
+                var ids = getActiveTermsInstanceIds();
+                var id = ids.indexOf(focusedTermId) !== -1 ? focusedTermId : ids[0];
+                if (id && termMap[id]) termMap[id].focus();
+            }
 
             $(document).on('copy', function (e) {
+                if ($('body').hasClass('modal-open') || !$(e.target).closest('.xterm').length) return;
                 var selectedText = getSelectedTerminalText();
                 var clipboard = e.originalEvent && e.originalEvent.clipboardData;
                 if (!selectedText || !clipboard) {
@@ -251,24 +191,6 @@
                     termMap[selectionTermId].clearSelection();
                 }
                 selectionTermId = null;
-                termFocus = true;
-            });
-
-            $(document).on('paste', function (e) {
-                if ($('body').hasClass('modal-open') || isFormEntryTarget(e.target)
-                    || $(e.target).closest('.xterm').length) {
-                    return;
-                }
-
-                var clipboard = e.originalEvent && e.originalEvent.clipboardData;
-                var pastedText = clipboard ? clipboard.getData('text/plain') : '';
-                if (!pastedText || !sendToActiveTerminals({command: pastedText})) {
-                    return;
-                }
-
-                e.preventDefault();
-                termFocus = true;
-                $('#dummy').focus();
             });
 
             var termMap = {};
@@ -277,21 +199,17 @@
             var selectionTermId = null;
             var focusedTermId = null;
 
-            // zsh can emit its default standout PROMPT_EOL_MARK on any line that
-            // doesn't end in a newline, not just the very first paint - a duplicated
-            // or newly-connected terminal's first WebSocket message often only
-            // contains a partial prefix of the shell's startup output (this poller's
-            // 25ms cycle can catch the channel mid-stream), so the marked line can
-            // just as easily arrive in a later message as in the first one. Matching
-            // it here, shared by both write paths below, means either can strip it.
-            var zshEolMark = /\x1b\[1m\x1b\[7m%\x1b\[27m(?:\x1b\[1m)?\x1b\[0m(?= +\r)/;
-
+            var outputFilters = {};
 
             $("#reset_size").click(function () {
                 resetSize();
             });
 
             function resetSize() {
+                var wrapper = document.querySelector('.live-term-container .termwrapper');
+                if (!wrapper || !$('.run_cmd').length) return;
+                // Match the audit terminal height; extra rows scroll with the page.
+                var outputHeight = 320;
                 var ids = [];
                 $(".run_cmd").each(function () {
                     ids.push($(this).attr("id").replace("run_cmd_", ""));
@@ -303,7 +221,7 @@
                         "height": "auto"
                     });
                     output.css("width", "100%");
-                    output.height(346 + y_offset);
+                    output.height(outputHeight);
                     resize(output);
                 }
             }
@@ -384,11 +302,16 @@
             // Register websocket heartbeat
             connection.onopen = function (e) {
                 heartbeat();
+                $("#terminal-connection").text("Connected");
             };
 
             // Log errors
             connection.onerror = function (error) {
-                console.log('WebSocket Error ' + error);
+                $('#terminal-connection').text('Connection error — exit and reconnect').addClass('error');
+            };
+
+            connection.onclose = function () {
+                $('#terminal-connection').text('Disconnected — exit and reconnect').addClass('error');
             };
 
             // Log messages from the server
@@ -396,11 +319,14 @@
                 var json = JSON.parse(e.data);
                 $.each(json, function (key, val) {
                     if (val.output != '') {
+                        if (!outputFilters[val.instanceId]) outputFilters[val.instanceId] = createBastillionOutputFilter();
+                        val.output = outputFilters[val.instanceId](val.output);
+                        if (!val.output) return;
                         if (!termMap[val.instanceId]) {
                             createTermMap(val.instanceId, val.output);
                             resetSize();
                         } else {
-                            termMap[val.instanceId].write(val.output.replace(zshEolMark, ''));
+                            termMap[val.instanceId].write(val.output);
                         }
                     }
 
@@ -466,7 +392,16 @@
                 termMap[id].attachCustomKeyEventHandler(function (event) {
                     var copyShortcut = event.type === 'keydown' && !event.altKey
                         && (event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'c';
-                    return !(copyShortcut && termMap[id].hasSelection());
+                    if (copyShortcut && termMap[id].hasSelection()) return false;
+                    // Preserve the legacy multiplex interrupt explicitly; copy with a
+                    // selection still belongs to the clipboard, never the remote shell.
+                    if (event.type === 'keydown' && event.ctrlKey && !event.altKey && !event.metaKey
+                        && event.key.toLowerCase() === 'c') {
+                        event.preventDefault();
+                        sendToActiveTerminals({keyCode: 67});
+                        return false;
+                    }
+                    return true;
                 });
                 termMap[id].onData(function (data) {
                     sendToActiveTerminals({command: data});
@@ -477,12 +412,11 @@
                 termMap[id].onSelectionChange(function () {
                     if (termMap[id].hasSelection()) {
                         selectionTermId = String(id);
-                        termFocus = false;
                     }
                 });
 
                 var blinkingBlockCursor = '\x1b[1 q';
-                termMap[id].write(output.replace(zshEolMark, '') + blinkingBlockCursor, function () {
+                termMap[id].write(output + blinkingBlockCursor, function () {
                     // xterm does not initialize its cursor until the first focus or key
                     // event. Prime it after the prompt is parsed. Keep the first pane
                     // focused and restore the user's current pane as others initialize.
@@ -519,16 +453,17 @@
                     } else {
                         element.addClass('run_cmd_active')
                     }
+                    updateTerminalSelection();
                 });
 
                 var id = element.attr("id").replace("run_cmd_", "");
+                element.find('.term-header').on('click', function () {
+                    focusSelectedTerminal();
+                });
                 element.find(".output").on('mouseup', function () {
                     var terminal = termMap[id];
                     if (terminal && terminal.hasSelection()) {
                         selectionTermId = id;
-                        termFocus = false;
-                    } else {
-                        termFocus = true;
                     }
                 });
 
@@ -614,6 +549,8 @@
                 insertFn($(createTermElement(newInstanceId, hostId, displayLabel)));
 
                 setTerminalEvents($("#run_cmd_" + newInstanceId));
+                updateTerminalSelection();
+                resetSize();
 
                 //call server to create instances. createSession.ktrl has no view, so its
                 //response body is empty - $.getJSON forces JSON parsing and rejects on that
@@ -681,7 +618,8 @@
                 setTerminalEvents($("#run_cmd_" + [[${s.instanceId}]]));
             [/]
 
-            var y_offset = $('.run_cmd:first').innerHeight() - $('.run_cmd').find(".output:first").innerHeight();
+            updateTerminalSelection();
+            resetSize();
             [/]
 
         });
@@ -690,6 +628,10 @@
     </script>
 
     <style>
+        .terminal-toolbar { display: flex; align-items: center; gap: 18px; padding: 0 2px 14px; color: var(--bastillion-muted); font-size: .8rem; }
+        #terminal-selection { color: var(--bastillion-accent); font-weight: 700; white-space: nowrap; }
+        #terminal-connection { margin-left: auto; }
+        .terminal-toolbar + [hidden] { display: none; }
         .live-term-container {
             width: calc(100% - 32px);
             max-width: none;
@@ -780,19 +722,18 @@
                                                 class="nav-link">Exit Terminals</a>
                         </li>
                     </ul>
-                    <div class="clear"></div>
-                    <div style="float:right;width:1px;height:1px;overflow:hidden">
-                        <textarea name="dummy" id="dummy" size="1"
-                                  style="border:none;color:#FFFFFF;width:1px;height:1px"></textarea>
-                        <input type="text" name="dummy2" id="dummy2" size="1"
-                               style="border:none;color:#FFFFFF;width:1px;height:1px">
-                    </div>
                 </template>
             </div>
             <!--/.nav-collapse -->
         </div>
     </div>
     <div class="term-container live-term-container container">
+        <div class="terminal-toolbar">
+            <span id="terminal-selection" role="status" aria-live="polite"></span>
+            <span>Ctrl/Cmd-click to select multiple.</span>
+            <span id="terminal-connection" role="status">Connecting…</span>
+        </div>
+        <div id="terminal-empty" class="empty-state" hidden><strong>No open terminals</strong><span>Use Terminal Actions → Connect to Host to start a session.</span></div>
         <div class="termwrapper"></div>
     </div>
 </template>

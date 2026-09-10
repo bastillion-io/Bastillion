@@ -22,79 +22,35 @@
         <!--/.nav-collapse -->
     </div>
 </div>
-<div class="container">
-    <h3>Setup Two-Factor Authentication</h3>
-    <div class="row featurette">
-        <div class="col-lg-7">
-            <div class="card">
-                <div class="card-body">
-                    <img th:src="'qrImage.ktrl?qrImage=' + ${qrImage} + '&amp;_csrf=' + ${session._csrf}"
-                         th:alt="${qrImage}">
-                </div>
-                <div class="card-footer">
-                    <label>Can't scan QR code?</label>&#xA0;&#xA0;<a href="#" onclick="$('#shared-secret').toggleClass('hidden');">Show
-
-                    secret</a>
-                    <span id="shared-secret" class="hidden"
-                          th:text="' - ' + ${sharedSecret}"></span>
-                </div>
-            </div>
+<main class="container otp-setup">
+    <h1>Set up two-factor authentication</h1>
+    <p>Scan this code with your authenticator app, then enable two-factor authentication.</p>
+    <section class="otp-panel" aria-label="Authenticator setup">
+        <div class="otp-code">
+            <img th:src="'qrImage.ktrl?qrImage=' + ${qrImage} + '&amp;_csrf=' + ${session._csrf}"
+                 alt="Authenticator setup QR code">
         </div>
-        <div class="col-lg-5">
-            <p>Scan the QR code using <a href="https://authy.com/" target="_blank">Authy</a>
-                or
-                <a
-                        href="https://github.com/google/google-authenticator" target="_blank">Google Authenticator</a> on your Android or iOS device to setup two-factor
-                authentication.</p>
-            <table class="table table-striped table-hover">
-                <thead>
-                <tr>
-                    <th>Authy</th>
-                    <th>Link</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>Android</td>
-                    <td><a href="https://play.google.com/store/apps/details?id=com.authy.authy"
-                           target="_blank">Google Play</a>
-                    </td>
-                </tr>
-                <tr>
-                    <td>iOS</td>
-                    <td><a href="https://itunes.apple.com/us/app/authy/id494168017" target="_blank">iTunes</a>
-                    </td>
-                </tr>
-                <tr>
-                    <th>Google Authenticator</th>
-                    <th>Link</th>
-                </tr>
-                <tr>
-                    <td>Android</td>
-                    <td><a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2"
-                           target="_blank">Google Play</a>
-                    </td>
-                </tr>
-                <tr>
-                    <td>iOS</td>
-                    <td><a href="https://itunes.apple.com/us/app/google-authenticator/id388497605"
-                           target="_blank">iTunes</a>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-            <div th:if="${!@io.bastillion.manage.control.OTPKtrl@requireOTP}">
-                <button th:onclick="window.location = 'menu.html?_csrf=' + [[${session._csrf}]]"
-                        class="btn btn-secondary btn-muted spacer spacer-left" style="float:left">Skip for Now</button>
-            </div>
-            <form th:action="@{/admin/otpSubmit.ktrl}" method="post">
-                <input type="hidden" name="_csrf" th:value="${session._csrf}">
-                <input type="hidden" name="sharedSecret" th:value="${sharedSecret}">
-                <input type="submit" class="btn btn-secondary spacer spacer-right" value="Got It!">
-            </form>
+        <div class="otp-instructions">
+            <h2>Connect your authenticator</h2>
+            <ol>
+                <li>Open your authenticator app and add an account.</li>
+                <li>Scan the QR code or enter the setup key.</li>
+                <li>Enable two-factor authentication below.</li>
+            </ol>
+            <details class="otp-manual">
+                <summary>Enter setup key manually</summary>
+                <code id="shared-secret" th:text="${sharedSecret}"></code>
+            </details>
+            <p class="otp-note">You will need a code from this app each time you sign in.</p>
         </div>
-    </div>
-</div>
+        <form class="otp-actions" th:action="@{/admin/otpSubmit.ktrl}" method="post">
+            <input type="hidden" name="_csrf" th:value="${session._csrf}">
+            <input type="hidden" name="sharedSecret" th:value="${sharedSecret}">
+            <a th:if="${!@io.bastillion.manage.control.OTPKtrl@requireOTP}"
+               th:href="'menu.html?_csrf=' + ${session._csrf}" class="btn btn-outline-secondary">Skip for now</a>
+            <button type="submit" class="btn btn-secondary">Enable two-factor authentication</button>
+        </form>
+    </section>
+</main>
 </body>
-
 </html>

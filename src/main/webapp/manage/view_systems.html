@@ -69,7 +69,7 @@
         /*<![CDATA[*/
         $(document).ready(function () {
             [# th:if= "${hostSystem.id > 0}"]
-                new bootstrap.Modal($('#edit_dialog_' + [[${hostSystem.id}]]).show();
+                new bootstrap.Modal($('#edit_dialog_' + [[${hostSystem.id}]])).show();
             [/]
 
             [# th:if= "${hostSystem.id <= 0}"]
@@ -85,7 +85,7 @@
 
 <body>
 <div th:replace="~{_res/inc/navigation}"></div>
-<div class="container">
+<div class="container table-page">
     <form id="viewSystems" th:action="@{/manage/viewSystems.ktrl}" method="get">
         <input type="hidden" name="_csrf" th:value="${session._csrf}">
         <input type="hidden" id="viewSystems_sortedSet_orderByDirection" name="sortedSet.orderByDirection"
@@ -93,7 +93,7 @@
         <input type="hidden" id="viewSystems_sortedSet_orderByField" name="sortedSet.orderByField"
                th:value="${sortedSet.orderByField}">
         <h3>Manage Systems</h3>
-        <p>Add / Delete systems below or distribute SSH keys</p>
+        <p>Manage connections and distribute SSH keys.</p>
         <div th:if="${profileList != null && !profileList.empty}">
             <table>
                 <tr>
@@ -173,7 +173,7 @@
             </tbody>
         </table>
     </div>
-    <p class="error" th:if="${sortedSet.itemList == null || sortedSet.itemList.empty}">No systems defined yet</p>
+    <p class="empty-state" th:if="${sortedSet.itemList == null || sortedSet.itemList.empty}"><strong>No systems to show</strong><span>Add a system to get started, or choose another profile if a filter is applied.</span></p>
     <button class="btn btn-secondary add_btn spacer spacer-bottom"  data-bs-toggle="modal"
             data-bs-target="#add_dialog">Add System
     </button>
@@ -248,7 +248,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary cancel_btn" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-secondary submit_btn">Submit</button>
+                    <button type="button" class="btn btn-secondary submit_btn">Save system</button>
                 </div>
             </div>
         </div>
@@ -326,7 +326,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary cancel_btn" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-secondary submit_btn">Submit</button>
+                        <button type="button" class="btn btn-secondary submit_btn">Save system</button>
                     </div>
                 </div>
             </div>
@@ -369,7 +369,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary cancel_btn" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-secondary submit_btn">Submit</button>
+                    <button type="button" class="btn btn-secondary submit_btn">Connect</button>
                 </div>
             </div>
         </div>
@@ -412,7 +412,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary cancel_btn" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-secondary submit_btn">Submit</button>
+                    <button type="button" class="btn btn-secondary submit_btn">Connect</button>
                 </div>
             </div>
         </div>

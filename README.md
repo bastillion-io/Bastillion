@@ -217,6 +217,20 @@ Or for local dev without repackaging on every change:
 mvn compile exec:java
 ```
 
+For an isolated local UI review, keep test data in a separate directory and generate the
+database password automatically on first startup:
+
+```bash
+CONFIG_DIR=/tmp/bastillion-ui-review/ TLS_ENABLED=false PORT=8080 \
+  mvn -DGEN_DB_PASS=true compile exec:java
+```
+
+Open `http://localhost:8080` and sign in with the default credentials above. This HTTP
+configuration is for local development. For deployment, use HTTPS as described below.
+HTML, CSS, and JavaScript are served from `target/classes/webapp`; after editing files
+under `src/main/webapp`, run `mvn resources:resources` and reload the browser to see changes. Templates are cached for up to 60 seconds;
+restart the development process to clear that cache immediately.
+
 Listens on `https://localhost:8443` by default, same as the downloaded release above — see
 [TLS / HTTPS](#tls--https) below for how that certificate gets set up and how to use your
 own instead.

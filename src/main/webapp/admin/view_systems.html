@@ -49,12 +49,12 @@
         });
         /*]]>*/
     </script>
-    <title>Bastillion - Manage Systems</title>
+    <title>Bastillion - Terminals</title>
 </head>
 
 <body>
 <div th:replace="~{_res/inc/navigation}"></div>
-<div class="container">
+<div class="container table-page">
     <template th:if="${script != null && script.id != null }" th:remove="tag">
         <h3>Execute Script on Systems</h3>
         <p>Run <b> <a data-bs-toggle="modal" data-bs-target="#script_dialog" th:text="${script.displayNm}"></a></b> on
@@ -79,7 +79,7 @@
     </template>
     <template th:if="${script == null || script.id == null}" th:remove="tag">
         <h3>Terminals</h3>
-        <p>Select the systems below to generate SSH sessions in multiple terminals</p>
+        <p>Choose systems to open in the terminal workspace.</p>
     </template>
     <form th:action="@{/admin/viewSystems.ktrl}" id="viewSystems" method="get">
         <input type="hidden" name="_csrf" th:value="${session._csrf}">

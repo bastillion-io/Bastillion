@@ -78,16 +78,14 @@
     </script>
 
 
-    <title>Bastillion - View / Disable SSH Keys</title>
+    <title>Bastillion - SSH Key Access</title>
 </head>
 
 <body>
 <div th:replace="~{_res/inc/navigation}"></div>
-<div class="container">
-    <h3>View / Disable SSH Keys</h3>
-    <p>Disabling will remove the public key from all host systems. Additional
-        SSH keys with the same fingerprint can no longer be set forcing users to
-        rotate keys.</p>
+<div class="container table-page table-page-wide">
+    <h3>SSH Key Access</h3>
+    <p>Disabling a key removes it from all systems and blocks reuse of its fingerprint. Users must add a new key to restore access.</p>
     <table>
         <tr>
             <td class="align_left">
@@ -101,7 +99,7 @@
                         <tr>
                             <td class="align_left"><a
                                     th:href="'../admin/viewKeys.ktrl?_csrf=' + ${session._csrf}"
-                                    class="btn btn-success">Add / Remove Keys</a>
+                                    class="btn btn-success">Manage My Keys</a>
                             </td>
                             <td>|</td>
                             <td th:if="${userList != null && !userList.empty}">
@@ -115,7 +113,7 @@
                             </td>
                             <td th:if="${profileList != null && !profileList.empty}">
                                 <select th:name="'sortedSet.filterMap[' + ${@io.bastillion.manage.db.PublicKeyDB@FILTER_BY_PROFILE_ID} + ']'"
-                                        title="Profile" class="form-select view_frm_select">
+                                        title="Key status" class="form-select view_frm_select">
                                     <option value="">- Select Profile -</option>
                                     <option th:each="p : ${profileList}" th:value="${p.id}"
                                             th:text="${p.nm}"
@@ -174,7 +172,7 @@
                         </div>
                     </td>
                     <td th:text="'[ ' + ${p.type} + ' ]'"></td>
-                    <td th:text="${p.fingerprint}"></td>
+                    <td class="key-fingerprint" th:text="${p.fingerprint}"></td>
                     <td th:text="${#dates.format(p.createDt, 'dd-MMM-yyyy')}"></td>
                     <td>
                         <div>
@@ -194,7 +192,7 @@
             </tbody>
         </table>
     </div>
-    <p class="error" th:if="${sortedSet.itemList == null || sortedSet.itemList.empty}">No SSH keys defined yet</p>
+    <p class="empty-state" th:if="${sortedSet.itemList == null || sortedSet.itemList.empty}"><strong>No SSH keys to show</strong><span>Add a public key to manage SSH access, or adjust the user and status filters.</span></p>
 </div>
 </body>
 

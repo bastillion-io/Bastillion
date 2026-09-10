@@ -10,7 +10,7 @@ package io.bastillion.manage.model;
  */
 public class Script {
     Long id;
-    String script = "#!/bin/bash\n\n";
+    String script = "";
     String displayNm;
 
     public Long getId() {

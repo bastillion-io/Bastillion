@@ -116,7 +116,7 @@
 
 <body>
 <div th:replace="~{_res/inc/navigation}"></div>
-<div class="container">
+<div class="container table-page table-page-wide">
     <form id="viewKeys" th:action="@{/admin/viewKeys.ktrl}" method="get">
         <input type="hidden" name="_csrf" th:value="${session._csrf}">
         <input type="hidden" id="viewKeys_sortedSet_orderByDirection" name="sortedSet.orderByDirection"
@@ -125,14 +125,14 @@
                th:value="${sortedSet.orderByField}">
     </form>
     <h3>Manage SSH Keys</h3>
-    <p>Add / Delete SSH keys for current user.</p>
+    <p>Manage your public keys and system access.</p>
     <template
             th:if="${#strings.equals(session.userType, 'M') || (profileList != null && !profileList.empty)}"
             th:remove="tag">
         <table th:if="${#strings.equals(session.userType, 'M')}">
             <tr>
                 <td class="align_left"><a th:href="'../manage/viewKeys.ktrl?_csrf=' + ${session._csrf}"
-                                          class="btn btn-danger">View / Disable SSH Keys</a>
+                                          class="btn btn-danger">Review Key Access</a>
                 </td>
             </tr>
         </table>
@@ -167,7 +167,7 @@
                         </div>
                     </td>
                     <td th:text="'[ ' + ${p.type} + ' ]'"></td>
-                    <td th:text="${p.fingerprint}"></td>
+                    <td class="key-fingerprint" th:text="${p.fingerprint}"></td>
                     <td th:text="${#dates.format(p.createDt, 'dd-MMM-yyyy')}"></td>
                     <td>
                         <div>
@@ -185,7 +185,7 @@
             </tbody>
         </table>
     </div>
-    <p class="error" th:if="${sortedSet.itemList == null || sortedSet.itemList.empty}">No additional SSH keys defined yet</p>
+    <p class="empty-state" th:if="${sortedSet.itemList == null || sortedSet.itemList.empty}"><strong>No additional SSH keys yet</strong><span>Add a public key for access through your assigned profiles.</span></p>
     <button class="btn btn-secondary add_btn spacer spacer-bottom" data-bs-toggle="modal"
             data-bs-target="#add_dialog">Add SSH Key
     </button>

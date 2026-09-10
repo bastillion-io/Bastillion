@@ -70,7 +70,7 @@
 
 <body>
 <div th:replace="~{_res/inc/navigation}"></div>
-<div class="container">
+<div class="container table-page">
     <form id="viewScripts" th:action="@{/admin/viewScripts.ktrl}" method="get">
         <input type="hidden" name="_csrf" th:value="${session._csrf}">
         <input type="hidden" id="viewScripts_sortedSet_orderByDirection" name="sortedSet.orderByDirection"
@@ -79,7 +79,7 @@
                th:value="${sortedSet.orderByField}">
     </form>
     <h3>Manage Scripts</h3>
-    <p>Add / Delete scripts or select a script below to execute</p>
+    <p>Create reusable commands to run across selected systems.</p>
     <div class="scrollWrapper"
          th:if="${sortedSet.itemList != null && !sortedSet.itemList.empty}">
         <table class="table-striped scrollableTable">
@@ -119,18 +119,19 @@
             </tbody>
         </table>
     </div>
-    <p class="error" th:if="${sortedSet.itemList == null || sortedSet.itemList.empty}">No scripts defined yet</p>
+    <p class="empty-state" th:if="${sortedSet.itemList == null || sortedSet.itemList.empty}"><strong>No saved scripts yet</strong><span>Create a script to reuse commands across your systems.</span></p>
     <button class="btn btn-secondary add_btn spacer spacer-bottom" data-bs-toggle="modal"
             data-bs-target="#add_dialog">Add Script
     </button>
     <div id="add_dialog" class="modal fade">
-        <div class="modal-dialog">
+        <div class="modal-dialog script-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Add Script</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <p class="text-muted small">Commands run in each system's current shell. Omit the shebang line.</p>
                     <div class="row">
                         <div th:replace="~{_res/inc/errors}"></div>
                         <form th:action="@{/admin/saveScript.ktrl}" method="post" class="save_script_form_add">
@@ -150,7 +151,7 @@
                                     </td>
                                     <td>
                                                 <textarea name="script.script" th:text="${script.script}" class="form-control" title="Script"
-                                                          rows="15" cols="35" wrap="hard"></textarea> <span
+                                                          rows="15" cols="35" wrap="off" spellcheck="false"></textarea> <span
                                             class="error"
                                             th:text="${fieldErrors.get('script.script')}"></span>
                                     </td>
@@ -164,20 +165,21 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary cancel_btn" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-secondary submit_btn">Submit</button>
+                    <button type="button" class="btn btn-secondary submit_btn">Save script</button>
                 </div>
             </div>
         </div>
     </div>
     <template th:each="s : ${sortedSet.itemList}" th:remove="tag">
         <div th:id="'edit_dialog_' + ${s.id}" class="modal fade">
-            <div class="modal-dialog">
+            <div class="modal-dialog script-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Edit Script</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+                    <p class="text-muted small">Commands run in each system's current shell. Omit the shebang line.</p>
                         <div class="row">
                             <div th:replace="~{_res/inc/errors}"></div>
                             <form th:action="@{/admin/saveScript.ktrl}" method="post"
@@ -200,7 +202,7 @@
                                         <td>
                                                     <textarea name="script.script" th:text="${s.script}" class="form-control" title="Script"
                                                               rows="15"
-                                                              cols="35" wrap="hard"></textarea> <span class="error"
+                                                              cols="35" wrap="off" spellcheck="false"></textarea> <span class="error"
                                                                                                       th:text="${fieldErrors.get('script.script')}"></span>
                                         </td>
                                     </tr>
@@ -214,7 +216,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary cancel_btn" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-secondary submit_btn">Submit</button>
+                        <button type="button" class="btn btn-secondary submit_btn">Save script</button>
                     </div>
                 </div>
             </div>
