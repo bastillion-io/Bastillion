@@ -2,7 +2,7 @@
 
 Contributor: Loophole, LLC
 
-Source Code: https://github.com/bastillion-io/Bastillion
+Source Code: https://github.com/Loophole-LLC/Bastillion
 
 ## Purpose
 

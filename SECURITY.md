@@ -2,7 +2,7 @@
 
 ## Scope
 
-This covers [Bastillion](https://github.com/bastillion-io/Bastillion) itself — the SSH
+This covers [Bastillion](https://github.com/Loophole-LLC/Bastillion) itself — the SSH
 console and key management application in this repo.
 
 It does not cover [loophole.company](https://loophole.company) (the license purchase

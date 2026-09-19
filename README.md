@@ -1,5 +1,5 @@
-![Build](https://github.com/bastillion-io/Bastillion/actions/workflows/github-build.yml/badge.svg)
-![CodeQL](https://github.com/bastillion-io/Bastillion/actions/workflows/codeql-analysis.yml/badge.svg)
+![Build](https://github.com/Loophole-LLC/Bastillion/actions/workflows/github-build.yml/badge.svg)
+![CodeQL](https://github.com/Loophole-LLC/Bastillion/actions/workflows/codeql-analysis.yml/badge.svg)
 ![License](https://img.shields.io/badge/license-Prosperity%203.0.0-blue)
 ![Java](https://img.shields.io/badge/Java-21-orange)
 [![Built with Claude Code](https://img.shields.io/badge/Built%20with-Claude%20Code-D97757?logo=claude&logoColor=white)](https://claude.com/claude-code)
@@ -155,7 +155,7 @@ pricing page when you get the expiry warning.
 ---
 
 ## Installation Options
-**Free:** https://github.com/bastillion-io/Bastillion/releases
+**Free:** https://github.com/Loophole-LLC/Bastillion/releases
 
 ---
 
@@ -177,7 +177,7 @@ apt-get install openjdk-21-jdk
 
 ## Download and Run
 
-Download the latest jar from [Releases](https://github.com/bastillion-io/Bastillion/releases):
+Download the latest jar from [Releases](https://github.com/Loophole-LLC/Bastillion/releases):
 ```bash
 java -jar bastillion-<version>.jar
 ```
@@ -602,7 +602,7 @@ uncommenting:
 - `io.bastillion.manage.util.SystemAudit`
 - `audit-appender`
 
-> https://github.com/bastillion-io/Bastillion/blob/main/src/main/resources/log4j2.xml#L19-L22
+> https://github.com/Loophole-LLC/Bastillion/blob/main/src/main/resources/log4j2.xml#L19-L22
 </details>
 
 <details>

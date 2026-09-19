@@ -3,7 +3,7 @@
   "license": "The Prosperity Public License",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/bastillion-io/Bastillion.git"
+    "url": "git+https://github.com/Loophole-LLC/Bastillion.git"
   },
   "scripts": {
     "build-assets": "node scripts/build-assets.mjs"

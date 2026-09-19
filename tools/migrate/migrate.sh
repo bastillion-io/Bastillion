@@ -20,7 +20,7 @@ shopt -s nullglob
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-JAR_URL="https://github.com/bastillion-io/Bastillion/releases/download/v5.0.0/bastillion-migrate-1.0.0.jar"
+JAR_URL="https://github.com/Loophole-LLC/Bastillion/releases/download/v5.0.0/bastillion-migrate-1.0.0.jar"
 JAR_SHA256="0b2d315c4785a2b7edf91f917d2910faea524bcf65c814cd9777772368b85aa6"
 JAR_CACHE="$SCRIPT_DIR/target/bastillion-migrate-1.0.0.jar"
 
